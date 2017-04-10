@@ -67,17 +67,19 @@ Fliplet.Widget.instance('form-builder', function (data) {
 
         this.isSending = true;
 
-        Fliplet.Hooks.run('beforeFormSubmit', formData).then(function () {
-          return Fliplet.DataSources.connect(data.dataSourceId);
-        }).then(function (connection) {
-          return connection.insert(formData);
-        }).then(function () {
-          $vm.reset();
-        }, function (err) {
-          console.error(err);
-          $vm.error = err.message || err.description || err;
-          $vm.isSending = false;
-        });
+        if (data.dataSourceId) {
+          Fliplet.Hooks.run('beforeFormSubmit', formData).then(function () {
+            return Fliplet.DataSources.connect(data.dataSourceId);
+          }).then(function (connection) {
+            return connection.insert(formData);
+          }).then(function () {
+            $vm.reset();
+          }, function (err) {
+            console.error(err);
+            $vm.error = err.message || err.description || err;
+            $vm.isSending = false;
+          });
+        }
 
         // We might use this code to save the form data locally when going away from the page
         // $(window).unload(function onWindowUnload() {
