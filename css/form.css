@@ -424,6 +424,16 @@ textarea.form-control {
   position: relative;
   overflow: hidden;
   padding-right: 40px;
+  padding-left: 40px;
+}
+
+.fileUpload > canvas {
+  position: absolute;
+  width: 36px;
+  height: 36px;
+  top: 4px;
+  left: 4px;
+  border-radius: 5px;
 }
 
 .fileUpload .fa {
@@ -437,10 +447,39 @@ textarea.form-control {
   margin-top: -10px;
   right: 10px;
   color: #FFF;
+  opacity: 0.5;
 }
 
 .fileUpload input[type="file"] {
   display: none;
+}
+
+.file-thumbnail-helper {
+  position: absolute;
+  height: 34px;
+  width: 30px;
+  right: 6px;
+  top: 50%;
+  margin-top: -17px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.file-thumbnail-helper img {
+  max-width: 100%;
+  max-height: 100%;
+}
+
+.file-name-helper {
+  margin-top: -10px;
+  font-size: 12px;
+}
+@media screen and (min-width: 640px) {
+  .file-name-helper {
+    margin-top: 0;
+    display: inline-block;
+  }
 }
 /* START RATING */
 .star-rating {

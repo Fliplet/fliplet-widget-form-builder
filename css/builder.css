@@ -294,6 +294,15 @@ label.fileUpload {
   color: #fff;
 }
 
+.fileUpload > canvas {
+  position: absolute;
+  width: 36px;
+  height: 36px;
+  top: 4px;
+  left: 4px;
+  border-radius: 5px;
+}
+
 .fileUpload .fa {
   display: block;
   position: absolute;
@@ -305,6 +314,7 @@ label.fileUpload {
   margin-top: -10px;
   right: 10px;
   color: #FFF;
+  opacity: 0.5;
 }
 
 .fileUpload input[type="file"] {

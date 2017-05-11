@@ -11,7 +11,7 @@ this["Fliplet"]["Widget"]["Templates"]["templates.configurations.email"] = Handl
 },"useData":true});
 
 this["Fliplet"]["Widget"]["Templates"]["templates.configurations.file"] = Handlebars.template({"compiler":[7,">= 4.0.0"],"main":function(container,depth0,helpers,partials,data) {
-    return "<div class=\"form-group\">\n  <label>Allowed files</label>\n  <label for=\"allow-files\" class=\"select-proxy-display\">\n    <span class=\"icon fa fa-chevron-down\"></span>\n    <span class=\"select-value-proxy\">All files</span>\n    <select class=\"form-control hidden-select\" id=\"allow-files\" v-model=\"accept\">\n      <option value=\"\">All files</option>\n      <option value=\"image/gif, image/jpg, image/jpeg, image/tiff, image/png\">Images only</option>\n    </select>\n  </label>\n</div>\n";
+    return "\n";
 },"useData":true});
 
 this["Fliplet"]["Widget"]["Templates"]["templates.configurations.form-result"] = Handlebars.template({"compiler":[7,">= 4.0.0"],"main":function(container,depth0,helpers,partials,data) {
@@ -33,6 +33,10 @@ this["Fliplet"]["Widget"]["Templates"]["templates.configurations.form"] = Handle
 
 this["Fliplet"]["Widget"]["Templates"]["templates.configurations.horizontalRule"] = Handlebars.template({"compiler":[7,">= 4.0.0"],"main":function(container,depth0,helpers,partials,data) {
     return "";
+},"useData":true});
+
+this["Fliplet"]["Widget"]["Templates"]["templates.configurations.image"] = Handlebars.template({"compiler":[7,">= 4.0.0"],"main":function(container,depth0,helpers,partials,data) {
+    return "<div class=\"form-group\">\n  <label>Custom width</label>\n  <input class=\"form-control\" type=\"number\" v-model.trim=\"customWidth\" />\n</div>\n<div class=\"form-group\">\n  <label>Custom height</label>\n  <input class=\"form-control\" type=\"number\" v-model.trim=\"customHeight\" />\n</div>\n\n";
 },"useData":true});
 
 this["Fliplet"]["Widget"]["Templates"]["templates.configurations.input"] = Handlebars.template({"compiler":[7,">= 4.0.0"],"main":function(container,depth0,helpers,partials,data) {

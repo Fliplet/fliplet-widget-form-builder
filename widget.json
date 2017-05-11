@@ -33,6 +33,8 @@
       "js/components/select.js",
       "js/components/radio.js",
       "js/components/checkbox.js",
+      "js/components/image.js",
+      "js/components/file.js",
       "js/components/title.js",
       "js/components/paragraph.js",
       "js/components/buttons.js",
@@ -44,6 +46,8 @@
       "js/configurations/select.js",
       "js/configurations/radio.js",
       "js/configurations/checkbox.js",
+      "js/configurations/image.js",
+      "js/configurations/file.js",
       "js/configurations/title.js",
       "js/configurations/paragraph.js",
       "js/configurations/buttons.js",
@@ -62,6 +66,7 @@
       "font-awesome"
     ],
     "assets": [
+      "vendor/load-image.all.min.js",
       "js/build.templates.js",
       "js/libs/core.js",
 
@@ -71,6 +76,8 @@
       "js/components/select.js",
       "js/components/radio.js",
       "js/components/checkbox.js",
+      "js/components/image.js",
+      "js/components/file.js",
       "js/components/title.js",
       "js/components/paragraph.js",
       "js/components/buttons.js",

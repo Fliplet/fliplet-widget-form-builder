@@ -1,5 +1,7 @@
 <label :for="name" class="fileUpload btn btn-primary">
-  <i class="fa fa-plus" aria-hidden="true"></i> Choose file
-  <input type="file" ref="fileInput" :id="name" :name="name" class="input-file selectfile" :accept="accept" :required="required" v-on:change="updateValue()">
+  <i class="fa fa-plus" aria-hidden="true"></i> <span v-if="selectedFileName">Replace file</span><span v-else>Choose file</span>
+  <input type="file" ref="fileInput" :id="name" :name="name" class="input-file selectfile" :required="required" v-on:change="updateValue()">
 </label>
-<span class="text-helper file-name-helper">\{{ value }}</span>
+<template v-if="selectedFileName">
+  <div class="file-name-helper">Chosen file: <strong>\{{ selectedFileName }}</strong></div>
+<template>

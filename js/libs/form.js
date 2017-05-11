@@ -36,8 +36,8 @@ Fliplet.Widget.instance('form-builder', function(data) {
         this.isSending = false;
         this.isSent = true;
       },
-      onInput: function (fieldName, value) {
-        this.fields.some(function (field) {
+      onInput: function(fieldName, value) {
+        this.fields.some(function(field) {
           if (field.name === fieldName) {
             field.value = value;
             return true;
@@ -46,14 +46,13 @@ Fliplet.Widget.instance('form-builder', function(data) {
       },
       onSubmit: function() {
         var $vm = this;
-        var hasFileInputs = this.fields.some(function(field) {
-          return isFile(field.value);
-        });
-        var formData = hasFileInputs ? (new FormData()) : {};
+        var formData = {};
 
         function appendField(name, value) {
-          if (hasFileInputs) {
-            formData.append(name, value);
+          if (Array.isArray(formData[name])) {
+            formData[name].push(value);
+          } else if (typeof formData[name] !== 'undefined') {
+            formData[name] = [formData[name], value];
           } else {
             formData[name] = value;
           }

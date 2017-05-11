@@ -5,6 +5,15 @@ Fliplet.FormBuilder.field('file', {
     accept: {
       type: String,
       default: ''
+    },
+    selectedFileName: {
+      type: String,
+      default: ''
+    }
+  },
+  computed: {
+    selectedFileName: function() {
+      return this.value && this.value[0].name
     }
   },
   methods: {
