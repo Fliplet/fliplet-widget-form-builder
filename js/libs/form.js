@@ -37,7 +37,7 @@ Fliplet.Widget.instance('form-builder', function(data) {
       fields.forEach(function(field) {
         var savedValue = progress[field.name];
 
-        if (typeof savedValue !== 'undefined') {
+        if (typeof savedValue !== 'undefined' && field.populateOnUpdate !== false) {
           field.value = savedValue;
         }
       });
