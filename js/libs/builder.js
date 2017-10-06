@@ -96,6 +96,7 @@ var app = new Vue({
       dataSources: [],
       section: 'form', // form or settings
       settings: formSettings,
+      widgetInstanceId: formSettings.id,
       templates: [],
       chooseTemplate: !formSettings.templateId,
       toChangeTemplate: false,
@@ -292,36 +293,44 @@ var app = new Vue({
 
         if ($vm.settings.dataStore.indexOf('dataSource') > -1 || $vm.settings.dataSourceId) {
           var newHook = {
-            widgetInstanceId: $vm.settings.id,
+            widgetInstanceId: $vm.widgetInstanceId,
             runOn: ['insert'],
             type: 'email',
-            payload: $vm.settings.emailTemplateAdd
+            payload: $vm.emailTemplateAdd
           };
 
           Fliplet.DataSources.getById($vm.settings.dataSourceId).then(function(dataSource) {
-            if (dataSource.hooks.length) {
-              // Update existing hook
-              var currentHook = _.find(dataSource.hooks, function(o) {
-                return o.widgetInstanceId == $vm.settings.id;
-              });
-
-              currentHook.payload = $vm.settings.emailTemplateAdd;
-
-              var index = _.findIndex(dataSource.hooks, function(o) {
-                return o.widgetInstanceId == $vm.settings.id;
-              });
-              dataSource.hooks.splice(index, 1, currentHook);
-
-              Fliplet.DataSources.update($vm.settings.dataSourceId, {
-                hooks: dataSource.hooks
-              });
-            } else {
-              // Add new hook
+            if (!dataSource.hooks.length) {
+              // No hooks found at all. Add new hook.
               dataSource.hooks.push(newHook);
-              Fliplet.DataSources.update($vm.settings.dataSourceId, {
+              return Fliplet.DataSources.update($vm.settings.dataSourceId, {
                 hooks: dataSource.hooks
               });
             }
+
+            // Update existing hook
+            var currentHook = _.find(dataSource.hooks, function(o) {
+              return o.widgetInstanceId == $vm.widgetInstanceId;
+            });
+            
+            if (!currentHook) {
+              // Current hook not found. Add new hook.
+              dataSource.hooks.push(newHook);
+              return Fliplet.DataSources.update($vm.settings.dataSourceId, {
+                hooks: dataSource.hooks
+              });
+            }
+
+            currentHook.payload = $vm.emailTemplateAdd;
+
+            var index = _.findIndex(dataSource.hooks, function(o) {
+              return o.widgetInstanceId == $vm.widgetInstanceId;
+            });
+            dataSource.hooks.splice(index, 1, currentHook);
+
+            return Fliplet.DataSources.update($vm.settings.dataSourceId, {
+              hooks: dataSource.hooks
+            });
           });
         }
 
@@ -353,36 +362,44 @@ var app = new Vue({
 
         if ($vm.settings.dataStore.indexOf('editDataSource') > -1 || $vm.settings.dataSourceId) {
           var newHook = {
-            widgetInstanceId: $vm.settings.id,
+            widgetInstanceId: $vm.widgetInstanceId,
             runOn: ['update'],
             type: 'email',
-            payload: $vm.settings.emailTemplateEdit
+            payload: $vm.emailTemplateEdit
           };
 
           Fliplet.DataSources.getById($vm.settings.dataSourceId).then(function(dataSource) {
-            if (dataSource.hooks.length) {
-              // Update existing hook
-              var currentHook = _.find(dataSource.hooks, function(o) {
-                return o.widgetInstanceId == $vm.settings.id;
-              });
-
-              currentHook.payload = $vm.settings.emailTemplateEdit;
-
-              var index = _.findIndex(dataSource.hooks, function(o) {
-                return o.widgetInstanceId == $vm.settings.id;
-              });
-              dataSource.hooks.splice(index, 1, currentHook);
-
-              Fliplet.DataSources.update($vm.settings.dataSourceId, {
-                hooks: dataSource.hooks
-              });
-            } else {
-              // Add new hook
+            if (!dataSource.hooks.length) {
+              // No hooks found at all. Add new hook.
               dataSource.hooks.push(newHook);
-              Fliplet.DataSources.update($vm.settings.dataSourceId, {
+              return Fliplet.DataSources.update($vm.settings.dataSourceId, {
                 hooks: dataSource.hooks
               });
             }
+
+            // Update existing hook
+            var currentHook = _.find(dataSource.hooks, function(o) {
+              return o.widgetInstanceId == $vm.widgetInstanceId;
+            });
+            
+            if (!currentHook) {
+              // Current hook not found. Add new hook.
+              dataSource.hooks.push(newHook);
+              return Fliplet.DataSources.update($vm.settings.dataSourceId, {
+                hooks: dataSource.hooks
+              });
+            }
+
+            currentHook.payload = $vm.emailTemplateEdit;
+
+            var index = _.findIndex(dataSource.hooks, function(o) {
+              return o.widgetInstanceId == $vm.widgetInstanceId;
+            });
+            dataSource.hooks.splice(index, 1, currentHook);
+
+            return Fliplet.DataSources.update($vm.settings.dataSourceId, {
+              hooks: dataSource.hooks
+            });
           });
         }
 
@@ -631,7 +648,7 @@ var app = new Vue({
           Fliplet.DataSources.getById($vm.settings.dataSourceId).then(function(dataSource) {
             if (dataSource.hooks.length) {
               var index = _.findIndex(dataSource.hooks, function(o) {
-                return o.widgetInstanceId == $vm.settings.id;
+                return o.widgetInstanceId == $vm.widgetInstanceId;
               });
               dataSource.hooks.splice(index, 1);
 
@@ -653,7 +670,7 @@ var app = new Vue({
           Fliplet.DataSources.getById($vm.settings.dataSourceId).then(function(dataSource) {
             if (dataSource.hooks.length) {
               var index = _.findIndex(dataSource.hooks, function(o) {
-                return o.widgetInstanceId == $vm.settings.id;
+                return o.widgetInstanceId == $vm.widgetInstanceId;
               });
               dataSource.hooks.splice(index, 1);
 
