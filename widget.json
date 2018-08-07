@@ -29,6 +29,10 @@
       "vendor/bootstrap-datepicker3.css",
       "vendor/bootstrap-datepicker.js",
       "vendor/signature-pad.js",
+      "vendor/summernote.min.js",
+      "vendor/summernote-cleaner.js",
+      "vendor/summernote-ext-rtl.js",
+      "vendor/summernote.css",
 
       "js/components/input.js",
       "js/components/email.js",
@@ -50,6 +54,7 @@
       "js/components/date.js",
       "js/components/time.js",
       "js/components/signature.js",
+      "js/components/wysiwyg.js",
 
       "js/configurations/input.js",
       "js/configurations/email.js",
@@ -71,6 +76,7 @@
       "js/configurations/date.js",
       "js/configurations/time.js",
       "js/configurations/signature.js",
+      "js/configurations/wysiwyg.js",
 
       "js/libs/builder.js",
       "css/builder.css"
@@ -84,6 +90,7 @@
       "vue.js",
       "fliplet-communicate",
       "fliplet-datasources",
+      "fliplet-media",
       "font-awesome",
       "moment",
       "fliplet-session"
@@ -95,6 +102,13 @@
       "vendor/bootstrap-datepicker3.css",
       "vendor/bootstrap-datepicker.js",
       "vendor/signature-pad.js",
+      "vendor/summernote.min.js",
+      "vendor/summernote-cleaner.js",
+      "vendor/summernote-ext-rtl.js",
+      "vendor/summernote.css",
+      "font/summernote.eot",
+      "font/summernote.ttf",
+      "font/summernote.woff",
 
       "js/components/input.js",
       "js/components/email.js",
@@ -116,6 +130,7 @@
       "js/components/date.js",
       "js/components/time.js",
       "js/components/signature.js",
+      "js/components/wysiwyg.js",
 
       "js/libs/form.js",
       "css/form.css"

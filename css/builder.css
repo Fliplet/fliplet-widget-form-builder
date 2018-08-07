@@ -655,7 +655,7 @@ label.fileUpload {
   border-radius: 0;
 }
 
-.panel-default>.panel-heading {
+.panel-default>.form-panel-heading {
   padding: 0;
   border-radius: 0;
   color: #ffffff;
@@ -672,11 +672,11 @@ label.fileUpload {
   pointer-events: none;
 }
 
-.panel-default>.panel-heading+.panel-collapse {
+.panel-default>.form-panel-heading+.panel-collapse {
   overflow: auto;
 }
 
-.panel-default>.panel-heading+.panel-collapse>.panel-body {
+.panel-default>.form-panel-heading+.panel-collapse>.panel-body {
   border-top-color: #14505e;
   overflow: auto;
   display: none;
@@ -690,7 +690,7 @@ label.fileUpload {
   padding: 0;
 }
 
-.panel-heading .chevron-icon {
+.form-panel-heading .chevron-icon {
   position: absolute;
   top: 0;
   right: 0;
@@ -701,7 +701,7 @@ label.fileUpload {
   pointer-events: none;
 }
 
-.panel-heading .chevron-icon i {
+.form-panel-heading .chevron-icon i {
   position: absolute;
   top: 0;
   bottom: 0;
@@ -712,16 +712,16 @@ label.fileUpload {
   transition: transform 0.25s ease;
 }
 
-.panel-heading .panel-title.collapsed+.chevron-icon i {
+.form-panel-heading .panel-title.collapsed+.chevron-icon i {
   transform: rotate(180deg);
 }
 
-.panel .panel-heading[role="tab"] .panel-title {
+.panel .form-panel-heading[role="tab"] .panel-title {
   font-size: 14px;
   padding: 10px 35px 10px 10px;
 }
 
-.panel .panel-heading .panel-title {
+.panel .form-panel-heading .panel-title {
   padding: 0;
 }
 

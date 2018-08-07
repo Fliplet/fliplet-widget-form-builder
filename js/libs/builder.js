@@ -41,7 +41,7 @@ function attachObservers() {
   var $accordion = $('#componentsAccordion')
 
   var recalculateHeight = function(obj) {
-    var $panelHeading = $('.panel-heading')
+    var $panelHeading = $('.form-panel-heading')
     var tabsHeight = $panelHeading.outerHeight() * $panelHeading.length
     var borders = $panelHeading.length * 3
     var wrapperHeight = $('.components-list .form-html').innerHeight() - tabsHeight

@@ -80,7 +80,7 @@
       </label>
 
       <div class="panel panel-warning">
-        <div class="panel-heading">
+        <div class="form-panel-heading">
           <h3 class="panel-title">Are you sure you want to load a new form?</h3>
         </div>
         <div class="panel-body">
@@ -321,7 +321,7 @@
               <form class="form-html">
                 <div class="panel-group" id="componentsAccordion" role="tablist" aria-multiselectable="true">
                   <div class="panel panel-default" v-for="(category, idx) in categories">
-                    <div class="panel-heading" role="tab">
+                    <div class="form-panel-heading" role="tab">
                       <h4 class="panel-title" v-bind:class="{ collapsed: idx !== 0}" role="button" data-toggle="collapse" data-parent="#componentsAccordion" :href="'#category' + idx" :aria-expanded="idx === 0" :aria-controls="'category' + idx">
                       \{{ category.name }}
                       </h4>
