@@ -3,14 +3,14 @@
     <i class="fa fa-clock-o"></i>
   </div>
 
-  <input 
+  <input
     type="time"
     v-model="value"
     v-on:change="updateValue()"
     :name="name"
     :id="name"
     :placeholder="placeholder"
-    :required="required"
+    :required="required && !hidden"
     class="form-control"
   />
 </div>

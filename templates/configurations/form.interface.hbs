@@ -46,6 +46,22 @@
       </div>
     </div>
 
+    <div class="form-group">
+        <div class="col-xs-12">
+          <label class="control-label" for="field-label">Field visibility</label>
+        </div>
+        <div class="col-xs-12">
+          <label for="field-visibility" class="select-proxy-display">
+            <span class="icon fa fa-chevron-down"></span>
+            <span class="select-value-proxy">2</span>
+            <select class="form-control hidden-select" id="field-visibility" v-model="hidden">
+              <option :value="false">Show this field</option>
+              <option :value="true">Hide this field</option>
+            </select>
+          </label>
+        </div>
+      </div>
+
     {{#hasOptions}}
       <div class="form-group cleafix">
         <div class="col-xs-12">

@@ -238,10 +238,19 @@ Fliplet.Widget.instance('form-builder', function(data) {
         return found;
       },
       onSubmit: function() {
-        Fliplet.Analytics.trackEvent({
-          category: 'form',
-          action: 'submit'
+        // Manually check hidden fields that are required
+        var requiredError = _.find(this.fields, function(field) {
+          if (field.required && field.hidden && !field.value) {
+            return true;
+          }
         });
+
+        if (requiredError) {
+          requiredError = 'The field "' + requiredError.label + '" is required.';
+          this.error = requiredError;
+          Fliplet.UI.Toast(requiredError);
+          return;
+        }
 
         var $vm = this;
         var formData = {};
@@ -270,11 +279,16 @@ Fliplet.Widget.instance('form-builder', function(data) {
           return;
         }
 
+        Fliplet.Analytics.trackEvent({
+          category: 'form',
+          action: 'submit'
+        });
+
         this.fields.forEach(function(field) {
           var value = field.value;
           var type = field._type;
 
-          if (field._submit === false || !field.enabled) {
+          if (field._submit === false || !field.enabled || type === 'buttons') {
             return;
           }
 
@@ -597,6 +611,12 @@ Fliplet.Widget.instance('form-builder', function(data) {
                     }
                   });
                 }
+              },
+              show: function () {
+                field.hidden = false;
+              },
+              hide: function () {
+                field.hidden = true;
               },
               options: function (values) {
                 if (!Array.isArray(values)) {

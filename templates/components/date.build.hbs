@@ -3,14 +3,14 @@
     <i class="fa fa-calendar"></i>
   </div>
 
-  <input 
+  <input
   	type="text"
   	v-model="value"
   	v-on:change="updateValue()"
   	:name="name"
   	:id="name"
   	:placeholder="placeholder"
-  	:required="required"
+  	:required="required && !hidden"
   	class="date-picker form-control"
   />
 </div>
@@ -19,14 +19,14 @@
     <i class="fa fa-calendar"></i>
   </div>
 
-  <input 
+  <input
     type="date"
     v-model="value"
     v-on:input="updateValue()"
     :name="name"
     :id="name"
     :placeholder="placeholder"
-    :required="required"
+    :required="required && !hidden"
     class="form-control"
   />
 </div>

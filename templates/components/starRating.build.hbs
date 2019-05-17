@@ -1,6 +1,6 @@
 <div class="inverse-direction">
   <template v-for="(option, index) in values">
-    <input class="rating-input" :name="name" type="radio" :id="name + '-' + index" v-model="value" :value="option.id" v-on:change="updateValue()" :required="required">
+    <input class="rating-input" :name="name" type="radio" :id="name + '-' + index" v-model="value" :value="option.id" v-on:change="updateValue()" :required="required && !hidden">
     <label class="rating-star" :for="name + '-' + index">
       <i class="fa fa-star-o"></i>
       <i class="fa fa-star"></i>

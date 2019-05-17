@@ -1,6 +1,6 @@
 <template v-for="(option, index) in options">
   <div class="radio radio-icon">
-    <input type="radio" :id="name + '-' + index" :name="name" v-model="value" :required="required" :value="option.id" v-on:change="updateValue()" >
+    <input type="radio" :id="name + '-' + index" :name="name" v-model="value" :required="required && !hidden" :value="option.id" v-on:change="updateValue()" >
     <label :for="name + '-' + index">
       <span class="check"><i class="fa fa-circle"></i></span> \{{ option.id }}
     </label>

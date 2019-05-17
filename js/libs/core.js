@@ -106,6 +106,10 @@ Fliplet.FormBuilder = (function() {
           type: Boolean,
           default: true
         },
+        hidden: {
+          type: Boolean,
+          default: false
+        },
         value: {
           type: String,
           default: ''
