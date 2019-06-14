@@ -68,7 +68,7 @@ Fliplet.FormBuilder.field('image', {
       $(this.$refs.imageInput).parents('.form-group').removeClass('has-error');
 
       if (!this.required) {
-        if(this.value.length && !this.isImageValid){
+        if (this.value.length && !this.isImageValid) {
           $(this.$refs.imageInput).parents('.form-group').addClass('has-error');
           return Promise.reject('Field [' + this.name + '] height and width exceeded.');
         }
@@ -80,7 +80,7 @@ Fliplet.FormBuilder.field('image', {
 
         return Promise.reject('Please fill in required fields.');
       }
-      if(!this.isImageValid){
+      if (!this.isImageValid) {
         $(this.$refs.imageInput).parents('.form-group').addClass('has-error');
         return Promise.reject('Field [' + this.name + '] height and width exceeded.');
       }
@@ -158,9 +158,9 @@ Fliplet.FormBuilder.field('image', {
 
       var image = new Image();
       image.onload = function () {
-        if(this.height > $vm.customHeight || this.width > $vm.customWidth){
+        if (this.height > $vm.customHeight || this.width > $vm.customWidth) {
           $vm.isImageValid = false;
-        }else{
+        } else {
           $vm.isImageValid = true;
         }
       };
