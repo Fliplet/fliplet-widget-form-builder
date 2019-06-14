@@ -70,7 +70,7 @@ Fliplet.FormBuilder.field('image', {
       if (!this.required) {
         if (this.value.length && !this.isImageValid) {
           $(this.$refs.imageInput).parents('.form-group').addClass('has-error');
-          return Promise.reject('Field [' + this.name + '] height and width exceeded.');
+          return Promise.reject('Field [' + this.name + '] height or width exceeded.');
         }
         return;
       }
@@ -82,7 +82,7 @@ Fliplet.FormBuilder.field('image', {
       }
       if (!this.isImageValid) {
         $(this.$refs.imageInput).parents('.form-group').addClass('has-error');
-        return Promise.reject('Field [' + this.name + '] height and width exceeded.');
+        return Promise.reject('Field [' + this.name + '] height or width exceeded.');
       }
     },
     requestPicture: function(fileInput) {
