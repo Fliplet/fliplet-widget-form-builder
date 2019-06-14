@@ -42,7 +42,8 @@ Fliplet.FormBuilder.field('image', {
   data: {
     boundingRect: undefined,
     cameraSource: undefined,
-    forcedClick: false
+    forcedClick: false,
+    isImageValid: undefined
   },
   created: function() {
     Fliplet.FormBuilder.on('reset', this.onReset);
@@ -67,6 +68,10 @@ Fliplet.FormBuilder.field('image', {
       $(this.$refs.imageInput).parents('.form-group').removeClass('has-error');
 
       if (!this.required) {
+        if(this.value.length && !this.isImageValid){
+          $(this.$refs.imageInput).parents('.form-group').addClass('has-error');
+          return Promise.reject('Field [' + this.name + '] height and width exceeded.');
+        }
         return;
       }
 
@@ -74,6 +79,10 @@ Fliplet.FormBuilder.field('image', {
         $(this.$refs.imageInput).parents('.form-group').addClass('has-error');
 
         return Promise.reject('Please fill in required fields.');
+      }
+      if(!this.isImageValid){
+        $(this.$refs.imageInput).parents('.form-group').addClass('has-error');
+        return Promise.reject('Field [' + this.name + '] height and width exceeded.');
       }
     },
     requestPicture: function(fileInput) {
@@ -146,6 +155,17 @@ Fliplet.FormBuilder.field('image', {
     },
     processImage: function(file, addThumbnail) {
       var $vm = this;
+
+      var image = new Image();
+      image.onload = function () {
+        if(this.height > $vm.customHeight || this.width > $vm.customWidth){
+          $vm.isImageValid = false;
+        }else{
+          $vm.isImageValid = true;
+        }
+      };
+      image.src = window.URL.createObjectURL(file);
+
       var mimeType = file.type || 'image/png';
       loadImage.parseMetaData(file, function(data) {
         loadImage(
