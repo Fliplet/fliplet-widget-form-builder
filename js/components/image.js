@@ -80,6 +80,7 @@ Fliplet.FormBuilder.field('image', {
 
         return Promise.reject('Please fill in required fields.');
       }
+      
       if (!this.isImageValid) {
         $(this.$refs.imageInput).parents('.form-group').addClass('has-error');
         return Promise.reject('Field [' + this.name + '] height or width exceeded.');
