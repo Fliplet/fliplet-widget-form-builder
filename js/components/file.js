@@ -40,20 +40,28 @@ Fliplet.FormBuilder.field('file', {
       return _.map(this.selectedFiles, 'name').join(', ');
     }
   },
+  mounted: function () {
+    this.onReset();
+  },
   methods: {
+    onReset: function() {
+      this.selectedFiles = [];
+      this.selectedFileName = '';
+      
+      this.$emit('_input', this.name, this.selectedFiles);
+    },
     updateValue: function() {
       var $vm = this;
-
-      this.selectedFiles.splice(0, this.selectedFiles.length);
-
-      var operations = [];
-
-      for (var i = 0; i < this.$refs.fileInput.files.length; i++) {
-        var file = this.$refs.fileInput.files.item(i);
-        this.selectedFiles.push(file);
+      var files = $vm.$refs.fileInput.files;
+      
+      $vm.selectedFiles.splice(0, $vm.selectedFiles.length);
+      
+      for (var i = 0; i < files.length; i++) {
+        var file = files.item(i);
+        $vm.selectedFiles.push(file);
       }
-
-      $vm.$emit('_input', $vm.name, this.selectedFiles);
+      
+      $vm.$emit('_input', $vm.name, $vm.selectedFiles);
     }
   }
 });
