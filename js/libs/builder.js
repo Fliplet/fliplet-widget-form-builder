@@ -260,7 +260,9 @@ var app = new Vue({
 
       if (name === '') {
         this.settings.dataSourceId = '';
-        alert('You must enter a data source name');
+        Fliplet.Modal.alert({
+          message: 'You must enter a data source name'
+        });
         return;
       }
 
