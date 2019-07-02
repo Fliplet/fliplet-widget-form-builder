@@ -37,23 +37,36 @@ Fliplet.FormBuilder.field('file', {
   },
   computed: {
     selectedFileName: function() {
-      return _.map(this.selectedFiles, 'name').join(', ');
+      return _.map(this.value, 'name').join(', ');
     }
   },
+  created: function() {
+    Fliplet.FormBuilder.on('reset', this.onReset);
+  },
+  destroyed: function() {
+    Fliplet.FormBuilder.off('reset', this.onReset);
+  },
   methods: {
+    onReset: function() {
+      var $vm = this;
+      
+      $vm.value = [];
+      $vm.selectedFileName = '';
+      
+      $vm.$emit('_input', $vm.name, $vm.value);
+    },
     updateValue: function() {
       var $vm = this;
-
-      this.selectedFiles.splice(0, this.selectedFiles.length);
-
-      var operations = [];
-
-      for (var i = 0; i < this.$refs.fileInput.files.length; i++) {
-        var file = this.$refs.fileInput.files.item(i);
-        this.selectedFiles.push(file);
+      var files = $vm.$refs.fileInput.files;
+  
+      $vm.value.splice(0, $vm.value.length);
+  
+      for (var i = 0; i < files.length; i++) {
+        var file = files.item(i);
+        $vm.value.push(file);
       }
 
-      $vm.$emit('_input', $vm.name, this.selectedFiles);
+      $vm.$emit('_input', $vm.name, $vm.value);
     }
   }
 });

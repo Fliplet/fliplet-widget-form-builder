@@ -49,11 +49,10 @@ Fliplet.FormBuilder.field('image', {
     Fliplet.Hooks.on('beforeFormSubmit', this.onBeforeSubmit);
   },
   mounted: function () {
-    var $vm = this;
-  
-    $vm.value.forEach(function (image, index) {
-      $vm.addThumbnailToCanvas(image, index);
-    });
+    this.drawImagesAfterInit();
+  },
+  updated: function() {
+    this.drawImagesAfterInit();
   },
   destroyed: function() {
     Fliplet.FormBuilder.off('reset', this.onReset);
@@ -221,6 +220,13 @@ Fliplet.FormBuilder.field('image', {
       for (var i = 0; i < files.length; i++) {
         this.processImage(files.item(i), true);
       }
+    },
+    drawImagesAfterInit: function() {
+      var $vm = this;
+    
+      $vm.value.forEach(function (image, index) {
+        $vm.addThumbnailToCanvas(image, index);
+      });
     },
     drawImageOnCanvas: function(img, canvas) {
       var imgWidth = img.width;
