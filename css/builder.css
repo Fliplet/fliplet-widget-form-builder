@@ -378,15 +378,29 @@ nav>.btn {
   padding-top: 10px;
 }
 
+.fileUpload.file-input .row {
+  display: flex;
+  flex-wrap: wrap;
+}
+.fileUpload.file-input .row > div {
+  float: none;
+}
+
 .fileUpload .canvas-holder {
   position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
+  min-height: 82px;
   padding: 5px 10px;
   background: rgba(255,255,255,0.5);
   border: 1px solid rgba(0,0,0,0.3);
   border-radius: 3px;
+}
+
+.fileUpload.file-input .canvas-holder {
+  min-height: calc(100% - 34px);
+  margin-bottom: 10px;
 }
 
 .fileUpload .row {
@@ -446,7 +460,7 @@ nav>.btn {
   position: relative;
 }
 
-.fileUpload .fa {
+.fileUpload .fa:not(.fa-file) {
   display: block;
   position: absolute;
   width: 20px;
@@ -467,7 +481,19 @@ nav>.btn {
   pointer-events: none;
 }
 
-/* STAR RATING */
+.fileUpload .file-icon {
+  font-size: 40px;
+}
+
+.fileUpload .file-name {
+  display: block;
+  overflow: hidden;
+  max-width: 100%;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+  /* STAR RATING */
 .component [_type="flStarRating"] .inverse-direction {
   overflow: hidden;
   display: inline-block;
@@ -678,10 +704,14 @@ nav>.btn {
     padding-top: 10px;
   }
 
-    .fileUpload .canvas-holder canvas {
-        width: 100%;
-        height: 130px;
-    }
+  .fileUpload .canvas-holder {
+    min-height: 130px;
+  }
+
+  .fileUpload .canvas-holder canvas {
+      width: 100%;
+      height: 130px;
+  }
 }
 
 .form-settings h3 {
