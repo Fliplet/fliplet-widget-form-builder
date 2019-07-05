@@ -2,7 +2,7 @@
   <i class="fa fa-plus" aria-hidden="true"></i>
   <span v-if="selectedFileName">Replace file</span>
   <span v-else>Choose file</span>
-  <input type="file" ref="fileInput" :id="name" :name="name" :data-folder-id="mediaFolderId" class="input-file selectfile" :required="required" v-on:change="updateValue()" multiple>
+  <input type="file" ref="fileInput" :id="_elementId" :name="name" :data-folder-id="mediaFolderId" class="input-file selectfile" :required="required" v-on:change="updateValue()" multiple>
 </label>
 <template v-if="selectedFileName">
   <div class="file-name-helper">Chosen file(s): <strong>\{{ selectedFileName }}</strong></div>

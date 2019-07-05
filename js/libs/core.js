@@ -85,6 +85,10 @@ Fliplet.FormBuilder = (function() {
         return this.showLabel || this.showLabel === undefined;
       };
 
+      component.computed._elementId = function() {
+        return this.name + '-' + this.$parent.$el.dataset.formBuilderId;
+      }
+
       component.template = templates['templates.components.field']({
         template: template()
       });
@@ -206,7 +210,7 @@ Fliplet.FormBuilder = (function() {
 
         return '';
       };
-  
+
       component.computed._fieldLabelError = function() {
         if (!this.label) {
           return 'Please provide a Field name & label';
@@ -288,7 +292,7 @@ Fliplet.FormBuilder = (function() {
       if (!component.methods.openFilePicker) {
         component.methods.openFilePicker = component.methods._openFilePicker;
       }
-
+      
       component.methods._openFileManager = function() {
         var $vm = this;
 

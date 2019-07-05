@@ -1,7 +1,7 @@
 <template v-for="(option, index) in options">
   <div class="checkbox checkbox-icon">
-    <input type="checkbox" :id="name + '-' + index" :name="name" v-model="value" :value="option.id" :required="isRequired" v-on:change="updateValue()">
-    <label :for="name + '-' + index">
+    <input type="checkbox" :id="_elementId + '-' + index" :name="name" v-model="value" :value="option.id" :required="isRequired" v-on:change="updateValue()">
+    <label :for="_elementId + '-' + index">
       <span class="check"><i class="fa fa-check"></i></span> \{{ option.label || option.id }}
     </label>
   </div>

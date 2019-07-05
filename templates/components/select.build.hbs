@@ -1,5 +1,5 @@
 <label :for="name" class="select-proxy-display">
-  <select class="form-control hidden-select" :name="name" :id="name" v-model="value" :required="required" v-on:change="updateValue()">
+  <select class="form-control hidden-select" :name="name" :id="_elementId" v-model="value" :required="required" v-on:change="updateValue()">
     <option v-if="placeholder" value="">\{{ placeholder }}</option>
     <option v-for="option in options" :value="option.id" :disabled="option.disabled">
       \{{ option.label || option.id }}
