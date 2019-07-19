@@ -375,7 +375,10 @@ nav>.btn {
 .fileUpload {
   position: relative;
   overflow: hidden;
-  padding-top: 10px;
+}
+
+.fileUpload span {
+  padding-right: 10px;
 }
 
 .fileUpload .canvas-holder {
@@ -452,10 +455,10 @@ nav>.btn {
   width: 20px;
   height: 20px;
   line-height: 20px;
-  font-size: 20px;
+  font-size: 15px;
   top: 50%;
   margin-top: -10px;
-  right: 10px;
+  right: 4px;
   color: #FFF;
   opacity: 0.5;
 }
