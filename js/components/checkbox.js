@@ -42,6 +42,18 @@ Fliplet.FormBuilder.field('checkbox', {
       this.highlightError();
 
       this.$emit('_input', this.name, ordered);
+    },
+    clickHandler: function (option) {
+      var val = option.label || option.id;
+      var index = this.value.indexOf(val);
+
+      if (index === -1) {
+        this.value.push(val);
+      } else {
+        this.value.splice(index, 1);
+      }
+
+      this.updateValue();
     }
   },
   created: function () {

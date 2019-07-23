@@ -23,5 +23,11 @@ Fliplet.FormBuilder.field('radio', {
       rules.value.required = window.validators.required;
     }
     return rules;
+  },
+  methods: {
+    clickHandler: function (option) {
+      this.value = option.label || option.id;
+      this.updateValue();
+    }
   }
 });
