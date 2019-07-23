@@ -37,6 +37,10 @@ Fliplet.FormBuilder.field('image', {
     mediaFolderNavStack: {
       type: Array,
       default: []
+    },
+    hasCorruptedImage: {
+      type: Boolean,
+      default: false
     }
   },
   data: {
@@ -61,13 +65,13 @@ Fliplet.FormBuilder.field('image', {
   methods: {
     removeImage: function(index) {
       var $vm = this;
-  
+
       $vm.value.splice(index, 1);
-  
+
       $vm.value.forEach(function (image, index) {
         $vm.addThumbnailToCanvas(image, index);
       });
-  
+
       $vm.$emit('_input', $vm.name, $vm.value);
     },
     onReset: function() {
@@ -168,6 +172,12 @@ Fliplet.FormBuilder.field('image', {
         };
 
         loadImage(file, function (img) {
+          if (img.type === 'error') {
+            $vm.hasCorruptedImage = true;
+             return;
+          }
+          $vm.hasCorruptedImage = false;
+
           var scaledImage = loadImage.scale(img, options);
           var imgBase64Url = scaledImage.toDataURL(mimeType, $vm.jpegQuality);
 
