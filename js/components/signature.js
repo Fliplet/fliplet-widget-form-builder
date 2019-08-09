@@ -50,7 +50,7 @@ Fliplet.FormBuilder.field('signature', {
 
     Fliplet.FormBuilder.on('reset', this.onReset);
     Fliplet.Hooks.on('beforeFormSubmit', this.onBeforeSubmit);
-    
+
     $(window).on('resize', this.onResize);
     this.onResize();
   },
@@ -62,12 +62,12 @@ Fliplet.FormBuilder.field('signature', {
   methods: {
     onResize: function() {
       var canvas = this.$refs.canvas;
-      
-      if (this.previousClientWidth !== canvas.clientWidth) {
+
+      if ($vm.previousClientWidth !== canvas.clientWidth) {
         canvas.width = canvas.clientWidth;
         canvas.height = canvas.clientHeight;
         this.onReset();
-        this.previousClientWidth = canvas.width;
+        $vm.previousClientWidth = canvas.width;
       }
     },
     onReset: function() {
