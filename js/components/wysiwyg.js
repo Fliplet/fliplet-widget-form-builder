@@ -29,7 +29,7 @@ Fliplet.FormBuilder.field('wysiwyg', {
     value: function (val) {
       // This happens when the value is updated programmatically via the FormBuilder field().val() method
       if (this.editor && val !== this.editor.getContent()) {
-        return this.editor.setContent(val, { format : 'raw' });
+        return this.editor.setContent(val || '', { format : 'raw' });
       }
 
       if (val !== this.value) {
