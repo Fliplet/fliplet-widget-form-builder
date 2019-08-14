@@ -993,3 +993,25 @@ form hr {
     transform: rotate(360deg);
   }
 }
+
+/* Centered increase decrease buttons in the time piker for chrome mac OS */
+
+input[type='time']::-webkit-inner-spin-button,
+input[type='time']::-webkit-outer-spin-button {
+  margin: 1px 0 0 3px;
+}
+
+input[type='time']::-webkit-clear-button {
+  margin-top: 3px;
+}
+
+/* Centered increase decrease buttons in the time piker for chrome windows OS */
+
+.windows input[type='time']::-webkit-inner-spin-button,
+.windows input[type='time']::-webkit-outer-spin-button {
+  margin: 5px 0 0 3px;
+}
+
+.windows input[type='time']::-webkit-clear-button {
+  margin-top: 3px;
+}
