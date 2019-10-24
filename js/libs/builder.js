@@ -163,18 +163,17 @@ var app = new Vue({
 
         $(event.item).remove();
 
-        var i = (_.max(_.compact(_.map(this.fields, function (field) {
-          var idx = field.name.match(/^field-([0-9]+)/);
-          if (idx && idx.length) {
-            return parseInt(idx[1], 10);
-          }
-        }))) || 0) + 1;
+        var fieldsWithSameName = _.filter(this.fields, function(item) {
+          return item.name.match(component.name.replace('(', '\\(').replace(')', '\\)'));
+        });
 
-        this.fields.splice(event.newIndex, 0, {
+        var index = fieldsWithSameName.length;
+
+        return this.fields.splice(event.newIndex, 0, {
           _type: componentName,
           _submit: typeof component.submit !== 'undefined' ? component.submit : true,
-          name: 'field-' + i,
-          label: component.name,
+          name: component.name + (index ? '-' + index : ''),
+          label: component.name + (index ? '-' + index : ''),
           value: value.default || value.type()
         });
       }
