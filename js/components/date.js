@@ -40,6 +40,7 @@ Fliplet.FormBuilder.field('date', {
       var $el = $(this.$el).find('input.date-picker').datepicker({
         format: "yyyy-mm-dd",
         todayHighlight: true,
+        weekStart: moment().creationData().locale._week.dow,
         autoclose: true
       }).on('changeDate', function(e) {
         var value = moment(e.date).format(DATE_FORMAT);
