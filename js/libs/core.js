@@ -161,6 +161,10 @@ Fliplet.FormBuilder = (function() {
         canHide: {
           type: Boolean,
           default: true
+        },
+        readonly: {
+          type: Boolean,
+          default: false
         }
       }, component.props);
 

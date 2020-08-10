@@ -1,33 +1,64 @@
 <div v-if="description" class="help-block description">\{{ description }}</div>
 <div v-if="isWeb" class="input-group custom-date">
-  <div class="input-group-addon">
-    <i class="fa fa-calendar"></i>
-  </div>
+  <template v-if="readonly">
+    <p class="form-control-static">\{{ value }}</p>
+    <input
+      type="hidden"
+      v-model.lazy="value"
+      v-on:change="updateValue()"
+      :name="name"
+      :id="name"
+      :placeholder="placeholder"
+      class="form-control"
+    />
+  </template>
 
-  <input
-    type="text"
-    v-model.lazy="value"
-    v-on:change="updateValue()"
-    v-on:input="onInput($event)"
-    :name="name"
-    :id="name"
-    :placeholder="placeholder"
-    class="date-picker form-control"
-  />
+  <template v-else>
+    <div class="input-group-addon">
+      <i class="fa fa-calendar"></i>
+    </div>
+
+    <input
+      type="text"
+      v-model.lazy="value"
+      v-on:change="updateValue()"
+      v-on:input="onInput($event)"
+      :name="name"
+      :id="name"
+      :placeholder="placeholder"
+      class="date-picker form-control"
+    />
+  </template>
 </div>
 <div v-else class="input-group native-date">
-  <div class="input-group-addon">
-    <i class="fa fa-calendar"></i>
-  </div>
 
-  <input
-    type="date"
-    v-model.lazy="value"
-    v-on:change="updateValue()"
-    :name="name"
-    :id="name"
-    :placeholder="placeholder"
-    class="form-control"
-  />
+  <template v-if="readonly">
+    <p class="form-control-static">\{{ value }}</p>
+    <input
+      type="hidden"
+      v-model.lazy="value"
+      v-on:change="updateValue()"
+      :name="name"
+      :id="name"
+      :placeholder="placeholder"
+      class="form-control"
+    />
+  </template>
+
+  <template v-else>
+    <div class="input-group-addon">
+      <i class="fa fa-calendar"></i>
+    </div>
+
+    <input 
+      type="date"
+      v-model.lazy="value"
+      v-on:change="updateValue()"
+      :name="name"
+      :id="name"
+      :placeholder="placeholder"
+      class="form-control"
+    />
+  </template>
 </div>
 <p class="text-danger" v-if="$v.value.required === false && $v.value.$dirty">Field is required.</p>

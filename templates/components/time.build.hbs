@@ -1,18 +1,34 @@
 <div v-if="description" class="help-block description">\{{ description }}</div>
 <div class="input-group custom-time">
-  <div class="input-group-addon">
-    <i class="fa fa-clock-o"></i>
-  </div>
+  <template v-if="readonly">
+    <p class="form-control-static">\{{ value }}</p>
+    <input
+      type="hidden"
+      v-model.lazy="value"
+      v-on:change="updateValue()"
+      v-on:input="onInput($event)"
+      :name="name"
+      :id="name"
+      :placeholder="placeholder"
+      class="form-control"
+    />
+  </template>
 
-  <input
-    type="time"
-    v-model.lazy="value"
-    v-on:change="updateValue()"
-    v-on:input="onInput($event)"
-    :name="name"
-    :id="name"
-    :placeholder="placeholder"
-    class="form-control"
-  />
+  <template v-else>
+    <div class="input-group-addon">
+      <i class="fa fa-clock-o"></i>
+    </div>
+
+    <input
+      type="time"
+      v-model.lazy="value"
+      v-on:change="updateValue()"
+      v-on:input="onInput($event)"
+      :name="name"
+      :id="name"
+      :placeholder="placeholder"
+      class="form-control"
+    />
+  </template>
 </div>
 <p class="text-danger" v-if="$v.value.required === false && $v.value.$dirty">Field is required.</p>

@@ -22,5 +22,10 @@ Fliplet.FormBuilder.field('textarea', {
       rules.value.required = window.validators.required;
     }
     return rules;
+  },
+  methods: {
+    replaceNewLines: function(value) {
+      return value.replace(/(?:\r\n|\r|\n)/g, '<br>')
+    }
   }
 });
