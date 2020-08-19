@@ -33,12 +33,24 @@ Fliplet.FormBuilder.field('time', {
   },
   methods: {
     updateValue: function(value) {
-      if (value) {
+      if (this.autofill === 'always') {
+        this.value = this.getCurrentTime();
+      } else if (value) {
         this.value = value;
       }
 
       this.highlightError();
       this.$emit('_input', this.name, this.value);
+    },
+    getCurrentTime: function() {
+      var now = new Date();
+      var hours = now.getHours();
+      var minutes = now.getMinutes();
+
+      hours = ('0' + hours).slice(-2);
+      minutes = ('0' + minutes).slice(-2);
+
+      return hours + ':' + minutes;
     }
   },
   beforeUpdate: function() {
@@ -55,19 +67,9 @@ Fliplet.FormBuilder.field('time', {
   mounted: function() {
     var $vm = this;
     if (!this.value || this.autofill === 'always') {
-      var now = new Date();
-      var hours = now.getHours();
-      var minutes = now.getMinutes();
+      var currentTime = this.getCurrentTime();
 
-      if(hours < 10) {
-        hours = '0' + hours;
-      }
-
-      if(minutes < 10) {
-        minutes = '0' + minutes;
-      }
-
-      this.updateValue(hours + ':' + minutes);
+      this.updateValue(currentTime);
       this.empty = false;
     }
     $vm.$v.$reset();

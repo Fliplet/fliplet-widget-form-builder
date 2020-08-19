@@ -40,7 +40,9 @@ Fliplet.FormBuilder.field('date', {
   },
   methods: {
     updateValue: function(value) {
-      if (value) {
+      if (this.autofill === 'always') {
+        this.value = moment().format('YYYY-MM-DD');
+      } else if (value) {
         this.value = value;
       }
 
