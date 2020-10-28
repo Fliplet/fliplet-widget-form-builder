@@ -7,10 +7,12 @@
     </div>
   </div>
   <main v-bind:class="{ 'select-template': chooseTemplate }">
-    <header>
+    <header class="header-wrapper">
       <p v-if="chooseTemplate">Template gallery</p>
       <p v-else>Configure your form</p>
-      <a href="https://help.fliplet.com/article/176" target="_blank">Need help?</a>
+      <a href="https://help.fliplet.com/form-component/" class="help-icon" target="_blank">
+        <i class="fa fa-question-circle-o"></i>
+      </a>
     </header>
     <section v-if="chooseTemplate" class="col-sm-12 choose-template" ref="templateGallery">
       <p class="templates-sub-title">Choose a form template to get started.</p>

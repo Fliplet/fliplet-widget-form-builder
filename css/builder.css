@@ -8,6 +8,22 @@ html, body {
   height: 100% !important; /* ensures the fields accordion works on the CLI */
 }
 
+.help-icon {
+  font-size: 16px;
+  margin-left: 8px;
+  color: #333;
+  opacity: 0.5;
+}
+
+header {
+  padding-bottom: 0.5em;
+}
+
+.header-wrapper p {
+  flex: none;
+  margin: 0;
+}
+
 .loading-message {
   display: none;
   padding-top: 25%;
