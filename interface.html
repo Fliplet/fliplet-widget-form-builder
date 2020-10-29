@@ -6,63 +6,11 @@
       <p>Loading the form builder... Please wait!</p>
     </div>
   </div>
-  <main v-bind:class="{ 'select-template': chooseTemplate }">
+  <main>
     <header>
-      <p v-if="chooseTemplate">Template gallery</p>
-      <p v-else>Configure your form</p>
+      <p>Configure your form</p>
       <a href="https://help.fliplet.com/article/176" target="_blank">Need help?</a>
     </header>
-    <section v-if="chooseTemplate" class="col-sm-12 choose-template" ref="templateGallery">
-      <p class="templates-sub-title">Choose a form template to get started.</p>
-      <template v-if="organizationTemplates.length">
-        <div class="gallery-heading">Templates by \{{ organizationName }}</div>
-        <div class="templates-holder">
-          <div class="template-wrapper" v-for="template in organizationTemplates">
-            <div class="template-info">
-              <h4 class="template-title">\{{ template.settings.displayName }} <span type="button" class="template-created-info" data-toggle="tooltip" data-placement="left" :title="template.createdDescription"><i class="fa fa-info" aria-hidden="true"></i></span></h4>
-              <div v-if="readMore.indexOf(template.id) > -1" class="template-desc">
-                <span v-html="template.settings.description"></span>
-                <a href="#" class="readless" v-on:click.prevent="toggleReadMore(false, template.id)">Close</a>
-              </div>
-              <div v-else class="template-desc">
-                <span v-html="truncate(template.settings.description, 100)"></span>
-                <a v-if="template.settings.description.length > 100" href="#" class="readmore" v-on:click.prevent="toggleReadMore(true, template.id)">Read more <i class="fa fa-angle-down"></i></a>
-              </div>
-              <div class="template-controls">
-                <div class="btn btn-secondary" v-on:click.prevent="previewTemplate(template.id)">
-                  <template v-if="settings.previewingTemplate === template.id">Previewing</template>
-                  <template v-else>Preview</template>
-                </div>
-                <div class="btn btn-primary" v-on:click.prevent="useTemplate(template.id)">Use</div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </template>
-      <div class="gallery-heading">Fliplet templates</div>
-      <div class="templates-holder">
-        <div class="template-wrapper" v-for="template in systemTemplates">
-          <div class="template-info">
-            <h4 class="template-title">\{{ template.settings.displayName }} <span type="button" class="template-created-info" data-toggle="tooltip" data-placement="left" title="Created by Fliplet"><i class="fa fa-info" aria-hidden="true"></i></span></h4>
-            <div v-if="readMore.indexOf(template.id) > -1" class="template-desc">
-              <span v-html="template.settings.description"></span>
-              <a href="#" class="readless" v-on:click.prevent="toggleReadMore(false, template.id)">Close</a>
-            </div>
-            <div v-else class="template-desc">
-              <span v-html="truncate(template.settings.description, 100)"></span>
-              <a v-if="template.settings.description.length > 100" href="#" class="readmore" v-on:click.prevent="toggleReadMore(true, template.id)">Read more <i class="fa fa-angle-down"></i></a>
-            </div>
-            <div class="template-controls">
-              <div class="btn btn-secondary" v-on:click.prevent="previewTemplate(template.id)">
-                <template v-if="settings.previewingTemplate === template.id">Previewing</template>
-                <template v-else>Preview</template>
-              </div>
-              <div class="btn btn-primary" v-on:click.prevent="useTemplate(template.id)">Use</div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
     <section v-if="toChangeTemplate" class="col-sm-12 change-template">
       <div class="back-btn">
         <a href="#" v-on:click.prevent="goBack"><i class="fa fa-angle-left"></i> Back</a>
@@ -96,7 +44,7 @@
         </div>
       </div>
     </section>
-    <div class="builder" v-show="!chooseTemplate && !toChangeTemplate">
+    <div class="builder">
       <nav>
         <ul class="nav nav-tabs">
           <li v-bind:class="{ active: section === 'form' }">
