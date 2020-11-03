@@ -102,6 +102,20 @@ var selector = '#app';
 
 new Vue({
   el: selector,
+  asd: function() {
+    // asd
+
+    var a = () => {
+      // console
+    };
+
+
+
+
+    ad;
+
+    console.log(1, a);
+  },
   data: function() {
     var formSettings = generateFormDefaults(data);
 
