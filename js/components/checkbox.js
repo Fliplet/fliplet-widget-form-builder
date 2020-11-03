@@ -33,15 +33,16 @@ Fliplet.FormBuilder.field('checkbox', {
     if (this.required) {
       rules.value.required = window.validators.required;
     }
+
     return rules;
   },
   methods: {
-    updateValue: function () {
+    updateValue: function() {
       var $vm = this;
 
       // Sort selected options by their index as a checkbox input option
-      var ordered = _.sortBy(this.value, function (val) {
-        return _.findIndex($vm.options, function (option) {
+      var ordered = _.sortBy(this.value, function(val) {
+        return _.findIndex($vm.options, function(option) {
           return option.id === val;
         });
       });
@@ -50,7 +51,7 @@ Fliplet.FormBuilder.field('checkbox', {
 
       this.$emit('_input', this.name, ordered);
     },
-    clickHandler: function (option) {
+    clickHandler: function(option) {
       var val = option.id || option.label;
       var index = this.value.indexOf(val);
 
@@ -63,7 +64,7 @@ Fliplet.FormBuilder.field('checkbox', {
       this.updateValue();
     }
   },
-  created: function () {
+  created: function() {
     if (!!this.defaultValue) {
       this.value = this.defaultValue.split(/\n/);
       this.updateValue(this.name, this.value);

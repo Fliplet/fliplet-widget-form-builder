@@ -1,5 +1,5 @@
+/* eslint-disable eqeqeq */
 Fliplet.FormBuilder = (function() {
-  var fields = [];
   var components = {};
   var eventHub = new Vue();
 
@@ -72,11 +72,11 @@ Fliplet.FormBuilder = (function() {
         component.methods.updateValue = function() {
           this.highlightError();
           this.$emit('_input', this.name, this.value);
-        }
+        };
       }
 
       // Define method to highlight Error on blur form field
-      component.methods.highlightError = function () {
+      component.methods.highlightError = function() {
         var $vm = this;
 
         if ($vm.$v && $vm.$v.value) {
@@ -98,7 +98,7 @@ Fliplet.FormBuilder = (function() {
       if (!component.methods.resetForm) {
         component.methods.resetForm = function() {
           this.$emit('_reset');
-        }
+        };
       }
 
       if (!component.computed) {
@@ -116,12 +116,12 @@ Fliplet.FormBuilder = (function() {
 
         var vm = this;
 
-        var option = _.find(this.options, function (opt) {
+        var option = _.find(this.options, function(opt) {
           return opt.id == vm.value;
         });
 
         return option ? (option.label || option.id) : this.value;
-      }
+      };
 
       var fieldContext = $('html').hasClass('context-build') ? 'field' : 'interface';
 
@@ -306,7 +306,7 @@ Fliplet.FormBuilder = (function() {
       component.methods._initTooltip = function() {
         var $vm = this;
 
-        $vm.$nextTick(function () {
+        $vm.$nextTick(function() {
           var tooltip = $vm.$refs.tooltip;
 
           if (tooltip) {
@@ -315,22 +315,23 @@ Fliplet.FormBuilder = (function() {
         });
       };
 
-      component.methods._initDatepicker = function () {
+      component.methods._initDatepicker = function() {
         var $vm = this;
 
-        $vm.$nextTick(function () {
+        $vm.$nextTick(function() {
           var $el = $(this.$el).find('input.date-picker').datepicker({
-            format: "yyyy-mm-dd",
+            format: 'yyyy-mm-dd',
             todayHighlight: true,
             autoclose: true
           }).on('changeDate', function(e) {
             var value = moment(e.date).format(DATE_FORMAT);
+
             $vm.value = value;
           });
 
           $el.datepicker('setDate', this.value || new Date());
         });
-      }
+      };
 
       if (!component.methods.initDatepicker) {
         component.methods.initDatepicker = component.methods._initDatepicker;
@@ -360,8 +361,11 @@ Fliplet.FormBuilder = (function() {
                 });
                 Fliplet.Widget.toggleSaveButton(!!data.length);
                 var msg = data.length ? data.length + ' folder selected' : 'no selected folders';
+
                 Fliplet.Widget.info(msg);
                 break;
+              default:
+                // nothing
             }
           }
         });
@@ -409,16 +413,17 @@ Fliplet.FormBuilder = (function() {
       // If options is an array, automatically deal with options
       if (hasOptions) {
         component.computed._options = function generateOptions() {
-          return this.options.map(function (option) {
+          return this.options.map(function(option) {
             if (option.id && option.label && option.id != option.label) {
               return option.label + ' <' + option.id + '>';
             }
+
             return option.label || option.id;
           }).join('\r\n');
         };
 
         component.methods._setOptions = function setOptions(str) {
-          this.options = _.compact(str.split(/\r?\n/).map(function (rawOption) {
+          this.options = _.compact(str.split(/\r?\n/).map(function(rawOption) {
             rawOption = rawOption.trim();
 
             var regex = /<.*>$/g;
@@ -428,6 +433,7 @@ Fliplet.FormBuilder = (function() {
             if (match) {
               option.label = rawOption.replace(regex, '').trim();
               var value = match[0].substring(1, match[0].length - 1).trim();
+
               option.id = value || option.label;
             } else {
               option.label = rawOption;

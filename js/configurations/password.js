@@ -1,6 +1,6 @@
 Fliplet.FormBuilder.configuration('password', {
   watch: {
-    autogenerate: function (val) {
+    autogenerate: function(val) {
       if (!val) {
         return;
       }

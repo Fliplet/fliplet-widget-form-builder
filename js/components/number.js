@@ -17,7 +17,7 @@ Fliplet.FormBuilder.field('number', {
       type: String
     }
   },
-  validations: function () {
+  validations: function() {
     var rules = {
       value: {
         integer: window.validators.integer,
@@ -41,27 +41,27 @@ Fliplet.FormBuilder.field('number', {
     return rules;
   },
   methods: {
-    positiveValidator: function () {
+    positiveValidator: function() {
       return window.validators.helpers.withParams(
         {
           type: 'positiveValidator'
         },
-        function (value) {
+        function(value) {
           if (!value) {
             return true;
           }
 
           return parseFloat(value) >= 0;
         }
-      )
+      );
     },
-    decimalValidator: function (maxNumbersAfterPoint) {
+    decimalValidator: function(maxNumbersAfterPoint) {
       return window.validators.helpers.withParams(
         {
           type: 'decimalValidator',
           value: maxNumbersAfterPoint
         },
-        function (value) {
+        function(value) {
           var decimal = /^(-?\d+((\.|\,)\d{1,10})?)$/;
 
           if (!value) {
@@ -72,17 +72,18 @@ Fliplet.FormBuilder.field('number', {
             return false;
           }
 
-          value = value.replace(",", ".");
+          value = value.replace(',', '.');
           value = parseFloat(value);
 
-          if(_.isNaN(value)) {
+          if (_.isNaN(value)) {
             return false;
           }
 
           var currentNumbersAfterPoint = 0;
 
           if (Math.floor(value) !== value) {
-            var valueParts = value.toString().split(".");
+            var valueParts = value.toString().split('.');
+
             currentNumbersAfterPoint = valueParts[1] ? valueParts[1].length : 0;
           }
 

@@ -1,3 +1,5 @@
+/* global loadImage, addThumbnailToCanvas */
+
 Fliplet.FormBuilder.field('file', {
   name: 'Attach a file',
   category: 'Files',
@@ -52,8 +54,6 @@ Fliplet.FormBuilder.field('file', {
   },
   destroyed: function() {
     Fliplet.FormBuilder.off('reset', this.onReset);
-  },
-  destroyed: function() {
     this.selectedFiles.length = 0;
   },
   methods: {
@@ -70,7 +70,7 @@ Fliplet.FormBuilder.field('file', {
 
       $vm.$emit('_input', $vm.name, $vm.value);
     },
-    validateValue: function () {
+    validateValue: function() {
       if (typeof this.value === 'string' && this.value) {
         this.value = [this.value];
       }
@@ -115,7 +115,7 @@ Fliplet.FormBuilder.field('file', {
 
       $vm.value.splice(index, 1);
 
-      $vm.value.forEach(function (file, index) {
+      $vm.value.forEach(function(file, index) {
         if ($vm.isFileImage(file)) {
           $vm.processImage(file, false, index);
         }

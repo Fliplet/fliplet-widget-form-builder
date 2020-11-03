@@ -26,7 +26,7 @@ Fliplet.FormBuilder.field('date', {
   data: function() {
     return {
       datePicker: null
-    }
+    };
   },
   validations: function() {
     var rules = {
@@ -36,11 +36,12 @@ Fliplet.FormBuilder.field('date', {
     if (this.required) {
       rules.value.required = window.validators.required;
     }
+
     return rules;
   },
   computed: {
     isWeb: function() {
-      return Fliplet.Env.get('platform') === 'web'
+      return Fliplet.Env.get('platform') === 'web';
     }
   },
   mounted: function() {
@@ -48,7 +49,7 @@ Fliplet.FormBuilder.field('date', {
 
     if (Fliplet.Env.get('platform') === 'web') {
       this.datePicker = $(this.$el).find('input.date-picker').datepicker({
-        format: "yyyy-mm-dd",
+        format: 'yyyy-mm-dd',
         todayHighlight: true,
         autoclose: true
       }).on('changeDate', function(e) {
@@ -63,6 +64,7 @@ Fliplet.FormBuilder.field('date', {
       $vm.updateValue(moment().format('YYYY-MM-DD'));
       this.empty = false;
     }
+
     $vm.$v.$reset();
   },
   watch: {

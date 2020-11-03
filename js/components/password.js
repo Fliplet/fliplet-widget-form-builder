@@ -45,7 +45,7 @@ Fliplet.FormBuilder.field('password', {
       type: String
     }
   },
-  validations: function () {
+  validations: function() {
     var rules = {
       value: {},
       passwordConfirmation: {}
@@ -62,18 +62,18 @@ Fliplet.FormBuilder.field('password', {
     return rules;
   },
   computed: {
-    fieldPlaceholder: function () {
+    fieldPlaceholder: function() {
       return this.autogenerate ? 'A password will be automatically generated' : this.placeholder;
     }
   },
-  mounted: function () {
+  mounted: function() {
     if (this.autogenerate && !this.value) {
       this.value = this.generateRandomPassword(this.autogenerateLength);
       this.updateValue();
     }
   },
   methods: {
-    generateRandomPassword: function (length) {
+    generateRandomPassword: function(length) {
       var alphabet = 'abcdefghijklmnopqrstuvwxyz!#$%&*-ABCDEFGHIJKLMNOP1234567890';
       var password = '';
 
@@ -83,11 +83,11 @@ Fliplet.FormBuilder.field('password', {
 
       return password;
     },
-    updatePasswordConfirmation: function () {
+    updatePasswordConfirmation: function() {
       this.$v.passwordConfirmation.$touch();
       this.highlightError();
     },
-    onPasswordConfirmationInput: function ($event) {
+    onPasswordConfirmationInput: function($event) {
       this.$emit('_input', this.name, $event.target.value, true);
     }
   }

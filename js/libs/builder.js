@@ -1,3 +1,4 @@
+/* eslint-disable eqeqeq */
 var widgetId = parseInt(Fliplet.Widget.getDefaultId(), 10);
 var widgetUuid = Fliplet.Widget.getUUID(widgetId);
 var data = Fliplet.Widget.getData(widgetId) || {};
@@ -6,9 +7,10 @@ var data = Fliplet.Widget.getData(widgetId) || {};
 if (data.fields) {
   data.fields = _.compact(data.fields);
 }
+
 if (Array.isArray(data.onSubmit) && data.onSubmit.length) {
   data.onSubmit.forEach(function(el, i) {
-    if(el === 'templatedEmail'){
+    if (el === 'templatedEmail') {
       data.onSubmit.splice(i, 1);
     }
   });
@@ -28,47 +30,48 @@ if (data.settings && data.settings.emailTemplate) {
 function changeSelectText() {
   setTimeout(function() {
     $('.hidden-select:not(.component .hidden-select)').each(function() {
-      var selectedText = $(this).find('option:selected').text()
+      var selectedText = $(this).find('option:selected').text();
+
       if (selectedText !== '') {
-        $(this).parents('.select-proxy-display').find('.select-value-proxy').html(selectedText)
+        $(this).parents('.select-proxy-display').find('.select-value-proxy').html(selectedText);
       } else {
-        $(this).parents('.select-proxy-display').find('.select-value-proxy').html('Select a data source')
+        $(this).parents('.select-proxy-display').find('.select-value-proxy').html('Select a data source');
       }
-    })
-  }, 1)
+    });
+  }, 1);
 }
 
 function attachObservers() {
-  var $accordion = $('#componentsAccordion')
+  var $accordion = $('#componentsAccordion');
 
   var recalculateHeight = function(obj) {
-    var $panelHeading = $('.panel-heading')
-    var tabsHeight = $panelHeading.outerHeight() * $panelHeading.length
-    var borders = $panelHeading.length * 3
-    var wrapperHeight = $('.components-list .form-html').innerHeight() - tabsHeight
+    var $panelHeading = $('.panel-heading');
+    var tabsHeight = $panelHeading.outerHeight() * $panelHeading.length;
+    var borders = $panelHeading.length * 3;
+    var wrapperHeight = $('.components-list .form-html').innerHeight() - tabsHeight;
 
-    obj.children('.panel-body').css('height', wrapperHeight - borders)
-    obj.children('.panel-body').fadeIn(250)
+    obj.children('.panel-body').css('height', wrapperHeight - borders);
+    obj.children('.panel-body').fadeIn(250);
     obj.children('.panel-body').animate({
       scrollTop: 0
-    }, 250)
-  }
+    }, 250);
+  };
 
-  recalculateHeight($('.panel-collapse'))
+  recalculateHeight($('.panel-collapse'));
 
   $accordion.on('show.bs.collapse', '.panel-collapse', function() {
-    recalculateHeight($(this))
-  })
+    recalculateHeight($(this));
+  });
 
   $accordion.on('hide.bs.collapse', '.panel-collapse', function() {
-    $(this).children('.panel-body').fadeOut(250)
-  })
+    $(this).children('.panel-body').fadeOut(250);
+  });
 }
 
 Vue.directive('sortable', {
   inserted: function(el, binding) {
     if (Sortable) {
-      new Sortable(el, binding.value || {})
+      new Sortable(el, binding.value || {});
     }
   }
 });
@@ -97,7 +100,7 @@ function generateFormDefaults(data) {
 
 var selector = '#app';
 
-var app = new Vue({
+new Vue({
   el: selector,
   data: function() {
     var formSettings = generateFormDefaults(data);
@@ -192,7 +195,7 @@ var app = new Vue({
           }
         },
         size: 'small'
-      }).then(function (result) {
+      }).then(function(result) {
         if (result) {
           $vm.fields.splice(index, 1);
           $vm.activeFieldConfigType = null;
@@ -217,6 +220,7 @@ var app = new Vue({
     },
     onFieldSettingChanged: function(fieldData) {
       var $vm = this;
+
       Object.keys(fieldData).forEach(function(prop) {
         $vm.activeField[prop] = fieldData[prop];
       });
@@ -239,7 +243,6 @@ var app = new Vue({
       changeSelectText();
     },
     goBack: function() {
-      var $vm = this;
       this.toChangeTemplate = false;
       Fliplet.Studio.emit('widget-save-label-reset');
       Fliplet.Widget.toggleSaveButton(true);
@@ -262,9 +265,11 @@ var app = new Vue({
       if (this.settings.onSubmit.indexOf('templatedEmailAdd') > -1) {
         this.settings.emailTemplateAdd = this.emailTemplateAdd || this.defaultEmailSettings;
       }
+
       if (this.settings.onSubmit.indexOf('templatedEmailEdit') > -1) {
         this.settings.emailTemplateEdit = this.emailTemplateEdit || this.defaultEmailSettings;
       }
+
       if (this.settings.onSubmit.indexOf('generateEmail') > -1) {
         this.settings.generateEmailTemplate = this.generateEmailTemplate || this.defaultEmailSettingsForCompose;
       }
@@ -281,6 +286,7 @@ var app = new Vue({
     createDefaultBodyTemplate: function(fields) {
       // Creates default email template
       var defaultEmailTemplate = '<h1>' + this.settings.name + '</h1><p>A form submission has been received.</p>';
+
       defaultEmailTemplate += '<ul>';
 
       fields.forEach(function(field) {
@@ -322,7 +328,6 @@ var app = new Vue({
           var payload = JSON.parse(JSON.stringify($vm.emailTemplateAdd));
 
           operation = Fliplet.DataSources.getById($vm.settings.dataSourceId).then(function(dataSource) {
-
             // Find hooks to update
             var hooks = _.filter(dataSource.hooks, {
               type: 'email',
@@ -332,9 +337,9 @@ var app = new Vue({
 
             if (hooks.length) {
               // Update hooks
-              hooks.forEach(function (hook) {
+              hooks.forEach(function(hook) {
                 hook.payload = payload;
-              })
+              });
             } else {
               // Add new hook
               dataSource.hooks.push({
@@ -354,7 +359,7 @@ var app = new Vue({
           operation = Promise.resolve();
         }
 
-        operation.then(function () {
+        operation.then(function() {
           $vm.save().then(function() {
             Fliplet.Studio.emit('reload-widget-instance', Fliplet.Widget.getDefaultId());
           });
@@ -401,7 +406,7 @@ var app = new Vue({
 
             if (hooks.length) {
               // Update hooks
-              hooks.forEach(function (hook) {
+              hooks.forEach(function(hook) {
                 hook.payload = payload;
               });
             } else {
@@ -423,7 +428,7 @@ var app = new Vue({
           operation = Promise.resolve();
         }
 
-        operation.then(function () {
+        operation.then(function() {
           $vm.save().then(function() {
             Fliplet.Studio.emit('reload-widget-instance', Fliplet.Widget.getDefaultId());
           });
@@ -479,13 +484,13 @@ var app = new Vue({
     updateDataSource: function() {
       var dataSourceId = this.settings.dataSourceId;
       var newColumns = _.chain(this.fields)
-        .filter(function(field){
+        .filter(function(field) {
           return field._submit !== false;
         })
         .map('name')
         .value();
 
-      var fieldsToHash = _.map(_.filter(this.fields, function (field) {
+      var fieldsToHash = _.map(_.filter(this.fields, function(field) {
         return !!field.hash;
       }), 'name');
 
@@ -500,8 +505,9 @@ var app = new Vue({
         var columns = _.uniq(newColumns.concat(ds.columns));
 
         // remove existing hooks for the operations
-        ds.hooks = _.reject(ds.hooks || [], function (hook) {
+        ds.hooks = _.reject(ds.hooks || [], function(hook) {
           var result = hook.widgetInstanceId == widgetId && hook.type == 'operations';
+
           if (result) {
             hooksDeleted = true;
           }
@@ -511,7 +517,8 @@ var app = new Vue({
 
         if (fieldsToHash) {
           var payload = {};
-          fieldsToHash.forEach(function (field) {
+
+          fieldsToHash.forEach(function(field) {
             payload[field] = ['hash'];
           });
 
@@ -593,6 +600,7 @@ var app = new Vue({
       });
 
       var settings = formTemplate.settings;
+
       settings.templateId = formTemplate.id;
       settings.name = this.settings.name;
 
@@ -731,18 +739,19 @@ var app = new Vue({
         valid_elements: '*[*]',
         allow_script_urls: true,
         min_height: 200,
-        setup: function (editor) {
-          editor.on('init', function () {
+        setup: function(editor) {
+          editor.on('init', function() {
             $vm.resultEditor = editor;
 
             // initialize value if it was set prior to initialization
             if ($vm.settings.resultHtml) {
               var updatedHtml = $vm.convertVueEventAttributes($vm.settings.resultHtml);
+
               editor.setContent(updatedHtml, {format: 'raw'});
             }
           });
 
-          editor.on('change', function (e) {
+          editor.on('change', function() {
             $vm.settings.resultHtml = editor.getContent();
           });
         }
@@ -754,10 +763,10 @@ var app = new Vue({
       var $html = $('<div/>').append(html);
       var $allElements = $html.find('*');
 
-      _.each($allElements, function (el) {
+      _.each($allElements, function(el) {
         var $el = $(el);
 
-        _.each(el.attributes, function (attr) {
+        _.each(el.attributes, function(attr) {
           if (_.startsWith(attr.name, '@')) {
             var event = attr.name.split('.');
             var newAttrName = event[0].replace('@', 'v-on:');
@@ -766,9 +775,22 @@ var app = new Vue({
             $el.attr(newAttrName, newAttrValue);
             $el.removeAttr(attr.name);
           }
-        })
+        });
       });
       return $html.html();
+    },
+    loadTemplates: function() {
+      if (data.fields) {
+        return Promise.resolve(); // do not load templates when editing a form as such UI is not shown
+      }
+
+      var $vm = this;
+
+      return Fliplet.FormBuilder.templates().then(function(templates) {
+        $vm.templates = templates.system.concat(templates.organization);
+        $vm.systemTemplates = templates.system;
+        $vm.organizationTemplates = templates.organization;
+      });
     }
   },
   watch: {
@@ -799,6 +821,7 @@ var app = new Vue({
     },
     'section': function(value) {
       var $vm = this;
+
       if (value === 'settings') {
         $vm.setupCodeEditor();
         changeSelectText();
@@ -833,6 +856,7 @@ var app = new Vue({
         this.checkEmailTemplate();
       } else {
         this.toggleTemplatedEmailAdd = false;
+
         // Remove hook
         if ($vm.settings.dataSourceId && $vm.settings.dataSourceId !== '') {
           Fliplet.DataSources.getById($vm.settings.dataSourceId).then(function(dataSource) {
@@ -860,6 +884,7 @@ var app = new Vue({
         this.checkEmailTemplate();
       } else {
         this.toggleTemplatedEmailEdit = false;
+
         // Remove hook
         if ($vm.settings.dataSourceId && $vm.settings.dataSourceId !== '') {
           Fliplet.DataSources.getById($vm.settings.dataSourceId).then(function(dataSource) {
@@ -906,11 +931,7 @@ var app = new Vue({
 
     Fliplet.FormBuilder.on('field-settings-changed', this.onFieldSettingChanged);
 
-    Fliplet.FormBuilder.templates().then(function(templates) {
-      $vm.templates = templates.system.concat(templates.organization);
-      $vm.systemTemplates = templates.system;
-      $vm.organizationTemplates = templates.organization;
-
+    this.loadTemplates().then(function() {
       $(selector).removeClass('is-loading');
 
       $($vm.$refs.templateDescription).tinymce({
@@ -929,8 +950,8 @@ var app = new Vue({
         menubar: false,
         statusbar: false,
         min_height: 300,
-        setup: function (ed) {
-          $vm.editor = ed
+        setup: function(ed) {
+          $vm.editor = ed;
           $vm.editor.on('keyup paste', function() {
             $vm.settings.description = $vm.editor.getContent();
           });
@@ -955,6 +976,7 @@ var app = new Vue({
     window.generateEmailProvider = null;
     window.linkProvider = null;
     var $vm = this;
+
     $vm.settings.name = $vm.settings.name || 'Untitled form';
 
     if (!$vm.showDataSourceSettings) {
@@ -965,6 +987,7 @@ var app = new Vue({
       Fliplet.Studio.emit('widget-save-label-update', {
         text: ''
       });
+
       // Init tooltip
       if ($vm.$refs.templateGallery) {
         $($vm.$refs.templateGallery).find('[data-toggle="tooltip"]').tooltip();
@@ -977,7 +1000,8 @@ var app = new Vue({
     }
 
     var savedLinkData = $vm.settings && $vm.settings.linkAction;
-    var linkData = $.extend(true, {
+
+    $.extend(true, {
       action: 'screen',
       page: '',
       transition: 'slide.left',
@@ -994,7 +1018,7 @@ var app = new Vue({
       $vm.initDataSourceProvider();
     }
 
-    Fliplet.Organizations.get().then(function (organizations) {
+    Fliplet.Organizations.get().then(function(organizations) {
       $vm.organizationName = organizations.length && organizations[0].name;
     });
 
@@ -1026,15 +1050,14 @@ var app = new Vue({
       $vm.triggerSave();
     });
 
-    Fliplet.Widget.onCancelRequest(function () {
-
+    Fliplet.Widget.onCancelRequest(function() {
       var emailProviderNames = [
         'emailTemplateAddProvider',
         'emailTemplateEditProvider',
         'generateEmailProvider'
       ];
 
-      _.each(emailProviderNames, function (providerName) {
+      _.each(emailProviderNames, function(providerName) {
         if (window[providerName]) {
           window[providerName].close();
           window[providerName] = null;

@@ -9,7 +9,7 @@ Fliplet.FormBuilder.field('url', {
       type: String
     }
   },
-  validations: function () {
+  validations: function() {
     var rules = {
       value: {
         // URL regex taken form https://www.regextester.com/94502 and added % sign
@@ -20,6 +20,7 @@ Fliplet.FormBuilder.field('url', {
     if (this.required) {
       rules.value.required = window.validators.required;
     }
+
     return rules;
   }
 });

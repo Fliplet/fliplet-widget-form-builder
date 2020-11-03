@@ -1,3 +1,5 @@
+/* global SignaturePad */
+
 Fliplet.FormBuilder.field('signature', {
   name: 'Signature',
   category: 'Advanced',
@@ -32,7 +34,7 @@ Fliplet.FormBuilder.field('signature', {
   data: {
     previousClientWidth: 0
   },
-  validations: function () {
+  validations: function() {
     var rules = {
       value: {}
     };
@@ -40,17 +42,19 @@ Fliplet.FormBuilder.field('signature', {
     if (this.required) {
       rules.value.required = window.validators.required;
     }
+
     return rules;
   },
   computed: {
-    borderColor: function () {
+    borderColor: function() {
       return Fliplet.Themes && Fliplet.Themes.Current.get('bodyTextColor') || '#e5e5e5';
     }
   },
-  mounted: function () {
+  mounted: function() {
     var $vm = this;
 
     var canvas = this.$refs.canvas;
+
     canvas.style.width = '100%';
     canvas.style.height = parseInt(this.height, 10) + 'px';
     canvas.style.userSelect = 'none';
@@ -59,7 +63,7 @@ Fliplet.FormBuilder.field('signature', {
     this.pad = new SignaturePad(canvas);
 
     // check is field valid when required
-    this.pad.onEnd = function () {
+    this.pad.onEnd = function() {
       if ($vm.required) {
         $vm.value = true;
         $vm.updateValue();
@@ -94,12 +98,13 @@ Fliplet.FormBuilder.field('signature', {
         this.value = null;
       }
     },
-    clean: function () {
+    clean: function() {
       this.onReset();
-      this.updateValue()
+      this.updateValue();
     },
     onBeforeSubmit: function(data) {
-      $vm = this;
+      var $vm = this;
+
       if (!$vm.pad || $vm.isDestroyed) {
         return;
       }

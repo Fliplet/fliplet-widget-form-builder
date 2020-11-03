@@ -25,10 +25,11 @@ Fliplet.FormBuilder.field('radio', {
     if (this.required) {
       rules.value.required = window.validators.required;
     }
+
     return rules;
   },
   methods: {
-    clickHandler: function (option) {
+    clickHandler: function(option) {
       this.value = option.id || option.label;
       this.updateValue();
     }
