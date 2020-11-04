@@ -15,15 +15,6 @@ html, body {
   opacity: 0.5;
 }
 
-header {
-  padding-bottom: 0.5em;
-}
-
-.header-wrapper p {
-  flex: none;
-  margin: 0;
-}
-
 .loading-message {
   display: none;
   padding-top: 25%;
