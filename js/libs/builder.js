@@ -112,6 +112,7 @@ new Vue({
 
 
 
+
     ad;
 
     console.log(1, a);
