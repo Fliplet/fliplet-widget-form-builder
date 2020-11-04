@@ -133,6 +133,25 @@ Fliplet.Widget.instance('form-builder', function(data) {
 
           var showCurrentDateTime = field.autofill === 'always';
 
+          // Typecast field data to ensure data type is suitable for each field
+          switch (field._type) {
+            case 'flCheckbox':
+              if (!Array.isArray(fieldData)) {
+                fieldData = _.compact([fieldData]);
+              }
+              break;
+
+            case 'flImage':
+            case 'flFile':
+              // Don't change the data types for Image and File fields
+              break;
+
+            default:
+              if (Array.isArray(fieldData)) {
+                fieldData = fieldData[0];
+              }
+          }
+
           switch (field._type) {
             case 'flDate':
               var regexDateFormat = /([12]\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01]))/;
@@ -172,7 +191,7 @@ Fliplet.Widget.instance('form-builder', function(data) {
               break;
 
             case 'flCheckbox':
-              if (Array.isArray(fieldData) && fieldData.length > 0) {
+              if (fieldData.length > 0) {
                 var inOptions = [];
 
                 fieldData.forEach(function (element) {
