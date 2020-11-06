@@ -8,14 +8,9 @@
   </div>
   <main v-bind:class="{ 'select-template': chooseTemplate }">
     <header>
-      <p v-if="chooseTemplate">
-        Template gallery
-        <a href="https://help.fliplet.com/form-component/" class="help-icon" target="_blank">
-          <i class="fa fa-question-circle-o"></i>
-        </a>
-      </p>
-      <p v-else>
-        Configure your form
+      <p>
+        <template v-if="chooseTemplate">Template gallery</template>
+        <template v-else>Configure your form</template>
         <a href="https://help.fliplet.com/form-component/" class="help-icon" target="_blank">
           <i class="fa fa-question-circle-o"></i>
         </a>
