@@ -1,5 +1,7 @@
 # Fliplet Form Builder
 
+- Branching type: *Gitflow-like*
+
 Documentation is available at https://developers.fliplet.com/API/components/form-builder.html
 
 ---
