@@ -4,7 +4,7 @@
   "description": "Documentation is available at https://developers.fliplet.com/API/components/form-builder.html",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "eslint:github-action": "eslint ."
   },
   "repository": {
     "type": "git",
