@@ -1,5 +1,5 @@
 <div v-if="description" class="help-block description">\{{ description }}</div>
-<div class="fileUpload file-input focus-outline" :class="{ 'fileUpload-padding-top': value.length }">
+<div class="fileUpload file-input" :class="{ 'fileUpload-padding-top': value.length }">
   <div class="row">
     <div ref="canvasWrap" class="text-center" v-for="(file, index) in value">
       <div class="canvas-holder">

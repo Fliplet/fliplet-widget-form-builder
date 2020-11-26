@@ -1,7 +1,7 @@
 <template>
   <div v-if="description" class="help-block description">\{{ description }}</div>
   <template v-for="(option, index) in options">
-    <div class="radio radio-icon focus-outline">
+    <div class="radio radio-icon">
       <input
         type="radio"
         :id="name + '-' + index"

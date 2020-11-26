@@ -23,7 +23,7 @@ this["Fliplet"]["Widget"]["Templates"]["templates.configurations.file"] = Handle
 },"useData":true});
 
 this["Fliplet"]["Widget"]["Templates"]["templates.configurations.form-result"] = Handlebars.template({"compiler":[7,">= 4.0.0"],"main":function(container,depth0,helpers,partials,data) {
-    return "<h2>Thank you for submitting the form!</h2>\n<hr />\n<a href=\"#\" class=\"btn btn-primary focus-outline\" v-on:click=\"start($event)\">Start over</a>\n";
+    return "<h2>Thank you for submitting the form!</h2>\n<hr />\n<a href=\"#\" class=\"btn btn-primary\" v-on:click=\"start($event)\">Start over</a>\n";
 },"useData":true});
 
 this["Fliplet"]["Widget"]["Templates"]["templates.configurations.form"] = Handlebars.template({"1":function(container,depth0,helpers,partials,data) {
