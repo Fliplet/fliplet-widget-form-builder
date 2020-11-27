@@ -85,13 +85,6 @@ Fliplet.FormBuilder.field('wysiwyg', {
       tinymce.DOM.setStyle(this.labelElement, 'display', '');
     },
     onPlaceholderFocus: function() {
-      var outlineContainer = this.$el.querySelector('.mce-container-body.mce-stack-layout');
-
-      if (outlineContainer) {
-        outlineContainer.classList.add('focus-outline-active');
-      }
-
-
       if (!this.editor.settings.readonly) {
         this.hidePlaceholderLabel();
       }
@@ -99,12 +92,6 @@ Fliplet.FormBuilder.field('wysiwyg', {
       this.editor.execCommand('mceFocus', false);
     },
     onPlaceholderBlur: function() {
-      var outlineContainer = this.$el.querySelector('.mce-container-body.mce-stack-layout');
-
-      if (outlineContainer) {
-        outlineContainer.classList.remove('focus-outline-active');
-      }
-
       if (!this.editor.getContent()) {
         this.showPlaceholderLabel();
       } else {
