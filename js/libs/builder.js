@@ -1035,6 +1035,9 @@ new Vue({
       }
     }, savedLinkData);
 
+    this.toggleAccessType('insert', this.showExtraAdd);
+    this.toggleAccessType('update', this.showExtraEdit);
+
     if (!window.linkProvider) {
       $vm.initLinkProvider();
     }
