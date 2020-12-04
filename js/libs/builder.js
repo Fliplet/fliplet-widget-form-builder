@@ -188,6 +188,10 @@ new Vue({
         });
       }
     },
+    updateAccessTypes: function() {
+      this.toggleAccessType('insert', this.showExtraAdd);
+      this.toggleAccessType('update', this.showExtraEdit);
+    },
     deleteField: function(fieldLabel, index) {
       var $vm = this;
 
@@ -858,8 +862,7 @@ new Vue({
       this.showExtraAdd = value.indexOf('dataSource') > -1;
       this.showExtraEdit = value.indexOf('editDataSource') > -1;
 
-      this.toggleAccessType('insert', this.showExtraAdd);
-      this.toggleAccessType('update', this.showExtraEdit);
+      this.updateAccessTypes();
 
       if (window.dataSourceProvider) {
         window.dataSourceProvider.emit('update-security-rules', { accessRules: this.accessRules });
@@ -1035,8 +1038,7 @@ new Vue({
       }
     }, savedLinkData);
 
-    this.toggleAccessType('insert', this.showExtraAdd);
-    this.toggleAccessType('update', this.showExtraEdit);
+    this.updateAccessTypes();
 
     if (!window.linkProvider) {
       $vm.initLinkProvider();
