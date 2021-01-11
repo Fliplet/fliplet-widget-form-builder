@@ -35,13 +35,13 @@
         </div>
       </div>
 
-      <div v-if="!isHidden" class="form-group cleafix">
+      <div class="form-group cleafix">
         <div class="col-xs-12">
           <label class="control-label">Is this field required?</label>
         </div>
         <div class="col-xs-12">
           <div class="radio radio-icon">
-            <input type="radio" id="required-yes" name="required-option" v-bind:value="true" v-model="required">
+            <input type="radio" id="required-yes" name="required-option" v-bind:value="true" v-model="required" v-on:input="isHidden = false">
             <label for="required-yes">
               <span class="check"><i class="fa fa-circle"></i></span> <strong>Yes</strong> - Users will have to fill in the field
             </label>
@@ -55,22 +55,15 @@
         </div>
       </div>
 
-      <div v-if="canHide" class="form-group-cleafix">
-        <div v-if="isHidden" class="alert alert-info">
-          <p>Hidden fields cannot be set as required. Please disable field hiding before marking the field as required.</p>
-        </div>
-        <div v-if="!required" class="checkbox checkbox-icon form-hide-checkbox">
-          <input type="checkbox" :name="name" v-model="isHidden" id="form-hide-checkbox">
+      <div class="form-group-cleafix">
+        <div class="checkbox checkbox-icon form-hide-checkbox">
+          <input type="checkbox" :name="name" v-model="isHidden" id="form-hide-checkbox" v-on:input="required = false">
           <label for="form-hide-checkbox">
             <span class="check"><i class="fa fa-check"></i></span>
             <span class="hide-field">Hide this field from users.</span>
           </label>
         </div>
-        <div v-else class="alert alert-info">
-          <p>Required fields cannot be hidden. Please disable field requirement before hiding the field.</p>
-        </div>
       </div>
-
     </div>
 
     {{#hasOptions}}
