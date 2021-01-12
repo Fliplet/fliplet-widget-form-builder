@@ -640,7 +640,7 @@ Fliplet.Widget.instance('form-builder', function(data) {
           $vm.loadEntryForUpdate();
         }, function(err) {
           console.error(err);
-          $vm.error = err.message || err.description || err;
+          $vm.error = Fliplet.parseError(err);
           $vm.isSending = false;
           Fliplet.Hooks.run('onFormSubmitError', { formData: formData, error: err });
         });
