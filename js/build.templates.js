@@ -103,5 +103,5 @@ this["Fliplet"]["Widget"]["Templates"]["templates.components.wysiwyg"] = Handleb
 },"useData":true});
 
 this["Fliplet"]["Widget"]["Templates"]["templates.configurations.radio"] = Handlebars.template({"compiler":[7,">= 4.0.0"],"main":function(container,depth0,helpers,partials,data) {
-    return "<div class=\"form-group\">\n  <label>Description</label>\n  <input class=\"form-control\" type=\"text\" v-model.trim=\"description\" placeholder=\"Description text\" />\n</div>\n<div class=\"form-group\">\n  <label>Default value <small>(Enter one of the options you entered above)</small></label>\n  <input class=\"form-control\" type=\"text\" v-model.trim=\"value\" placeholder=\"Default value\" />\n</div>\n";
+    return "<div v-show=\"defaultValueSource === 'default'\" class=\"form-group\">\n  <label>Default value <small>(Enter one of the options you entered above)</small></label>\n  <input class=\"form-control\" type=\"text\" v-model.trim=\"value\" placeholder=\"Default value\" />\n</div>\n";
 },"useData":true});

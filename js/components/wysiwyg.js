@@ -164,6 +164,10 @@ Fliplet.FormBuilder.field('wysiwyg', {
           $vm.addPlaceholder();
           $vm.addBulletedListShortcutsWindows();
 
+          if ($vm.defaultValueSource !== 'default') {
+            $vm.setValueFromDefaultSettings({ source: $vm.defaultValueSource, key: $vm.defaultValueKey });
+          }
+
           // initialise value if it was set prior to initialisation
           if ($vm.value) {
             editor.setContent($vm.value, { format: 'raw' });

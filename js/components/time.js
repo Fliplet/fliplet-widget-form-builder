@@ -56,6 +56,10 @@ Fliplet.FormBuilder.field('time', {
   mounted: function() {
     var $vm = this;
 
+    if (this.defaultValueSource !== 'default') {
+      this.setValueFromDefaultSettings({ source: this.defaultValueSource, key: this.defaultValueKey });
+    }
+
     if (!this.value || this.autofill === 'always') {
       var now = new Date();
       var hours = now.getHours();
