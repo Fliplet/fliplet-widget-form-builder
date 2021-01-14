@@ -324,6 +324,7 @@ new Vue({
       });
 
       Fliplet.Widget.toggleCancelButton(false);
+      Fliplet.Widget.setSaveButtonLabel('Save');
 
       window.emailTemplateAddProvider.then(function onForwardEmailProvider(result) {
         window.emailTemplateAddProvider = null;
@@ -373,6 +374,7 @@ new Vue({
             Fliplet.Studio.emit('reload-widget-instance', Fliplet.Widget.getDefaultId());
           });
           Fliplet.Widget.autosize();
+          Fliplet.Widget.setSaveButtonLabel('Save & Close');
         });
       });
     },
@@ -393,6 +395,7 @@ new Vue({
       });
 
       Fliplet.Widget.toggleCancelButton(false);
+      Fliplet.Widget.setSaveButtonLabel('Save');
 
       window.emailTemplateEditProvider.then(function onForwardEmailProvider(result) {
         window.emailTemplateEditProvider = null;
@@ -442,6 +445,7 @@ new Vue({
             Fliplet.Studio.emit('reload-widget-instance', Fliplet.Widget.getDefaultId());
           });
           Fliplet.Widget.autosize();
+          Fliplet.Widget.setSaveButtonLabel('Save & Close');
         });
       });
     },
@@ -462,6 +466,7 @@ new Vue({
       });
 
       Fliplet.Widget.toggleCancelButton(false);
+      Fliplet.Widget.setSaveButtonLabel('Save');
 
       window.generateEmailProvider.then(function onForwardEmailProvider(result) {
         window.generateEmailProvider = null;
@@ -471,6 +476,7 @@ new Vue({
           Fliplet.Studio.emit('reload-widget-instance', Fliplet.Widget.getDefaultId());
         });
         Fliplet.Widget.autosize();
+        Fliplet.Widget.setSaveButtonLabel('Save & Close');
       });
     },
     checkEmailTemplate: function() {
@@ -1053,10 +1059,6 @@ new Vue({
     });
 
     Fliplet.Widget.onSaveRequest(function() {
-      if (window.dataSourceProvider) {
-        window.dataSourceProvider.forwardSaveRequest();
-      }
-
       if (window.emailTemplateAddProvider) {
         return window.emailTemplateAddProvider.forwardSaveRequest();
       }
@@ -1077,6 +1079,10 @@ new Vue({
         return window.linkProvider.forwardSaveRequest();
       }
 
+      if (window.dataSourceProvider) {
+        window.dataSourceProvider.forwardSaveRequest();
+      }
+
       $vm.triggerSave();
     });
 
@@ -1091,6 +1097,7 @@ new Vue({
         if (window[providerName]) {
           window[providerName].close();
           window[providerName] = null;
+          Fliplet.Widget.setSaveButtonLabel('Save & Close');
         }
       });
 
