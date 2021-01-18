@@ -142,7 +142,7 @@ Fliplet.FormBuilder = (function() {
           }
 
           if (componentName === 'flCheckbox') {
-            value = [value];
+            value = Array.isArray(value) ? value : [value];
           }
 
           var isValueChanged = value !== $vm.value;
@@ -205,7 +205,9 @@ Fliplet.FormBuilder = (function() {
 
       if (!component.mounted) {
         component.mounted = function() {
-          this.setValueFromDefaultSettings({ source: this.defaultValueSource, key: this.defaultValueKey });
+          if (this.defaultValueSource !== 'default') {
+            this.setValueFromDefaultSettings({ source: this.defaultValueSource, key: this.defaultValueKey });
+          }
         };
       }
 
