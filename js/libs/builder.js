@@ -451,7 +451,7 @@ new Vue({
             Fliplet.Studio.emit('reload-widget-instance', Fliplet.Widget.getDefaultId());
           });
           Fliplet.Widget.autosize();
-          Fliplet.Widget.setSaveButtonLabel(SAVE_BUTTON_LABELS.SAVE);
+          Fliplet.Widget.setSaveButtonLabel(SAVE_BUTTON_LABELS.SAVE_AND_CLOSE);
         });
       });
     },
@@ -482,7 +482,7 @@ new Vue({
           Fliplet.Studio.emit('reload-widget-instance', Fliplet.Widget.getDefaultId());
         });
         Fliplet.Widget.autosize();
-        Fliplet.Widget.setSaveButtonLabel(SAVE_BUTTON_LABELS.SAVE);
+        Fliplet.Widget.setSaveButtonLabel(SAVE_BUTTON_LABELS.SAVE_AND_CLOSE);
       });
     },
     checkEmailTemplate: function() {
