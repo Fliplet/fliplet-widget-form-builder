@@ -82,7 +82,7 @@ Fliplet.FormBuilder.field('time', {
   watch: {
     value: function(val) {
       if (!val) {
-        this.updateValue(moment(new Date()).format('HH:mm'));
+        this.updateValue(moment().format('HH:mm'));
       }
     }
   }
