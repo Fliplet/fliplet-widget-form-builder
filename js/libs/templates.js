@@ -16,47 +16,6 @@ var systemTemplates = [{
     }
     ]
   }
-},
-{
-  id: 2,
-  settings: {
-    displayName: 'Enquiry',
-    description: 'An easy way to track enquiries from your customers.',
-    fields: [{
-      _type: 'flInput',
-      name: 'Name',
-      label: 'Name'
-    },
-    {
-      _type: 'flEmail',
-      name: 'Email address',
-      label: 'Email address'
-    },
-    {
-      _type: 'flSelect',
-      name: 'Enquiry type',
-      label: 'What is your enquiry about?',
-      options: [{
-        id: 'Support'
-      },
-      {
-        id: 'Feedback'
-      }
-      ]
-    },
-    {
-      _type: 'flTextarea',
-      name: 'Message',
-      label: 'How can we help you today?'
-    },
-    {
-      _type: 'flButtons',
-      name: 'buttons',
-      label: 'Form buttons',
-      _submit: false
-    }
-    ]
-  }
 }
 ];
 
