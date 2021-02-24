@@ -1,12 +1,14 @@
 <div v-if="description" class="help-block description">\{{ description }}</div>
 <label :for="name" class="select-proxy-display">
   <select
-    class="form-control hidden-select"
+    class="form-control hidden-select focus-outline"
     :name="name"
     :id="name"
     v-model="value"
     v-on:change="updateValue()"
-    v-on:input="onInput($event)">
+    v-on:input="onInput($event)"
+    tabindex="0"
+  >
     <option v-if="placeholder" value="">\{{ placeholder }}</option>
     <option v-for="option in options" :value="(_.isNumber(option.id) || _.isString(option.id)) ? option.id : option.label" :disabled="option.disabled">
       \{{ option.label || option.id }}

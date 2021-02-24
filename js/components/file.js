@@ -140,6 +140,9 @@ Fliplet.FormBuilder.field('file', {
       }
 
       $vm.$emit('_input', $vm.name, $vm.value);
+    },
+    openFileDialog: function() {
+      this.$refs.fileInput.click();
     }
   }
 });

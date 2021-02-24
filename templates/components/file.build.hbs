@@ -10,10 +10,10 @@
       <span class="file-name">\{{ file.name }}</span>
     </div>
   </div>
-  <label class="btn btn-primary">
+  <label class="btn btn-primary focus-outline" tabindex="0" v-on:keydown.space.prevent="openFileDialog()">
     <i class="fa fa-plus" aria-hidden="true"></i>
     <span>Choose file</span>
-    <input type="file" ref="fileInput" :id="name" :name="name" :data-folder-id="mediaFolderId" class="input-file selectfile" :required="required" v-on:change="updateValue()" multiple>
+    <input type="file" ref="fileInput" :id="name" :name="name" :data-folder-id="mediaFolderId" class="input-file selectfile" :required="required" v-on:change="updateValue()" multiple tabindex="-1">
   </label>
 </div>
  

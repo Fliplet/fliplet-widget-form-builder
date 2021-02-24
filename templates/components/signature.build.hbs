@@ -1,6 +1,15 @@
 <div v-if="description" class="help-block description">\{{ description }}</div>
-<div class="field-signature">
+<div class="field-signature focus-outline" tabindex="0">
   <canvas :id="name" ref="canvas"></canvas>
-  <a href="#" v-on:click.prevent="clean()"><i class="fa fa-times"></i> Clear</a>
+  <a
+    href="#"
+    class="focus-outline"
+    tabindex="0"
+    v-on:click.prevent="clean()"
+    v-on:keydown.space.prevent="clean()"
+  >
+    <i class="fa fa-times"></i>
+    Clear
+  </a>
 </div>
 <p class="text-danger" v-if="$v.value.required === false && $v.value.$dirty">Field is required.</p>

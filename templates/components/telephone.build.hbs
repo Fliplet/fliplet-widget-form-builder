@@ -1,13 +1,14 @@
 <div v-if="description" class="help-block description">\{{ description }}</div>
 <input
   type="tel"
-  class="form-control"
+  class="form-control focus-outline"
   v-model.trim.lazy="value"
   v-on:blur="updateValue()"
   v-on:input="onInput($event)"
   :name="name"
   :id="name"
   :placeholder="placeholder"
+  tabindex="0"
 />
 <p class="text-danger" v-if="$v.value.required === false && $v.value.$dirty">Field is required.</p>
 <p class="text-danger" v-if="$v.value.phone === false && $v.value.$dirty">Phone could contain <b>; , . ( ) - + SPACE * #</b> and numbers.</p>

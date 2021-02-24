@@ -1,6 +1,6 @@
 <template v-if="showSubmit">
-<button :type="submitType" class="btn btn-primary pull-right">\{{ submitValue }}</button>
+<button :type="submitType" class="btn btn-primary pull-right focus-outline" tabindex="0">\{{ submitValue }}</button>
 </template>
 <template v-if="showClear">
-<button :type="clearType" class="btn btn-secondary pull-right" @click="resetForm()">\{{ clearValue }}</button>
+<button :type="clearType" class="btn btn-secondary pull-right focus-outline" tabindex="0" @click="resetForm()">\{{ clearValue }}</button>
 </template>
