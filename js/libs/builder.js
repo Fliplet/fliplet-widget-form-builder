@@ -831,6 +831,12 @@ new Vue({
         $vm.templates = templates.system.concat(templates.organization);
         $vm.systemTemplates = templates.system;
         $vm.organizationTemplates = templates.organization;
+
+        if (!$vm.organizationTemplates.length) {
+          var blankTemplateId = $vm.systemTemplates[0].id;
+
+          $vm.useTemplate(blankTemplateId);
+        }
       });
     }
   },
@@ -971,8 +977,6 @@ new Vue({
     Fliplet.FormBuilder.on('field-settings-changed', this.onFieldSettingChanged);
 
     this.loadTemplates().then(function() {
-      $(selector).removeClass('is-loading');
-
       $($vm.$refs.templateDescription).tinymce({
         plugins: [
           'lists advlist image charmap hr code',
@@ -1002,6 +1006,7 @@ new Vue({
           $($vm.$refs.templateGallery).find('[data-toggle="tooltip"]').tooltip({
             container: 'body'
           });
+          $(selector).removeClass('is-loading');
         }, 500);
       }
     });
