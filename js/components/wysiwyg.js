@@ -188,13 +188,13 @@ Fliplet.FormBuilder.field('wysiwyg', {
         editor.on('focus', function() {
           var $el = $(editor.iframeElement);
 
-          $el.parents().eq(1).addClass('tinymce-focus');
+          $el.parents().eq(1).addClass('focus-outline');
         });
 
         editor.on('blur', function() {
           var $el = $(editor.iframeElement);
 
-          $el.parents().eq(1).removeClass('tinymce-focus');
+          $el.parents().eq(1).removeClass('focus-outline');
         });
 
         editor.on('change', function() {
