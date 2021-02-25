@@ -40,13 +40,13 @@ Fliplet.FormBuilder.field('starRating', {
   methods: {
     increaseRatingValue: function() {
       if (this.value < 5) {
-        this.value = (+this.value + 1).toString();
+        this.value = +this.value + 1;
         this.updateValue();
       }
     },
     decreaseRatingValue: function() {
       if (this.value > 0) {
-        this.value = (+this.value - 1).toString();
+        this.value = +this.value - 1;
         this.updateValue();
       }
     }
