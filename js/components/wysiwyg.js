@@ -185,6 +185,18 @@ Fliplet.FormBuilder.field('wysiwyg', {
 
         editor.on('keydown', $vm.addBulletedListShortcutsMac);
 
+        editor.on('focus', function() {
+          var $el = $(editor.iframeElement);
+
+          $el.parents().eq(1).addClass('tinymce-focus');
+        });
+
+        editor.on('blur', function() {
+          var $el = $(editor.iframeElement);
+
+          $el.parents().eq(1).removeClass('tinymce-focus');
+        });
+
         editor.on('change', function() {
           $vm.value = editor.getContent();
 
