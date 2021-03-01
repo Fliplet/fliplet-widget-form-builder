@@ -19,6 +19,7 @@
           v-on:keydown.down.prevent="focusHandler(index + 1)"
           v-on:keydown.left.prevent="focusHandler(index - 1)"
           v-on:keydown.up.prevent="focusHandler(index - 1)"
+          v-on:keydown.space.prevent="focusHandler(index)"
         >
           <i class="fa fa-circle"></i>
         </span>
