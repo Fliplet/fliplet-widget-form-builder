@@ -550,7 +550,7 @@ new Vue({
             payload: payload
           });
         } else if (!hooksDeleted) {
-          if (_.isEqual(columns.sort(), ds.columns.sort())) {
+          if (_.isEqual(columns.concat().sort(), ds.columns.concat().sort())) {
             return Promise.resolve(); // no need to update
           }
         }
