@@ -1,5 +1,19 @@
 <div v-if="description" class="help-block description">\{{ description }}</div>
-<div class="fileUpload file-input" :class="{ 'fileUpload-padding-top': value.length }">
+<template v-if="readonly">
+  <ul class="file-holder">
+    <li class="file-item" v-for="(file, index) in value" @click="onFileItemClick(file.url)">
+      <div class="file-title">\{{ file.name }}</div>
+      <div class="file-info">
+        <span class="file-info-uploaded">Uploaded: \{{ showLocalDateFormat(file.createdAt) }}</span>
+        <span v-show="file.metadata && file.metadata.size" class="file-info-size">Size: \{{ humanFileSize(file.metadata && file.metadata.size) }}</span>
+      </div>
+      <div class="file-icon">
+        <i class="fa fa-angle-right"></i>
+      </div>
+    </li>
+  </ul>
+</template>
+<div v-else class="fileUpload file-input" :class="{ 'fileUpload-padding-top': value.length }">
   <div class="row">
     <div ref="canvasWrap" class="text-center" v-for="(file, index) in value">
       <div class="canvas-holder">

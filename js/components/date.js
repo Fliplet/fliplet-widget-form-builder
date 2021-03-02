@@ -65,7 +65,7 @@ Fliplet.FormBuilder.field('date', {
 
     if (!this.value || this.autofill === 'always') {
       // HTML5 date field wants YYYY-MM-DD format
-      $vm.updateValue(moment().format('YYYY-MM-DD'));
+      this.value = moment().format('YYYY-MM-DD');
       this.empty = false;
     }
 

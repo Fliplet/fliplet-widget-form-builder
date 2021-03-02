@@ -189,6 +189,26 @@ Fliplet.FormBuilder = (function() {
         return this.showLabel || this.showLabel === undefined;
       };
 
+      component.computed._showField = function() {
+        if (this.readonly) {
+          if (['flTime', 'flDate'].includes(this._componentName)) {
+            return true;
+          }
+
+          if (Array.isArray(this.value)) {
+            return !!this.value.length;
+          }
+
+          return !!this.value;
+        }
+
+        if (this.isHidden) {
+          return false;
+        }
+
+        return true;
+      };
+
       component.computed._selectedLabel = function() {
         if (!this.options) {
           return this.value;
@@ -230,6 +250,10 @@ Fliplet.FormBuilder = (function() {
           type: String,
           default: component.name || 'Label text'
         },
+        _componentName: {
+          type: String,
+          default: componentName
+        },
         showLabel: {
           type: Boolean,
           default: true
@@ -249,6 +273,10 @@ Fliplet.FormBuilder = (function() {
         canHide: {
           type: Boolean,
           default: true
+        },
+        readonly: {
+          type: Boolean,
+          default: false
         },
         defaultValueSource: {
           type: String,
@@ -326,6 +354,11 @@ Fliplet.FormBuilder = (function() {
       component.props._componentsWithPersonalization = {
         type: Array,
         default: ['flInput', 'flCheckbox', 'flRadio', 'flEmail', 'flNumber', 'flTelephone', 'flUrl', 'flTextarea', 'flWysiwyg', 'flSelect', 'flDate', 'flTime']
+      };
+
+      component.props._readOnlyComponents = {
+        type: Array,
+        default: ['flInput', 'flCheckbox', 'flRadio', 'flEmail', 'flNumber', 'flTelephone', 'flUrl', 'flTextarea', 'flWysiwyg', 'flSelect', 'flDate', 'flTime', 'flStarRating', 'flSignature', 'flImage', 'flFile']
       };
 
       component.props._idx = {

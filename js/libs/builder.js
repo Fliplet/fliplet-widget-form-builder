@@ -1012,6 +1012,7 @@ new Vue({
           $($vm.$refs.templateGallery).find('[data-toggle="tooltip"]').tooltip({
             container: 'body'
           });
+          $(selector).removeClass('is-loading');
         }, 500);
       }
     });

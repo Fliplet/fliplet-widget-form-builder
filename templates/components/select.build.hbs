@@ -1,18 +1,36 @@
 <div v-if="description" class="help-block description">\{{ description }}</div>
-<label :for="name" class="select-proxy-display">
-  <select
-    class="form-control hidden-select"
-    :name="name"
-    :id="name"
-    v-model="value"
-    v-on:change="updateValue()"
-    v-on:input="onInput($event)">
-    <option v-if="placeholder" value="">\{{ placeholder }}</option>
-    <option v-for="option in options" :value="(_.isNumber(option.id) || _.isString(option.id)) ? option.id : option.label" :disabled="option.disabled">
-      \{{ option.label || option.id }}
-    </option>
-  </select>
-  <span class="icon fa fa-chevron-down"></span>
-  <span class="select-value-proxy"><template v-if="value && value !== ''">\{{ _selectedLabel }}</template><template v-else>\{{ placeholder }}</template></span>
-</label>
-<p class="text-danger" v-if="$v.value.required === false && $v.value.$dirty">Field is required.</p>
+<template v-if="readonly">
+  <p class="form-control-static">\{{ value }}</p>
+    <select
+      class="form-control hidden-select hidden"
+      :name="name"
+      :id="name"
+      v-model="value"
+      v-on:change="updateValue()"
+      v-on:input="onInput($event)">
+      <option v-if="placeholder" value="">\{{ placeholder }}</option>
+      <option v-for="option in options" :value="(_.isNumber(option.id) || _.isString(option.id)) ? option.id : option.label" :disabled="option.disabled">
+        \{{ option.label || option.id }}
+      </option>
+    </select>
+</template>
+<template v-else>
+  <label :for="name" class="select-proxy-display">
+    <select
+      class="form-control hidden-select"
+      :name="name"
+      :id="name"
+      v-model="value"
+      v-on:change="updateValue()"
+      v-on:input="onInput($event)">
+      <option v-if="placeholder" value="">\{{ placeholder }}</option>
+      <option v-for="option in options" :value="(_.isNumber(option.id) || _.isString(option.id)) ? option.id : option.label" :disabled="option.disabled">
+        \{{ option.label || option.id }}
+      </option>
+    </select>
+    <span class="icon fa fa-chevron-down"></span>
+    <span class="select-value-proxy"><template v-if="value && value !== ''">\{{ _selectedLabel }}</template><template v-else>\{{ placeholder }}</template></span>
+  </label>
+  <p class="text-danger" v-if="$v.value.required === false && $v.value.$dirty">Field is required.</p>
+</template>
+

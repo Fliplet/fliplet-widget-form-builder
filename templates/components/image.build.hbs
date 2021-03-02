@@ -1,5 +1,15 @@
 <div v-if="description" class="help-block description">\{{ description }}</div>
-<div class="fileUpload" :class="{ 'fileUpload-padding-top': value.length }">
+
+<div v-if="readonly" class="fileUpload" :class="{ 'fileUpload-padding-top': value.length }">
+  <div class="row">
+    <div v-for="(image, index) in value" @click="onImageClick(index)" class="multiple-images-item">
+      <div class="image-item" :style="{ 'background-image': 'url(' + image + ')' }"></div>
+    </div>
+  </div>
+  <input multiple type="hidden" ref="imageInput" :id="name" :name="name" class="input-file selectfile" accept="image/gif, image/jpg, image/jpeg, image/tiff, image/png" :data-folder-id="mediaFolderId">
+</div>
+
+<div v-else class="fileUpload" :class="{ 'fileUpload-padding-top': value.length }">
   <div class="row">
     <div v-for="(image, index) in value">
       <div class="canvas-holder">

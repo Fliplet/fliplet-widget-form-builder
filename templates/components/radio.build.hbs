@@ -1,17 +1,33 @@
 <template>
   <div v-if="description" class="help-block description">\{{ description }}</div>
-  <template v-for="(option, index) in options">
-    <div class="radio radio-icon">
-      <input
-        type="radio"
-        :id="name + '-' + index"
-        :name="name"
-        v-model="value"
-        :value="option.id || option.label">
-      <label v-on:click="clickHandler(option)">
-        <span class="check"><i class="fa fa-circle"></i></span> \{{ option.label || option.id }}
-      </label>
+  <template v-if="readonly">
+    <template v-for="(option, index) in options">
+      <template v-if="value === option.label || value === option.id">
+        <p class="form-control-static">\{{ option.label || option.id }}</p>
+        <input
+            type="hidden"
+            :id="name + '-' + index"
+            :name="name"
+            v-model="value"
+            :value="option.id || option.label">
+      </template>
+    </template>
+  </template>
+  <template v-else>
+    <template v-for="(option, index) in options">
+      <div class="radio radio-icon">
+        <input
+          type="radio"
+          :id="name + '-' + index"
+          :name="name"
+          v-model="value"
+          :value="option.id || option.label">
+        <label v-on:click="clickHandler(option)">
+          <span class="check"><i class="fa fa-circle"></i></span> \{{ option.label || option.id }}
+        </label>
     </div>
+    </template>
+
   </template>
   <p class="text-danger" v-if="$v.value.required === false && $v.value.$dirty">Field is required.</p>
 </template>
