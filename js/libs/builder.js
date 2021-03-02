@@ -979,7 +979,7 @@ new Vue({
     Fliplet.FormBuilder.on('field-settings-changed', this.onFieldSettingChanged);
 
     this.loadTemplates().then(function() {
-      if ($vm.organizationTemplates.length) {
+      if ($vm.organizationTemplates.length || data.fields) {
         $(selector).removeClass('is-loading');
       }
 
