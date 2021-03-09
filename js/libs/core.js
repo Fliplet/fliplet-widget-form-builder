@@ -465,8 +465,6 @@ Fliplet.FormBuilder = (function() {
       };
 
       component.methods._initDatepicker = function() {
-        debugger;
-
         var $vm = this;
 
         $vm.$nextTick(function() {
