@@ -618,6 +618,10 @@ nav>.btn {
   padding-left: 57px;
 }
 
+.form-control[readonly] {
+  background-color: inherit !important;
+}
+
 /* SIGNATURE FIELD */
 
 .field-signature {

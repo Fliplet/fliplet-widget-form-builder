@@ -216,6 +216,10 @@ a {
   min-height: 44px;
 }
 
+.form-control[readonly] {
+  background-color: inherit !important;
+}
+
 .form-control.has-error {
   border: 1px solid #a94442;
 }
