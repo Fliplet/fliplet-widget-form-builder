@@ -1,4 +1,5 @@
 var DATE_FORMAT = 'YYYY-MM-DD';
+var LOCAL_FORMAT = moment.localeData().longDateFormat('L');
 
 Fliplet.FormBuilder.field('date', {
   name: 'Date picker',
@@ -42,6 +43,9 @@ Fliplet.FormBuilder.field('date', {
   computed: {
     isWeb: function() {
       return Fliplet.Env.get('platform') === 'web';
+    },
+    getLocalFormattedValue: function() {
+      return moment(this.value).format(LOCAL_FORMAT);
     }
   },
   mounted: function() {
@@ -49,14 +53,23 @@ Fliplet.FormBuilder.field('date', {
 
     if (Fliplet.Env.get('platform') === 'web') {
       this.datePicker = $(this.$el).find('input.date-picker').datepicker({
-        format: 'yyyy-mm-dd',
+        format: {
+          toDisplay: function(date) {
+            return moment(date).format(LOCAL_FORMAT);
+          },
+          toValue: function(date) {
+            return date;
+          }
+        },
         todayHighlight: true,
         autoclose: true
       }).on('changeDate', function(e) {
         $vm.value = moment(e.date).format(DATE_FORMAT);
+
+        $vm.updateValue();
       });
 
-      this.datePicker.datepicker('setDate', this.value || new Date());
+      this.datePicker.datepicker('setDate', new Date(this.value) || new Date());
     }
 
     if (this.defaultValueSource !== 'default') {
@@ -65,21 +78,11 @@ Fliplet.FormBuilder.field('date', {
 
     if (!this.value || this.autofill === 'always') {
       // HTML5 date field wants YYYY-MM-DD format
-      this.value = moment().format('YYYY-MM-DD');
+      this.value = moment().format(DATE_FORMAT);
       this.empty = false;
     }
 
     this.$emit('_input', this.name, this.value);
     $vm.$v.$reset();
-  },
-  watch: {
-    value: function(val) {
-      if (Fliplet.Env.get('platform') === 'web') {
-        this.datePicker.datepicker('setDate', val);
-      }
-
-      this.highlightError();
-      this.$emit('_input', this.name, val);
-    }
   }
 });

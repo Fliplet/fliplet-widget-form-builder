@@ -21,6 +21,11 @@ Fliplet.FormBuilder.field('time', {
       default: true
     }
   },
+  data: function() {
+    return {
+      LOCAL_FORMAT: moment.localeData().longDateFormat('LT')
+    };
+  },
   validations: function() {
     var rules = {
       value: {}
@@ -73,7 +78,9 @@ Fliplet.FormBuilder.field('time', {
         minutes = '0' + minutes;
       }
 
-      this.updateValue(hours + ':' + minutes);
+      var formattedTime = moment(hours + ':' + minutes, 'HH:mm').format(this.LOCAL_FORMAT);
+
+      this.updateValue(formattedTime);
       this.empty = false;
     }
 
@@ -82,7 +89,7 @@ Fliplet.FormBuilder.field('time', {
   watch: {
     value: function(val) {
       if (!val) {
-        this.updateValue(moment().format('HH:mm'));
+        this.updateValue(moment().format(this.LOCAL_FORMAT));
       }
     }
   }
