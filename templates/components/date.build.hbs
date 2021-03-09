@@ -3,7 +3,7 @@
   <p class="form-control-static">\{{ value }}</p>
   <input
     type="hidden"
-    v-model.lazy="value"
+    v-model.lazy="getLocalFormattedValue"
     v-on:change="updateValue()"
     :name="name"
     :id="name"

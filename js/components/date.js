@@ -43,9 +43,6 @@ Fliplet.FormBuilder.field('date', {
   computed: {
     isWeb: function() {
       return Fliplet.Env.get('platform') === 'web';
-    },
-    getLocalFormattedValue: function() {
-      return moment(this.value).format(LOCAL_FORMAT);
     }
   },
   mounted: function() {
