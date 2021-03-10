@@ -24,7 +24,9 @@
           :id="name + '-' + index"
           :name="name"
           v-model="value"
-          :value="option.id || option.label">
+          :value="option.id || option.label"
+          tabindex="-1"
+        >
         <label v-on:click="clickHandler(option)">
           <span
             ref="radioButton"
