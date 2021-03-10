@@ -133,8 +133,11 @@ Fliplet.FormBuilder.field('wysiwyg', {
     var config = {
       target: this.$refs.textarea,
       theme: 'modern',
+      readonly: this.readonly,
       mobile: {
-        theme: 'mobile',
+        theme: this.readonly
+          ? 'silver'
+          : 'mobile',
         plugins: [ 'autosave', 'lists', 'autolink' ],
         toolbar: [ 'bold', 'italic', 'underline', 'bullist', 'numlist', 'removeformat' ]
       },
@@ -142,11 +145,13 @@ Fliplet.FormBuilder.field('wysiwyg', {
         'advlist autolink lists link directionality',
         'autoresize fullscreen code paste'
       ].join(' '),
-      toolbar: [
-        'bold italic underline',
-        'alignleft aligncenter alignright alignjustify | bullist numlist outdent indent',
-        'ltr rtl | link | removeformat code fullscreen'
-      ].join(' | '),
+      toolbar: this.readonly
+        ? false
+        : [
+          'bold italic underline',
+          'alignleft aligncenter alignright alignjustify | bullist numlist outdent indent',
+          'ltr rtl | link | removeformat code fullscreen'
+        ].join(' | '),
       image_advtab: true,
       menubar: false,
       statusbar: false,

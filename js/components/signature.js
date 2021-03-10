@@ -51,6 +51,10 @@ Fliplet.FormBuilder.field('signature', {
     }
   },
   mounted: function() {
+    if (this.readonly) {
+      return;
+    }
+
     var $vm = this;
 
     var canvas = this.$refs.canvas;

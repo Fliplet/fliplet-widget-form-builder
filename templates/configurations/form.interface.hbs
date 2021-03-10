@@ -94,7 +94,7 @@
           <option value="query">Link query parameter</option>
         </select>
         <div class="col-xs-12 text-right">
-          <a href="#!" target="_blank">Learn more about these types</a>
+          <a href="https://help.fliplet.com/form-component/" target="_blank">Learn more about these types</a>
         </div>
         <div v-if="defaultValueSource !== 'default'">
           <label>Default key</label>
@@ -110,6 +110,15 @@
 
     <div class="col-xs-12">
       {{{ template }}}
+    </div>
+
+    <div v-if='_readOnlyComponents.includes(_componentName)' class="col-xs-12 form-group">
+      <div class="checkbox checkbox-icon">
+        <input type="checkbox" id="readonly" name="readonly" v-model="readonly">
+        <label for="readonly">
+          <span class="check"><i class="fa fa-check"></i></span> Read only and cannot be edited
+        </label>
+      </div>
     </div>
 
   </div>

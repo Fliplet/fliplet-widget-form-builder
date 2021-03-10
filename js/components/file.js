@@ -52,15 +52,73 @@ Fliplet.FormBuilder.field('file', {
   created: function() {
     Fliplet.FormBuilder.on('reset', this.onReset);
   },
+  updated: function() {
+    if (this.readonly) {
+      var $vm = this;
+      var isFileDataLoaded = false;
+      var fileIDs = _.map(this.value, function(fileURL) {
+        if (typeof fileURL === 'string' && /v1\/media\/files\/([0-9]+)/.test(fileURL)) {
+          return +fileURL.match(/v1\/media\/files\/([0-9]+)/)[1];
+        }
+
+        isFileDataLoaded = true;
+
+        return null;
+      });
+
+      if (isFileDataLoaded) {
+        return;
+      }
+
+      Fliplet.Media.Files.getAll({
+        files: fileIDs,
+        fields: ['name', 'url', 'metadata', 'createdAt']
+      }).then(function(files) {
+        $vm.value = files;
+      }).catch(function() {});
+    }
+  },
   destroyed: function() {
     Fliplet.FormBuilder.off('reset', this.onReset);
     this.selectedFiles.length = 0;
   },
   methods: {
+    showLocalDateFormat: function(date) {
+      return moment(date).format(moment.localeData().longDateFormat('L'));
+    },
+    onFileItemClick: function(url) {
+      Fliplet.Navigate.file(url);
+    },
     isFileImage: function(file) {
       if (file && file.type) {
         return (file.type.indexOf('image') >= 0);
       }
+    },
+    /**
+     * Format bytes as human-readable text.
+     *
+     * @param {Number} bytes size in bytes
+     *
+     * @return {String} Formatted size i.e 1.2MB
+     */
+    humanFileSize: function(bytes) {
+      var unitCapacity = 1000;
+      var decimals = 1;
+
+      if (Math.abs(bytes) < unitCapacity) {
+        return bytes + ' B';
+      }
+
+      var units = ['kB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
+      var unitIndex = -1;
+      var round  = 10 * decimals;
+
+      do {
+        bytes /= unitCapacity;
+        ++unitIndex;
+      } while (Math.round(Math.abs(bytes) * round ) / round  >= unitCapacity && unitIndex < units.length - 1);
+
+      return bytes.toFixed(decimals) + ' ' + units[unitIndex];
     },
     onReset: function() {
       var $vm = this;

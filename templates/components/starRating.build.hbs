@@ -1,5 +1,24 @@
 <div v-if="description" class="help-block description">\{{ description }}</div>
+<div v-if="readonly" class="inverse-direction">
+  <template v-for="(option, index) in values">
+    <template v-if="value >= option.id">
+      <input
+        class="rating-input"
+        :name="name"
+        type="radio"
+        :id="name + '-' + index"
+        v-model="value"
+        :value="option.id"
+      />
+      <label class="rating-star">
+        <i class="fa fa-star-o"></i>
+        <i class="fa fa-star"></i>
+      </label>
+    </template>
+  </template>
+</div>
 <div
+  v-else
   class="inverse-direction focus-outline"
   tabindex="0"
   v-on:keydown.up.prevent="increaseRatingValue()"
