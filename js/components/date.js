@@ -81,5 +81,13 @@ Fliplet.FormBuilder.field('date', {
       this.highlightError();
       this.$emit('_input', this.name, val);
     }
+  },
+  methods: {
+    onInputFocus: function(e) {
+      e.target.parentElement.classList.add('input-focused');
+    },
+    onInputBlur: function(e) {
+      e.target.parentElement.classList.remove('input-focused');
+    }
   }
 });

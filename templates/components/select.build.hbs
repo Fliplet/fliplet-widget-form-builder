@@ -25,6 +25,8 @@
       v-model="value"
       v-on:change="updateValue()"
       v-on:input="onInput($event)"
+      v-on:focus="onInputFocus"
+      v-on:blur="onInputBlur"
       tabindex="0"
     >
       <option v-if="placeholder" value="">\{{ placeholder }}</option>

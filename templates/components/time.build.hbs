@@ -28,6 +28,8 @@
       v-model.lazy="value"
       v-on:change="updateValue()"
       v-on:input="onInput($event)"
+      v-on:focus="onInputFocus"
+      v-on:blur="onInputBlur"
       :name="name"
       :id="name"
       :placeholder="placeholder"

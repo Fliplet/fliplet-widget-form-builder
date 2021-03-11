@@ -47,5 +47,13 @@ Fliplet.FormBuilder.field('select', {
     }
 
     return rules;
+  },
+  methods: {
+    onInputFocus: function(e) {
+      e.target.parentElement.classList.add('input-focused');
+    },
+    onInputBlur: function(e) {
+      e.target.parentElement.classList.remove('input-focused');
+    }
   }
 });

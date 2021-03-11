@@ -40,6 +40,12 @@ Fliplet.FormBuilder.field('time', {
 
       this.highlightError();
       this.$emit('_input', this.name, this.value);
+    },
+    onInputFocus: function(e) {
+      e.target.parentElement.classList.add('input-focused');
+    },
+    onInputBlur: function(e) {
+      e.target.parentElement.classList.remove('input-focused');
     }
   },
   beforeUpdate: function() {
