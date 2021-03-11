@@ -15,7 +15,7 @@
   Today
 </template>
 <template v-else>
-  <div v-if="isWeb" class="input-group custom-date">
+  <div v-if="isWeb" class="input-group custom-date" :class="{ 'input-focused': isInputFocused }">
     <div class="input-group-addon">
       <i class="fa fa-calendar"></i>
     </div>
@@ -25,8 +25,8 @@
       v-model.lazy="value"
       v-on:change="updateValue()"
       v-on:input="onInput($event)"
-      v-on:focus="onInputFocus"
-      v-on:blur="onInputBlur"
+      v-on:focus="isInputFocused = true"
+      v-on:blur="isInputFocused = false"
       :name="name"
       :id="name"
       :placeholder="placeholder"
@@ -34,7 +34,7 @@
       tabindex="0"
     />
   </div>
-  <div v-else class="input-group native-date">
+  <div v-else class="input-group native-date" :class="{ 'input-focused': isInputFocused }">
     <div class="input-group-addon">
       <i class="fa fa-calendar"></i>
     </div>
@@ -43,8 +43,8 @@
       type="date"
       v-model.lazy="value"
       v-on:change="updateValue()"
-      v-on:focus="onInputFocus"
-      v-on:blur="onInputBlur"
+      v-on:focus="isInputFocused = true"
+      v-on:blur="isInputFocused = false"
       :name="name"
       :id="name"
       :placeholder="placeholder"

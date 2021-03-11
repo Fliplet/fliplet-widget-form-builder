@@ -24,6 +24,11 @@ Fliplet.FormBuilder.field('select', {
       type: String
     }
   },
+  data: function() {
+    return {
+      isInputFocused: false
+    };
+  },
   mounted: function() {
     var $vm = this;
 
@@ -47,13 +52,5 @@ Fliplet.FormBuilder.field('select', {
     }
 
     return rules;
-  },
-  methods: {
-    onInputFocus: function(e) {
-      e.target.parentElement.classList.add('input-focused');
-    },
-    onInputBlur: function(e) {
-      e.target.parentElement.classList.remove('input-focused');
-    }
   }
 });
