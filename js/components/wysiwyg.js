@@ -155,6 +155,11 @@ Fliplet.FormBuilder.field('wysiwyg', {
       image_advtab: true,
       menubar: false,
       statusbar: false,
+      // Prevent URLs from being altered
+      // https://stackoverflow.com/questions/3796942
+      relative_urls: false,
+      remove_script_host: false,
+      convert_urls: true,
       inline: false,
       resize: false,
       autoresize_bottom_margin: 0,
