@@ -23,6 +23,7 @@ Fliplet.FormBuilder.field('time', {
   },
   data: function() {
     return {
+      timepicker: null,
       LOCAL_FORMAT: moment.localeData().longDateFormat('LT')
     };
   },
@@ -60,6 +61,17 @@ Fliplet.FormBuilder.field('time', {
   },
   mounted: function() {
     var $vm = this;
+
+    if (Fliplet.Env.get('platform') === 'web' && Modernizr.ie11) {
+      this.timepicker = $('input[type="time"]').timeEntry({
+        show24Hours: true
+      }).on('change', function(event) {
+        $vm.value = event.target.value;
+        $vm.updateValue($vm.value);
+      });
+
+      this.timepicker.timeEntry('setTime', this.value);
+    }
 
     if (this.defaultValueSource !== 'default') {
       this.setValueFromDefaultSettings({ source: this.defaultValueSource, key: this.defaultValueKey });

@@ -430,6 +430,10 @@ Fliplet.FormBuilder = (function() {
           this._showNameField = this.name !== this.label;
           this.initTooltip();
           this.initDatepicker();
+
+          if (Modernizr.ie11) {
+            this.initTimePicker();
+          }
         };
       }
 
@@ -499,6 +503,24 @@ Fliplet.FormBuilder = (function() {
 
       if (!component.methods.initDatepicker) {
         component.methods.initDatepicker = component.methods._initDatepicker;
+      }
+
+      component.methods._initTimePicker = function() {
+        var $vm = this;
+
+        $vm.$nextTick(function() {
+          var $el = $('input[type="time"]').timeEntry({
+            show24Hour: true
+          }).on('change', function(event) {
+            $vm.value = event.target.value;
+          });
+
+          $el.timeEntry('setTime', this.value);
+        });
+      };
+
+      if (!component.methods._initTimePicker) {
+        component.methods.initTimePicker = component.methods.initTimePicker;
       }
 
       if (!component.methods.initTooltip) {
