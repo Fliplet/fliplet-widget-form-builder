@@ -519,8 +519,8 @@ Fliplet.FormBuilder = (function() {
         });
       };
 
-      if (!component.methods._initTimePicker) {
-        component.methods.initTimePicker = component.methods.initTimePicker;
+      if (!component.methods.initTimePicker) {
+        component.methods.initTimePicker = component.methods._initTimePicker;
       }
 
       if (!component.methods.initTooltip) {
