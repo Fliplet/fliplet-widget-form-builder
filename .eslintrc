@@ -2,8 +2,6 @@
   "extends": "fliplet",
   "globals": {
     "Modernizr": "readonly",
-    "TimePolyfill": "readonly",
-    "supportsTime": "readonly",
     "Vue": "readonly",
     "Sortable": "readonly"
   }
