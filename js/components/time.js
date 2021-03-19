@@ -47,19 +47,17 @@ Fliplet.FormBuilder.field('time', {
       this.highlightError();
       this.$emit('_input', this.name, this.value);
     },
-    initTimePicker: function() {
+    initIETimePicker: function() {
       var $vm = this;
 
-      if (Fliplet.Env.is('web') && Modernizr.ie11) {
-        this.timepicker = $($vm.$refs.timepicker).timeEntry({
-          show24Hours: true
-        }).on('change', function(event) {
-          $vm.value = event.target.value;
-          $vm.updateValue($vm.value);
-        });
+      this.timepicker = $($vm.$refs.timepicker).timeEntry({
+        show24Hours: true
+      }).on('change', function(event) {
+        $vm.value = event.target.value;
+        $vm.updateValue($vm.value);
+      });
 
-        this.timepicker.timeEntry('setTime', $vm.value);
-      }
+      this.timepicker.timeEntry('setTime', $vm.value);
 
       $vm.$v.$reset();
     }
@@ -76,7 +74,9 @@ Fliplet.FormBuilder.field('time', {
     }
   },
   mounted: function() {
-    this.initTimePicker();
+    if (Fliplet.Env.is('web') && Modernizr.ie11) {
+      this.initIETimePicker();
+    }
 
     if (this.defaultValueSource !== 'default') {
       this.setValueFromDefaultSettings({ source: this.defaultValueSource, key: this.defaultValueKey });
