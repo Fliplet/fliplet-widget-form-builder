@@ -509,7 +509,7 @@ Fliplet.FormBuilder = (function() {
         var $vm = this;
 
         $vm.$nextTick(function() {
-          var $el = $('input[type="time"]').timeEntry({
+          var $el = $($vm.$refs.timepicker).timeEntry({
             show24Hour: true
           }).on('change', function(event) {
             $vm.value = event.target.value;
@@ -519,8 +519,8 @@ Fliplet.FormBuilder = (function() {
         });
       };
 
-      if (!component.methods._initTimePicker) {
-        component.methods.initTimePicker = component.methods.initTimePicker;
+      if (!component.methods.initTimePicker) {
+        component.methods.initTimePicker = component.methods._initTimePicker;
       }
 
       if (!component.methods.initTooltip) {
