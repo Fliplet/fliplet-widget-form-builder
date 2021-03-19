@@ -62,8 +62,8 @@ Fliplet.FormBuilder.field('time', {
   mounted: function() {
     var $vm = this;
 
-    if (Fliplet.Env.get('platform') === 'web' && Modernizr.ie11) {
-      this.timepicker = $('input[type="time"]').timeEntry({
+    if (Fliplet.Env.is('web') && Modernizr.ie11) {
+      this.timepicker = $(this.$el).find('input[type="time"]').timeEntry({
         show24Hours: true
       }).on('change', function(event) {
         $vm.value = event.target.value;

@@ -217,7 +217,7 @@ a {
 }
 
 .form-control[readonly] {
-  background-color: #ffffff !important;
+  background-color: transparent !important;
 }
 
 .form-control.has-error {
