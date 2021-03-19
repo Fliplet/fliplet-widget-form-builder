@@ -509,7 +509,7 @@ Fliplet.FormBuilder = (function() {
         var $vm = this;
 
         $vm.$nextTick(function() {
-          var $el = $(this.$el).find('input[type="time"]').timeEntry({
+          var $el = $($vm.$refs.timepicker).timeEntry({
             show24Hour: true
           }).on('change', function(event) {
             $vm.value = event.target.value;
