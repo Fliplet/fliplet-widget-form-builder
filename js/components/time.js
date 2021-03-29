@@ -47,7 +47,7 @@ Fliplet.FormBuilder.field('time', {
       this.highlightError();
       this.$emit('_input', this.name, this.value);
     },
-    initIETimePicker: function() {
+    initTimePicker: function() {
       var $vm = this;
 
       this.timepicker = $($vm.$refs.timepicker).timeEntry({
@@ -74,11 +74,8 @@ Fliplet.FormBuilder.field('time', {
     }
   },
   mounted: function() {
-    var isExplorer = navigator.userAgent.indexOf('Trident/') !== -1;
-    var isSafari = navigator.userAgent.indexOf('Safari') !== -1;
-
-    if (Fliplet.Env.is('web') && (isExplorer || isSafari)) {
-      this.initIETimePicker();
+    if (Fliplet.Env.is('web') && (Fliplet.Env.get('ie11') || Fliplet.Env.get('safari'))) {
+      this.initTimePicker();
     }
 
     if (this.defaultValueSource !== 'default') {

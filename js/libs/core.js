@@ -5,8 +5,9 @@ Fliplet.FormBuilder = (function() {
 
   var DATE_FORMAT = 'YYYY-MM-DD';
   var LOCAL_FORMAT_DATE = moment.localeData().longDateFormat('L');
-  var isExplorer = navigator.userAgent.indexOf('Trident/') !== -1;
-  var isSafari = navigator.userAgent.indexOf('Safari') !== -1;
+
+  Fliplet.Env.set('ie11', navigator.userAgent.indexOf('Trident/') !== -1);
+  Fliplet.Env.set('safari', navigator.userAgent.indexOf('Safari') !== -1);
 
   Vue.use(window.vuelidate.default);
 
@@ -433,7 +434,7 @@ Fliplet.FormBuilder = (function() {
           this.initTooltip();
           this.initDatepicker();
 
-          if (isExplorer || isSafari) {
+          if (Fliplet.Env.get('ie11') || Fliplet.Env.get('safari')) {
             this.initTimePicker();
           }
         };
