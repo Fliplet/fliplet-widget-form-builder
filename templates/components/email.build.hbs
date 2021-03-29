@@ -15,7 +15,7 @@
 </template>
 <input v-else
   type="email"
-  class="form-control"
+  class="form-control focus-outline"
   v-model.trim.lazy="value"
   v-on:blur="updateValue()"
   v-on:input="onInput($event)"
@@ -23,6 +23,7 @@
   :id="name"
   :placeholder="placeholder"
   autocomplete="new-password"
+  tabindex="0"
 />
 <p class="text-danger" v-if="$v.value.email === false && $v.value.$dirty">The input is not a valid email address.</p>
 <p class="text-danger" v-if="$v.value.required === false && $v.value.$dirty">Field is required.</p>

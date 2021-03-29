@@ -195,6 +195,18 @@ Fliplet.FormBuilder.field('wysiwyg', {
 
         editor.on('keydown', $vm.addBulletedListShortcutsMac);
 
+        editor.on('focus', function() {
+          var $el = $(editor.iframeElement);
+
+          $el.parent().parent().addClass('focus-outline');
+        });
+
+        editor.on('blur', function() {
+          var $el = $(editor.iframeElement);
+
+          $el.parent().parent().removeClass('focus-outline');
+        });
+
         editor.on('change', function() {
           $vm.value = editor.getContent();
 
