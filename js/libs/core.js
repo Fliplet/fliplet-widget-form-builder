@@ -5,6 +5,8 @@ Fliplet.FormBuilder = (function() {
 
   var DATE_FORMAT = 'YYYY-MM-DD';
   var LOCAL_FORMAT_DATE = moment.localeData().longDateFormat('L');
+  var isExplorer = navigator.userAgent.indexOf('Trident/') !== -1;
+  var isSafari = navigator.userAgent.indexOf('Safari') !== -1;
 
   Vue.use(window.vuelidate.default);
 
@@ -427,9 +429,6 @@ Fliplet.FormBuilder = (function() {
 
       if (!component.mounted) {
         component.mounted = function() {
-          var isExplorer = navigator.userAgent.indexOf('Trident/') !== -1;
-          var isSafari = navigator.userAgent.indexOf('Safari') !== -1;
-
           this._showNameField = this.name !== this.label;
           this.initTooltip();
           this.initDatepicker();
