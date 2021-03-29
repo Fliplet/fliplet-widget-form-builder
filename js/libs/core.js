@@ -427,11 +427,14 @@ Fliplet.FormBuilder = (function() {
 
       if (!component.mounted) {
         component.mounted = function() {
+          var isExplorer = navigator.userAgent.indexOf('Trident/') !== -1;
+          var isSafari = navigator.userAgent.indexOf('Safari') !== -1;
+
           this._showNameField = this.name !== this.label;
           this.initTooltip();
           this.initDatepicker();
 
-          if (Modernizr.ie11) {
+          if (isExplorer || isSafari) {
             this.initTimePicker();
           }
         };

@@ -74,7 +74,10 @@ Fliplet.FormBuilder.field('time', {
     }
   },
   mounted: function() {
-    if (Fliplet.Env.is('web') && Modernizr.ie11) {
+    var isExplorer = navigator.userAgent.indexOf('Trident/') !== -1;
+    var isSafari = navigator.userAgent.indexOf('Safari') !== -1;
+
+    if (Fliplet.Env.is('web') && (isExplorer || isSafari)) {
       this.initIETimePicker();
     }
 
