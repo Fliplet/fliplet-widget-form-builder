@@ -32,7 +32,6 @@
       "vendor/bootstrap-datepicker.js",
       "vendor/jquery.plugin.min.js",
       "vendor/jquery.timeentry.min.js",
-      "vendor/swfobject.js",
       "vendor/signature-pad.js",
 
       "js/components/input.js",
@@ -107,7 +106,6 @@
       "vendor/bootstrap-datepicker.js",
       "vendor/jquery.plugin.min.js",
       "vendor/jquery.timeentry.min.js",
-      "vendor/swfobject.js",
       "vendor/signature-pad.js",
 
       "js/components/input.js",
