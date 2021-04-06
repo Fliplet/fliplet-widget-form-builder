@@ -17,7 +17,15 @@
     </template>
   </template>
 </div>
-<div v-else class="inverse-direction focus-outline">
+<div
+  v-else
+  class="inverse-direction focus-outline"
+  tabindex="0"
+  v-on:keydown.up.prevent="increaseRatingValue()"
+  v-on:keydown.right.prevent="increaseRatingValue()"
+  v-on:keydown.down.prevent="decreaseRatingValue()"
+  v-on:keydown.left.prevent="decreaseRatingValue()"
+>
   <template v-for="(option, index) in values">
     <input
       class="rating-input"
@@ -28,6 +36,7 @@
       :value="option.id"
       v-on:change="updateValue()"
       v-on:input="onInput($event)"
+      tabindex="-1"
     >
     <label class="rating-star" :for="name + '-' + index">
       <i class="fa fa-star-o"></i>

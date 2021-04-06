@@ -5,11 +5,14 @@
       <template v-if="value === option.label || value === option.id">
         <p class="form-control-static">\{{ option.label || option.id }}</p>
         <input
-            type="hidden"
-            :id="name + '-' + index"
-            :name="name"
-            v-model="value"
-            :value="option.id || option.label">
+          type="hidden"
+          :id="name + '-' + index"
+          :name="name"
+          v-model="value"
+          :value="option.id || option.label"
+          class="focus-outline"
+          tabindex="0"
+        >
       </template>
     </template>
   </template>
@@ -21,9 +24,23 @@
           :id="name + '-' + index"
           :name="name"
           v-model="value"
-          :value="option.id || option.label">
+          :value="option.id || option.label"
+          tabindex="-1"
+        >
         <label v-on:click="clickHandler(option)">
-          <span class="check"><i class="fa fa-circle"></i></span> \{{ option.label || option.id }}
+          <span
+            ref="radioButton"
+            class="check focus-outline"
+            tabindex="0"
+            v-on:keydown.right.prevent="focusHandler(index + 1)"
+            v-on:keydown.down.prevent="focusHandler(index + 1)"
+            v-on:keydown.left.prevent="focusHandler(index - 1)"
+            v-on:keydown.up.prevent="focusHandler(index - 1)"
+            v-on:keydown.space.prevent="focusHandler(index)"
+          >
+            <i class="fa fa-circle"></i>
+          </span>
+          <span class="option-item"></span>\{{ option.label || option.id }}</span>
         </label>
     </div>
     </template>

@@ -23,7 +23,8 @@ Fliplet.FormBuilder.field('time', {
   },
   data: function() {
     return {
-      LOCAL_FORMAT: moment.localeData().longDateFormat('LT')
+      LOCAL_FORMAT: moment.localeData().longDateFormat('LT'),
+      isInputFocused: false
     };
   },
   validations: function() {

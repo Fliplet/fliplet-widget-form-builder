@@ -14,7 +14,7 @@
 </template>
 
 <textarea v-else
-  class="form-control"
+  class="form-control focus-outline"
   v-model.trim.lazy="value"
   v-on:blur="updateValue()"
   v-on:input="onInput($event)"
@@ -22,5 +22,6 @@
   :id="name"
   :placeholder="placeholder"
   :rows="rows"
+  tabindex="0"
 ></textarea>
 <p class="text-danger" v-if="$v.value.required === false && $v.value.$dirty">Field is required.</p>
