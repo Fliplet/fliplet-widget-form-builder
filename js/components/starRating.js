@@ -36,5 +36,19 @@ Fliplet.FormBuilder.field('starRating', {
     }
 
     return rules;
+  },
+  methods: {
+    increaseRatingValue: function() {
+      if (this.value < 5) {
+        this.value = +this.value + 1;
+        this.updateValue();
+      }
+    },
+    decreaseRatingValue: function() {
+      if (this.value > 0) {
+        this.value = +this.value - 1;
+        this.updateValue();
+      }
+    }
   }
 });

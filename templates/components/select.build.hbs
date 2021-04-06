@@ -2,12 +2,14 @@
 <template v-if="readonly">
   <p class="form-control-static">\{{ value }}</p>
     <select
-      class="form-control hidden-select hidden"
+      class="form-control hidden-select hidden focus-outline"
       :name="name"
       :id="name"
       v-model="value"
       v-on:change="updateValue()"
-      v-on:input="onInput($event)">
+      v-on:input="onInput($event)"
+      tabindex="0"
+    >
       <option v-if="placeholder" value="">\{{ placeholder }}</option>
       <option v-for="option in options" :value="(_.isNumber(option.id) || _.isString(option.id)) ? option.id : option.label" :disabled="option.disabled">
         \{{ option.label || option.id }}
@@ -15,14 +17,22 @@
     </select>
 </template>
 <template v-else>
-  <label :for="name" class="select-proxy-display">
+  <label
+    :for="name"
+    class="select-proxy-display" 
+    :class="{ 'input-focused': isInputFocused }"
+  >
     <select
-      class="form-control hidden-select"
+      class="form-control hidden-select focus-outline"
       :name="name"
       :id="name"
       v-model="value"
       v-on:change="updateValue()"
-      v-on:input="onInput($event)">
+      v-on:input="onInput($event)"
+      v-on:focus="isInputFocused = true"
+      v-on:blur="isInputFocused = false"
+      tabindex="0"
+    >
       <option v-if="placeholder" value="">\{{ placeholder }}</option>
       <option v-for="option in options" :value="(_.isNumber(option.id) || _.isString(option.id)) ? option.id : option.label" :disabled="option.disabled">
         \{{ option.label || option.id }}

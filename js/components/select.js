@@ -24,6 +24,11 @@ Fliplet.FormBuilder.field('select', {
       type: String
     }
   },
+  data: function() {
+    return {
+      isInputFocused: false
+    };
+  },
   mounted: function() {
     var $vm = this;
 

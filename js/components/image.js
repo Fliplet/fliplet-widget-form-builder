@@ -292,6 +292,9 @@ Fliplet.FormBuilder.field('image', {
         addThumbnailToCanvas(image, index,
           $vm);
       });
+    },
+    openFileDialog: function() {
+      this.$refs.imageInput.click();
     }
   }
 });

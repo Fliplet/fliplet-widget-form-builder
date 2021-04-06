@@ -26,7 +26,8 @@ Fliplet.FormBuilder.field('date', {
   },
   data: function() {
     return {
-      datePicker: null
+      datePicker: null,
+      isInputFocused: false
     };
   },
   validations: function() {

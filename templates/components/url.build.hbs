@@ -16,13 +16,14 @@
 
 <input v-else
   type="text"
-  class="form-control"
+  class="form-control focus-outline"
   v-model.trim.lazy="value"
   v-on:blur="updateValue()"
   v-on:input="onInput($event)"
   :name="name"
   :id="name"
   :placeholder="placeholder"
+  tabindex="0"
 />
 <p class="text-danger" v-if="$v.value.url === false && $v.value.$dirty">The input is not a valid URL.</p>
 <p class="text-danger" v-if="$v.value.required === false && $v.value.$dirty">Field is required.</p>
