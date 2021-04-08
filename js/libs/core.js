@@ -191,10 +191,6 @@ Fliplet.FormBuilder = (function() {
       };
 
       component.computed.getLocalFormattedValue = function() {
-        if (!this.value) {
-          return moment().format(LOCAL_FORMAT_DATE);
-        }
-
         return moment(this.value).format(LOCAL_FORMAT_DATE);
       };
 
