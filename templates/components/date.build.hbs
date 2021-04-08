@@ -25,6 +25,7 @@
       type="text"
       v-model.lazy="getLocalFormattedValue"
       v-on:change="updateValue()"
+      v-on:input="onInput($event)"
       v-on:focus="isInputFocused = true"
       v-on:blur="isInputFocused = false"
       :name="name"
