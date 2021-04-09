@@ -6,9 +6,6 @@ Fliplet.FormBuilder = (function() {
   var DATE_FORMAT = 'YYYY-MM-DD';
   var LOCAL_FORMAT_DATE = moment.localeData().longDateFormat('L');
 
-  Fliplet.Env.set('ie11', navigator.userAgent.indexOf('Trident/') !== -1);
-  Fliplet.Env.set('safari', navigator.userAgent.indexOf('Safari') !== -1);
-
   Vue.use(window.vuelidate.default);
 
   var templates = Fliplet.Widget.Templates;
@@ -258,6 +255,13 @@ Fliplet.FormBuilder = (function() {
           type: String,
           required: true
         },
+        browserSupport: {
+          type: Object,
+          default: {
+            ie11: navigator.userAgent.indexOf('Trident/') !== -1,
+            safari: navigator.userAgent.indexOf('Safari') !== -1
+          }
+        },
         label: {
           type: String,
           default: component.name || 'Label text'
@@ -353,6 +357,14 @@ Fliplet.FormBuilder = (function() {
         type: Array
       };
 
+      component.props._browserSupport = {
+        type: Object,
+        default: {
+          ie11: navigator.userAgent.indexOf('Trident/') !== -1,
+          safari: navigator.userAgent.indexOf('Safari') !== -1
+        }
+      };
+
       component.props._componentName = {
         type: String,
         default: componentName
@@ -434,7 +446,7 @@ Fliplet.FormBuilder = (function() {
           this.initTooltip();
           this.initDatepicker();
 
-          if (Fliplet.Env.get('ie11') || Fliplet.Env.get('safari')) {
+          if (this._browserSupport.ie11 || this._browserSupport.safari) {
             this.initTimePicker();
           }
         };
