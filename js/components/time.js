@@ -51,12 +51,11 @@ Fliplet.FormBuilder.field('time', {
     initTimePicker: function() {
       var $vm = this;
 
-      this.timepicker = $($vm.$refs.timepicker).timeEntry({
-        show24Hours: true
-      }).on('change', function(event) {
-        $vm.value = event.target.value;
-        $vm.updateValue($vm.value);
-      });
+      this.timepicker = $($vm.$refs.timepicker).timeEntry()
+        .on('change', function(event) {
+          $vm.value = event.target.value;
+          $vm.updateValue($vm.value);
+        });
 
       this.timepicker.timeEntry('setTime', $vm.value);
 
