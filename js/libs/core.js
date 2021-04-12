@@ -178,7 +178,7 @@ Fliplet.FormBuilder = (function() {
           case 'safari':
             return navigator.userAgent.indexOf('Safari') !== -1;
           default:
-            break;
+            return false;
         }
       };
 
