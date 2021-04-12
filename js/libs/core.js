@@ -171,6 +171,17 @@ Fliplet.FormBuilder = (function() {
         }
       };
 
+      component.methods.browserSupport = function(browserType) {
+        switch (browserType) {
+          case 'IE11':
+            return navigator.userAgent.indexOf('Trident/') !== -1;
+          case 'safari':
+            return navigator.userAgent.indexOf('Safari') !== -1;
+          default:
+            break;
+        }
+      };
+
       component.methods.onInput = _.debounce(function($event) {
         this.$emit('_input', this.name, $event.target.value);
       }, 200);
@@ -254,13 +265,6 @@ Fliplet.FormBuilder = (function() {
         name: {
           type: String,
           required: true
-        },
-        browserSupport: {
-          type: Object,
-          default: {
-            ie11: navigator.userAgent.indexOf('Trident/') !== -1,
-            safari: navigator.userAgent.indexOf('Safari') !== -1
-          }
         },
         label: {
           type: String,
@@ -357,14 +361,6 @@ Fliplet.FormBuilder = (function() {
         type: Array
       };
 
-      component.props._browserSupport = {
-        type: Object,
-        default: {
-          ie11: navigator.userAgent.indexOf('Trident/') !== -1,
-          safari: navigator.userAgent.indexOf('Safari') !== -1
-        }
-      };
-
       component.props._componentName = {
         type: String,
         default: componentName
@@ -446,7 +442,7 @@ Fliplet.FormBuilder = (function() {
           this.initTooltip();
           this.initDatepicker();
 
-          if (this._browserSupport.ie11 || this._browserSupport.safari) {
+          if (this.browserSupport('IE11') || this.browserSupport('safari')) {
             this.initTimePicker();
           }
         };
