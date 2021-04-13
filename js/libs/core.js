@@ -171,6 +171,17 @@ Fliplet.FormBuilder = (function() {
         }
       };
 
+      component.methods.browserSupport = function(browserType) {
+        switch (browserType) {
+          case 'IE11':
+            return navigator.userAgent.indexOf('Trident/') !== -1;
+          case 'Safari':
+            return navigator.userAgent.indexOf('Safari') !== -1;
+          default:
+            return false;
+        }
+      };
+
       component.methods.onInput = _.debounce(function($event) {
         this.$emit('_input', this.name, $event.target.value);
       }, 200);
@@ -426,6 +437,10 @@ Fliplet.FormBuilder = (function() {
           this._showNameField = this.name !== this.label;
           this.initTooltip();
           this.initDatepicker();
+
+          if (this.browserSupport('IE11') || this.browserSupport('safari')) {
+            this.initTimePicker();
+          }
         };
       }
 
@@ -495,6 +510,24 @@ Fliplet.FormBuilder = (function() {
 
       if (!component.methods.initDatepicker) {
         component.methods.initDatepicker = component.methods._initDatepicker;
+      }
+
+      component.methods._initTimePicker = function() {
+        var $vm = this;
+
+        $vm.$nextTick(function() {
+          var $el = $($vm.$refs.timepicker).timeEntry({
+            show24Hour: true
+          }).on('change', function(event) {
+            $vm.value = event.target.value;
+          });
+
+          $el.timeEntry('setTime', this.value);
+        });
+      };
+
+      if (!component.methods.initTimePicker) {
+        component.methods.initTimePicker = component.methods._initTimePicker;
       }
 
       if (!component.methods.initTooltip) {
