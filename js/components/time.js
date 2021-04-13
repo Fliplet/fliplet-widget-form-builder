@@ -74,7 +74,7 @@ Fliplet.FormBuilder.field('time', {
     }
   },
   mounted: function() {
-    if (Fliplet.Env.is('web') && (this.browserSupport('IE11') || this.browserSupport('safari'))) {
+    if (Fliplet.Env.is('web') && (this.browserSupport('IE11') || this.browserSupport('Safari'))) {
       this.initTimePicker();
     }
 

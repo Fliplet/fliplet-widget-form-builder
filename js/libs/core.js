@@ -175,7 +175,7 @@ Fliplet.FormBuilder = (function() {
         switch (browserType) {
           case 'IE11':
             return navigator.userAgent.indexOf('Trident/') !== -1;
-          case 'safari':
+          case 'Safari':
             return navigator.userAgent.indexOf('Safari') !== -1;
           default:
             return false;
