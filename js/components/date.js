@@ -45,6 +45,16 @@ Fliplet.FormBuilder.field('date', {
       return Fliplet.Env.get('platform') === 'web';
     }
   },
+  methods: {
+    updateValue: function(value) {
+      if (value) {
+        this.value = value;
+      }
+
+      this.highlightError();
+      this.$emit('_input', this.name, this.value);
+    }
+  },
   mounted: function() {
     var $vm = this;
 
@@ -75,12 +85,9 @@ Fliplet.FormBuilder.field('date', {
   },
   watch: {
     value: function(val) {
-      if (Fliplet.Env.get('platform') === 'web') {
-        this.datePicker.datepicker('setDate', val);
+      if (!val) {
+        this.updateValue(moment().format(DATE_FORMAT));
       }
-
-      this.highlightError();
-      this.$emit('_input', this.name, val);
     }
   }
 });
