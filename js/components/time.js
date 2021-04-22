@@ -23,7 +23,6 @@ Fliplet.FormBuilder.field('time', {
   },
   data: function() {
     return {
-      timepicker: null,
       LOCAL_FORMAT: moment.localeData().longDateFormat('LT'),
       isInputFocused: false
     };
