@@ -133,7 +133,7 @@ Fliplet.Widget.instance('form-builder', function(data) {
             return; // do not update the field value
           }
 
-          var showCurrentDateTime = field.autofill === 'always';
+          var showCurrentDateTime = field.autofill === 'empty';
 
           // Typecast field data to ensure data type is suitable for each field
           switch (field._type) {

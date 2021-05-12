@@ -329,7 +329,7 @@ Fliplet.FormBuilder = (function() {
 
       // On submit event
       component.methods._onSubmit = function() {
-        if (!this.defaultValueKey && this._componentsWithPersonalization.includes(this._componentName) && this.defaultValueSource !== 'default') {
+        if (!this.defaultValueKey && this.defaultValueSource !== 'default') {
           return 'Key field is required';
         }
 
@@ -365,11 +365,6 @@ Fliplet.FormBuilder = (function() {
       component.props._componentsWithDescription = {
         type: Array,
         default: ['flInput', 'flCheckbox', 'flRadio', 'flEmail', 'flNumber', 'flTelephone', 'flUrl', 'flTextarea', 'flWysiwyg', 'flSelect', 'flDate', 'flTime', 'flStarRating', 'flSignature', 'flImage', 'flFile']
-      };
-
-      component.props._componentsWithPersonalization = {
-        type: Array,
-        default: ['flInput', 'flCheckbox', 'flRadio', 'flEmail', 'flNumber', 'flTelephone', 'flUrl', 'flTextarea', 'flWysiwyg', 'flSelect', 'flDate', 'flTime']
       };
 
       component.props._readOnlyComponents = {

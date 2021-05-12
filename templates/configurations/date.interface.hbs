@@ -4,6 +4,18 @@
   </div>
   <div>
     <div class="radio radio-icon">
+      <input type="radio" id="empty" name="empty" value='empty' v-model="autofill">
+      <label for="empty">
+        <span class="check"><i class="fa fa-circle"></i></span>No default value
+      </label>
+    </div>
+    <div class="radio radio-icon">
+      <input type="radio" id="specific" name="specific" value='specific' v-model="autofill">
+      <label for="specific">
+        <span class="check"><i class="fa fa-circle"></i></span>Autofill with a specific date if it's empty
+      </label>
+    </div>
+    <div class="radio radio-icon">
       <input type="radio" id="default" name="default" value='default' v-model="autofill">
       <label for="default">
         <span class="check"><i class="fa fa-circle"></i></span>Autofill with current date if it's empty
@@ -36,8 +48,4 @@
       </label>
     </div>
   </div>
-</div>
-<div class="form-group">
-  <label>Placeholder</label>
-  <input class="form-control" type="text" v-model.trim="placeholder" placeholder="Placeholder text" />
 </div>
