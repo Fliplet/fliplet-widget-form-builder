@@ -10,7 +10,7 @@ Fliplet.FormBuilder.field('time', {
     },
     autofill: {
       type: String,
-      default: 'empty'
+      default: 'always'
     },
     defaultSource: {
       type: String,
