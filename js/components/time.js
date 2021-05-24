@@ -61,6 +61,13 @@ Fliplet.FormBuilder.field('time', {
       $vm.$v.$reset();
     }
   },
+  computed: {
+    isApplyCurrentDateFiled() {
+      if (this.autofill === 'always' || this.autofill === 'default') {
+        return true;
+      }
+    }
+  },
   beforeUpdate: function() {
     /**
      * if the passed time is in the HH:mm A format,

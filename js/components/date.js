@@ -44,6 +44,11 @@ Fliplet.FormBuilder.field('date', {
   computed: {
     isWeb: function() {
       return Fliplet.Env.get('platform') === 'web';
+    },
+    isApplyCurrentDateFiled() {
+      if (this.autofill === 'always' || this.autofill === 'default') {
+        return true;
+      }
     }
   },
   methods: {
@@ -82,7 +87,6 @@ Fliplet.FormBuilder.field('date', {
       if (this.autofill !== 'empty') {
         this.datePicker.datepicker('setDate', new Date(this.value) || new Date());
       }
-
     }
 
     if (this.defaultValueSource !== 'default') {
@@ -95,7 +99,7 @@ Fliplet.FormBuilder.field('date', {
       this.empty = false;
     }
 
-    if(this.autofill === 'empty') {
+    if (this.autofill === 'empty') {
       this.value = '';
       this.datePicker.datepicker('setDate', '');
 
