@@ -541,10 +541,6 @@ html[dir="rtl"] .radio.radio-icon input[type="radio"] + label > span.check {
   padding-top: 10px;
 }
 
-.fileUpload span {
-  padding-right: 10px;
-}
-
 .fileUpload .canvas-holder {
   position: relative;
   display: flex;
@@ -712,9 +708,41 @@ html[dir="rtl"] .radio.radio-icon input[type="radio"] + label > span.check {
   position: absolute;
   right: 0;
   top: 50%;
-  transform: translate(0, -50%);font-size: 34px;
+  transform: translate(0, -50%);
+  font-size: 34px;
   min-width: 30px;
   color: #666;
+}
+
+.file-holder.editable {
+  padding: 0;
+  list-style-type: none;
+  width: 100%;
+  padding-right: 10px;
+}
+
+.file-holder.editable .file-title {
+  word-break: break-all;
+}
+
+.file-holder.editable .file-content {
+  max-width: calc(100% - 30px);
+}
+
+.file-holder.editable .file-icon {
+  width: 30px;
+  height: 30px;
+}
+
+.file-holder.editable .file-icon .fa {
+  color: #e03629;
+  opacity: 0.3;
+  font-size: 34px;
+  right: 0;
+}
+
+.file-holder.editable .no-pointer-events {
+  pointer-events: none;
 }
 
 .image-gallery {

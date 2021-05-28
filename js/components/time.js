@@ -45,6 +45,19 @@ Fliplet.FormBuilder.field('time', {
 
       this.highlightError();
       this.$emit('_input', this.name, this.value);
+    },
+    initTimePicker: function() {
+      var $vm = this;
+
+      this.timepicker = $($vm.$refs.timepicker).timeEntry()
+        .on('change', function(event) {
+          $vm.value = event.target.value;
+          $vm.updateValue($vm.value);
+        });
+
+      this.timepicker.timeEntry('setTime', $vm.value);
+
+      $vm.$v.$reset();
     }
   },
   beforeUpdate: function() {
@@ -59,7 +72,9 @@ Fliplet.FormBuilder.field('time', {
     }
   },
   mounted: function() {
-    var $vm = this;
+    if (Fliplet.Env.is('web') && (this.browserSupport('IE11') || this.browserSupport('Safari'))) {
+      this.initTimePicker();
+    }
 
     if (this.defaultValueSource !== 'default') {
       this.setValueFromDefaultSettings({ source: this.defaultValueSource, key: this.defaultValueKey });
@@ -81,8 +96,6 @@ Fliplet.FormBuilder.field('time', {
       this.updateValue(hours + ':' + minutes);
       this.empty = false;
     }
-
-    $vm.$v.$reset();
   },
   watch: {
     value: function(val) {
