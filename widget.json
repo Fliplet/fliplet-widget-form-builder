@@ -93,7 +93,7 @@
       "fliplet-media",
       "font-awesome",
       "moment",
-      "tinymce",
+      { "name": "tinymce:5.7.0", "interact": false },
       "fliplet-session"
     ],
     "assets": [
@@ -107,6 +107,10 @@
       "vendor/jquery.plugin.min.js",
       "vendor/jquery.timeentry.min.js",
       "vendor/signature-pad.js",
+      "vendor/tinymce/icons/default/icons.min.js",
+      "vendor/tinymce/themes/silver/theme.min.js",
+      "vendor/tinymce/plugins/pasteplaintext/plugin.min.js",
+      "vendor/tinymce/plugins/mention/plugin.js",
 
       "js/components/input.js",
       "js/components/email.js",

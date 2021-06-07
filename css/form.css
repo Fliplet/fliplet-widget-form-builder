@@ -1131,6 +1131,12 @@ input[type='time']::-webkit-clear-button {
   background-position: center;
 }
 
+.rte-autocomplete.dropdown-menu li a {
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
 @media screen and (min-width: 640px) {
   .row > div.multiple-images-item {
     width: calc(33.33% - 7.5px);

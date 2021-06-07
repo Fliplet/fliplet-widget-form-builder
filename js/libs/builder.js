@@ -799,7 +799,6 @@ new Vue({
         }
       });
     },
-
     // Converts @event attributes to v-on:event
     convertVueEventAttributes: function(html) {
       var $html = $('<div/>').append(html);
@@ -874,8 +873,8 @@ new Vue({
       if (value === 'settings') {
         $vm.setupCodeEditor();
         changeSelectText();
-      } else {
-        tinymce.remove();
+      } else if ($vm.$refs.resulthtml) {
+        $($vm.$refs.resulthtml).tinymce().remove();
       }
     },
     'settings.dataStore': function(value) {
@@ -983,29 +982,6 @@ new Vue({
         $(selector).removeClass('is-loading');
       }
 
-      $($vm.$refs.templateDescription).tinymce({
-        plugins: [
-          'lists advlist image charmap hr code',
-          'searchreplace wordcount insertdatetime table textcolor colorpicker'
-        ],
-        toolbar: [
-          'formatselect |',
-          'bold italic underline strikethrough |',
-          'forecolor backcolor |',
-          'alignleft aligncenter alignright alignjustify | bullist numlist outdent indent |',
-          'blockquote subscript superscript | table insertdatetime charmap hr |',
-          'removeformat | code'
-        ].join(' '),
-        menubar: false,
-        statusbar: false,
-        min_height: 300,
-        setup: function(ed) {
-          $vm.editor = ed;
-          $vm.editor.on('keyup paste', function() {
-            $vm.settings.description = $vm.editor.getContent();
-          });
-        }
-      });
 
       if ($vm.chooseTemplate && $vm.$refs.templateGallery) {
         setTimeout(function() {
