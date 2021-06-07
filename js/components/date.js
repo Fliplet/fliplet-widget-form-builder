@@ -22,6 +22,10 @@ Fliplet.FormBuilder.field('date', {
     empty: {
       type: Boolean,
       default: true
+    },
+    invalidDate: {
+      type: Boolean,
+      default: false
     }
   },
   data: function() {
@@ -49,6 +53,9 @@ Fliplet.FormBuilder.field('date', {
       if (this.autofill === 'always' || this.autofill === 'default') {
         return true;
       }
+    },
+    isApplySpecificDateFiled() {
+      return this.autofill === 'specific';
     }
   },
   methods: {

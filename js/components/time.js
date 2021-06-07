@@ -19,6 +19,10 @@ Fliplet.FormBuilder.field('time', {
     empty: {
       type: Boolean,
       default: true
+    },
+    invalidTime: {
+      type: Boolean,
+      default: false
     }
   },
   data: function() {
@@ -66,6 +70,9 @@ Fliplet.FormBuilder.field('time', {
       if (this.autofill === 'always' || this.autofill === 'default') {
         return true;
       }
+    },
+    isApplySpecificDateFiled() {
+      return this.autofill === 'specific'
     }
   },
   beforeUpdate: function() {
