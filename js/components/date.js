@@ -54,7 +54,7 @@ Fliplet.FormBuilder.field('date', {
         return true;
       }
     },
-    isApplySpecificDateFiled() {
+    isApplySpecificDateField() {
       return this.autofill === 'specific';
     }
   },
