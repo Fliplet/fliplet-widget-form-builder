@@ -463,6 +463,8 @@ Fliplet.Widget.instance('form-builder', function(data) {
 
         // form validation
         $vm.isFormValid = true;
+        
+        var invalidFields = [];
 
         $vm.$children.forEach(function (inputField) {
 
@@ -472,185 +474,241 @@ Fliplet.Widget.instance('form-builder', function(data) {
 
             if (inputField.$v.$invalid) {
               $(inputField.$el).addClass('has-error');
+              invalidFields.push(inputField);
               $vm.isFormValid = false;
             }
           }
         });
 
-       if(!$vm.isFormValid){
-         return;
-       }
-
-        this.isSending = true;
-
-        function appendField(name, value) {
-          if (Array.isArray(formData[name])) {
-            formData[name].push(value);
-          } else if (typeof formData[name] !== 'undefined') {
-            formData[name] = [formData[name], value];
-          } else {
-            formData[name] = value;
-          }
+        /**
+         * Showing an error message
+         * 
+         * @param {String} errorMessage - an error message that we should show to the user
+         *  if its empty string show default message
+         * @returns {void} shows a toast message to users
+         */
+        function showValidationMessage(errorMessage) {
+          errorMessage = errorMessage || 'Please complete all required fields.';
+          Fliplet.UI.Toast(errorMessage);
         }
 
-        var errorFields = Object.keys(this.errors);
-        var fieldErrors = [];
-        if (errorFields.length) {
-          errorFields.forEach(function (fieldName) {
-            fieldErrors.push(errorFields[fieldName]);
-          });
+        /**
+         * This method will decide what we will do after isFormInvalid hook
+         * 
+         * @returns {Promise} With this logic:
+         *  1. In case there was no listener on isFormInvalid hook we will show the toast
+         *     with default message
+         *  2. In case when listener was resolved with Promise.resolve() we allow user to submit invalid form
+         *     and will not show the toast
+         *  3. In case when listener was resolved with Promise.reject() we will not show the toast
+         *     and not allow form to submit
+         *  4. In case when listener was resolved with Promise.reject('') we will show the toast with default text
+         *  5. In case when listener was resolved with Promise.reject('error text') we will show the toast
+         *     with 'error text' message
+         */
+        function onFormInvalid() {
+          return new Promise(function(resolve, reject) {
+            Fliplet.Hooks.run('isFormInvalid', invalidFields)
+              .then(function(result) {
+                if (!result.length) {
+                  showValidationMessage('');
 
-          $vm.error = fieldErrors.join('. ');
-          $vm.isSending = false;
-          return;
+                  return reject();
+                }
+                
+                return resolve();
+              })
+              .catch(function(response) {
+                switch (typeof response) {
+                  case 'string':
+                    return showValidationMessage(response);
+                  default:
+                    return reject();
+                }
+              })
+          })
         }
 
-        this.fields.forEach(function(field) {
-          var value = field.value;
-          var type = field._type;
+        function onFormSubmission() {
+          if (!$vm.isFormValid) {
+            return onFormInvalid();
+          }
 
-          if (field._submit === false || !field.enabled) {
+          return Promise.resolve();
+        }
+
+        return onFormSubmission().then(function() {
+          $vm.isSending = true;
+
+          function appendField(name, value) {
+            if (Array.isArray(formData[name])) {
+              formData[name].push(value);
+            } else if (typeof formData[name] !== 'undefined') {
+              formData[name] = [formData[name], value];
+            } else {
+              formData[name] = value;
+            }
+          }
+  
+          var errorFields = Object.keys($vm.errors);
+          var fieldErrors = [];
+          if (errorFields.length) {
+            errorFields.forEach(function (fieldName) {
+              fieldErrors.push(errorFields[fieldName]);
+            });
+  
+            $vm.error = fieldErrors.join('. ');
+            $vm.isSending = false;
             return;
           }
-
-          if (field.submitWhenFalsy === false && !value) {
-            return;
-          }
-
-          if (isFile(value)) {
-            // File input
-            for (var i = 0; i < value.length; i++) {
-              appendField(field.name, value.item(i));
-            }
-          } else {
-            // Remove spaces and dashes from value (when it's a string)
-            if (typeof value === 'string' && ['flNumber', 'flTelephone'].indexOf(type) !== -1) {
-              value = value.replace(/-|\s/g, '');
-            }
-            if (type === 'flDate') {
-              value = moment(value);
-
-              if (moment(value).isValid()) {
-                value = value.format('YYYY-MM-DD');
-              } else {
-                value = null;
-              }
-            }
-            // Other inputs
-            appendField(field.name, value);
-          }
-        });
-
-        formPromise.then(function (form) {
-          return Fliplet.Hooks.run('beforeFormSubmit', formData, form);
-        }).then(function() {
-          if (data.dataSourceId) {
-            return Fliplet.DataSources.connect(data.dataSourceId);
-          }
-
-          return;
-        }).then(function(connection) {
-          // Append schema as private variable
-          formData._flSchema = {};
+  
           $vm.fields.forEach(function(field) {
-            if (field.mediaFolderId) {
-              formData._flSchema[field.name] = {
-                mediaFolderId: field.mediaFolderId
-              };
+            var value = field.value;
+            var type = field._type;
+  
+            if (field._submit === false || !field.enabled) {
+              return;
             }
-          });
-
-          if (entryId && entry && data.dataSourceId) {
-            return connection.update(entryId, formData, {
-              offline: false,
-              ack: data.linkAction && data.redirect,
-              source: data.uuid
-            });
-          }
-
-          if (data.dataStore && data.dataStore.indexOf('dataSource') > -1 && data.dataSourceId) {
-            return connection.insert(formData, {
-              offline: data.offline,
-              ack: data.linkAction && data.redirect,
-              source: data.uuid
-            });
-          }
-
-          return;
-        }).then(function(result) {
-          return formPromise.then(function (form) {
-            return Fliplet.Hooks.run('afterFormSubmit', { formData: formData, result: result }, form).then(function () {
-              if (entryId !== 'session') {
-                return;
+  
+            if (field.submitWhenFalsy === false && !value) {
+              return;
+            }
+  
+            if (isFile(value)) {
+              // File input
+              for (var i = 0; i < value.length; i++) {
+                appendField(field.name, value.item(i));
               }
-
-              // If the user just updated his/her profile
-              // let's update the cached session.
-              return Fliplet.Session.get().catch(function () {
-                // silent failure
+            } else {
+              // Remove spaces and dashes from value (when it's a string)
+              if (typeof value === 'string' && ['flNumber', 'flTelephone'].indexOf(type) !== -1) {
+                value = value.replace(/-|\s/g, '');
+              }
+              if (type === 'flDate') {
+                value = moment(value);
+  
+                if (moment(value).isValid()) {
+                  value = value.format('YYYY-MM-DD');
+                } else {
+                  value = null;
+                }
+              }
+              // Other inputs
+              appendField(field.name, value);
+            }
+          });
+  
+          formPromise.then(function (form) {
+            return Fliplet.Hooks.run('beforeFormSubmit', formData, form);
+          }).then(function() {
+            if (data.dataSourceId) {
+              return Fliplet.DataSources.connect(data.dataSourceId);
+            }
+  
+            return;
+          }).then(function(connection) {
+            // Append schema as private variable
+            formData._flSchema = {};
+            $vm.fields.forEach(function(field) {
+              if (field.mediaFolderId) {
+                formData._flSchema[field.name] = {
+                  mediaFolderId: field.mediaFolderId
+                };
+              }
+            });
+  
+            if (entryId && entry && data.dataSourceId) {
+              return connection.update(entryId, formData, {
+                offline: false,
+                ack: data.linkAction && data.redirect,
+                source: data.uuid
+              });
+            }
+  
+            if (data.dataStore && data.dataStore.indexOf('dataSource') > -1 && data.dataSourceId) {
+              return connection.insert(formData, {
+                offline: data.offline,
+                ack: data.linkAction && data.redirect,
+                source: data.uuid
+              });
+            }
+  
+            return;
+          }).then(function(result) {
+            return formPromise.then(function (form) {
+              return Fliplet.Hooks.run('afterFormSubmit', { formData: formData, result: result }, form).then(function () {
+                if (entryId !== 'session') {
+                  return;
+                }
+  
+                // If the user just updated his/her profile
+                // let's update the cached session.
+                return Fliplet.Session.get().catch(function () {
+                  // silent failure
+                });
               });
             });
-          });
-        }).then(function() {
-          if (data.saveProgress) {
-            localStorage.removeItem(progressKey);
-          }
-
-          var operation = Promise.resolve();
-
-          // Emails are only sent by the client when data source hooks aren't set
-          if (!data.dataSourceId) {
-            if (data.emailTemplateAdd && data.onSubmit && data.onSubmit.indexOf('templatedEmailAdd') > -1) {
-              operation = Fliplet.Communicate.sendEmail(_.extend({}, data.emailTemplateAdd), formData);
+          }).then(function() {
+            if (data.saveProgress) {
+              localStorage.removeItem(progressKey);
             }
-
-            if (data.emailTemplateEdit && data.onSubmit && data.onSubmit.indexOf('templatedEmailEdit') > -1) {
-              operation = Fliplet.Communicate.sendEmail(_.extend({}, data.emailTemplateEdit), formData);
+  
+            var operation = Promise.resolve();
+  
+            // Emails are only sent by the client when data source hooks aren't set
+            if (!data.dataSourceId) {
+              if (data.emailTemplateAdd && data.onSubmit && data.onSubmit.indexOf('templatedEmailAdd') > -1) {
+                operation = Fliplet.Communicate.sendEmail(_.extend({}, data.emailTemplateAdd), formData);
+              }
+  
+              if (data.emailTemplateEdit && data.onSubmit && data.onSubmit.indexOf('templatedEmailEdit') > -1) {
+                operation = Fliplet.Communicate.sendEmail(_.extend({}, data.emailTemplateEdit), formData);
+              }
             }
-          }
-
-          if (data.generateEmailTemplate && data.onSubmit && data.onSubmit.indexOf('generateEmail') > -1) {
-            operation = Fliplet.Communicate.composeEmail(_.extend({}, data.generateEmailTemplate), formData);
-          }
-
-          if (data.linkAction && data.redirect) {
-            return operation.then(function () {
-              return trackEventOp.then(function () {
+  
+            if (data.generateEmailTemplate && data.onSubmit && data.onSubmit.indexOf('generateEmail') > -1) {
+              operation = Fliplet.Communicate.composeEmail(_.extend({}, data.generateEmailTemplate), formData);
+            }
+  
+            if (data.linkAction && data.redirect) {
+              return operation.then(function () {
+                return trackEventOp.then(function () {
+                  Fliplet.Navigate.to(data.linkAction);
+                });
+              }).catch(function (err) {
+                Fliplet.Modal.alert({
+                  message: Fliplet.parseError(err)
+                });
                 Fliplet.Navigate.to(data.linkAction);
-              });
-            }).catch(function (err) {
-              Fliplet.Modal.alert({
-                message: Fliplet.parseError(err)
-              });
-              Fliplet.Navigate.to(data.linkAction);
-            })
-          }
-
-          $vm.isSent = true;
-          $vm.isSending = false;
-          $vm.reset(false);
-          /**
-           * When we try to submit a form in Edge or IE11 and use components date picker and rich text
-           * (only in this sequence) we could saw that rich text textarea become empty but there was no
-           * message that we successfully submitted the form. That was because Vue wasn't updating view.
-           * $forceUpdate solve this issue.
-           */
-          $vm.$forceUpdate();
-
-          $vm.loadEntryForUpdate();
-        }, function(err) {
-          console.error(err);
-          $vm.error = Fliplet.parseError(err);
-          $vm.isSending = false;
-          Fliplet.Hooks.run('onFormSubmitError', { formData: formData, error: err });
+              })
+            }
+  
+            $vm.isSent = true;
+            $vm.isSending = false;
+            $vm.reset(false);
+            /**
+             * When we try to submit a form in Edge or IE11 and use components date picker and rich text
+             * (only in this sequence) we could saw that rich text textarea become empty but there was no
+             * message that we successfully submitted the form. That was because Vue wasn't updating view.
+             * $forceUpdate solve this issue.
+             */
+            $vm.$forceUpdate();
+  
+            $vm.loadEntryForUpdate();
+          }, function(err) {
+            console.error(err);
+            $vm.error = Fliplet.parseError(err);
+            $vm.isSending = false;
+            Fliplet.Hooks.run('onFormSubmitError', { formData: formData, error: err });
+          });
+  
+          // We might use this code to save the form data locally when going away from the page
+          // $(window).unload(function onWindowUnload() {
+          //   localStorage.setItem('fl-form-data-' + data.id, this.fields.map(function (field) {
+          //     return { name: field.name, value: field.value };
+          //   }));
+          // });
         });
-
-        // We might use this code to save the form data locally when going away from the page
-        // $(window).unload(function onWindowUnload() {
-        //   localStorage.setItem('fl-form-data-' + data.id, this.fields.map(function (field) {
-        //     return { name: field.name, value: field.value };
-        //   }));
-        // });
       },
       loadEntryForUpdate: function(fn) {
         var $vm = this;

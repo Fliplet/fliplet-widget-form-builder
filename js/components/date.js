@@ -1,5 +1,4 @@
 var DATE_FORMAT = 'YYYY-MM-DD';
-var LOCAL_FORMAT = moment.localeData().longDateFormat('L');
 
 Fliplet.FormBuilder.field('date', {
   name: 'Date picker',
@@ -73,14 +72,7 @@ Fliplet.FormBuilder.field('date', {
 
     if (Fliplet.Env.get('platform') === 'web') {
       this.datePicker = $(this.$el).find('input.date-picker').datepicker({
-        format: {
-          toDisplay: function(date) {
-            return moment(date).format(LOCAL_FORMAT);
-          },
-          toValue: function(date) {
-            return date;
-          }
-        },
+        format: 'yyyy-mm-dd',
         todayHighlight: true,
         autoclose: true
       }).on('changeDate', function(e) {
@@ -102,7 +94,7 @@ Fliplet.FormBuilder.field('date', {
 
     if (!this.value || this.autofill === 'always') {
       // HTML5 date field wants YYYY-MM-DD format
-      this.value = moment().format(DATE_FORMAT);
+      this.value = moment().format('YYYY-MM-DD');
       this.empty = false;
     }
 
