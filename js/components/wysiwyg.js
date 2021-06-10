@@ -12,7 +12,7 @@ Fliplet.FormBuilder.field('wysiwyg', {
     description: {
       type: String
     },
-    widgetId: {
+    tinymceId: {
       type: Number
     }
   },
@@ -133,7 +133,7 @@ Fliplet.FormBuilder.field('wysiwyg', {
     var $vm = this;
     var lineHeight = 40;
 
-    this.widgetId = this.name + parseInt($(this.$refs.textarea).parents('[data-form-builder-id]').data('formBuilderId'), 10);
+    this.tinymceId = this.name + parseInt($(this.$refs.textarea).parents('[data-form-builder-id]').data('formBuilderId'), 10);
 
     var config = {
       target: this.$refs.textarea,
