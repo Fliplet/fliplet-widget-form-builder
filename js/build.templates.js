@@ -99,7 +99,7 @@ this["Fliplet"]["Widget"]["Templates"]["templates.components.url"] = Handlebars.
 },"useData":true});
 
 this["Fliplet"]["Widget"]["Templates"]["templates.components.wysiwyg"] = Handlebars.template({"compiler":[7,">= 4.0.0"],"main":function(container,depth0,helpers,partials,data) {
-    return "<div v-if=\"description\" class=\"help-block description\">{{ description }}</div>\n<textarea\n  class=\"form-control\"\n  v-model.trim.lazy=\"value\"\n  ref=\"textarea\"\n  :name=\"name\"\n  :id=\"name\"\n  :placeholder=\"placeholder\"\n></textarea>\n<div\n  class=\"ghost-tinymce\"\n  ref=\"ghost\"\n  v-html=\"value\"\n  v-if=\"isInterface\">\n</div>\n<p class=\"text-danger\" v-if=\"$v.value.required === false && $v.value.$dirty\">Field is required.</p>";
+    return "<div v-if=\"description\" class=\"help-block description\">{{ description }}</div>\n<textarea\n  class=\"form-control\"\n  v-model.trim.lazy=\"value\"\n  ref=\"textarea\"\n  :name=\"name\"\n  :id=\"widgetId\"\n  :placeholder=\"placeholder\"\n></textarea>\n<div\n  class=\"ghost-tinymce\"\n  ref=\"ghost\"\n  v-html=\"value\"\n  v-if=\"isInterface\">\n</div>\n<p class=\"text-danger\" v-if=\"$v.value.required === false && $v.value.$dirty\">Field is required.</p>";
 },"useData":true});
 
 this["Fliplet"]["Widget"]["Templates"]["templates.configurations.radio"] = Handlebars.template({"compiler":[7,">= 4.0.0"],"main":function(container,depth0,helpers,partials,data) {

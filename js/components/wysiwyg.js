@@ -11,6 +11,9 @@ Fliplet.FormBuilder.field('wysiwyg', {
     },
     description: {
       type: String
+    },
+    widgetId: {
+      type: Number
     }
   },
   validations: function() {
@@ -130,6 +133,8 @@ Fliplet.FormBuilder.field('wysiwyg', {
     var $vm = this;
     var lineHeight = 40;
 
+    this.widgetId = this.name + parseInt($(this.$refs.textarea).parents('[data-form-builder-id]').data('formBuilderId'), 10);
+
     var config = {
       target: this.$refs.textarea,
       theme: 'modern',
@@ -234,5 +239,5 @@ Fliplet.FormBuilder.field('wysiwyg', {
     }
 
     Fliplet.FormBuilder.off('reset', this.onReset);
-  }
+  },
 });
