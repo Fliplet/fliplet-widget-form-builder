@@ -239,5 +239,5 @@ Fliplet.FormBuilder.field('wysiwyg', {
     }
 
     Fliplet.FormBuilder.off('reset', this.onReset);
-  },
+  }
 });
