@@ -57,16 +57,6 @@ Fliplet.FormBuilder.field('date', {
       return this.autofill === 'specific';
     }
   },
-  methods: {
-    updateValue: function(value) {
-      if (value) {
-        this.value = value;
-      }
-
-      this.highlightError();
-      this.$emit('_input', this.name, this.value);
-    }
-  },
   mounted: function() {
     var $vm = this;
 
@@ -113,6 +103,9 @@ Fliplet.FormBuilder.field('date', {
       if (!val && this.autofill !== 'empty') {
         this.updateValue(moment().format(DATE_FORMAT));
       }
+
+      this.highlightError();
+      this.$emit('_input', this.name, val);
     }
   }
 });
