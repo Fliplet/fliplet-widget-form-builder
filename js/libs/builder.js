@@ -799,7 +799,6 @@ new Vue({
         }
       });
     },
-
     // Converts @event attributes to v-on:event
     convertVueEventAttributes: function(html) {
       var $html = $('<div/>').append(html);
@@ -874,8 +873,8 @@ new Vue({
       if (value === 'settings') {
         $vm.setupCodeEditor();
         changeSelectText();
-      } else {
-        tinymce.remove();
+      } else if ($vm.$refs.resulthtml) {
+        $($vm.$refs.resulthtml).tinymce().remove();
       }
     },
     'settings.dataStore': function(value) {
@@ -1006,6 +1005,7 @@ new Vue({
           });
         }
       });
+
 
       if ($vm.chooseTemplate && $vm.$refs.templateGallery) {
         setTimeout(function() {
