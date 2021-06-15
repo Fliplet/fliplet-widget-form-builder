@@ -170,17 +170,6 @@ Fliplet.FormBuilder = (function() {
         }
       };
 
-      component.methods.browserSupport = function(browserType) {
-        switch (browserType) {
-          case 'IE11':
-            return navigator.userAgent.indexOf('Trident/') !== -1;
-          case 'Safari':
-            return navigator.userAgent.indexOf('Safari') !== -1;
-          default:
-            return false;
-        }
-      };
-
       component.methods.onInput = _.debounce(function($event) {
         this.$emit('_input', this.name, $event.target.value);
       }, 200);
@@ -432,6 +421,17 @@ Fliplet.FormBuilder = (function() {
         }
 
         return '';
+      };
+
+      component.methods.browserSupport = function(browserType) {
+        switch (browserType) {
+          case 'IE11':
+            return navigator.userAgent.indexOf('Trident/') !== -1;
+          case 'Safari':
+            return navigator.userAgent.indexOf('Safari') !== -1;
+          default:
+            return false;
+        }
       };
 
       if (!component.mounted) {
