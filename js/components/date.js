@@ -48,12 +48,10 @@ Fliplet.FormBuilder.field('date', {
     isWeb: function() {
       return Fliplet.Env.get('platform') === 'web';
     },
-    isApplyCurrentDateFiled() {
-      if (this.autofill === 'always' || this.autofill === 'default') {
-        return true;
-      }
+    applyCurrentDateField() {
+      return this.autofill === 'always' || this.autofill === 'default';
     },
-    isApplySpecificDateField() {
+    showCustomValueField() {
       return this.autofill === 'specific';
     }
   },
