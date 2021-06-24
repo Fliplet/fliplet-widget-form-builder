@@ -1,6 +1,6 @@
 {
-  "name": "Form Sabantsev",
-  "package": "com.fliplet.form-builder-sabantsev",
+  "name": "Form",
+  "package": "com.fliplet.form-builder",
   "version": "1.0.0",
   "icon": "img/icon.png",
   "tags": ["type:component", "category:general"],
