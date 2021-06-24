@@ -64,11 +64,13 @@
 
 		renderInput: function () {
 			var rawHtml = '<span id="autocomplete">' +
-				'<span id="autocomplete-delimiter"></span>' +
+				//'<span id="autocomplete-delimiter"></span>' +
+				'<span id="autocomplete-delimiter">' + this.options.delimiter + '</span>' +
 				'<span id="autocomplete-searchtext"><span class="dummy">\uFEFF</span></span>' +
 				'</span>';
 
 			this.editor.execCommand('mceInsertContent', false, rawHtml);
+			this.editor.focus();
 			this.editor.selection.select(this.editor.selection.dom.select('span#autocomplete-searchtext span')[0]);
 			this.editor.selection.collapse(0);
 		},
@@ -79,6 +81,8 @@
 			this.editor.on('click', this.editorClickProxy = $.proxy(this.rteClicked, this));
 
 			$('body').on('click', this.bodyClickProxy = $.proxy(this.rteLostFocus, this));
+
+			$(this.editor.getWin()).on('scroll', this.rteScroll = $.proxy(function () { this.cleanUp(true); }, this));
 		},
 
 		unbindEvents: function () {
@@ -93,7 +97,6 @@
 
 		rteKeyUp: function (e) {
 			this.updateQuery();
-
 			switch (e.which || e.keyCode) {
 				//DOWN ARROW
 				case 40:
@@ -109,6 +112,8 @@
 
 				//BACKSPACE
 				case 8:
+				//SPACE
+				case 32:
 					if (this.query === '') {
 						this.cleanUp(true);
 					} else {
@@ -147,6 +152,8 @@
 				case 13:
 				//ESC
 				case 27:
+				//SPACE
+				case 32:
 					e.preventDefault();
 					break;
 
@@ -188,6 +195,8 @@
 		},
 
 		lookup: function () {
+			this.query = $.trim($(this.editor.getBody()).find('#autocomplete-searchtext').text()).replace('\ufeff', '');
+			
 			if (this.$dropdown === undefined) {
 				this.show();
 			}
@@ -233,7 +242,6 @@
 
 		show: function () {
 			var offset = this.editor.inline ? this.offsetInline() : this.offset();
-
 			this.$dropdown = $(this.renderDropdown())
 				.css({ 'top': offset.top, 'left': offset.left, 'maxWidth':  offset.maxWidth});
 
@@ -339,7 +347,7 @@
 					return;
 				}
 
-				var replacement = $('<p>' + text + '</p>')[0].firstChild,
+				var replacement = $('<p>' + this.options.delimiter + text + '</p>')[0].firstChild,
 					focus = $(this.editor.selection.getNode()).offset().top === ($selection.offset().top + (($selection.outerHeight() - $selection.height()) / 2));
 
 				this.editor.dom.replace(replacement, $selection[0]);
@@ -354,17 +362,17 @@
 		offset: function () {
 			var rtePosition = $(this.editor.getContainer()).offset(),
 				contentAreaPosition = $(this.editor.getContentAreaContainer()).position(),
-				nodePosition = $(this.editor.dom.select('span#autocomplete')).position();
-
-			// 160 min-width of the dropdown
-			nodePosition.left = nodePosition.left + 160 >= this.editorContainerWidth
-				? nodePosition.left - 160
-				: nodePosition.left;
+				nodePosition = $(this.editor.dom.select('span#autocomplete')).position(),
+				listBox = nodePosition.left + this.editorContainerWidth / 2,
+				containerBox = this.editor.container.offsetWidth + this.editor.container.offsetLeft,
+				listPosLeft = listBox > containerBox
+					? nodePosition.left - (listBox - containerBox)
+					: rtePosition.left + contentAreaPosition.left + nodePosition.left;
 
 			return {
 				top: rtePosition.top + contentAreaPosition.top + nodePosition.top - $(this.editor.getDoc()).scrollTop() + 5,
-				left: rtePosition.left + contentAreaPosition.left + nodePosition.left,
-				maxWidth: this.editorContainerWidth > 640 ? 640 : this.editorContainerWidth 
+				left: listPosLeft,
+				maxWidth: this.editorContainerWidth / 2
 			};
 		},
 
@@ -384,28 +392,33 @@
 
 		init: function (ed) {
 
-			var autoComplete,
-				autoCompleteData = ed.getParam('mentions');
+            var autoComplete,
+                autoCompleteData = ed.getParam('mentions');
 
-			// If the delimiter is undefined set default value to ['@'].
-			// If the delimiter is a string value convert it to an array. (backwards compatibility)
-			autoCompleteData.delimiter = (autoCompleteData.delimiter !== undefined) ? !$.isArray(autoCompleteData.delimiter) ? [autoCompleteData.delimiter] : autoCompleteData.delimiter : ['@'];
+            // If the delimiter is undefined set default value to ['@'].
+            // If the delimiter is a string value convert it to an array. (backwards compatibility)
+            autoCompleteData.delimiter = (autoCompleteData.delimiter !== undefined) ? !$.isArray(autoCompleteData.delimiter) ? [autoCompleteData.delimiter] : autoCompleteData.delimiter : ['@'];
 
-			ed.on('input', function (e) {
-				var selection = ed.selection.getSel();
-				var delimiterIndex = $.inArray(e.data, autoCompleteData.delimiter);
-				var showMention = ($(selection.focusNode).text()[selection.focusOffset - 2] === ' ' || selection.focusOffset === 1) && delimiterIndex > -1;
+            function prevCharIsSpace() {
+                var start = ed.selection.getRng(true).startOffset,
+					text = ed.selection.getRng(true).startContainer.data || '',
+					charachter = text.substr(start > 0 ? start - 1 : 0, 1);
 
-				if (showMention) {
-					if (autoComplete === undefined || (autoComplete.hasFocus !== undefined && !autoComplete.hasFocus)) {
-						e.preventDefault();
-						// Clone options object and set the used delimiter.
-						autoComplete = new AutoComplete(ed, $.extend({}, autoCompleteData, { delimiter: autoCompleteData.delimiter[delimiterIndex] }));
-					}
-				}
-			});
+                return (!!$.trim(charachter).length) ? false : true;
+            }
 
-		},
+            ed.on('keypress', function (e) {
+                var delimiterIndex = $.inArray(String.fromCharCode(e.which || e.keyCode), autoCompleteData.delimiter);
+                if (delimiterIndex > -1 && prevCharIsSpace()) {
+                    if (autoComplete === undefined || (autoComplete.hasFocus !== undefined && !autoComplete.hasFocus)) {
+                        e.preventDefault();
+                        // Clone options object and set the used delimiter.
+                        autoComplete = new AutoComplete(ed, $.extend({}, autoCompleteData, { delimiter: autoCompleteData.delimiter[delimiterIndex] }));
+                    }
+                }
+            });
+
+        },
 
 		getInfo: function () {
 			return {
