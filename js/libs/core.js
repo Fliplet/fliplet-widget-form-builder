@@ -174,6 +174,17 @@ Fliplet.FormBuilder = (function() {
         this.$emit('_input', this.name, $event.target.value);
       }, 200);
 
+      component.methods.browserSupport = function(browserType) {
+        switch (browserType) {
+          case 'IE11':
+            return navigator.userAgent.indexOf('Trident/') !== -1;
+          case 'Safari':
+            return navigator.userAgent.indexOf('Safari') !== -1;
+          default:
+            return false;
+        }
+      };
+
       // Define method to trigger the form reset from a children
       if (!component.methods.resetForm) {
         component.methods.resetForm = function() {
@@ -321,7 +332,7 @@ Fliplet.FormBuilder = (function() {
           return;
         }
 
-        if (['flDate', 'flTime'].includes(this._componentName) && this.showCustomValueField && !this.value) {
+        if (['flDate', 'flTime'].includes(this._componentName) && this.isApplySpecificDateField && !this.value) {
           this.invalidDate = true;
           this.invalidTime = true;
 

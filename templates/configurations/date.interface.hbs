@@ -30,13 +30,13 @@
   </div>
 </div>
 
-<div v-if="showCustomValueField" class="form-group" _type="flDate">
+<div v-if="isApplySpecificDateField" class="form-group" _type="flDate">
     <label class="control-label">Default value</label>
     <div v-show="invalidDate" class="text-danger">This field is required*</div>
     <input type="date" class="form-control" v-model="value">
 </div>
 
-<div v-if="applyCurrentDateField" class="form-group">
+<div v-if="isApplyCurrentDateFiled" class="form-group">
   <div>
     <label class="control-label">When applying the current date</label>
   </div>
