@@ -11,6 +11,9 @@ Fliplet.FormBuilder.field('wysiwyg', {
     },
     description: {
       type: String
+    },
+    tinymceId: {
+      type: Number
     }
   },
   validations: function() {
@@ -130,17 +133,17 @@ Fliplet.FormBuilder.field('wysiwyg', {
     var $vm = this;
     var lineHeight = 40;
 
+    this.tinymceId = _.kebabCase(this.name) + '-' + $(this.$refs.textarea).parents('[data-form-builder-id]').data('formBuilderId');
+
     var config = {
       target: this.$refs.textarea,
       theme: 'modern',
-      readonly: this.readonly,
       mobile: {
-        theme: this.readonly
-          ? 'silver'
-          : 'mobile',
+        theme: 'mobile',
         plugins: [ 'autosave', 'lists', 'autolink' ],
         toolbar: [ 'bold', 'italic', 'underline', 'bullist', 'numlist', 'removeformat' ]
       },
+      readonly: this.readonly,
       plugins: [
         'advlist autolink lists link directionality',
         'autoresize fullscreen code paste'
@@ -171,6 +174,10 @@ Fliplet.FormBuilder.field('wysiwyg', {
         $vm.editor = editor;
 
         editor.on('init', function() {
+          if (editor.settings.theme === 'mobile' && $vm.readonly) {
+            editor.editorContainer.style.pointerEvents = 'none';
+          }
+
           $vm.addPlaceholder();
           $vm.addBulletedListShortcutsWindows();
 
