@@ -65,7 +65,7 @@ Fliplet.FormBuilder.field('time', {
     }
   },
   computed: {
-    isApplyCurrentDateFiled() {
+    isApplyCurrentDateField() {
       return this.autofill === 'always' || this.autofill === 'default';
     },
     isApplySpecificDateField() {

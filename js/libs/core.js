@@ -335,12 +335,10 @@ Fliplet.FormBuilder = (function() {
         if (['flDate', 'flTime'].includes(this._componentName) && this.isApplySpecificDateField && !this.value) {
           this.invalidDate = true;
           this.invalidTime = true;
-
           return;
-        } else {
-          this.invalidDate = false;
-          this.invalidTime = false;
         }
+        this.invalidDate = false;
+        this.invalidTime = false;
 
         var $vm = this;
         var data = {};
