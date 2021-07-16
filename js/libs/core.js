@@ -322,6 +322,15 @@ Fliplet.FormBuilder = (function() {
         'props', 'computed'
       ]), component);
 
+      component.methods.includesComponent = function(container, value) {
+        var returnValue = false;
+        var pos = container.indexOf(value);
+        if (pos >= 0) {
+          returnValue = true;
+        }
+        return returnValue;
+      }
+
       // On submit event
       component.methods._onSubmit = function() {
         if (!this.defaultValueKey && this._componentsWithPersonalization.includes(this._componentName) && this.defaultValueSource !== 'default') {
@@ -332,11 +341,12 @@ Fliplet.FormBuilder = (function() {
           return;
         }
 
-        if (['flDate', 'flTime'].includes(this._componentName) && this.isApplySpecificDateField && !this.value) {
+        if (this.includesComponent(['flDate', 'flTime'], this._componentName) && this.isApplySpecificDateField && !this.value) {
           this.invalidDate = true;
           this.invalidTime = true;
           return;
         }
+
         this.invalidDate = false;
         this.invalidTime = false;
 
