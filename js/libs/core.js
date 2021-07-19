@@ -340,19 +340,15 @@ Fliplet.FormBuilder = (function() {
         if (this._fieldNameError || this._fieldLabelError) {
           return;
         }
-
-        if (this.includesComponent(['flDate'], this._componentName) && this.isApplySpecificDateField && !this.value) {
+        
+        debugger;
+        if (['flDate', 'flTime'].indexOf(this._componentName) !== -1 && this.isApplySpecificDateField && !this.value) {
           this.invalidDate = true;
-          return;
-        }
-
-        this.invalidDate = false;
-
-        if (this.includesComponent(['flTime'], this._componentName) && this.isApplySpecificDateField && !this.value) {
           this.invalidTime = true;
           return;
         }
 
+        this.invalidDate = false;
         this.invalidTime = false;
 
         var $vm = this;
