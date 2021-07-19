@@ -341,13 +341,18 @@ Fliplet.FormBuilder = (function() {
           return;
         }
 
-        if (this.includesComponent(['flDate', 'flTime'], this._componentName) && this.isApplySpecificDateField && !this.value) {
+        if (this.includesComponent(['flDate'], this._componentName) && this.isApplySpecificDateField && !this.value) {
           this.invalidDate = true;
-          this.invalidTime = true;
           return;
         }
 
         this.invalidDate = false;
+
+        if (this.includesComponent(['flTime'], this._componentName) && this.isApplySpecificDateField && !this.value) {
+          this.invalidTime = true;
+          return;
+        }
+
         this.invalidTime = false;
 
         var $vm = this;
