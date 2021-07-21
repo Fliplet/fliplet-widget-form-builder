@@ -328,7 +328,7 @@ Fliplet.Widget.instance('form-builder', function(data) {
               value = value.split(/\n/);
             }
           } else {
-            value = data.fields[index].value;
+            value = ' ';
           }
 
           // Clone value if it's an array to ensure the original object does not mutate

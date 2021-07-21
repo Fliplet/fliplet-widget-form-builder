@@ -65,11 +65,11 @@ Fliplet.FormBuilder.field('time', {
     }
   },
   computed: {
-    applyCurrentTime() {
+    isApplyCurrentDateField: function() {
       return this.autofill === 'always' || this.autofill === 'default';
     },
-    showCustomValueField() {
-      return this.autofill === 'specific'
+    isApplySpecificDateField: function() {
+      return this.autofill === 'specific';
     }
   },
   beforeUpdate: function() {
