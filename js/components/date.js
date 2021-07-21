@@ -48,10 +48,10 @@ Fliplet.FormBuilder.field('date', {
     isWeb: function() {
       return Fliplet.Env.get('platform') === 'web';
     },
-    isApplyCurrentDateField() {
+    isApplyCurrentDateField: function() {
       return this.autofill === 'always' || this.autofill === 'default';
     },
-    isApplySpecificDateField() {
+    isApplySpecificDateField: function() {
       return this.autofill === 'specific';
     }
   },
@@ -68,7 +68,7 @@ Fliplet.FormBuilder.field('date', {
           $vm.value = moment(e.date).format(DATE_FORMAT);
         }
 
-       $vm.updateValue();
+        $vm.updateValue();
       });
 
       if (this.autofill !== 'empty') {
