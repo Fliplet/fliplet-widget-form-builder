@@ -19,10 +19,6 @@ Fliplet.FormBuilder.field('time', {
     empty: {
       type: Boolean,
       default: true
-    },
-    invalidTime: {
-      type: Boolean,
-      default: false
     }
   },
   data: function() {
@@ -67,9 +63,6 @@ Fliplet.FormBuilder.field('time', {
   computed: {
     isApplyCurrentDateField: function() {
       return this.autofill === 'always' || this.autofill === 'default';
-    },
-    isApplySpecificDateField: function() {
-      return this.autofill === 'specific';
     }
   },
   beforeUpdate: function() {
