@@ -21,6 +21,10 @@ Fliplet.FormBuilder.field('password', {
       type: Boolean,
       default: false
     },
+    canShowPassword: {
+      type: Boolean,
+      default: false
+    },
     passwordConfirmation: {
       type: String,
       default: ''
@@ -110,6 +114,16 @@ Fliplet.FormBuilder.field('password', {
     }
   },
   methods: {
+    showPassword: function() {
+      var $passwordInputs = $('.input-password');
+
+      $.each($passwordInputs, function(i, el) {
+        var $passwordInput = $(el);
+
+        $passwordInput.attr('type', $passwordInput.prop('type') === 'password' ? 'text' : 'password');
+        $('.fa-eye').toggleClass('fa-eye-slash', $passwordInput.prop('type') === 'text');
+      });
+    },
     generateRandomPassword: function(length) {
       var alphabet = 'abcdefghijklmnopqrstuvwxyz!#$%&*-ABCDEFGHIJKLMNOP1234567890';
       var password = '';

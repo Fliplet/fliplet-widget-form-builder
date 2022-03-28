@@ -7,6 +7,13 @@
   opacity: 0.65;
 }
 
+.fa-eye, .fa-eye-slash {
+  position: absolute;
+  top: 15px;
+  right: 30px;
+  display: inline-block;
+}
+
 .fl-form.form-offline .cover-form {
   position: absolute;
   top: 0;
