@@ -25,8 +25,8 @@
   :placeholder="placeholder"
   tabindex="0"
 />
-<p class="text-danger" v-if="$v.value.maxLength === false && $v.value.$dirty">This field only accept up to 15 digits.</p>
-<p class="text-danger" v-if="$v.value.required === false && $v.value.$dirty">Field is required.</p>
-<p class="text-danger" v-if="$v.value.positive === false && $v.value.$dirty">Only positive digits are allowed.</p>
-<p class="text-danger" v-if="$v.value.integer === false && $v.value.$dirty">Only integer digits are allowed.</p>
-<p class="text-danger" v-if="$v.value.decimal === false && $v.value.$dirty">Only digits or \{{decimals}} digits after point are allowed.</p>
+<p class="text-danger" v-if="$v.value.maxLength === false && $v.value.$dirty">{{T "widgets.form.number.invalidLength"}}</p>
+<p class="text-danger" v-if="$v.value.required === false && $v.value.$dirty">{{T "widgets.form.errors.required"}}</p>
+<p class="text-danger" v-if="$v.value.positive === false && $v.value.$dirty">{{T "widgets.form.number.onlyPositiveDigitsAllowed"}}</p>
+<p class="text-danger" v-if="$v.value.integer === false && $v.value.$dirty">{{T "widgets.form.number.onlyIntegerDigitsAllowed"}}</p>
+<p class="text-danger" v-if="$v.value.decimal === false && $v.value.$dirty">\{{$t("widgets.form.number.invalidDecimal", {decimals: decimals})}}</p>

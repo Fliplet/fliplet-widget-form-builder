@@ -1,4 +1,5 @@
 Fliplet.FormBuilder.field('number', {
+  i18n: window.VueI18Next,
   name: 'Number input',
   category: 'Text inputs',
   props: {

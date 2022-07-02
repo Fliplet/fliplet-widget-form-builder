@@ -1,5 +1,3 @@
-var DATE_FORMAT = 'YYYY-MM-DD';
-
 Fliplet.FormBuilder.field('date', {
   name: 'Date picker',
   category: 'Text inputs',
@@ -27,7 +25,8 @@ Fliplet.FormBuilder.field('date', {
     return {
       datePicker: null,
       isInputFocused: false,
-      isPreview: Fliplet.Env.get('preview')
+      isPreview: Fliplet.Env.get('preview'),
+      today: moment().locale('en').format('YYYY-MM-DD')
     };
   },
   validations: function() {
@@ -42,62 +41,49 @@ Fliplet.FormBuilder.field('date', {
     return rules;
   },
   computed: {
-    isWeb: function() {
-      return Fliplet.Env.get('platform') === 'web';
-    },
     isApplyCurrentDateField: function() {
       return this.autofill === 'always' || this.autofill === 'default';
+    },
+    readonlyValue: function() {
+      return this.value && moment(this.value).isValid()
+        ? TD(this.value, { format: 'L' })
+        : '';
     }
   },
   mounted: function() {
-    var $vm = this;
-
-    if (Fliplet.Env.get('platform') === 'web') {
-      this.datePicker = $(this.$el).find('input.date-picker').datepicker({
-        format: 'yyyy-mm-dd',
-        todayHighlight: true,
-        autoclose: true
-      });
-
-      // Set an initial value as configured
-      if (this.autofill !== 'empty') {
-        this.datePicker.datepicker('setDate', new Date(this.value) || new Date());
-      }
-
-      // Attach changeDate listener after initial value is assigned
-      this.datePicker.on('changeDate', function(e) {
-        if (e.date) {
-          $vm.value = moment(e.date).format(DATE_FORMAT);
-        }
-
-        $vm.updateValue();
-      });
-    }
+    this.initDatePicker();
 
     if (this.defaultValueSource !== 'default') {
-      this.setValueFromDefaultSettings({ source: this.defaultValueSource, key: this.defaultValueKey });
+      this.setValueFromDefaultSettings({
+        source: this.defaultValueSource,
+        key: this.defaultValueKey
+      });
     }
 
-    if (!this.value || this.autofill === 'always') {
-      // HTML5 date field wants YYYY-MM-DD format
-      this.value = moment().format(DATE_FORMAT);
+    if ((!this.value && this.autofill === 'default') || this.autofill === 'always') {
+      this.value = this.today;
       this.empty = false;
     }
 
     if (this.autofill === 'empty') {
       this.value = '';
-      this.datePicker.datepicker('setDate', '');
 
       return;
     }
 
     this.$emit('_input', this.name, this.value, false, true);
-    $vm.$v.$reset();
+    this.$v.$reset();
   },
   watch: {
     value: function(val) {
-      if (this.datepicker) {
-        this.datePicker.datepicker('setDate', val);
+      if (val === '' &&  ['default', 'always'].indexOf(this.autofill) > -1 && (this.required || this.autofill === 'always')) {
+        this.value = this.today;
+
+        return;
+      }
+
+      if (this.datePicker) {
+        this.datePicker.set(val, false);
       }
 
       if (this.isPreview && this.$v.value.$invalid) {
@@ -105,6 +91,38 @@ Fliplet.FormBuilder.field('date', {
       }
 
       this.$emit('_input', this.name, val, false, true);
+    }
+  },
+  created: function() {
+    Fliplet.Hooks.on('beforeFormSubmit', this.onBeforeSubmit);
+  },
+  destroyed: function() {
+    Fliplet.Hooks.off('beforeFormSubmit', this.onBeforeSubmit);
+  },
+  methods: {
+    initDatePicker: function() {
+      if (this.datePicker || !this.$refs.datePicker) {
+        return;
+      }
+
+      var $vm = this;
+
+      this.datePicker = Fliplet.UI.DatePicker(this.$refs.datePicker, {
+        required: this.required || this.autofill === 'always',
+        forceRequire: false,
+        value: this.value
+      });
+
+      this.datePicker.change(function(value) {
+        $vm.value = value;
+        $vm.updateValue();
+      });
+    },
+    onBeforeSubmit: function(data) {
+      // Empty date fields are validated to null before this hook is called
+      if (this.autofill === 'always' && data[this.name] === null) {
+        data[this.name] = this.defaultSource === 'submission' ? moment().locale('en').format('YYYY-MM-DD') : this.today;
+      }
     }
   }
 });

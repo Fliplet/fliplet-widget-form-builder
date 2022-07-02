@@ -13,4 +13,4 @@
   v-html="value"
   v-if="isInterface">
 </div>
-<p class="text-danger" v-if="$v.value.required === false && $v.value.$dirty">Field is required.</p>
+<p class="text-danger" v-if="$v.value.required === false && $v.value.$dirty">{{T "widgets.form.errors.required"}}</p>

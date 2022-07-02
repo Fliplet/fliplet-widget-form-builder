@@ -94,7 +94,7 @@ Fliplet.FormBuilder.field('password', {
   },
   computed: {
     fieldPlaceholder: function() {
-      return this.autogenerate ? 'A password will be automatically generated' : this.placeholder;
+      return this.autogenerate ? T('widgets.form.password.placeholder') : this.placeholder;
     },
     validationClass: function() {
       return {

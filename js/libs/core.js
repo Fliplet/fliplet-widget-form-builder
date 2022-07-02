@@ -242,10 +242,6 @@ Fliplet.FormBuilder = (function() {
 
       var fieldContext = $('html').hasClass('context-build') ? 'field' : 'interface';
 
-      component.template = templates['templates.components.' + fieldContext]({
-        template: template()
-      });
-
       componentName = name(componentName);
       components[componentName] = component;
 
@@ -301,7 +297,14 @@ Fliplet.FormBuilder = (function() {
         }
       }, component.props);
 
-      Vue.component(componentName, component);
+      // Wait until translations are available in Handlebars templates
+      Fliplet().then(function() {
+        component.template = templates['templates.components.' + fieldContext]({
+          template: template()
+        });
+
+        Vue.component(componentName, component);
+      });
     },
     fields: function() {
       return Object.keys(components);

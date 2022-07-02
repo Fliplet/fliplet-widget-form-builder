@@ -25,5 +25,5 @@
   autocomplete="new-password"
   tabindex="0"
 />
-<p class="text-danger" v-if="$v.value.email === false && $v.value.$dirty">The input is not a valid email address.</p>
-<p class="text-danger" v-if="$v.value.required === false && $v.value.$dirty">Field is required.</p>
+<p class="text-danger" v-if="$v.value.email === false && $v.value.$dirty">{{T "widgets.form.email.invalid"}}</p>
+<p class="text-danger" v-if="$v.value.required === false && $v.value.$dirty">{{T "widgets.form.errors.required"}}</p>

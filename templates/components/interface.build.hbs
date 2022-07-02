@@ -1,5 +1,5 @@
 <div :class="{ 'reduced-opacity': isHidden }" >
-  <span v-if="isHidden" class="label label-default">Hidden</span>
+  <span v-if="isHidden" class="label label-default">{{T "widgets.form.interface.hidden"}}</span>
   <div class="form-group row clearfix" :data-field="name">
     <div class="col-xs-12" v-if="_isFormField">
       <label class="control-label" :for="name">

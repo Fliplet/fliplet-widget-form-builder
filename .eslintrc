@@ -1,7 +1,6 @@
 {
   "extends": "fliplet",
   "globals": {
-    "Modernizr": "readonly",
     "Vue": "readonly",
     "Sortable": "readonly"
   }

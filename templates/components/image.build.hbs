@@ -19,10 +19,10 @@
     </div>
   </div>
   <label class="btn btn-primary focus-outline" tabindex="0" v-on:keydown.space.prevent="openFileDialog()">
-    <span>Choose image</span>
     <i class="fa fa-plus" aria-hidden="true"></i>
+    <span>{{T "widgets.form.image.instruction"}}</span>
     <input multiple type="file" ref="imageInput" :id="name" :name="name" class="input-file selectfile" accept="image/gif, image/jpg, image/jpeg, image/tiff, image/png" :data-folder-id="mediaFolderId" v-on:click="onFileClick" v-on:change="onFileChange" tabindex="-1">
   </label>
-  <p class="text-danger" v-if="hasCorruptedImage">The uploaded file is not a valid image. Please try again.</p>
-  <p class="text-danger" v-if="$v.value.required === false && $v.value.$dirty">Field is required.</p>
+  <p class="text-danger" v-if="hasCorruptedImage">{{T "widgets.form.image.invalid"}}</p>
+  <p class="text-danger" v-if="$v.value.required === false && $v.value.$dirty">{{T "widgets.form.errors.required"}}</p>
 </div>

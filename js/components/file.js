@@ -1,6 +1,7 @@
 /* global loadImage, addThumbnailToCanvas */
 
 Fliplet.FormBuilder.field('file', {
+  i18n: window.VueI18Next,
   name: 'Attach a file',
   category: 'Files',
   props: {
@@ -106,7 +107,7 @@ Fliplet.FormBuilder.field('file', {
   },
   methods: {
     showLocalDateFormat: function(date) {
-      return moment(date).format(moment.localeData().longDateFormat('L'));
+      return TD(date, { format: 'L' });
     },
     onFileItemClick: function(url) {
       Fliplet.Navigate.file(url);
@@ -140,7 +141,7 @@ Fliplet.FormBuilder.field('file', {
         ++unitIndex;
       } while (Math.round(Math.abs(bytes) * round ) / round  >= unitCapacity && unitIndex < units.length - 1);
 
-      return bytes.toFixed(decimals) + ' ' + units[unitIndex];
+      return TN(bytes.toFixed(decimals)) + ' ' + units[unitIndex];
     },
     onReset: function() {
       var $vm = this;

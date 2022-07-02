@@ -3,7 +3,7 @@
     <template v-if="isSending">
       <div class="sending-form">
         <div class="spinner-holder animated">
-          <div class="spinner-overlay">Loading...</div>
+          <div class="spinner-overlay" data-translate="widgets.form.loading">Loading...</div>
           <p v-html="isSendingMessage"></p>
         </div>
       </div>
@@ -11,14 +11,14 @@
     <template v-if="isLoading && !blockScreen">
       <div class="sending-form">
         <div class="spinner-holder animated">
-          <div class="spinner-overlay">Loading...</div>
+          <div class="spinner-overlay" data-translate="widgets.form.loading">Loading...</div>
           <p v-html="isLoadingMessage"></p>
         </div>
       </div>
     </template>
     <div v-if="!isSent" class="form-html">
       <div v-if="isOffline" class="text-danger" v-bind:class="{ 'cover-form' : blockScreen }" v-html="isOfflineMessage"></div>
-      <div v-if="hasRequiredFields" class="required-info-label">* Required fields</div>
+      <div v-if="hasRequiredFields" class="required-info-label">\{{$t("widgets.form.sending.requiredFields")}}</div>
       <template v-for="field in fields">
         <component :is="field._type" v-bind="field" v-on:_input="onInput" v-on:_error="onError" v-on:_reset="reset" v-if="field.enabled"></component>
       </template>

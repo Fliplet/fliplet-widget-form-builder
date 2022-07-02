@@ -16,13 +16,13 @@
         v-on:keydown.space.prevent="clean()"
       >
         <i class="fa fa-times"></i>
-        Clear
+        {{T "widgets.form.signature.actions.clear"}}
       </a>
     </div>
   </div>
   <div v-show="!isEditable" class="field-signature focus-outline signature-preview" tabindex="0">
     <img :src="value" alt="signature image" />
-    <a href="#" v-on:click.prevent="isEditable = true">Edit</a>
+    <a href="#" v-on:click.prevent="isEditable = true">{{T "widgets.form.signature.actions.edit"}}</a>
   </div>
-  <p class="text-danger" v-if="$v.value.required === false && $v.value.$dirty">Field is required.</p>
+  <p class="text-danger" v-if="$v.value.required === false && $v.value.$dirty">{{T "widgets.form.errors.required"}}</p>
 </template>
