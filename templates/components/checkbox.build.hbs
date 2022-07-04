@@ -1,5 +1,28 @@
 <template>
   <div v-if="description" class="help-block description">\{{ description }}</div>
+    <template v-if="isSelectAll">
+            <div class="checkbox checkbox-icon">
+       <input
+          type="checkbox"
+          :id="name + '-' + 'a'"
+          :name="name"
+          v-model="checkValue"
+          value="Select All"
+          tabindex="-1"
+        >
+        <label v-on:click="checkAllHandler()">
+          <span
+            class="check focus-outline"
+            tabindex="0"
+            v-on:keydown.space.prevent="checkAllHandler()"
+          >
+            <i class="fa fa-check"></i>
+          </span>
+          <span class="option-item">Select All</span> 
+        </label>
+        </div>
+  </template>
+
 
   <template v-if="readonly">
     <template v-for="(option, index) in options">

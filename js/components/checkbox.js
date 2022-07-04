@@ -25,6 +25,20 @@ Fliplet.FormBuilder.field('checkbox', {
           }
         ];
       }
+    },
+    selectAll: {
+      type: Array,
+      default: function() {
+        return [
+          {
+            label: T('widgets.form.checkbox.selectAll.selectAll')
+          }
+        ];
+      }
+    },
+    checkValue: {
+      type: Array,
+      default: []
     }
   },
   validations: function() {
@@ -48,10 +62,30 @@ Fliplet.FormBuilder.field('checkbox', {
           return (option.label || option.id) === val;
         });
       });
-
       this.highlightError();
 
       this.$emit('_input', this.name, ordered);
+    },
+    updateCheckValue: function() {
+      var $vm = this;
+      var index = $vm.checkValue.indexOf("Select All");
+
+      if (index === -1) {
+        $vm.checkValue.push("Select All");
+      } else {
+        $vm.checkValue.splice(index, 1);
+      }
+
+      
+       // Sort selected options by their index as a checkbox input option
+       var ordered = _.sortBy($vm.checkValue, function(val) {
+        return _.findIndex($vm.selectAll, function(option) {
+          return (option.label) === val;
+        });
+      });
+      this.highlightError();
+      this.$emit('_input', $vm.name, ordered);
+
     },
     clickHandler: function(option) {
       var val = option.id || option.label;
@@ -64,11 +98,23 @@ Fliplet.FormBuilder.field('checkbox', {
       }
 
       this.updateValue();
+    },
+    checkAllHandler: function(){
+      var $vm = this;
+      $vm.updateCheckValue();
+      $vm.value = [];
+      if($vm.checkValue.length > 0) {
+      _.forEach(this.options,function (option) {
+        var val = option.id || option.label;
+        $vm.value.push(val);
+      });
+      } 
+      this.updateValue();
     }
   },
   created: function() {
     var $vm = this;
-
+    console.log('Value');
     if (this.value.length > 0) {
       var selectedOptions = [];
 
@@ -83,14 +129,38 @@ Fliplet.FormBuilder.field('checkbox', {
       });
 
       this.value = selectedOptions.length ? _.uniqWith(this.value, _.isEqual) : [];
+      console.log(this.value);
+    }
+
+    if (this.checkValue.length > 0) {
+      var selectedOptions = [];
+
+      this.checkValue.forEach(function(value) {
+        var selectedValueOption = _.find($vm.selectAll, function(option) {
+          return (_.has(option, 'label') && _.has(option, 'id')) ? option.id === value : option.label === value;
+        });
+
+        if (selectedValueOption) {
+          selectedValueOption.push(selectedValueOption);
+        }
+      });
+
+      this.checkValue = selectedValueOption.length ? _.uniqWith(this.checkValue, _.isEqual) : [];
+      console.log(this.checkValue);
     }
 
     if (!!this.defaultValue) {
       this.value = this.defaultValue.split(/\n/);
+      this.checkValue = this.defaultValue.split(/\n/);
       this.updateValue(this.name, this.value);
+      this.updateValue(this.name, this.checkValue);
     } else if (!Array.isArray(this.value)) {
       this.value = [];
       this.updateValue(this.name, this.value);
+    } else if (!Array.isArray(this.checkValue)) {
+      this.checkValue = [];
+      this.updateValue(this.name, this.checkValue);
     }
+    
   }
 });

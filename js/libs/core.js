@@ -275,6 +275,10 @@ Fliplet.FormBuilder = (function() {
           type: Boolean,
           default: false
         },
+        isSelectAll: {
+          type: Boolean,
+          default: false
+        },
         canHide: {
           type: Boolean,
           default: true
@@ -368,6 +372,10 @@ Fliplet.FormBuilder = (function() {
       };
 
       component.props._componentsWithDescription = {
+        type: Array,
+        default: ['flInput', 'flCheckbox', 'flRadio', 'flEmail', 'flNumber', 'flTelephone', 'flUrl', 'flTextarea', 'flWysiwyg', 'flSelect', 'flDate', 'flTime', 'flStarRating', 'flSignature', 'flImage', 'flFile']
+      };
+      component.props._componentsWithSelectAll = {
         type: Array,
         default: ['flInput', 'flCheckbox', 'flRadio', 'flEmail', 'flNumber', 'flTelephone', 'flUrl', 'flTextarea', 'flWysiwyg', 'flSelect', 'flDate', 'flTime', 'flStarRating', 'flSignature', 'flImage', 'flFile']
       };
