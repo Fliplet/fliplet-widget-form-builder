@@ -26,7 +26,7 @@ Fliplet.FormBuilder.field('date', {
       datePicker: null,
       isInputFocused: false,
       isPreview: Fliplet.Env.get('preview'),
-      today: moment().format('YYYY-MM-DD')
+      today: moment().locale('en').format('YYYY-MM-DD')
     };
   },
   validations: function() {
@@ -60,8 +60,7 @@ Fliplet.FormBuilder.field('date', {
       });
     }
 
-    if (!this.value || this.autofill === 'always') {
-      // HTML5 date field wants YYYY-MM-DD format
+    if ((!this.value && this.autofill === 'default') || this.autofill === 'always') {
       this.value = this.today;
       this.empty = false;
     }
@@ -77,13 +76,15 @@ Fliplet.FormBuilder.field('date', {
   },
   watch: {
     value: function(val) {
-      if (this.autofill === 'always' && val === '') {
+      if (val === '' &&  ['default', 'always'].indexOf(this.autofill) > -1 && (this.required || this.autofill === 'always')) {
         this.value = this.today;
 
         return;
       }
 
-      this.datePicker.set(val, false);
+      if (this.datePicker) {
+        this.datePicker.set(val, false);
+      }
 
       if (this.isPreview && this.$v.value.$invalid) {
         this.highlightError();
@@ -91,6 +92,12 @@ Fliplet.FormBuilder.field('date', {
 
       this.$emit('_input', this.name, val, false, true);
     }
+  },
+  created: function() {
+    Fliplet.Hooks.on('beforeFormSubmit', this.onBeforeSubmit);
+  },
+  destroyed: function() {
+    Fliplet.Hooks.off('beforeFormSubmit', this.onBeforeSubmit);
   },
   methods: {
     initDatePicker: function() {
@@ -102,6 +109,7 @@ Fliplet.FormBuilder.field('date', {
 
       this.datePicker = Fliplet.UI.DatePicker(this.$refs.datePicker, {
         required: this.required || this.autofill === 'always',
+        forceRequire: false,
         value: this.value
       });
 
@@ -109,6 +117,12 @@ Fliplet.FormBuilder.field('date', {
         $vm.value = value;
         $vm.updateValue();
       });
+    },
+    onBeforeSubmit: function(data) {
+      // Empty date fields are validated to null before this hook is called
+      if (this.autofill === 'always' && data[this.name] === null) {
+        data[this.name] = this.defaultSource === 'submission' ? moment().locale('en').format('YYYY-MM-DD') : this.today;
+      }
     }
   }
 });
