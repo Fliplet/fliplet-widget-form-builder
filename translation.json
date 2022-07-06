@@ -58,6 +58,9 @@
         "defaultOptions": {
           "option1": "Option 1",
           "option2": "Option 2"
+        },
+        "isSelectAll": {
+          "isSelectAll":"Select All"
         }
       },
       "radio": {

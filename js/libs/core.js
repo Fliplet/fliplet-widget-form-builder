@@ -275,7 +275,7 @@ Fliplet.FormBuilder = (function() {
           type: Boolean,
           default: false
         },
-        isSelectAll: {
+        selectAll: {
           type: Boolean,
           default: false
         },
@@ -377,7 +377,7 @@ Fliplet.FormBuilder = (function() {
       };
       component.props._componentsWithSelectAll = {
         type: Array,
-        default: ['flInput', 'flCheckbox', 'flRadio', 'flEmail', 'flNumber', 'flTelephone', 'flUrl', 'flTextarea', 'flWysiwyg', 'flSelect', 'flDate', 'flTime', 'flStarRating', 'flSignature', 'flImage', 'flFile']
+        default: ['flCheckbox']
       };
 
       component.props._readOnlyComponents = {

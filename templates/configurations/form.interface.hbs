@@ -64,14 +64,14 @@
           </label>
         </div>
       </div>
-    </div>
 
-    <div v-if='_componentsWithSelectAll.includes(_componentName)' class="col-xs-12 form-group">
-      <div class="checkbox checkbox-icon">
-        <input type="checkbox" id="isSelectAll" name="isSelectAll" v-model="isSelectAll" v-on:input="required = false">
-        <label for="isSelectAll">
-          <span class="check"><i class="fa fa-check"></i></span> Include Select All
-        </label>
+      <div v-if='_componentsWithSelectAll.includes(_componentName)' class="col-xs-12 form-group">
+        <div class="checkbox checkbox-icon">
+          <input type="checkbox" id="selectAll" name="selectAll" v-model="selectAll" v-on:input="required = false">
+          <label for="selectAll">
+            <span class="check"><i class="fa fa-check"></i></span>Include Select All
+          </label>
+        </div>
       </div>
     </div>
 

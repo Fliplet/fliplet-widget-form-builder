@@ -26,12 +26,12 @@ Fliplet.FormBuilder.field('checkbox', {
         ];
       }
     },
-    selectAll: {
+    isSelectAll: {
       type: Array,
       default: function() {
         return [
           {
-            label: T('widgets.form.checkbox.selectAll.selectAll')
+            label: T('widgets.form.checkbox.isSelectAll.isSelectAll')
           }
         ];
       }
@@ -68,24 +68,24 @@ Fliplet.FormBuilder.field('checkbox', {
     },
     updateCheckValue: function() {
       var $vm = this;
-      var index = $vm.checkValue.indexOf("Select All");
+      var index = $vm.checkValue.indexOf('Select All');
 
       if (index === -1) {
-        $vm.checkValue.push("Select All");
+        $vm.checkValue.push('Select All');
       } else {
         $vm.checkValue.splice(index, 1);
       }
 
-      
-       // Sort selected options by their index as a checkbox input option
-       var ordered = _.sortBy($vm.checkValue, function(val) {
-        return _.findIndex($vm.selectAll, function(option) {
+      // Sort selected options by their index as a checkbox input option
+      var ordered = _.sortBy($vm.checkValue, function(val) {
+        return _.findIndex($vm.isSelectAll, function(option) {
           return (option.label) === val;
         });
       });
-      this.highlightError();
-      this.$emit('_input', $vm.name, ordered);
 
+      this.highlightError();
+
+      this.$emit('_input', $vm.name, ordered);
     },
     clickHandler: function(option) {
       var val = option.id || option.label;
@@ -99,22 +99,26 @@ Fliplet.FormBuilder.field('checkbox', {
 
       this.updateValue();
     },
-    checkAllHandler: function(){
+    checkAllHandler: function() {
       var $vm = this;
+
       $vm.updateCheckValue();
       $vm.value = [];
-      if($vm.checkValue.length > 0) {
-      _.forEach(this.options,function (option) {
-        var val = option.id || option.label;
-        $vm.value.push(val);
-      });
-      } 
+
+      if ($vm.checkValue.length > 0) {
+        _.forEach(this.options, function(option) {
+          var val = option.id || option.label;
+
+          $vm.value.push(val);
+        });
+      }
+
       this.updateValue();
     }
   },
   created: function() {
     var $vm = this;
-    console.log('Value');
+    
     if (this.value.length > 0) {
       var selectedOptions = [];
 
@@ -129,14 +133,13 @@ Fliplet.FormBuilder.field('checkbox', {
       });
 
       this.value = selectedOptions.length ? _.uniqWith(this.value, _.isEqual) : [];
-      console.log(this.value);
     }
 
     if (this.checkValue.length > 0) {
       var selectedOptions = [];
 
       this.checkValue.forEach(function(value) {
-        var selectedValueOption = _.find($vm.selectAll, function(option) {
+        var selectedValueOption = _.find($vm.isSelectAll, function(option) {
           return (_.has(option, 'label') && _.has(option, 'id')) ? option.id === value : option.label === value;
         });
 
@@ -146,7 +149,6 @@ Fliplet.FormBuilder.field('checkbox', {
       });
 
       this.checkValue = selectedValueOption.length ? _.uniqWith(this.checkValue, _.isEqual) : [];
-      console.log(this.checkValue);
     }
 
     if (!!this.defaultValue) {
@@ -161,6 +163,5 @@ Fliplet.FormBuilder.field('checkbox', {
       this.checkValue = [];
       this.updateValue(this.name, this.checkValue);
     }
-    
   }
 });
