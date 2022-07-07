@@ -118,7 +118,7 @@ Fliplet.FormBuilder.field('checkbox', {
   },
   created: function() {
     var $vm = this;
-    
+
     if (this.value.length > 0) {
       var selectedOptions = [];
 
@@ -136,10 +136,10 @@ Fliplet.FormBuilder.field('checkbox', {
     }
 
     if (this.checkValue.length > 0) {
-      var selectedOptions = [];
+      var selectedValueOption = [];
 
       this.checkValue.forEach(function(value) {
-        var selectedValueOption = _.find($vm.isSelectAll, function(option) {
+        selectedValueOption = _.find($vm.isSelectAll, function(option) {
           return (_.has(option, 'label') && _.has(option, 'id')) ? option.id === value : option.label === value;
         });
 
