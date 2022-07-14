@@ -719,6 +719,8 @@ Fliplet().then(function () {
           var $vm = this;
 
           if (entryId || fn) {
+            $vm.isLoading = true;
+
             var loadEntry = typeof fn === 'function'
               ? fn(entryId)
               : Fliplet.DataSources.connect(data.dataSourceId, { offline: false }).then(function (ds) {
@@ -765,6 +767,8 @@ Fliplet().then(function () {
           }
 
           if (data.autobindProfileEditing) {
+            $vm.isLoading = true;
+
             return Fliplet.Session.get().then(function (session) {
               var isEditMode = false;
 

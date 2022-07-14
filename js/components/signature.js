@@ -32,17 +32,23 @@ Fliplet.FormBuilder.field('signature', {
   },
   data: function() {
     return {
+      pad: null,
       previousClientWidth: 0,
-      isEditable: true
+      isEditable: true,
+      isDestroyed: false,
+      loadedFromData: false
     };
   },
   validations: function() {
+    var $vm = this;
     var rules = {
       value: {}
     };
 
     if (this.required) {
-      rules.value.required = window.validators.required;
+      rules.value.required = function() {
+        return !!($vm.pad && !$vm.pad.isEmpty());
+      };
     }
 
     return rules;
@@ -53,7 +59,8 @@ Fliplet.FormBuilder.field('signature', {
     }
   },
   created: function() {
-    if (this.value) {
+    if (this.$parent.isLoading) {
+      this.loadedFromData = true;
       this.isEditable = false;
     }
   },
@@ -63,7 +70,6 @@ Fliplet.FormBuilder.field('signature', {
     }
 
     var $vm = this;
-
     var canvas = this.$refs.canvas;
 
     canvas.style.width = '100%';
@@ -75,10 +81,8 @@ Fliplet.FormBuilder.field('signature', {
 
     // check is field valid when required
     this.pad.onEnd = function() {
-      if ($vm.required) {
-        $vm.value = true;
-        $vm.updateValue();
-      }
+      $vm.value = $vm.getPadValueAsData();
+      $vm.updateValue();
     };
 
     Fliplet.FormBuilder.on('reset', this.onReset);
@@ -113,25 +117,19 @@ Fliplet.FormBuilder.field('signature', {
       this.updateValue();
       this.isEditable = true;
     },
+    getPadValueAsData: function(includeFilename) {
+      return this.pad && this.pad.toDataURL('image/png') +
+        (includeFilename
+          ? ';filename:' + this.name + ' ' + moment().format('YYYY-MM-DD HH:mm') + '.png'
+          : '');
+    },
     onBeforeSubmit: function(data) {
-      var $vm = this;
-
-      if (!$vm.pad || $vm.isDestroyed) {
+      if (!this.pad || this.isDestroyed) {
         return;
       }
 
-      // highlight Error if not valid field when required
-      if ($vm.required && $vm.pad.isEmpty()) {
-        this.highlightError();
-      }
-
       // Get signature as base 64 string
-      data[this.name] = this.pad.toDataURL('image/png') + ';filename:' + this.name + ' ' + moment().format('YYYY-MM-DD HH:mm') + '.png';
-    }
-  },
-  watch: {
-    value: function(val) {
-      this.isEditable = !val;
+      data[this.name] = this.getPadValueAsData(true);
     }
   }
 });
