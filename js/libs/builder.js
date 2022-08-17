@@ -107,6 +107,8 @@ var SAVE_BUTTON_LABELS = {
   SAVE_AND_CLOSE: 'Save & Close'
 };
 
+var CANCEL_BUTTON_LABEL = 'Cancel';
+
 // Wait for form fields to be ready, as they get defined after translations are initialized
 Fliplet().then(function() {
   new Vue({
@@ -261,12 +263,16 @@ Fliplet().then(function() {
         this.activeField = field;
         changeSelectText();
         Fliplet.Studio.emit('widget-save-label-update');
+        Fliplet.Studio.emit('widget-cancel-label-update');
+        Fliplet.Widget.toggleCancelButton(false);
         this.$forceUpdate();
       },
       closeEdit: function() {
         this.activeFieldConfigType = null;
         this.activeField = {};
         Fliplet.Studio.emit('widget-save-label-reset');
+        Fliplet.Widget.setCancelButtonLabel(CANCEL_BUTTON_LABEL);
+        Fliplet.Widget.toggleCancelButton(true);
       },
       onFieldSettingChanged: function(fieldData) {
         var $vm = this;
@@ -277,6 +283,8 @@ Fliplet().then(function() {
 
         $vm.save();
         Fliplet.Studio.emit('reload-widget-instance', widgetId);
+        Fliplet.Widget.setCancelButtonLabel(CANCEL_BUTTON_LABEL);
+        Fliplet.Widget.toggleCancelButton(true);
         this.closeEdit();
       },
       changeTemplate: function() {
