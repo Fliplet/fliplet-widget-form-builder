@@ -3,10 +3,22 @@
 <div v-if="readonly" class="fileUpload" :class="{ 'fileUpload-padding-top': value.length }">
   <div class="row">
     <div v-for="(image, index) in value" @click="onImageClick(index)" class="multiple-images-item">
-      <div class="image-item" :style="{ 'background-image': 'url(' + image + ')' }"></div>
+      <div
+        class="image-item"
+        :style="{ 'background-image': 'url(' + Fliplet.Media.authenticate(image) + ')' }"
+      ></div>
     </div>
   </div>
-  <input multiple type="hidden" ref="imageInput" :id="name" :name="name" class="input-file selectfile" accept="image/gif, image/jpg, image/jpeg, image/tiff, image/png" :data-folder-id="mediaFolderId">
+  <input
+    multiple
+    type="hidden"
+    ref="imageInput"
+    :id="name"
+    :name="name"
+    class="input-file selectfile"
+    accept="image/gif, image/jpg, image/jpeg, image/tiff, image/png"
+    :data-folder-id="mediaFolderId"
+  />
 </div>
 
 <div v-else class="fileUpload" :class="{ 'fileUpload-padding-top': value.length }">
@@ -18,11 +30,29 @@
       </div>
     </div>
   </div>
-  <label class="btn btn-primary focus-outline" tabindex="0" v-on:keydown.space.prevent="openFileDialog()">
+  <label
+    class="btn btn-primary focus-outline"
+    tabindex="0"
+    v-on:keydown.space.prevent="openFileDialog()"
+  >
     <i class="fa fa-plus" aria-hidden="true"></i>
     <span>{{T "widgets.form.image.instruction"}}</span>
-    <input multiple type="file" ref="imageInput" :id="name" :name="name" class="input-file selectfile" accept="image/gif, image/jpg, image/jpeg, image/tiff, image/png" :data-folder-id="mediaFolderId" v-on:click="onFileClick" v-on:change="onFileChange" tabindex="-1">
+    <input
+      multiple
+      type="file"
+      ref="imageInput"
+      :id="name"
+      :name="name"
+      class="input-file selectfile"
+      accept="image/gif, image/jpg, image/jpeg, image/tiff, image/png"
+      :data-folder-id="mediaFolderId"
+      v-on:click="onFileClick"
+      v-on:change="onFileChange"
+      tabindex="-1"
+    />
   </label>
   <p class="text-danger" v-if="hasCorruptedImage">{{T "widgets.form.image.invalid"}}</p>
-  <p class="text-danger" v-if="$v.value.required === false && $v.value.$dirty">{{T "widgets.form.errors.required"}}</p>
+  <p class="text-danger" v-if="$v.value.required === false && $v.value.$dirty">{{T
+      "widgets.form.errors.required"
+    }}</p>
 </div>
