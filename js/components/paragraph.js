@@ -1,5 +1,5 @@
 Fliplet.FormBuilder.field('paragraph', {
-  name: 'Paragraph',
+  name: 'Format Paragraph',
   category: 'Formatting',
   submit: false,
   props: {

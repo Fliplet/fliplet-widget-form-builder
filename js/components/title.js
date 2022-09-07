@@ -1,5 +1,5 @@
 Fliplet.FormBuilder.field('title', {
-  name: 'Title',
+  name: 'Format Title',
   category: 'Formatting',
   submit: false,
   props: {
