@@ -45,7 +45,7 @@ Fliplet.FormBuilder.field('signature', {
       value: {}
     };
 
-    if (this.required) {
+    if (this.required && !this.readonly) {
       rules.value.required = function() {
         return !!($vm.pad && !$vm.pad.isEmpty());
       };

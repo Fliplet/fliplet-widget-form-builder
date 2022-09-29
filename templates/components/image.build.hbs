@@ -1,37 +1,16 @@
 <div v-if="description" class="help-block description">\{{ description }}</div>
-
-<div v-if="readonly" class="fileUpload" :class="{ 'fileUpload-padding-top': value.length }">
-  <div class="row">
-    <div v-for="(image, index) in value" @click="onImageClick(index)" class="multiple-images-item">
-      <div
-        class="image-item"
-        :style="{ 'background-image': 'url(' + Fliplet.Media.authenticate(image) + ')' }"
-      ></div>
-    </div>
-  </div>
-  <input
-    multiple
-    type="hidden"
-    ref="imageInput"
-    :id="name"
-    :name="name"
-    class="input-file selectfile"
-    accept="image/gif, image/jpg, image/jpeg, image/tiff, image/png"
-    :data-folder-id="mediaFolderId"
-  />
-</div>
-
-<div v-else class="fileUpload" :class="{ 'fileUpload-padding-top': value.length }">
+<div class="fileUpload" :class="{ 'fileUpload-disabled' : readonly, 'fileUpload-padding-top': value.length }">
   <div class="row">
     <div v-for="(image, index) in value">
       <div class="canvas-holder">
         <canvas ref="canvas"></canvas>
-        <button class="canvas-remove" type="button" v-on:click="removeImage(index)"></button>
+        <button class="canvas-remove" :class="{ 'hidden' : readonly }" type="button" v-on:click="removeImage(index)"></button>
       </div>
     </div>
   </div>
   <label
     class="btn btn-primary focus-outline"
+    :class="{ 'hidden' : readonly }"
     tabindex="0"
     v-on:keydown.space.prevent="openFileDialog()"
   >
@@ -55,4 +34,12 @@
   <p class="text-danger" v-if="$v.value.required === false && $v.value.$dirty">{{T
       "widgets.form.errors.required"
     }}</p>
+  <div class="row" :class="{ 'hidden' : !readonly }">
+    <label
+      class="btn btn-primary focus-outline"
+      tabindex="0"
+    >
+      <span :disabled="readonly">{{T "widgets.form.image.instruction"}}</span>
+    </label>
+  </div>
 </div>

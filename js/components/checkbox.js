@@ -32,7 +32,7 @@ Fliplet.FormBuilder.field('checkbox', {
       value: {}
     };
 
-    if (this.required) {
+    if (this.required && !this.readonly) {
       rules.value.required = window.validators.required;
     }
 

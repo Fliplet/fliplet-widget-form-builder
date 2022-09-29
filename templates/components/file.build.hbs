@@ -1,23 +1,9 @@
 <div v-if="description" class="help-block description">\{{ description }}</div>
-<template v-if="readonly">
-  <ul class="file-holder">
-    <li class="file-item" v-for="(file, index) in value" @click="onFileItemClick(file.url)">
-      <div class="file-title">\{{ file.name }}</div>
-      <div class="file-info">
-        <span class="file-info-uploaded">{{T "widgets.form.file.uploaded"}}: <strong>\{{ showLocalDateFormat(file.createdAt) }}</strong></span>
-        <span v-show="file.size" class="file-info-size">&ndash; <strong>\{{ humanFileSize(file.size) }}</strong></span>
-      </div>
-      <div class="file-icon">
-        <i class="fa fa-angle-right"></i>
-      </div>
-    </li>
-  </ul>
-</template>
-<div v-else class="fileUpload file-input" :class="{ 'fileUpload-padding-top': value.length }">
+<div class="fileUpload file-input" :class="{ 'fileUpload-padding-top': value.length, 'fileUpload-disabled' : readonly }">
   <div class="row">
-    <ul class="file-holder editable">
+    <ul class="file-holder" :class="{ 'editable' : !readonly }">
       <li class="file-item" v-for="(file, index) in value">
-        <div @click="onFileItemClick(file.url)" class="file-content" :class="{'no-pointer-events': !file.url}">
+        <div @click="readonly ? false : onFileItemClick(file.url)" class="file-content" :class="{ 'no-pointer-events' : !file.url }">
           <div class="file-title" >\{{ file.name }}</div>
           <div class="file-info">
             <span class="file-info-uploaded">
@@ -27,17 +13,16 @@
             <span v-show="file.size" class="file-info-size">&ndash; <strong>\{{ humanFileSize(file.size) }}</strong></span>
           </div>
         </div>
-        <div class="file-icon" @click="removeFile(index)">
+        <div class="file-icon" @click="readonly ? false : removeFile(index)">
           <i class="fa fa-times"></i>
         </div>
       </li>
     </ul>
   </div>
-  <label class="btn btn-primary focus-outline" tabindex="0" v-on:keydown.space.prevent="openFileDialog()">
-    <i class="fa fa-plus" aria-hidden="true"></i>
+  <label class="btn btn-primary focus-outline" tabindex="0" v-on:keydown.space.prevent="readonly ? false : openFileDialog()">
+    <i class="fa fa-plus" :class="{ 'hidden' : readonly }" aria-hidden="true"></i>
     <span>{{T "widgets.form.file.instruction"}}</span>
-    <input type="file" ref="fileInput" :id="name" :name="name" :data-folder-id="mediaFolderId" class="input-file selectfile" v-on:change="updateValue()" multiple tabindex="-1">
+    <input type="file" ref="fileInput" :id="name" :name="name" :data-folder-id="mediaFolderId" class="input-file selectfile" :class="{ 'hidden' : readonly }" v-on:change="updateValue()" multiple tabindex="-1">
   </label>
   <p class="text-danger" v-if="$v.value.required === false && $v.value.$dirty">{{T "widgets.form.errors.required"}}</p>
 </div>
- 

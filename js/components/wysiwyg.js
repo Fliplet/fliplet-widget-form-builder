@@ -21,7 +21,7 @@ Fliplet.FormBuilder.field('wysiwyg', {
       value: {}
     };
 
-    if (this.required) {
+    if (this.required && !this.readonly) {
       rules.value.required = window.validators.required;
     }
 
@@ -93,6 +93,11 @@ Fliplet.FormBuilder.field('wysiwyg', {
     onPlaceholderFocus: function() {
       if (!this.editor.settings.readonly) {
         this.hidePlaceholderLabel();
+      }
+
+      // for readonly rich text make placeholder text unselectable
+      if (this.editor.settings.readonly) {
+        tinymce.DOM.setStyle(this.labelElement, 'pointer-events', 'none');
       }
 
       this.editor.execCommand('mceFocus', false);
@@ -173,6 +178,7 @@ Fliplet.FormBuilder.field('wysiwyg', {
       autoresize_min_height: lineHeight * this.rows,
       autofocus: false,
       branding: false,
+      content_style: 'body { background-color: transparent; }',
       setup: function(editor) {
         $vm.editor = editor;
 

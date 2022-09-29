@@ -1,11 +1,6 @@
 <div v-if="description" class="help-block description">\{{ description }}</div>
-<template v-if="readonly">
-  <div class="field-signature focus-outline" tabindex="0">
-    <img :src="value" alt="signature image" />
-  </div>
-</template>
-<template v-else>
-  <div v-show="isEditable" class="signature-editor">
+<template>
+  <div v-show="isEditable" class="signature-editor" :class="{ 'readonly' : readonly }">
     <div class="field-signature focus-outline" tabindex="0">
       <canvas :id="name" ref="canvas"></canvas>
       <a
@@ -14,6 +9,7 @@
         tabindex="0"
         v-on:click.prevent="clean()"
         v-on:keydown.space.prevent="clean()"
+        :class="{ 'hidden' : readonly }"
       >
         <i class="fa fa-times"></i>
         {{T "widgets.form.signature.actions.clear"}}

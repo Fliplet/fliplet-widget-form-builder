@@ -34,7 +34,7 @@ Fliplet.FormBuilder.field('time', {
       value: {}
     };
 
-    if (this.required) {
+    if (this.required && !this.readonly) {
       rules.value.required = window.validators.required;
     }
 
@@ -57,7 +57,8 @@ Fliplet.FormBuilder.field('time', {
       this.timePicker = Fliplet.UI.TimePicker(this.$refs.timePicker, {
         required: this.required || this.autofill === 'always',
         forceRequire: false,
-        value: this.value
+        value: this.value,
+        readonly: this.readonly
       });
 
       this.timePicker.change(function(value) {
@@ -74,11 +75,6 @@ Fliplet.FormBuilder.field('time', {
   computed: {
     isApplyCurrentDateField: function() {
       return this.autofill === 'always' || this.autofill === 'default';
-    },
-    readonlyValue: function() {
-      return /^([01]\d|2[0-3]):?([0-5]\d)$/.test(this.value)
-        ? TD(this.value, { format: 'LT' })
-        : '';
     }
   },
   beforeUpdate: function() {

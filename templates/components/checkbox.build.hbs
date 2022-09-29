@@ -1,26 +1,8 @@
 <template>
   <div v-if="description" class="help-block description">\{{ description }}</div>
-
-  <template v-if="readonly">
+  <template>
     <template v-for="(option, index) in options">
-      <template v-if="value.includes(option.label) || value.includes(option.id)">
-        <p class="form-control-static">\{{ option.label || option.id }}</p>
-        <input
-          type="hidden"
-          :id="name + '-' + index"
-          :name="name"
-          v-model="value"
-          :value="option.id || option.label"
-          class="focus-outline"
-          tabindex="0"
-        />
-      </template>
-    </template>
-  </template>
-
-  <template v-else>
-    <template v-for="(option, index) in options">
-      <div class="checkbox checkbox-icon">
+      <div class="checkbox checkbox-icon" :class="{ 'readonly' : readonly }">
         <input
           type="checkbox"
           :id="name + '-' + index"
@@ -33,7 +15,7 @@
           <span
             class="check focus-outline"
             tabindex="0"
-            v-on:keydown.space.prevent="clickHandler(option)"
+            v-on:keydown.space.prevent="readonly ? false : clickHandler(option)"
           >
             <i class="fa fa-check"></i>
           </span>
@@ -42,7 +24,5 @@
       </div>
     </template>
   </template>
-
-
   <p class="text-danger" v-if="$v.value.required === false && $v.value.$dirty">{{ T "widgets.form.errors.required" }}</p>
 </template>

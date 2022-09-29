@@ -1,30 +1,15 @@
 <div v-if="description" class="help-block description">\{{ description }}</div>
-
-<template v-if="readonly">
-  <p class="form-control-static">\{{ readonlyValue }}</p>
-  <input
-    type="hidden"
-    v-model.lazy="value"
-    v-on:change="updateValue()"
-    v-on:input="onInput($event)"
-    :name="name"
-    :id="name"
-    :placeholder="placeholder"
-    class="form-control"
-  />
-</template>
-<template v-else-if="autofill === 'always' && defaultSource === 'submission'">
+<template v-if="autofill === 'always' && defaultSource === 'submission'">
   Now
 </template>
 <template v-else>
-  <div class="form-group fl-time-picker" ref="timePicker">
+  <div class="form-group fl-time-picker" :class="{ 'readonly' : readonly }" ref="timePicker">
     <i class="fa fa-clock-o fa-fw"></i>
-    <input type="time" class="form-control" :name="name" :id="name" />
-    <input type="text" class="form-control" />
+    <input type="time" class="form-control" :name="name" :id="name" :tabindex="readonly ? -1 : 0"/>
+    <input type="text" class="form-control" :tabindex="readonly ? -1 : 0"/>
     <i class="fa fa-times fa-fw"></i>
   </div>
 </template>
-
 <p class="text-danger" v-if="$v.value.required === false && $v.value.$dirty">
   {{T "widgets.form.errors.required"}}
 </p>

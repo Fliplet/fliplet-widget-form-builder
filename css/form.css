@@ -284,6 +284,10 @@ textarea.form-control {
   box-shadow: none;
 }
 
+.form-control[readonly] {
+  background-color: #f8f8f8;
+}
+
 .form-html .btn {
   margin-bottom: 15px;
 }
@@ -371,6 +375,22 @@ html[dir="rtl"] .checkbox.checkbox-icon input[type="checkbox"] + label > span.ch
   transform: scale(1);
 }
 
+.checkbox.checkbox-icon.readonly input[type="checkbox"] + label,
+.checkbox.checkbox-icon.readonly input[type="checkbox"] + label > span.check {
+  pointer-events: none;
+}
+
+.checkbox.checkbox-icon.readonly input[type="checkbox"] + label > span.check {
+  border: 1px solid #e1e1e1;
+  border-radius: 4px;
+}
+
+.checkbox.checkbox-icon.readonly input[type="checkbox"]:checked + label > span.check {
+  border: 1px solid #e1e1e1;
+  border-radius: 4px;
+  background-color: #e1e1e1;
+}
+
 /* RADIOS */
 
 .radio.radio-icon:first-of-type {
@@ -427,6 +447,14 @@ html[dir="rtl"] .radio.radio-icon input[type="radio"] + label > span.check {
   background-color: #337ab7;
 }
 
+.radio.radio-icon.readonly input[type="radio"]:checked + label > span.check {
+  background-color: #e1e1e1;
+}
+
+.radio.radio-icon.readonly input[type="radio"] + label > span.check {
+  border: 1px solid #e1e1e1;
+}
+
 .radio.radio-icon input[type="radio"] + label > span.check > i.fa {
   position: absolute;
   left: 0;
@@ -473,6 +501,11 @@ html[dir="rtl"] .radio.radio-icon input[type="radio"] + label > span.check {
   line-height: 44px;
   position: relative;
   color: #333;
+}
+
+.select-proxy-display.readonly,
+.fileUpload-disabled {
+  pointer-events: none;
 }
 
 .select-proxy-display > .hidden-select {
@@ -531,6 +564,16 @@ html[dir="rtl"] .radio.radio-icon input[type="radio"] + label > span.check {
 .fileUpload {
   position: relative;
   overflow: hidden;
+}
+
+.fileUpload-disabled label {
+  background-color: #e1e1e1;
+  border-radius: 31px !important;
+  width: 100%;
+}
+
+.fileUpload-disabled label span {
+  color: #fff;
 }
 
 .fileUpload-padding-top {
@@ -777,6 +820,17 @@ html[dir="rtl"] .radio.radio-icon input[type="radio"] + label > span.check {
   opacity: 0;
 }
 
+[_type="flStarRating"] .rating-input.readonly,
+[_type="flStarRating"] .rating-star.readonly,
+[_type="flStarRating"] .rating-star.readonly .fa {
+  pointer-events: none;
+}
+
+[_type="flStarRating"] .rating-star.readonly .fa,
+[data-field="flStarRating"] .rating-star.readonly {
+  color: #e5e5e5;
+}
+
 [_type="flStarRating"] .rating-star {
   position: relative;
   display: inline-block;
@@ -805,6 +859,14 @@ html[dir="rtl"] .radio.radio-icon input[type="radio"] + label > span.check {
 
 [_type="flStarRating"] .rating-input:checked ~ .rating-star .fa.fa-star {
   display: block;
+}
+
+[_type="flStarRating"] .rating-input ~ .readonly.rating-star .fa::before {
+  content: "\f005";
+}
+
+[_type="flStarRating"] .rating-input:checked ~ .readonly.rating-star .fa::before {
+  -webkit-text-stroke: 0px !important;
 }
 
 /* SIGNATURE FIELD */
@@ -845,6 +907,16 @@ html[dir="rtl"] .radio.radio-icon input[type="radio"] + label > span.check {
   flex-direction: column;
 }
 
+[data-widget-package="com.fliplet.form-builder"] [_type="flSignature"] .signature-editor.readonly .field-signature canvas {
+  background-color: transparent;
+  border-radius: 0%;
+  border: none !important;
+}
+
+.signature-editor.readonly .field-signature {
+  border-bottom: 1px solid #e5e5e5;
+}
+
 /* WYSIWYG FIELD */
 
 .form-group .mce-tinymce {
@@ -852,6 +924,7 @@ html[dir="rtl"] .radio.radio-icon input[type="radio"] + label > span.check {
   -webkit-box-shadow: none;
   -moz-box-shadow: none;
   box-shadow: none;
+  border-width: 1px !important;
 }
 
 .form-group .mce-tinymce > .mce-container-body.mce-stack-layout {
@@ -922,7 +995,9 @@ html[dir="rtl"] .radio.radio-icon input[type="radio"] + label > span.check {
 }
 
 .form-group div.mce-edit-area {
-  border-color: transparent;
+  background: #f8f8f8;
+  border: 1px solid #e5e5e5;
+  border-radius: 5px;
 }
 
 .tinymce-mobile-outer-container .tinymce-mobile-disabled-mask {
@@ -942,6 +1017,13 @@ html[dir="rtl"] .radio.radio-icon input[type="radio"] + label > span.check {
   .tinymce-mobile-editor-socket {
   border: 1px solid #ccc;
   border-radius: 4px;
+}
+
+/* DATE AND TIME PICKER */
+
+.form-group.fl-time-picker.readonly > .fa:first-child,
+.form-group.fl-date-picker.readonly > .fa:first-child {
+  color: #e1e1e1;
 }
 
 /* LINE BREAK */

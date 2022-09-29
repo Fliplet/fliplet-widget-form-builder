@@ -203,18 +203,6 @@ Fliplet.FormBuilder = (function() {
           return false;
         }
 
-        if (this.readonly) {
-          if (['flTime', 'flDate'].includes(this._componentName)) {
-            return true;
-          }
-
-          if (Array.isArray(this.value)) {
-            return !!this.value.length;
-          }
-
-          return !!this.value;
-        }
-
         return true;
       };
 

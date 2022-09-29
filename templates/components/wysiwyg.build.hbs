@@ -6,9 +6,11 @@
   :name="name"
   :id="tinymceId"
   :placeholder="placeholder"
+  :readonly="readonly"
 ></textarea>
 <div
   class="ghost-tinymce"
+  :class="{ 'readonly' : readonly }"
   ref="ghost"
   v-html="value"
   v-if="isInterface">

@@ -1,26 +1,9 @@
 <div v-if="description" class="help-block description">\{{ description }}</div>
-<template v-if="readonly">
-  <p class="form-control-static">\{{ value }}</p>
-    <select
-      class="form-control hidden-select hidden focus-outline"
-      :name="name"
-      :id="name"
-      v-model="value"
-      v-on:change="updateValue()"
-      v-on:input="onInput($event)"
-      tabindex="0"
-    >
-      <option v-if="placeholder" value="">\{{ placeholder }}</option>
-      <option v-for="option in options" :value="(_.isNumber(option.id) || _.isString(option.id)) ? option.id : option.label" :disabled="option.disabled">
-        \{{ option.label || option.id }}
-      </option>
-    </select>
-</template>
-<template v-else>
+<template>
   <label
     :for="name"
-    class="select-proxy-display" 
-    :class="{ 'input-focused': isInputFocused }"
+    class="select-proxy-display"
+    :class="{ 'input-focused': isInputFocused , 'readonly': readonly }"
   >
     <select
       class="form-control hidden-select focus-outline"
@@ -31,6 +14,7 @@
       v-on:input="onInput($event)"
       v-on:focus="isInputFocused = true"
       v-on:blur="isInputFocused = false"
+      v-on:keydown.prevent="readonly ? false : true"
       tabindex="0"
     >
       <option v-if="placeholder" value="">\{{ placeholder }}</option>

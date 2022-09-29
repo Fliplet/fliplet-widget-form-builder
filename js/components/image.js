@@ -63,7 +63,7 @@ Fliplet.FormBuilder.field('image', {
       value: {}
     };
 
-    if (this.required) {
+    if (this.required && !this.readonly) {
       rules.value.required = window.validators.required;
     }
 
@@ -105,6 +105,10 @@ Fliplet.FormBuilder.field('image', {
       $(this.$refs.imageInput).parents('.form-group').removeClass('has-error');
 
       if (!this.required) {
+        return;
+      }
+
+      if (this.readonly) {
         return;
       }
 

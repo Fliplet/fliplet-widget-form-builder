@@ -1,30 +1,11 @@
 <div v-if="description" class="help-block description">\{{ description }}</div>
-<div v-if="readonly" class="inverse-direction">
-  <template v-for="(option, index) in values">
-    <template v-if="value >= option.id">
-      <input
-        class="rating-input"
-        :name="name"
-        type="radio"
-        :id="name + '-' + index"
-        v-model="value"
-        :value="option.id"
-      />
-      <label class="rating-star">
-        <i class="fa fa-star-o"></i>
-        <i class="fa fa-star"></i>
-      </label>
-    </template>
-  </template>
-</div>
 <div
-  v-else
-  class="inverse-direction focus-outline"
+  class="inverse-direction focus-outline input-star-rating"
   tabindex="0"
-  v-on:keydown.up.prevent="increaseRatingValue()"
-  v-on:keydown.right.prevent="increaseRatingValue()"
-  v-on:keydown.down.prevent="decreaseRatingValue()"
-  v-on:keydown.left.prevent="decreaseRatingValue()"
+  v-on:keydown.up.prevent="readonly ? false : increaseRatingValue()"
+  v-on:keydown.right.prevent="readonly ? false : increaseRatingValue()"
+  v-on:keydown.down.prevent="readonly ? false : decreaseRatingValue()"
+  v-on:keydown.left.prevent="readonly ? false : decreaseRatingValue()"
 >
   <template v-for="(option, index) in values">
     <input
@@ -34,11 +15,13 @@
       :id="name + '-' + index"
       v-model="value"
       :value="option.id"
-      v-on:change="updateValue()"
-      v-on:input="onInput($event)"
+      v-on:change="readonly ? false : updateValue()"
+      v-on:input="readonly ? false : onInput($event)"
       tabindex="-1"
+      :readonly="readonly"
+      :class="{ 'readonly' : readonly }"
     >
-    <label class="rating-star" :for="name + '-' + index">
+    <label class="rating-star" :class="{ 'readonly' : readonly }" :for="name + '-' + index">
       <i class="fa fa-star-o"></i>
       <i class="fa fa-star"></i>
     </label>

@@ -34,7 +34,7 @@ Fliplet.FormBuilder.field('date', {
       value: {}
     };
 
-    if (this.required) {
+    if (this.required && !this.readonly) {
       rules.value.required = window.validators.required;
     }
 
@@ -43,11 +43,6 @@ Fliplet.FormBuilder.field('date', {
   computed: {
     isApplyCurrentDateField: function() {
       return this.autofill === 'always' || this.autofill === 'default';
-    },
-    readonlyValue: function() {
-      return this.value && moment(this.value).isValid()
-        ? TD(this.value, { format: 'L' })
-        : '';
     }
   },
   mounted: function() {
@@ -110,7 +105,8 @@ Fliplet.FormBuilder.field('date', {
       this.datePicker = Fliplet.UI.DatePicker(this.$refs.datePicker, {
         required: this.required || this.autofill === 'always',
         forceRequire: false,
-        value: this.value
+        value: this.value,
+        readonly: this.readonly
       });
 
       this.datePicker.change(function(value) {

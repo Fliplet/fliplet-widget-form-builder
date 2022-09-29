@@ -1,19 +1,5 @@
 <div v-if="description" class="help-block description">\{{ description }}</div>
-<template v-if="readonly">
-  <p class="form-control-static">\{{ value }}</p>
-  <input
-    type="hidden"
-    class="form-control"
-    v-model.trim.lazy="value"
-    v-on:change="updateValue()"
-    v-on:input="onInput($event)"
-    :name="name"
-    :id="name"
-    :placeholder="placeholder"
-    autocomplete="new-password"
-  />
-</template>
-<input v-else
+<input
   type="email"
   class="form-control focus-outline"
   v-model.trim.lazy="value"
@@ -24,6 +10,7 @@
   :placeholder="placeholder"
   autocomplete="new-password"
   tabindex="0"
+  :readonly="readonly"
 />
 <p class="text-danger" v-if="$v.value.email === false && $v.value.$dirty">{{T "widgets.form.email.invalid"}}</p>
 <p class="text-danger" v-if="$v.value.required === false && $v.value.$dirty">{{T "widgets.form.errors.required"}}</p>

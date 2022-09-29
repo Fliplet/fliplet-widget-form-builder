@@ -279,7 +279,7 @@ Fliplet().then(function () {
       computed: {
         hasRequiredFields: function() {
           return this.fields.some(function(el) {
-            return !!el.required;
+            return el.required && !el.readonly;
           });
         }
       },

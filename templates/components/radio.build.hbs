@@ -1,24 +1,8 @@
 <template>
   <div v-if="description" class="help-block description">\{{ description }}</div>
-  <template v-if="readonly">
+  <template>
     <template v-for="(option, index) in options">
-      <template v-if="value === option.label || value === option.id">
-        <p class="form-control-static">\{{ option.label || option.id }}</p>
-        <input
-          type="hidden"
-          :id="name + '-' + index"
-          :name="name"
-          v-model="value"
-          :value="option.id || option.label"
-          class="focus-outline"
-          tabindex="0"
-        >
-      </template>
-    </template>
-  </template>
-  <template v-else>
-    <template v-for="(option, index) in options">
-      <div class="radio radio-icon">
+      <div class="radio radio-icon" :class="{ 'readonly' : readonly }">
         <input
           type="radio"
           :id="name + '-' + index"
@@ -27,16 +11,16 @@
           :value="option.id || option.label"
           tabindex="-1"
         >
-        <label v-on:click="clickHandler(option)">
+        <label v-on:click="readonly ? false : clickHandler(option)">
           <span
             ref="radioButton"
             class="check focus-outline"
             tabindex="0"
-            v-on:keydown.right.prevent="focusHandler(index + 1)"
-            v-on:keydown.down.prevent="focusHandler(index + 1)"
-            v-on:keydown.left.prevent="focusHandler(index - 1)"
-            v-on:keydown.up.prevent="focusHandler(index - 1)"
-            v-on:keydown.space.prevent="focusHandler(index)"
+            v-on:keydown.right.prevent="readonly ? false : focusHandler(index + 1)"
+            v-on:keydown.down.prevent="readonly ? false : focusHandler(index + 1)"
+            v-on:keydown.left.prevent="readonly ? false : focusHandler(index - 1)"
+            v-on:keydown.up.prevent="readonly ? false : focusHandler(index - 1)"
+            v-on:keydown.space.prevent="readonly ? false : focusHandler(index)"
           >
             <i class="fa fa-circle"></i>
           </span>
@@ -44,7 +28,6 @@
         </label>
     </div>
     </template>
-
   </template>
   <p class="text-danger" v-if="$v.value.required === false && $v.value.$dirty">{{T "widgets.form.errors.required"}}</p>
 </template>
