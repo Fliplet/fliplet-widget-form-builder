@@ -145,9 +145,9 @@ this["Fliplet"]["Widget"]["Templates"]["templates.components.signature"] = Handl
 
   return "<div v-if=\"description\" class=\"help-block description\">{{ description }}</div>\r\n<template>\r\n  <div v-show=\"isEditable\" class=\"signature-editor\" :class=\"{ 'readonly' : readonly }\">\r\n    <div class=\"field-signature focus-outline\" tabindex=\"0\">\r\n      <canvas :id=\"name\" ref=\"canvas\"></canvas>\r\n      <a\r\n        href=\"#\"\r\n        class=\"focus-outline btn-clear\"\r\n        tabindex=\"0\"\r\n        v-on:click.prevent=\"clean()\"\r\n        v-on:keydown.space.prevent=\"clean()\"\r\n        :class=\"{ 'hidden' : readonly }\"\r\n      >\r\n        <i class=\"fa fa-times\"></i>\r\n        "
     + alias3((helpers.T || (depth0 && depth0.T) || alias2).call(alias1,"widgets.form.signature.actions.clear",{"name":"T","hash":{},"data":data}))
-    + "\r\n      </a>\r\n    </div>\r\n  </div>\r\n  <div v-show=\"!isEditable\" class=\"field-signature focus-outline signature-preview\" tabindex=\"0\">\r\n    <img :src=\"value\" alt=\"signature image\" />\r\n    <a href=\"#\" v-on:click.prevent=\"isEditable = true\">"
+    + "\r\n      </a>\r\n    </div>\r\n  </div>\r\n  <div v-show=\"!isEditable\" class=\"field-signature focus-outline signature-preview\" :class=\"{ 'readonly' : readonly }\" tabindex=\"0\">\r\n    <img :src=\"value\" alt=\"signature image\" />\r\n    <a\r\n      href=\"#\"\r\n      v-on:click.prevent=\"isEditable = true\"\r\n      :class=\"{ 'hidden' : readonly }\"\r\n    >\r\n      "
     + alias3((helpers.T || (depth0 && depth0.T) || alias2).call(alias1,"widgets.form.signature.actions.edit",{"name":"T","hash":{},"data":data}))
-    + "</a>\r\n  </div>\r\n  <p class=\"text-danger\" v-if=\"$v.value.required === false && $v.value.$dirty\">"
+    + "\r\n    </a>\r\n  </div>\r\n  <p class=\"text-danger\" v-if=\"$v.value.required === false && $v.value.$dirty\">"
     + alias3((helpers.T || (depth0 && depth0.T) || alias2).call(alias1,"widgets.form.errors.required",{"name":"T","hash":{},"data":data}))
     + "</p>\r\n</template>\r\n";
 },"useData":true});

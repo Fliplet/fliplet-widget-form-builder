@@ -16,9 +16,15 @@
       </a>
     </div>
   </div>
-  <div v-show="!isEditable" class="field-signature focus-outline signature-preview" tabindex="0">
+  <div v-show="!isEditable" class="field-signature focus-outline signature-preview" :class="{ 'readonly' : readonly }" tabindex="0">
     <img :src="value" alt="signature image" />
-    <a href="#" v-on:click.prevent="isEditable = true">{{T "widgets.form.signature.actions.edit"}}</a>
+    <a
+      href="#"
+      v-on:click.prevent="isEditable = true"
+      :class="{ 'hidden' : readonly }"
+    >
+      {{T "widgets.form.signature.actions.edit"}}
+    </a>
   </div>
   <p class="text-danger" v-if="$v.value.required === false && $v.value.$dirty">{{T "widgets.form.errors.required"}}</p>
 </template>
