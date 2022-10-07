@@ -863,10 +863,15 @@ html[dir="rtl"] .radio.radio-icon input[type="radio"] + label > span.check {
 
 [_type="flStarRating"] .rating-input ~ .readonly.rating-star .fa::before {
   content: "\f005";
+  -webkit-text-stroke: 1px #e1e1e1;
 }
 
-[_type="flStarRating"] .rating-input:checked ~ .readonly.rating-star .fa::before {
-  -webkit-text-stroke: 0px !important;
+[_type="flStarRating"] .rating-input ~ .readonly.rating-star .fa {
+  color: #f8f8f8;
+}
+
+[_type="flStarRating"] .rating-input:checked ~ .readonly.rating-star .fa {
+  color: #e1e1e1;
 }
 
 /* SIGNATURE FIELD */
