@@ -1,6 +1,24 @@
 <template>
   <div v-if="description" class="help-block description">\{{ description }}</div>
   <template>
+    <template v-if="addSelectAll">
+      <div class="checkbox checkbox-icon" :class="{ 'readonly' : readonly }">
+        <input
+          type="checkbox"
+          :id="name + '-' + 'select-all'"
+          v-model="selectedAll"
+        >
+        <label :for="name + '-' + 'select-all'">
+          <span
+            class="check focus-outline"
+            tabindex="0"
+          >
+            <i class="fa fa-check"></i>
+          </span>
+          <span class="option-item">{{T "widgets.form.checkbox.selectAll"}}</span>
+        </label>
+      </div>
+    </template>
     <template v-for="(option, index) in options">
       <div class="checkbox checkbox-icon" :class="{ 'readonly' : readonly }">
         <input

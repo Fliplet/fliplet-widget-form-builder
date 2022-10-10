@@ -66,6 +66,17 @@
       </div>
     </div>
 
+    {{#hasSelectAll}}
+    <div class="col-xs-12 form-group">
+      <div class="checkbox checkbox-icon">
+        <input type="checkbox" id="select-all" v-model="addSelectAll">
+        <label for="select-all">
+          <span class="check"><i class="fa fa-check"></i></span>Include Select All
+        </label>
+      </div>
+    </div>
+    {{/hasSelectAll}}
+
     {{#hasOptions}}
       <div class="form-group cleafix">
         <div class="col-xs-12">
