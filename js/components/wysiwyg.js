@@ -221,6 +221,7 @@ Fliplet.FormBuilder.field('wysiwyg', {
           var $el = $(editor.iframeElement);
 
           $el.parent().parent().removeClass('focus-outline');
+          $vm.onBlur();
         });
 
         editor.on('change', function() {

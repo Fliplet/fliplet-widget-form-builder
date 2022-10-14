@@ -2,7 +2,7 @@
 <input
   type="email"
   class="form-control focus-outline"
-  v-model.trim.lazy="value"
+  v-model.trim.lazy="$v.value.$model"
   v-on:change="updateValue()"
   v-on:input="onInput($event)"
   :name="name"
@@ -11,6 +11,7 @@
   autocomplete="new-password"
   tabindex="0"
   :readonly="readonly"
+  @blur="onBlur()"
 />
 <p class="text-danger" v-if="$v.value.email === false && $v.value.$dirty">{{T "widgets.form.email.invalid"}}</p>
 <p class="text-danger" v-if="$v.value.required === false && $v.value.$dirty">{{T "widgets.form.errors.required"}}</p>

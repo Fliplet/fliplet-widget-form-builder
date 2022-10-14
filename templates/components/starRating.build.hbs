@@ -13,13 +13,14 @@
       :name="name"
       type="radio"
       :id="name + '-' + index"
-      v-model="value"
+      v-model="$v.value.$model"
       :value="option.id"
       v-on:change="readonly ? false : updateValue()"
       v-on:input="readonly ? false : onInput($event)"
       tabindex="-1"
       :readonly="readonly"
       :class="{ 'readonly' : readonly }"
+      @blur="onBlur()"
     >
     <label class="rating-star" :class="{ 'readonly' : readonly }" :for="name + '-' + index">
       <i class="fa fa-star-o"></i>

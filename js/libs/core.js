@@ -161,6 +161,7 @@ Fliplet.FormBuilder = (function() {
 
         if ($vm.$v && $vm.$v.value) {
           if ($vm.$v.passwordConfirmation) {
+            $vm.isValid = !$vm.$v.value.$error;
             return;
           }
 
@@ -171,6 +172,11 @@ Fliplet.FormBuilder = (function() {
       component.methods.onInput = _.debounce(function($event) {
         this.$emit('_input', this.name, $event.target.value, false, true);
       }, 200);
+
+      component.methods.onBlur = function() {
+        this.$v.value.$touch();
+        this.highlightError();
+      };
 
       component.methods.browserSupport = function(browserType) {
         switch (browserType) {
