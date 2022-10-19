@@ -6,6 +6,7 @@
   v-on:keydown.right.prevent="readonly ? false : increaseRatingValue()"
   v-on:keydown.down.prevent="readonly ? false : decreaseRatingValue()"
   v-on:keydown.left.prevent="readonly ? false : decreaseRatingValue()"
+  @blur="onBlur()"
 >
   <template v-for="(option, index) in values">
     <input
@@ -13,14 +14,13 @@
       :name="name"
       type="radio"
       :id="name + '-' + index"
-      v-model="$v.value.$model"
+      v-model="value"
       :value="option.id"
       v-on:change="readonly ? false : updateValue()"
       v-on:input="readonly ? false : onInput($event)"
       tabindex="-1"
       :readonly="readonly"
       :class="{ 'readonly' : readonly }"
-      @blur="onBlur()"
     >
     <label class="rating-star" :class="{ 'readonly' : readonly }" :for="name + '-' + index">
       <i class="fa fa-star-o"></i>
