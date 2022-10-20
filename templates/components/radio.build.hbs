@@ -7,7 +7,7 @@
           type="radio"
           :id="name + '-' + index"
           :name="name"
-          v-model="value"
+          v-model.lazy="$v.value.$model"
           :value="option.id || option.label"
           tabindex="-1"
         >
@@ -21,6 +21,7 @@
             v-on:keydown.left.prevent="readonly ? false : focusHandler(index - 1)"
             v-on:keydown.up.prevent="readonly ? false : focusHandler(index - 1)"
             v-on:keydown.space.prevent="readonly ? false : focusHandler(index)"
+            @blur="onBlur()"
           >
             <i class="fa fa-circle"></i>
           </span>

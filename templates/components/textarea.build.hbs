@@ -1,7 +1,7 @@
 <div v-if="description" class="help-block description">\{{ description }}</div>
 <textarea
   class="form-control focus-outline"
-  v-model.trim.lazy="value"
+  v-model.trim.lazy="$v.value.$model"
   v-on:change="updateValue()"
   v-on:input="onInput($event)"
   :name="name"
@@ -10,5 +10,6 @@
   :rows="rows"
   tabindex="0"
   :readonly="readonly"
+  @blur="onBlur()"
 ></textarea>
 <p class="text-danger" v-if="$v.value.required === false && $v.value.$dirty">{{T "widgets.form.errors.required"}}</p>

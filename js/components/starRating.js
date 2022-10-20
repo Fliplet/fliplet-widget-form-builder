@@ -32,7 +32,11 @@ Fliplet.FormBuilder.field('starRating', {
     };
 
     if (this.required && !this.readonly) {
-      rules.value.required = window.validators.required;
+      rules.value.required = function(value) {
+        if (typeof value !== 'undefined' && value >= 0) {
+          return value;
+        }
+      };
     }
 
     return rules;

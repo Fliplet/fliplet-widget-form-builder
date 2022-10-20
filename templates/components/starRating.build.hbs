@@ -6,6 +6,7 @@
   v-on:keydown.right.prevent="readonly ? false : increaseRatingValue()"
   v-on:keydown.down.prevent="readonly ? false : decreaseRatingValue()"
   v-on:keydown.left.prevent="readonly ? false : decreaseRatingValue()"
+  @blur="onBlur()"
 >
   <template v-for="(option, index) in values">
     <input

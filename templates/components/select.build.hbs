@@ -9,13 +9,14 @@
       class="form-control hidden-select focus-outline"
       :name="name"
       :id="name"
-      v-model="value"
+      v-model.lazy="$v.value.$model"
       v-on:change="updateValue()"
       v-on:input="onInput($event)"
       v-on:focus="isInputFocused = true"
       v-on:blur="isInputFocused = false"
       v-on:keydown.prevent="readonly ? false : true"
       tabindex="0"
+      @blur="onBlur()"
     >
       <option v-if="placeholder" value="">\{{ placeholder }}</option>
       <option v-for="option in options" :value="(_.isNumber(option.id) || _.isString(option.id)) ? option.id : option.label" :disabled="option.disabled">

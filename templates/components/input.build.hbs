@@ -2,7 +2,7 @@
 <input
   type="text"
   class="form-control focus-outline"
-  v-model.trim.lazy="value"
+  v-model.trim.lazy="$v.value.$model"
   v-on:change="readonly ? false : updateValue()"
   v-on:input="readonly ? false : onInput($event)"
   :name="name"
@@ -10,5 +10,6 @@
   :placeholder="placeholder"
   tabindex="0"
   :readonly="readonly"
+  @blur="onBlur()"
 />
 <p class="text-danger" v-if="$v.value.required === false && $v.value.$dirty">{{T "widgets.form.errors.required"}}</p>

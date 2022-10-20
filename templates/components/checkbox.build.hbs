@@ -7,7 +7,7 @@
           type="checkbox"
           :id="name + '-' + index"
           :name="name"
-          v-model="value"
+          v-model.lazy="$v.value.$model"
           :value="option.id || option.label"
           tabindex="-1"
         >
@@ -16,6 +16,7 @@
             class="check focus-outline"
             tabindex="0"
             v-on:keydown.space.prevent="readonly ? false : clickHandler(option)"
+            @blur="onBlur()"
           >
             <i class="fa fa-check"></i>
           </span>
