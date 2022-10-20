@@ -36,7 +36,7 @@ Fliplet.FormBuilder.field('starRating', {
         if (typeof value !== 'undefined' && value >= 0) {
           return value;
         }
-      }
+      };
     }
 
     return rules;

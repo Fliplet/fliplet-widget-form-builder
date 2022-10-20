@@ -162,6 +162,7 @@ Fliplet.FormBuilder = (function() {
         if ($vm.$v && $vm.$v.value) {
           if ($vm.$v.passwordConfirmation) {
             $vm.isValid = !$vm.$v.value.$error;
+
             return;
           }
 
@@ -173,6 +174,7 @@ Fliplet.FormBuilder = (function() {
         this.$emit('_input', this.name, $event.target.value, false, true);
       }, 200);
 
+      // Define method to execute on blur form field
       component.methods.onBlur = function() {
         this.$v.value.$touch();
         this.highlightError();
