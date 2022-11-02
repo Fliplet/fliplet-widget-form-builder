@@ -133,7 +133,7 @@ Fliplet().then(function () {
           if (entry && entry.data && field.populateOnUpdate !== false) {
             var fieldData = entry.data[field.name];
 
-            if (typeof fieldData === 'undefined') {
+            if (typeof fieldData === 'undefined' && typeof progress !== 'undefined' && typeof progress[field.name] === 'undefined' && field.submit !== false) {
               return; // do not update the field value
             }
 
@@ -238,6 +238,7 @@ Fliplet().then(function () {
 
             if (typeof savedValue !== 'undefined') {
               field.value = savedValue;
+              field.valueIsFromProgress = true;
             }
           }
         });
@@ -273,7 +274,8 @@ Fliplet().then(function () {
           isEditMode: data.dataStore && data.dataStore.indexOf('editDataSource') > -1,
           blockScreen: false,
           today: moment().locale('en').format('YYYY-MM-DD'),
-          now: moment().locale('en').format('HH:mm')
+          now: moment().locale('en').format('HH:mm'),
+          id: data.id
         };
       },
       computed: {
@@ -327,11 +329,17 @@ Fliplet().then(function () {
             }
 
             field.value = value;
+
+            if (_.has(field, 'valueIsFromProgress')) {
+              field.valueIsFromProgress = false;
+            }
+
             $vm.triggerChange(field.name, field.value);
           });
 
           localStorage.removeItem(progressKey);
-          Fliplet.FormBuilder.emit('reset');
+
+          Fliplet.FormBuilder.emit('reset', { id: data.id });
           this.$emit('reset');
         },
         onError: function (fieldName, error) {
@@ -597,6 +605,10 @@ Fliplet().then(function () {
 
                 if (type === 'flEmail') {
                   value = value.toLowerCase();
+                }
+
+                if (_.has(field, 'valueIsFromProgress')) {
+                  field.valueIsFromProgress = false;
                 }
 
                 // Other inputs
