@@ -7,8 +7,9 @@
           type="checkbox"
           :id="name + '-' + 'select-all'"
           v-model="selectedAll"
+          tabindex="-1"
         >
-        <label :for="name + '-' + 'select-all'">
+        <label @click="selectAllClickHandler()">
           <span
             class="check focus-outline"
             tabindex="0"

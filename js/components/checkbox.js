@@ -122,6 +122,9 @@ Fliplet.FormBuilder.field('checkbox', {
       }
 
       this.updateValue();
+    },
+    selectAllClickHandler: function() {
+      this.selectedAll = !this.selectedAll;
     }
   },
   created: function() {
