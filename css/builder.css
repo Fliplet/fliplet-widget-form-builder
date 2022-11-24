@@ -556,6 +556,20 @@ input[type="time"]::-webkit-calendar-picker-indicator {
   opacity: 0;
 }
 
+/* SLIDER FIELD */
+
+[data-widget-package="com.fliplet.form-builder"] .form-group.fl-range-slider.readonly .range-slider-handle-value::before {
+  border-top-color: #e1e1e1;
+}
+
+[data-widget-package="com.fliplet.form-builder"] .form-group.fl-range-slider .range-slider.range-slider-active .range-slider-handle {
+  box-shadow: 0px 0px 0px 2px rgb(0 171 209 / 25%);
+}
+
+[data-widget-package="com.fliplet.form-builder"] .form-group.fl-range-slider > input {
+  width: 100% !important;
+}
+
 /* STAR RATING */
 .component [_type="flStarRating"] .inverse-direction {
   overflow: hidden;

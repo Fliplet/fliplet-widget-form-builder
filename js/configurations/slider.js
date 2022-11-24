@@ -1,0 +1,1 @@
+Fliplet.FormBuilder.configuration('slider');

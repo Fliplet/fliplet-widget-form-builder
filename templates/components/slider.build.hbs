@@ -1,0 +1,13 @@
+<div v-if="description" class="help-block description">\{{ description }}</div>
+<div class="form-group fl-range-slider" :class="{ 'readonly': readonly }" ref="slider">
+ <input
+    type="range"
+    :name="name"
+    :id="name"
+    :min="min"
+    :max="max"
+    :step="step"
+    v-model="value"
+    :tabindex="readonly ? -1 : 0"
+  />
+</div>
