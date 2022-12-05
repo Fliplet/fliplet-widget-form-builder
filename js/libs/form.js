@@ -322,6 +322,10 @@ Fliplet().then(function () {
               value = fieldSettings.value;
             }
 
+            if (fieldSettings.readonly === true) {
+              value = field.value;
+            }
+
             // Clone value if it's an array to ensure the original object does not mutate
             if (Array.isArray(value)) {
               value = value.slice(0);
