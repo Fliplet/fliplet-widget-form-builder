@@ -302,7 +302,6 @@ Fliplet().then(function () {
           var $vm = this;
 
           this.fields.forEach(function(field, index) {
-
             var value;
             var fieldSettings = data.fields[index];
 
