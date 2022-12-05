@@ -302,10 +302,11 @@ Fliplet().then(function () {
           var $vm = this;
 
           this.fields.forEach(function(field, index) {
+
             var value;
             var fieldSettings = data.fields[index];
 
-            if (field.isHidden) {
+            if (field.isHidden || fieldSettings.readonly) {
               return;
             }
 
@@ -320,10 +321,6 @@ Fliplet().then(function () {
               value = fieldSettings.defaultSource === 'submission' ? moment().locale('en').format('HH:mm') : $vm.now;
             } else {
               value = fieldSettings.value;
-            }
-
-            if (fieldSettings.readonly === true) {
-              value = field.value;
             }
 
             // Clone value if it's an array to ensure the original object does not mutate

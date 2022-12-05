@@ -144,12 +144,13 @@ Fliplet.FormBuilder.field('file', {
       return TN(bytes.toFixed(decimals)) + ' ' + units[unitIndex];
     },
     onReset: function() {
-      var $vm = this;
+      if (!this.readonly) {
+        var $vm = this;
+        $vm.value = [];
+        $vm.selectedFileName = '';
 
-      $vm.value = [];
-      $vm.selectedFileName = '';
-
-      $vm.$emit('_input', $vm.name, $vm.value);
+        $vm.$emit('_input', $vm.name, $vm.value);
+      }
     },
     validateValue: function() {
       if (typeof this.value === 'string' && this.value) {
