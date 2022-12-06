@@ -146,6 +146,7 @@ Fliplet.FormBuilder.field('file', {
     onReset: function() {
       if (!this.readonly) {
         var $vm = this;
+
         $vm.value = [];
         $vm.selectedFileName = '';
 
