@@ -98,10 +98,12 @@ Fliplet.FormBuilder.field('image', {
       $vm.$emit('_input', $vm.name, $vm.value);
     },
     onReset: function() {
-      if (!this.readonly) {
-        this.value = [];
-        this.$emit('_input', this.name, this.value);
+      if (this.readonly) {
+        return;
       }
+
+      this.value = [];
+      this.$emit('_input', this.name, this.value);
     },
     onBeforeSubmit: function() {
       $(this.$refs.imageInput).parents('.form-group').removeClass('has-error');
