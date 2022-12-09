@@ -98,15 +98,19 @@
     {{#isSlider}}
     <div class="form-group cleafix">
       <div class="col-xs-12">
-        <label>Minimum Value Number</label>
+        <label>Minimum value number</label>
         <input class="form-control" type="number" v-model.trim="min" placeholder="Default: 0"/>
       </div>
+    </div>
 
+    <div class="form-group cleafix">
       <div class="col-xs-12">
-        <label>Maximum Value Number</label>
+        <label>Maximum value number</label>
         <input class="form-control" type="number" v-model.trim="max" placeholder="Default: 100"/>
       </div>
+    </div>
 
+    <div class="form-group cleafix">
       <div class="col-xs-12">
         <label>Number of steps</label>
         <input class="form-control" type="number" v-model.trim="step" placeholder="Default: 1"/>
