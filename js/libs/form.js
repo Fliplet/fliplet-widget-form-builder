@@ -133,7 +133,7 @@ Fliplet().then(function () {
           if (entry && entry.data && field.populateOnUpdate !== false) {
             var fieldData = entry.data[field.name];
 
-            if (typeof fieldData === 'undefined') {
+            if (typeof fieldData === 'undefined' && field._submit) {
               return; // do not update the field value
             }
 
@@ -273,7 +273,8 @@ Fliplet().then(function () {
           isEditMode: data.dataStore && data.dataStore.indexOf('editDataSource') > -1,
           blockScreen: false,
           today: moment().locale('en').format('YYYY-MM-DD'),
-          now: moment().locale('en').format('HH:mm')
+          now: moment().locale('en').format('HH:mm'),
+          id: data.id
         };
       },
       computed: {
@@ -327,11 +328,13 @@ Fliplet().then(function () {
             }
 
             field.value = value;
+
             $vm.triggerChange(field.name, field.value);
           });
 
           localStorage.removeItem(progressKey);
-          Fliplet.FormBuilder.emit('reset');
+
+          Fliplet.FormBuilder.emit('reset', { id: data.id });
           this.$emit('reset');
         },
         onError: function (fieldName, error) {
@@ -595,8 +598,8 @@ Fliplet().then(function () {
                   }
                 }
 
-                if (type === 'flEmail') {
-                  value = value.toLowerCase();
+                if (type === 'flEmail' && typeof value === 'string') {
+                    value = value.toLowerCase();
                 }
 
                 // Other inputs
