@@ -96,21 +96,27 @@
     </div>
 
     {{#isSlider}}
-    <div class="form-group cleafix">
+    <div class="form-group cleafix" :class="{ 'has-error': errors.sliderMinMax }">
       <div class="col-xs-12">
-        <label>Minimum Value Number</label>
+        <label>Minimum value number</label>
         <input class="form-control" type="number" v-model.trim="min" placeholder="Default: 0"/>
       </div>
+    </div>
 
+    <div class="form-group cleafix" :class="{ 'has-error': errors.sliderMinMax }">
       <div class="col-xs-12">
-        <label>Maximum Value Number</label>
+        <label>Maximum value number</label>
         <input class="form-control" type="number" v-model.trim="max" placeholder="Default: 100"/>
       </div>
+      <p class="col-xs-12 help-block" v-if="errors.sliderMinMax">\{{ errors.sliderMinMax }}</p>
+    </div>
 
+    <div class="form-group cleafix" :class="{ 'has-error': errors.sliderStep }">
       <div class="col-xs-12">
         <label>Number of steps</label>
         <input class="form-control" type="number" v-model.trim="step" placeholder="Default: 1"/>
       </div>
+      <p class="col-xs-12 help-block" v-if="errors.sliderStep">\{{ errors.sliderStep }}</p>
     </div>
     {{/isSlider}}
 
@@ -154,6 +160,6 @@
   </div>
 
   <div class="footer">
-    <button type="submit" class="btn btn-primary" :class="{ disabled: _fieldNameError || _fieldLabelError }">Save</button>
+    <button type="submit" class="btn btn-primary" :class="{ disabled: _fieldNameError || _fieldLabelError || _hasErrors }">Save</button>
   </div>
 </form>

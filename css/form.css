@@ -1054,10 +1054,6 @@ html[dir="rtl"] .radio.radio-icon input[type="radio"] + label > span.check {
   color: #ffffff;
 }
 
-[data-widget-package="com.fliplet.form-builder"] .form-group.fl-range-slider.readonly .range-slider-handle-value::before {
-  border-top-color: #e1e1e1;
-}
-
 [data-widget-package="com.fliplet.form-builder"] .form-group.fl-range-slider .range-slider.range-slider-active .range-slider-handle {
   box-shadow: 0px 0px 0px 2px rgb(0 171 209 / 25%);
 }

@@ -558,6 +558,15 @@ input[type="time"]::-webkit-calendar-picker-indicator {
 
 /* SLIDER FIELD */
 
+[data-widget-package="com.fliplet.form-builder"] .form-group.fl-range-slider.readonly .range-slider-handle-value,
+[data-widget-package="com.fliplet.form-builder"] .form-group.fl-range-slider.disabled .range-slider-handle-value,
+[data-widget-package="com.fliplet.form-builder"] .form-group.fl-range-slider.readonly .range-slider-handle,
+[data-widget-package="com.fliplet.form-builder"] .form-group.fl-range-slider.disabled .range-slider-handle,
+[data-widget-package="com.fliplet.form-builder"] .form-group.fl-range-slider.readonly .range-slider-fill,
+[data-widget-package="com.fliplet.form-builder"] .form-group.fl-range-slider.disabled .range-slider-fill {
+  background-color: #e1e1e1;
+}
+
 [data-widget-package="com.fliplet.form-builder"] .form-group.fl-range-slider.readonly .range-slider-handle-value::before {
   border-top-color: #e1e1e1;
 }
@@ -568,6 +577,17 @@ input[type="time"]::-webkit-calendar-picker-indicator {
 
 [data-widget-package="com.fliplet.form-builder"] .form-group.fl-range-slider > input {
   width: 100% !important;
+}
+
+.form-group.fl-range-slider .range-slider-handle-value,
+.form-group.fl-range-slider .range-slider-handle,
+.form-group.fl-range-slider .range-slider-fill {
+  color: #2D2D2D;
+  background-color: #E1E1E1;
+}
+
+.form-group.fl-range-slider .range-slider-handle-value:before {
+  border-top-color: #E1E1E1;
 }
 
 /* STAR RATING */
