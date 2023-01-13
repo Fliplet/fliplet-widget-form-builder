@@ -551,7 +551,7 @@ input[type="time"].form-control {
 }
 
 input[type="time"]::-webkit-inner-spin-button,
-input[type="time"]::-webkit-calendar-picker-indicator {
+input[type="time"]:not(.basic-time-picker)::-webkit-calendar-picker-indicator {
   -webkit-appearance: none;
   opacity: 0;
 }

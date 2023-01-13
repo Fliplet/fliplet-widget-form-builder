@@ -464,24 +464,38 @@ Fliplet.FormBuilder = (function() {
       component.methods._getErrors = function() {
         this.errors = {};
 
-        if (this._componentName !== 'flSlider') {
-          return;
-        }
+        switch (this._componentName) {
+          case 'flDate':
+          case 'flTime':
+            if (!this.value) {
+              _.assignIn(this.errors, {
+                requiredField: 'This field is required*'
+              });
+            }
 
-        var max = !this.max ? 100 : Number(this.max);
-        var min = !this.min ? 0 : Number(this.min);
-        var step = !this.step ? 1 : Number(this.step);
+            break;
 
-        if (min >= max) {
-          _.assignIn(this.errors, {
-            sliderMinMax: 'The maximum value must be higher than the minimum value'
-          });
-        }
+          case 'flSlider':
+            var max = !this.max ? 100 : Number(this.max);
+            var min = !this.min ? 0 : Number(this.min);
+            var step = !this.step ? 1 : Number(this.step);
 
-        if (step > (max - min)) {
-          _.assignIn(this.errors, {
-            sliderStep: 'Number of steps should be less than or equal to the difference between maximum value and minimum value'
-          });
+            if (min >= max) {
+              _.assignIn(this.errors, {
+                sliderMinMax: 'The maximum value must be higher than the minimum value'
+              });
+            }
+
+            if (step > (max - min)) {
+              _.assignIn(this.errors, {
+                sliderStep: 'Number of steps should be less than or equal to the difference between maximum value and minimum value'
+              });
+            }
+
+            break;
+
+          default:
+            // nothing
         }
       };
 
