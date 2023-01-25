@@ -467,7 +467,7 @@ Fliplet.FormBuilder = (function() {
         switch (this._componentName) {
           case 'flDate':
           case 'flTime':
-            if (!this.value) {
+            if (this.autofill === 'custom' && !this.value) {
               _.assignIn(this.errors, {
                 requiredField: 'This field is required*'
               });
