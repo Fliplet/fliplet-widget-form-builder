@@ -907,10 +907,6 @@ html[dir="rtl"] .radio.radio-icon input[type="radio"] + label > span.check {
   border-color: #a94442 !important;
 }
 
-.has-error .select-proxy-display {
-  border: 1px solid #F05865 !important;
-}
-
 .signature-preview {
   display: flex;
   flex-direction: column;
