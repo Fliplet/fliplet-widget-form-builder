@@ -13,6 +13,18 @@ Fliplet.FormBuilder = (function() {
     return 'fl' + component.charAt(0).toUpperCase() + component.slice(1);
   }
 
+  function makeid(length) {
+    var text = '';
+    var possible =
+      'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+
+    for (var i = 0; i < length; i++) {
+      text += possible.charAt(Math.floor(Math.random() * possible.length));
+    }
+
+    return text;
+  }
+
   return {
     on: function(eventName, fn) {
       eventHub.$on(eventName, fn);
@@ -60,7 +72,11 @@ Fliplet.FormBuilder = (function() {
       var template = templates['templates.components.' + componentName];
 
       if (!template) {
-        throw new Error('A template for the ' + componentName + ' component has not been found');
+        throw new Error(
+          'A template for the ' +
+            componentName +
+            ' component has not been found'
+        );
       }
 
       if (!component.methods) {
@@ -92,11 +108,13 @@ Fliplet.FormBuilder = (function() {
         switch (data.source) {
           case 'profile':
             if (!data.key) {
-              throw new Error('A key is required to fetch data from the user\'s profile');
+              throw new Error(
+                "A key is required to fetch data from the user's profile"
+              );
             }
 
-            result = Fliplet.User.getCachedSession({ force: true })
-              .then(function(session) {
+            result = Fliplet.User.getCachedSession({ force: true }).then(
+              function(session) {
                 if (session && session.entries) {
                   if (session.entries.dataSource) {
                     return session.entries.dataSource.data[data.key];
@@ -112,18 +130,23 @@ Fliplet.FormBuilder = (function() {
                 }
 
                 return Fliplet.Profile.get(data.key);
-              });
+              }
+            );
             break;
           case 'query':
             if (!data.key) {
-              throw new Error('A key is required to fetch data from the navigation query parameters');
+              throw new Error(
+                'A key is required to fetch data from the navigation query parameters'
+              );
             }
 
             result = Fliplet.Navigate.query[data.key];
             break;
           case 'appStorage':
             if (!data.key) {
-              throw new Error('A key is required to fetch data from app storage');
+              throw new Error(
+                'A key is required to fetch data from app storage'
+              );
             }
 
             result = Fliplet.App.Storage.get(data.key);
@@ -211,11 +234,17 @@ Fliplet.FormBuilder = (function() {
       };
 
       component.computed._supportsRowOptions = function() {
-        return this._isFormField && component.props._componentName.default === 'flMatrix';
+        return (
+          this._isFormField &&
+          component.props._componentName.default === 'flMatrix'
+        );
       };
 
       component.computed._supportsColumnOptions = function() {
-        return this._isFormField && component.props._componentName.default === 'flMatrix';
+        return (
+          this._isFormField &&
+          component.props._componentName.default === 'flMatrix'
+        );
       };
 
       component.computed._showField = function() {
@@ -237,73 +266,81 @@ Fliplet.FormBuilder = (function() {
           return opt.id == vm.value;
         });
 
-        return option ? (option.label || option.id) : this.value;
+        return option ? option.label || option.id : this.value;
       };
 
       if (!component.mounted) {
         component.mounted = function() {
           if (this.defaultValueSource !== 'default') {
-            this.setValueFromDefaultSettings({ source: this.defaultValueSource, key: this.defaultValueKey });
+            this.setValueFromDefaultSettings({
+              source: this.defaultValueSource,
+              key: this.defaultValueKey
+            });
           }
         };
       }
 
-      var fieldContext = $('html').hasClass('context-build') ? 'field' : 'interface';
+      var fieldContext = $('html').hasClass('context-build')
+        ? 'field'
+        : 'interface';
 
       componentName = name(componentName);
       components[componentName] = component;
 
       // All fields have these properties
-      component.props = _.assign({
-        name: {
-          type: String,
-          required: true
+      component.props = _.assign(
+        {
+          name: {
+            type: String,
+            required: true
+          },
+          label: {
+            type: String,
+            default: component.name || 'Label text'
+          },
+          _componentName: {
+            type: String,
+            default: componentName
+          },
+          showLabel: {
+            type: Boolean,
+            default: true
+          },
+          value: {
+            type: String,
+            default: ''
+          },
+          required: {
+            type: Boolean,
+            default: false
+          },
+          isHidden: {
+            type: Boolean,
+            default: false
+          },
+          canHide: {
+            type: Boolean,
+            default: true
+          },
+          readonly: {
+            type: Boolean,
+            default: false
+          },
+          defaultValueSource: {
+            type: String,
+            default: 'default'
+          },
+          defaultValueKey: {
+            type: String,
+            default: ''
+          },
+          isValid: {
+            type: Boolean,
+            default: true
+          }
         },
-        label: {
-          type: String,
-          default: component.name || 'Label text'
-        },
-        _componentName: {
-          type: String,
-          default: componentName
-        },
-        showLabel: {
-          type: Boolean,
-          default: true
-        },
-        value: {
-          type: String,
-          default: ''
-        },
-        required: {
-          type: Boolean,
-          default: false
-        },
-        isHidden: {
-          type: Boolean,
-          default: false
-        },
-        canHide: {
-          type: Boolean,
-          default: true
-        },
-        readonly: {
-          type: Boolean,
-          default: false
-        },
-        defaultValueSource: {
-          type: String,
-          default: 'default'
-        },
-        defaultValueKey: {
-          type: String,
-          default: ''
-        },
-        isValid: {
-          type: Boolean,
-          default: true
-        }
-      }, component.props);
+        component.props
+      );
 
       // Wait until translations are available in Handlebars templates
       Fliplet().then(function() {
@@ -327,17 +364,23 @@ Fliplet.FormBuilder = (function() {
       componentName = name(componentName);
 
       // Extend from base component
-      component = _.assign({
-        computed: {},
-        methods: {},
-        props: {}
-      }, _.pick(components[componentName], [
-        'props', 'computed'
-      ]), component);
+      component = _.assign(
+        {
+          computed: {},
+          methods: {},
+          props: {}
+        },
+        _.pick(components[componentName], ['props', 'computed']),
+        component
+      );
 
       // On submit event
       component.methods._onSubmit = function() {
-        if (!this.defaultValueKey && this._componentsWithPersonalization.includes(this._componentName) && this.defaultValueSource !== 'default') {
+        if (
+          !this.defaultValueKey &&
+          this._componentsWithPersonalization.includes(this._componentName) &&
+          this.defaultValueSource !== 'default'
+        ) {
           return 'Key field is required';
         }
 
@@ -368,7 +411,7 @@ Fliplet.FormBuilder = (function() {
           data.step = !data.step ? 1 : Number(data.step);
 
           if ((data.max - data.min) % data.step !== 0) {
-            data.max = data.max - (data.max - data.min) % data.step;
+            data.max = data.max - ((data.max - data.min) % data.step);
           }
         }
 
@@ -390,17 +433,68 @@ Fliplet.FormBuilder = (function() {
 
       component.props._componentsWithPersonalization = {
         type: Array,
-        default: ['flInput', 'flCheckbox', 'flRadio', 'flEmail', 'flNumber', 'flTelephone', 'flUrl', 'flTextarea', 'flWysiwyg', 'flSelect', 'flSlider', 'flMatrix']
+        default: [
+          'flInput',
+          'flCheckbox',
+          'flRadio',
+          'flEmail',
+          'flNumber',
+          'flTelephone',
+          'flUrl',
+          'flTextarea',
+          'flWysiwyg',
+          'flSelect',
+          'flSlider',
+          'flMatrix'
+        ]
       };
 
       component.props._componentsWithDescription = {
         type: Array,
-        default: ['flInput', 'flCheckbox', 'flRadio', 'flEmail', 'flNumber', 'flTelephone', 'flUrl', 'flTextarea', 'flWysiwyg', 'flSelect', 'flDate', 'flTime', 'flStarRating', 'flSignature', 'flImage', 'flFile', 'flSlider', 'flMatrix']
+        default: [
+          'flInput',
+          'flCheckbox',
+          'flRadio',
+          'flEmail',
+          'flNumber',
+          'flTelephone',
+          'flUrl',
+          'flTextarea',
+          'flWysiwyg',
+          'flSelect',
+          'flDate',
+          'flTime',
+          'flStarRating',
+          'flSignature',
+          'flImage',
+          'flFile',
+          'flSlider',
+          'flMatrix'
+        ]
       };
 
       component.props._readOnlyComponents = {
         type: Array,
-        default: ['flInput', 'flCheckbox', 'flRadio', 'flEmail', 'flNumber', 'flTelephone', 'flUrl', 'flTextarea', 'flWysiwyg', 'flSelect', 'flDate', 'flTime', 'flStarRating', 'flSignature', 'flImage', 'flFile', 'flSlider', 'flMatrix']
+        default: [
+          'flInput',
+          'flCheckbox',
+          'flRadio',
+          'flEmail',
+          'flNumber',
+          'flTelephone',
+          'flUrl',
+          'flTextarea',
+          'flWysiwyg',
+          'flSelect',
+          'flDate',
+          'flTime',
+          'flStarRating',
+          'flSignature',
+          'flImage',
+          'flFile',
+          'flSlider',
+          'flMatrix'
+        ]
       };
 
       component.props._idx = {
@@ -441,7 +535,10 @@ Fliplet.FormBuilder = (function() {
 
       component.computed._fieldLabelError = function() {
         if (this.type === 'flButtons') {
-          if ((this.showSubmit && !this.submitValue) || (this.showClear && !this.clearValue)) {
+          if (
+            (this.showSubmit && !this.submitValue) ||
+            (this.showClear && !this.clearValue)
+          ) {
             return 'Please provide a Field Label';
           }
 
@@ -469,6 +566,28 @@ Fliplet.FormBuilder = (function() {
         return !_.isEmpty(this.errors);
       };
 
+      component.methods.addAccordionItem = function() {
+        var item = {};
+
+        item.id = makeid(8);
+        item.label = 'List item ' + (this.items.length + 1);
+        item.img =
+          'https://icons-for-free.com/download-icon-link+permalink+url+web+web+address+icon-1320191828785653121_512.png';
+        this.items.push(item);
+      };
+
+      component.methods.removeAccordionItem = function(item) {
+        this.items = this.items.filter((it) => it.id != item.id);
+      };
+
+      component.methods.onSortItems = function($event) {
+        this.items.splice(
+          $event.newIndex,
+          0,
+          this.items.splice($event.oldIndex, 1)[0]
+        );
+      };
+
       component.methods._getErrors = function() {
         this.errors = {};
 
@@ -490,13 +609,15 @@ Fliplet.FormBuilder = (function() {
 
             if (min >= max) {
               _.assignIn(this.errors, {
-                sliderMinMax: 'The maximum value must be higher than the minimum value'
+                sliderMinMax:
+                  'The maximum value must be higher than the minimum value'
               });
             }
 
-            if (step > (max - min)) {
+            if (step > max - min) {
               _.assignIn(this.errors, {
-                sliderStep: 'Number of steps should be less than or equal to the difference between maximum value and minimum value'
+                sliderStep:
+                  'Number of steps should be less than or equal to the difference between maximum value and minimum value'
               });
             }
 
@@ -505,20 +626,22 @@ Fliplet.FormBuilder = (function() {
           case 'flMatrix':
             if (this.columnOptions.length === 0) {
               _.assignIn(this.errors, {
-                matrixColumnOptions: 'Please enter column options for the matrix field'
+                matrixColumnOptions:
+                  'Please enter column options for the matrix field'
               });
             }
 
             if (this.rowOptions.length === 0) {
               _.assignIn(this.errors, {
-                matrixRowOptions: 'Please enter row options for the matrix field'
+                matrixRowOptions:
+                  'Please enter row options for the matrix field'
               });
             }
 
             break;
 
           default:
-            // nothing
+          // nothing
         }
       };
 
@@ -551,7 +674,8 @@ Fliplet.FormBuilder = (function() {
       };
 
       if (!component.methods.disableAutomatch) {
-        component.methods.disableAutomatch = component.methods._disableAutomatch;
+        component.methods.disableAutomatch =
+          component.methods._disableAutomatch;
       }
 
       component.methods._enableAutomatch = function() {
@@ -588,15 +712,18 @@ Fliplet.FormBuilder = (function() {
         var $vm = this;
 
         $vm.$nextTick(function() {
-          var $el = $(this.$el).find('input.date-picker').datepicker({
-            format: 'yyyy-mm-dd',
-            todayHighlight: true,
-            autoclose: true
-          }).on('changeDate', function(e) {
-            var value = moment(e.date).format(DATE_FORMAT);
+          var $el = $(this.$el)
+            .find('input.date-picker')
+            .datepicker({
+              format: 'yyyy-mm-dd',
+              todayHighlight: true,
+              autoclose: true
+            })
+            .on('changeDate', function(e) {
+              var value = moment(e.date).format(DATE_FORMAT);
 
-            $vm.value = value;
-          });
+              $vm.value = value;
+            });
 
           $el.datepicker('setDate', this.value || new Date());
         });
@@ -610,11 +737,13 @@ Fliplet.FormBuilder = (function() {
         var $vm = this;
 
         $vm.$nextTick(function() {
-          var $el = $($vm.$refs.timepicker).timeEntry({
-            show24Hour: true
-          }).on('change', function(event) {
-            $vm.value = event.target.value;
-          });
+          var $el = $($vm.$refs.timepicker)
+            .timeEntry({
+              show24Hour: true
+            })
+            .on('change', function(event) {
+              $vm.value = event.target.value;
+            });
 
           $el.timeEntry('setTime', this.value);
         });
@@ -637,26 +766,31 @@ Fliplet.FormBuilder = (function() {
           type: 'folder'
         };
 
-        window.currentProvider = Fliplet.Widget.open('com.fliplet.file-picker', {
-          data: config,
-          onEvent: function(e, data) {
-            switch (e) {
-              case 'widget-set-info':
-                Fliplet.Studio.emit('widget-save-label-reset');
-                Fliplet.Studio.emit('widget-save-label-update', {
-                  text: 'Select'
-                });
-                Fliplet.Widget.toggleSaveButton(!!data.length);
+        window.currentProvider = Fliplet.Widget.open(
+          'com.fliplet.file-picker',
+          {
+            data: config,
+            onEvent: function(e, data) {
+              switch (e) {
+                case 'widget-set-info':
+                  Fliplet.Studio.emit('widget-save-label-reset');
+                  Fliplet.Studio.emit('widget-save-label-update', {
+                    text: 'Select'
+                  });
+                  Fliplet.Widget.toggleSaveButton(!!data.length);
 
-                var msg = data.length ? data.length + ' folder selected' : 'no selected folders';
+                  var msg = data.length
+                    ? data.length + ' folder selected'
+                    : 'no selected folders';
 
-                Fliplet.Widget.info(msg);
-                break;
-              default:
+                  Fliplet.Widget.info(msg);
+                  break;
+                default:
                 // nothing
+              }
             }
           }
-        });
+        );
 
         window.currentProvider.then(function(result) {
           Fliplet.Widget.info('');
@@ -696,28 +830,34 @@ Fliplet.FormBuilder = (function() {
         component.methods.openFileManager = component.methods._openFileManager;
       }
 
-      var hasOptions = component.props.options && Array.isArray(component.props.options.type());
-      var hasSelectAll = component.props.addSelectAll && typeof component.props.addSelectAll.default === 'boolean';
+      var hasOptions =
+        component.props.options &&
+        Array.isArray(component.props.options.type());
+      var hasSelectAll =
+        component.props.addSelectAll &&
+        typeof component.props.addSelectAll.default === 'boolean';
       var isSlider = component.props._componentName.default === 'flSlider';
       var isMatrix = component.props._componentName.default === 'flMatrix';
 
       /**
-      * Generate text configurations for radio/checkbox options, separated by new lines
-      * @param {Array} options - A list of options to be mapped
-      * @returns {String} Text options for the configuration interface
-      */
+       * Generate text configurations for radio/checkbox options, separated by new lines
+       * @param {Array} options - A list of options to be mapped
+       * @returns {String} Text options for the configuration interface
+       */
       var generateOptionsAsText = function(options) {
         if (!options) {
           return;
         }
 
-        return options.map(function(option) {
-          if (option.id && option.label && option.id !== option.label) {
-            return option.label + ' <' + option.id + '>';
-          }
+        return options
+          .map(function(option) {
+            if (option.id && option.label && option.id !== option.label) {
+              return option.label + ' <' + option.id + '>';
+            }
 
-          return option.label || option.id;
-        }).join('\r\n');
+            return option.label || option.id;
+          })
+          .join('\r\n');
       };
 
       // If options is an array, automatically deal with options
@@ -741,37 +881,39 @@ Fliplet.FormBuilder = (function() {
             throw new Error('Attribute must be provided');
           }
 
-          this[attribute] = _.compact(_.map(str.split(/\r?\n/), function(option) {
-            if (option !== '') {
-              return option.trim();
-            }
-          }).map(function(rawOption) {
-            if (rawOption) {
-              rawOption = rawOption.trim();
-
-              var regex = /<.*>$/g;
-              var match = rawOption.match(regex);
-              var option = {};
-
-              if (match) {
-                option.label = rawOption.replace(regex, '').trim();
-
-                var value = match[0].substring(1, match[0].length - 1).trim();
-
-                option.id = value || option.label;
-              } else {
-                option.label = rawOption;
-                option.id = rawOption;
+          this[attribute] = _.compact(
+            _.map(str.split(/\r?\n/), function(option) {
+              if (option !== '') {
+                return option.trim();
               }
+            }).map(function(rawOption) {
+              if (rawOption) {
+                rawOption = rawOption.trim();
 
-              return option;
-            }
-          }));
+                var regex = /<.*>$/g;
+                var match = rawOption.match(regex);
+                var option = {};
+
+                if (match) {
+                  option.label = rawOption.replace(regex, '').trim();
+
+                  var value = match[0].substring(1, match[0].length - 1).trim();
+
+                  option.id = value || option.label;
+                } else {
+                  option.label = rawOption;
+                  option.id = rawOption;
+                }
+
+                return option;
+              }
+            })
+          );
         };
       }
 
       component.template = templates['templates.configurations.form']({
-        template: template && template() || '',
+        template: (template && template()) || '',
         hasOptions: hasOptions,
         hasSelectAll: hasSelectAll,
         isSlider: isSlider

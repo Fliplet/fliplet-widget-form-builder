@@ -9,6 +9,11 @@ var systemTemplates = [{
       label: 'Enter your first question'
     },
     {
+      _type: 'flPictureChoice',
+      name: 'Picture choice',
+      label: 'Picture choice'
+    },
+    {
       _type: 'flButtons',
       name: 'buttons',
       label: 'Form buttons',

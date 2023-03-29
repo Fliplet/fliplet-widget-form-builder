@@ -3,7 +3,10 @@
   "package": "com.fliplet.form-builder",
   "version": "1.0.0",
   "icon": "img/icon.png",
-  "tags": ["type:component", "category:general"],
+  "tags": [
+    "type:component",
+    "category:general"
+  ],
   "provider_only": false,
   "html_tag": "div",
   "interface": {
@@ -34,7 +37,6 @@
       "vendor/jquery.plugin.min.js",
       "vendor/jquery.timeentry.min.js",
       "vendor/signature-pad.js",
-
       "js/components/input.js",
       "js/components/email.js",
       "js/components/number.js",
@@ -45,6 +47,7 @@
       "js/components/wysiwyg.js",
       "js/components/select.js",
       "js/components/radio.js",
+      "js/components/pictureChoice.js",
       "js/components/checkbox.js",
       "js/components/matrix.js",
       "js/components/image.js",
@@ -58,7 +61,6 @@
       "js/components/time.js",
       "js/components/slider.js",
       "js/components/signature.js",
-
       "js/configurations/input.js",
       "js/configurations/email.js",
       "js/configurations/number.js",
@@ -68,6 +70,7 @@
       "js/configurations/textarea.js",
       "js/configurations/select.js",
       "js/configurations/radio.js",
+      "js/configurations/pictureChoice.js",
       "js/configurations/checkbox.js",
       "js/configurations/matrix.js",
       "js/configurations/image.js",
@@ -82,7 +85,6 @@
       "js/configurations/slider.js",
       "js/configurations/signature.js",
       "js/configurations/wysiwyg.js",
-
       "js/libs/builder.js",
       "css/builder.css"
     ]
@@ -112,7 +114,6 @@
       "js/libs/core.js",
       "vendor/jquery.plugin.min.js",
       "vendor/signature-pad.js",
-
       "js/components/input.js",
       "js/components/email.js",
       "js/components/number.js",
@@ -122,6 +123,7 @@
       "js/components/textarea.js",
       "js/components/select.js",
       "js/components/radio.js",
+      "js/components/pictureChoice.js",
       "js/components/checkbox.js",
       "js/components/matrix.js",
       "js/components/image.js",
@@ -136,7 +138,6 @@
       "js/components/slider.js",
       "js/components/signature.js",
       "js/components/wysiwyg.js",
-
       "js/libs/form.js",
       "css/form.css"
     ]

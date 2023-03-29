@@ -16,10 +16,9 @@
     "url": "https://github.com/Fliplet/fliplet-widget-form-builder/issues"
   },
   "homepage": "https://github.com/Fliplet/fliplet-widget-form-builder#readme",
-  "dependencies": {},
   "devDependencies": {
     "babel-eslint": "^10.1.0",
     "eslint": "^7.32.0",
-    "eslint-config-fliplet": "^1.0.8"
+    "eslint-config-fliplet": "^1.0.10"
   }
 }

@@ -1,39 +1,82 @@
 <form v-on:submit.prevent="onSubmit" class="form-horizontal">
   <div class="form-fields-holder">
     <div v-if="_isFormField">
-      <div class="form-group cleafix" :class="{ 'has-error': _fieldLabelError }">
-        <div class="col-xs-12">
-          <div class="row">
-            <div class="col-xs-5">
-              <label class="control-label" for="field-label">Field label</label>
-            </div>
-            <div class="col-xs-12">
-              <input class="form-control" @input="matchFields" id="field-label" type="text" v-model.trim="label" placeholder="Field description" />
-              <p class="help-block" v-if="_fieldLabelError" v-html="_fieldLabelError"></p>
+      {{#isPictureChoice}}
+        <div
+          class="form-group cleafix"
+          :class="{ 'has-error': _fieldLabelError }"
+        >
+          <div class="col-xs-12">
+            <div class="row">
+              <div class="col-xs-5">
+                <label class="control-label" for="field-label">Field label</label>
+              </div>
+              <div class="col-xs-12">
+                <input
+                  class="form-control"
+                  @input="matchFields"
+                  id="field-label"
+                  type="text"
+                  v-model.trim="label"
+                  placeholder="Field description"
+                />
+                <p
+                  class="help-block"
+                  v-if="_fieldLabelError"
+                  v-html="_fieldLabelError"
+                ></p>
+              </div>
             </div>
           </div>
         </div>
-      </div>
 
-      <div class="form-group cleafix" :class="{ 'has-error': _fieldNameError }">
-        <div class="col-xs-12">
-          <div class="row">
-            <div class="col-xs-5" v-if="_showNameField">
-              <label class="control-label" for="field-name">Field name</label>
-            </div>
-            <div class="col-xs-12 text-right" v-if="!_showNameField">
-              <span class="btn-link form-fields-customize" @click="disableAutomatch">Set the field's name <i class="text-muted fa fa-question-circle" ref="tooltip" data-viewport=".modal-body" data-toggle="tooltip" data-placement="left" title="Customize a different field name for the data source"></i></span>
-            </div>
-            <div class="col-xs-7 col-xs-7 text-right" v-else>
-              <span class="btn-link form-fields-customize" @click="enableAutomatch">Match the field's name and label</span>
-            </div>
-            <div class="col-xs-12" v-if="_showNameField">
-              <input id="field-name" class="form-control" type="text" v-model.trim="name" placeholder="Field name" />
-              <p class="help-block" v-if="_fieldNameError" v-html="_fieldNameError"></p>
+        <div
+          class="form-group cleafix"
+          :class="{ 'has-error': _fieldNameError }"
+        >
+          <div class="col-xs-12">
+            <div class="row">
+              <div class="col-xs-5" v-if="_showNameField">
+                <label class="control-label" for="field-name">Field name</label>
+              </div>
+              <div class="col-xs-12 text-right" v-if="!_showNameField">
+                <span
+                  class="btn-link form-fields-customize"
+                  @click="disableAutomatch"
+                >Set the field's name
+                  <i
+                    class="text-muted fa fa-question-circle"
+                    ref="tooltip"
+                    data-viewport=".modal-body"
+                    data-toggle="tooltip"
+                    data-placement="left"
+                    title="Customize a different field name for the data source"
+                  ></i></span>
+              </div>
+              <div class="col-xs-7 col-xs-7 text-right" v-else>
+                <span
+                  class="btn-link form-fields-customize"
+                  @click="enableAutomatch"
+                >Match the field's name and label</span>
+              </div>
+              <div class="col-xs-12" v-if="_showNameField">
+                <input
+                  id="field-name"
+                  class="form-control"
+                  type="text"
+                  v-model.trim="name"
+                  placeholder="Field name"
+                />
+                <p
+                  class="help-block"
+                  v-if="_fieldNameError"
+                  v-html="_fieldNameError"
+                ></p>
+              </div>
             </div>
           </div>
         </div>
-      </div>
+      {{/isPictureChoice}}
 
       <div class="form-group cleafix" v-if="_supportsRequired">
         <div class="col-xs-12">
@@ -41,15 +84,32 @@
         </div>
         <div class="col-xs-12">
           <div class="radio radio-icon">
-            <input type="radio" id="required-yes" name="required-option" v-bind:value="true" v-model="required" v-on:input="isHidden = false">
+            <input
+              type="radio"
+              id="required-yes"
+              name="required-option"
+              v-bind:value="true"
+              v-model="required"
+              v-on:input="isHidden = false"
+            />
             <label for="required-yes">
-              <span class="check"><i class="fa fa-circle"></i></span> <strong>Yes</strong> - Users will have to fill in the field
+              <span class="check"><i class="fa fa-circle"></i></span>
+              <strong>Yes</strong>
+              - Users will have to fill in the field
             </label>
           </div>
           <div class="radio radio-icon">
-            <input type="radio" id="required-no" name="required-option" v-bind:value="false" v-model="required">
+            <input
+              type="radio"
+              id="required-no"
+              name="required-option"
+              v-bind:value="false"
+              v-model="required"
+            />
             <label for="required-no">
-              <span class="check"><i class="fa fa-circle"></i></span> <strong>No</strong> - The field is optional
+              <span class="check"><i class="fa fa-circle"></i></span>
+              <strong>No</strong>
+              - The field is optional
             </label>
           </div>
         </div>
@@ -57,7 +117,13 @@
 
       <div class="form-group-cleafix">
         <div class="checkbox checkbox-icon form-hide-checkbox">
-          <input type="checkbox" :name="name" v-model="isHidden" id="form-hide-checkbox" v-on:input="required = false">
+          <input
+            type="checkbox"
+            :name="name"
+            v-model="isHidden"
+            id="form-hide-checkbox"
+            v-on:input="required = false"
+          />
           <label for="form-hide-checkbox">
             <span class="check"><i class="fa fa-check"></i></span>
             <span class="hide-field">Hide this field from users.</span>
@@ -66,113 +132,212 @@
       </div>
     </div>
 
-    <div class="form-group cleafix" v-if="_supportsRowOptions" :class="{ 'has-error': errors.matrixRowOptions }">
-      <div class="col-xs-12">
-        <label class="control-label">Row options (one per line)</label>
+    {{#isPictureChoice}}
+      <div
+        class="form-group cleafix"
+        v-if="_supportsRowOptions"
+        :class="{ 'has-error': errors.matrixRowOptions }"
+      >
+        <div class="col-xs-12">
+          <label class="control-label">Row options (one per line)</label>
+        </div>
+        <div class="col-xs-12">
+          <textarea
+            v-on:input="_setOptions($event.target.value, 'rowOptions')"
+            class="form-control"
+            rows="5"
+          >\{{ _rowOptions }}</textarea>
+        </div>
+        <p class="col-xs-12 help-block" v-if="errors.matrixRowOptions">\{{
+          errors.matrixRowOptions }}</p>
       </div>
-      <div class="col-xs-12">
-        <textarea v-on:input="_setOptions($event.target.value, 'rowOptions')" class="form-control" rows="5">\{{ _rowOptions }}</textarea>
-      </div>
-      <p class="col-xs-12 help-block" v-if="errors.matrixRowOptions">\{{ errors.matrixRowOptions }}</p>
-    </div>
 
-    <div class="form-group cleafix" v-if="_supportsColumnOptions" :class="{ 'has-error': errors.matrixColumnOptions }">
-      <div class="col-xs-12">
-        <label class="control-label">Column options (one per line)</label>
+      <div
+        class="form-group cleafix"
+        v-if="_supportsColumnOptions"
+        :class="{ 'has-error': errors.matrixColumnOptions }"
+      >
+        <div class="col-xs-12">
+          <label class="control-label">Column options (one per line)</label>
+        </div>
+        <div class="col-xs-12">
+          <textarea
+            v-on:input="_setOptions($event.target.value, 'columnOptions')"
+            class="form-control"
+            rows="5"
+          >\{{ _columnOptions }}</textarea>
+        </div>
+        <p class="col-xs-12 help-block" v-if="errors.matrixColumnOptions">\{{
+          errors.matrixColumnOptions }}</p>
       </div>
-      <div class="col-xs-12">
-        <textarea v-on:input="_setOptions($event.target.value, 'columnOptions')" class="form-control" rows="5">\{{ _columnOptions }}</textarea>
-      </div>
-      <p class="col-xs-12 help-block" v-if="errors.matrixColumnOptions">\{{ errors.matrixColumnOptions }}</p>
-    </div>
+    {{/isPictureChoice}}
 
     {{#hasSelectAll}}
-    <div class="col-xs-12 form-group">
-      <div class="checkbox checkbox-icon">
-        <input type="checkbox" id="select-all" v-model="addSelectAll">
-        <label for="select-all">
-          <span class="check"><i class="fa fa-check"></i></span>Include Select All
-        </label>
+      <div class="col-xs-12 form-group">
+        <div class="checkbox checkbox-icon">
+          <input type="checkbox" id="select-all" v-model="addSelectAll" />
+          <label for="select-all">
+            <span class="check"><i class="fa fa-check"></i></span>Include Select
+            All
+          </label>
+        </div>
       </div>
-    </div>
     {{/hasSelectAll}}
 
     {{#hasOptions}}
       <div class="form-group cleafix">
         <div class="col-xs-12">
-          <label class="control-label">Options <small>(One per line)</small></label>
+          <label class="control-label">Options
+            <small>(One per line)</small></label>
         </div>
         <div class="col-xs-12">
-          <textarea v-on:input="_setOptions($event.target.value, 'options')" class="form-control">\{{ _options }}</textarea>
+          <textarea
+            v-on:input="_setOptions($event.target.value, 'options')"
+            class="form-control"
+          >\{{ _options }}</textarea>
         </div>
       </div>
     {{/hasOptions}}
 
-     <div v-if="_componentsWithDescription.includes(_componentName)" class="form-group cleafix">
-       <div class="col-xs-12">
+    <div
+      v-if="_componentsWithDescription.includes(_componentName)"
+      class="form-group cleafix"
+    >
+      <div class="col-xs-12">
         <label>Description</label>
-        <input class="form-control" type="text" v-model.trim="description" placeholder="Description text" />
+        <input
+          class="form-control"
+          type="text"
+          v-model.trim="description"
+          placeholder="Description text"
+        />
       </div>
     </div>
 
     {{#isSlider}}
-    <div class="form-group cleafix" :class="{ 'has-error': errors.sliderMinMax }">
-      <div class="col-xs-12">
-        <label>Minimum value number</label>
-        <input class="form-control" type="number" v-model.trim="min" placeholder="Default: 0"/>
+      <div
+        class="form-group cleafix"
+        :class="{ 'has-error': errors.sliderMinMax }"
+      >
+        <div class="col-xs-12">
+          <label>Minimum value number</label>
+          <input
+            class="form-control"
+            type="number"
+            v-model.trim="min"
+            placeholder="Default: 0"
+          />
+        </div>
       </div>
-    </div>
 
-    <div class="form-group cleafix" :class="{ 'has-error': errors.sliderMinMax }">
-      <div class="col-xs-12">
-        <label>Maximum value number</label>
-        <input class="form-control" type="number" v-model.trim="max" placeholder="Default: 100"/>
+      <div
+        class="form-group cleafix"
+        :class="{ 'has-error': errors.sliderMinMax }"
+      >
+        <div class="col-xs-12">
+          <label>Maximum value number</label>
+          <input
+            class="form-control"
+            type="number"
+            v-model.trim="max"
+            placeholder="Default: 100"
+          />
+        </div>
+        <p class="col-xs-12 help-block" v-if="errors.sliderMinMax">\{{
+          errors.sliderMinMax }}</p>
       </div>
-      <p class="col-xs-12 help-block" v-if="errors.sliderMinMax">\{{ errors.sliderMinMax }}</p>
-    </div>
 
-    <div class="form-group cleafix" :class="{ 'has-error': errors.sliderStep }">
-      <div class="col-xs-12">
-        <label>Number of steps</label>
-        <input class="form-control" type="number" v-model.trim="step" placeholder="Default: 1"/>
+      <div
+        class="form-group cleafix"
+        :class="{ 'has-error': errors.sliderStep }"
+      >
+        <div class="col-xs-12">
+          <label>Number of steps</label>
+          <input
+            class="form-control"
+            type="number"
+            v-model.trim="step"
+            placeholder="Default: 1"
+          />
+        </div>
+        <p class="col-xs-12 help-block" v-if="errors.sliderStep">\{{
+          errors.sliderStep }}</p>
       </div>
-      <p class="col-xs-12 help-block" v-if="errors.sliderStep">\{{ errors.sliderStep }}</p>
-    </div>
     {{/isSlider}}
 
-    <div v-if="_componentsWithPersonalization.includes(_componentName)" class="form-group cleafix">
+    <div
+      v-if="_componentsWithPersonalization.includes(_componentName)"
+      class="form-group cleafix"
+    >
       <div class="col-xs-12">
         <label>Default value type</label>
-        <select class="form-control" :value="defaultValueSource" v-model="defaultValueSource">
+        <select
+          class="form-control"
+          :value="defaultValueSource"
+          v-model="defaultValueSource"
+        >
           <option value="default">Enter a value</option>
           <option value="profile">User profile data</option>
           <option value="appStorage">App storage variable</option>
           <option value="query">Link query parameter</option>
         </select>
         <div class="col-xs-12 text-right">
-          <a href="https://help.fliplet.com/form-component/" target="_blank">Learn more about these types</a>
+          <a
+            href="https://help.fliplet.com/form-component/"
+            target="_blank"
+          >Learn more about these types</a>
         </div>
         <div v-if="defaultValueSource !== 'default'">
           <label>Default key</label>
           <div v-if="!defaultValueKey" class="text-danger">
             This field is required*
           </div>
-          <input v-bind:class="{ 'border-danger': !defaultValueKey }" v-if="defaultValueSource === 'profile'"class="form-control" type="text" v-model.trim="defaultValueKey" placeholder="Enter user data field/column name" />
-          <input v-bind:class="{ 'border-danger': !defaultValueKey }" v-else-if="defaultValueSource === 'appStorage'"class="form-control" type="text" v-model.trim="defaultValueKey" placeholder="Enter storage key" />
-          <input v-bind:class="{ 'border-danger': !defaultValueKey }" v-else-if="defaultValueSource === 'query'"class="form-control" type="text" v-model.trim="defaultValueKey" placeholder=" Enter query name" />
+          <input
+            v-bind:class="{ 'border-danger': !defaultValueKey }"
+            v-if="defaultValueSource === 'profile'"
+            class="form-control"
+            type="text"
+            v-model.trim="defaultValueKey"
+            placeholder="Enter user data field/column name"
+          />
+          <input
+            v-bind:class="{ 'border-danger': !defaultValueKey }"
+            v-else-if="defaultValueSource === 'appStorage'"
+            class="form-control"
+            type="text"
+            v-model.trim="defaultValueKey"
+            placeholder="Enter storage key"
+          />
+          <input
+            v-bind:class="{ 'border-danger': !defaultValueKey }"
+            v-else-if="defaultValueSource === 'query'"
+            class="form-control"
+            type="text"
+            v-model.trim="defaultValueKey"
+            placeholder=" Enter query name"
+          />
         </div>
       </div>
     </div>
 
     <div class="col-xs-12">
-      {{{ template }}}
+      {{{template}}}
     </div>
 
-    <div v-if='_readOnlyComponents.includes(_componentName)' class="col-xs-12 form-group">
+    <div
+      v-if="_readOnlyComponents.includes(_componentName)"
+      class="col-xs-12 form-group"
+    >
       <div class="checkbox checkbox-icon">
-        <input type="checkbox" id="readonly" name="readonly" v-model="readonly">
+        <input
+          type="checkbox"
+          id="readonly"
+          name="readonly"
+          v-model="readonly"
+        />
         <label for="readonly">
-          <span class="check"><i class="fa fa-check"></i></span> Read only and cannot be edited
+          <span class="check"><i class="fa fa-check"></i></span>
+          Read only and cannot be edited
         </label>
       </div>
     </div>
@@ -180,6 +345,10 @@
   </div>
 
   <div class="footer">
-    <button type="submit" class="btn btn-primary" :class="{ disabled: _fieldNameError || _fieldLabelError || _hasErrors }">Save</button>
+    <button
+      type="submit"
+      class="btn btn-primary"
+      :class="{ disabled: _fieldNameError || _fieldLabelError || _hasErrors }"
+    >Save</button>
   </div>
 </form>
