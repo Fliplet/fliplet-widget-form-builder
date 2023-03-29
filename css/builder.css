@@ -751,8 +751,6 @@ input[type="time"]:not(.basic-time-picker)::-webkit-calendar-picker-indicator {
   height: 100%;
 }
 
-@import url(https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.0/jquery-ui.css);
-
 body {
   cursor: auto;
   position: absolute;
