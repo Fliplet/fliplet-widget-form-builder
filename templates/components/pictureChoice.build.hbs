@@ -1,0 +1,34 @@
+<div class="list list-default placeholder">
+  <ul v-if="items.length" class="list-holder">
+    <li v-for="(item, index) in items" :key="item.id" class="radio radio-icon" :class="{ 'readonly' : readonly }">
+      <input
+        type="radio"
+        :id="name + '-' + index"
+        :name="name"
+        tabindex="-1"
+        v-model.lazy="$v.value.$model"
+        :value="item"
+      >
+      <label v-on:click="readonly ? false : clickHandler(item)">
+        <span
+          ref="radioButton"
+          class="check focus-outline"
+          tabindex="0"
+          v-on:keydown.right.prevent="readonly ? false : focusHandler(index + 1)"
+          v-on:keydown.down.prevent="readonly ? false : focusHandler(index + 1)"
+          v-on:keydown.left.prevent="readonly ? false : focusHandler(index - 1)"
+          v-on:keydown.up.prevent="readonly ? false : focusHandler(index - 1)"
+          v-on:keydown.space.prevent="readonly ? false : focusHandler(index)"
+          @blur="onBlur()"
+        >
+          <i class="fa fa-circle"></i>
+        </span>
+        <img class="option-image" :src="item.img"/>
+        <span class="option-item"></span>\{{ item.label || item.id }}</span>
+      </label>
+    </li>
+  </ul>
+  <div v-else class="list-empty">
+    <p>Create your picture choice</p>
+  </div>
+</div>

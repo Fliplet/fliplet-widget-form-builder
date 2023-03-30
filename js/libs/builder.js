@@ -15,7 +15,7 @@ if (Array.isArray(data.onSubmit) && data.onSubmit.length) {
     }
   });
 
-  data.onSubmit = data.onSubmit;
+  data.onSubmit;
 }
 
 // Quick migration: "emailTemplate" has been renamed to "emailTemplateAdd"

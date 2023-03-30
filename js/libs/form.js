@@ -17,13 +17,10 @@ function drawImageOnCanvas(img, canvas) {
       imgHeight = canvasHeight;
       imgWidth = imgHeight * imgRatio;
     }
-  } else {
-    // IMAGE RATIO is wider than CANVAS RATIO, i.e. margin on the top & bottom
-    if (imgWidth > canvasWidth) {
-      // Image is wider. Resize image to fit width in canvas first.
-      imgWidth = canvasWidth;
-      imgHeight = imgWidth / imgRatio;
-    }
+  } else if (imgWidth > canvasWidth) {
+    // Image is wider. Resize image to fit width in canvas first.
+    imgWidth = canvasWidth;
+    imgHeight = imgWidth / imgRatio;
   }
 
   var drawX = (canvasWidth > imgWidth) ? (canvasWidth - imgWidth) / 2 : 0;
@@ -183,6 +180,7 @@ Fliplet().then(function() {
             switch (field._type) {
               case 'flDate':
                 var regexDateFormat = /([12]\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01]))/;
+                /* eslint-disable-next-line */
                 var regexISOFormat = /(\d{4})-(\d{2})-(\d{2})T(\d{2})\:(\d{2})\:(\d{2})[+-](\d{2})\:(\d{2})/;
 
                 if ((regexDateFormat.exec(fieldData) || regexISOFormat.exec(fieldData)) && !showCurrentDateTime) {
@@ -731,6 +729,7 @@ Fliplet().then(function() {
 
               $vm.loadEntryForUpdate();
             }, function(err) {
+              /* eslint-disable-next-line */
               console.error(err);
               $vm.error = Fliplet.parseError(err);
               $vm.isSending = false;

@@ -724,6 +724,166 @@ input[type="time"]:not(.basic-time-picker)::-webkit-calendar-picker-indicator {
   padding-left: 57px;
 }
 
+/* Picture choice */
+.picture-choice {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+}
+
+.picture-choice label {
+  display: flex;
+  align-items: center;
+  column-gap: 5px;
+}
+
+.picture-choice .form-group {
+  width: 100%;
+}
+
+.option-image {
+  width: 50px;
+  height: 50px;
+}
+
+.option-image img {
+  width: 100%;
+  height: 100%;
+}
+
+body {
+  cursor: auto;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 100%;
+  background-color: transparent;
+}
+
+.form-horizontal {
+  height: 100%;
+  padding: 15px;
+  overflow: auto;
+}
+
+.btn-link.text-danger {
+  color: #d9534f;
+}
+
+.btn-link:active.text-danger,
+.btn-link:active:focus.text-danger,
+.btn-link:active:hover.text-danger,
+.btn-link:focus.text-danger,
+.btn-link:hover.text-danger {
+  color: #c9302c;
+}
+
+.radio.radio-icon+.radio.radio-icon {
+  margin-top: 0;
+}
+
+.radio.radio-icon input[type="radio"] + label {
+  margin-left: 15px;
+}
+
+.panel-group {
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.panel {
+  opacity: 1;
+  transition: opacity 100ms linear;
+  -webkit-transition: opacity 100ms linear;
+}
+
+.panel.focus {
+  opacity: 0.7;
+}
+
+.panel-group .panel {
+  overflow: hidden;
+}
+
+.panel-group[draggable="true"] {
+  background-color: rgba(0, 171, 209, 0.3);
+}
+
+.panel-group[draggable="true"] {
+  background-color: #ffffff;
+}
+
+.panel-group[draggable="true"] .add {
+  display: none;
+}
+
+.panel-group.sortable-ghost[draggable="true"] {
+  background-color: rgba(0, 171, 209, 0.3);
+}
+
+.panel-heading {
+  position: relative;
+  padding: 0;
+}
+
+.panel-heading:hover {
+  cursor: -webkit-grab;
+  cursor: -moz-grab;
+}
+
+.panel-heading h4 {
+  padding: 10px 40px 10px 6px;
+}
+
+.panel-heading .fa-chevron-down,
+.panel-heading .fa-chevron-right {
+  margin-right: 10px;
+}
+
+.panel-title .fa {
+  cursor: pointer;
+}
+
+.panel-heading .icon-delete {
+  position: absolute;
+  top: 0;
+  right: 0;
+  opacity: 0;
+  color: #E60000;
+  width: 38px;
+  height: 38px;
+  line-height: 38px;
+  text-align: center;
+}
+
+.panel-heading:hover .icon-delete {
+  opacity: 1;
+}
+
+.panel-collapse {
+  opacity: 0;
+}
+
+.list-holder {
+  padding-left: 0;
+}
+
+.list-holder .radio .radio-icon {
+  display: flex;
+  align-items: center;
+}
+
+.panel-collapse.in {
+  opacity: 1;
+  transition: opacity 0.1s linear;
+  -webkit-transition: opacity 0.1s linear;
+}
+
+.panels-empty {
+  text-align: center;
+  margin-bottom: 40px;
+}
+
 /* SIGNATURE FIELD */
 
 .field-signature {

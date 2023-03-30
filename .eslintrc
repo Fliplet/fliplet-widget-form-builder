@@ -1,7 +1,14 @@
 {
-  "extends": "fliplet",
+  "extends": ["eslint:recommended", "fliplet"],
   "globals": {
     "Vue": "readonly",
     "Sortable": "readonly"
+  },
+  "parser": "espree",
+  "parserOptions": {
+    "ecmaVersion": 2017
+  },
+  "env": {
+    "es6": true
   }
 }
