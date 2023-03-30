@@ -1,4 +1,3 @@
-/* eslint-disable */
 var formBuilderInstances = [];
 
 function drawImageOnCanvas(img, canvas) {
@@ -33,18 +32,19 @@ function drawImageOnCanvas(img, canvas) {
   context.drawImage(img, drawX, drawY, imgWidth, imgHeight);
 }
 
+/* eslint-disable-next-line */
 function addThumbnailToCanvas(imageURI, indexCanvas, self, isFileCanvas) {
   var $vm = self;
 
   if (!imageURI.match(/^http/)) {
     imageURI = (imageURI.indexOf('base64') > -1)
       ? imageURI.split(';filename:')[0]
-      :'data:image/jpeg;base64,' + imageURI;
+      : 'data:image/jpeg;base64,' + imageURI;
   } else {
     imageURI = Fliplet.Media.authenticate(imageURI);
   }
 
-  $vm.$nextTick(function () {
+  $vm.$nextTick(function() {
     var canvas = isFileCanvas ? $vm.$refs.canvasWrap[indexCanvas].children[0].children[0] : this.$refs.canvas[indexCanvas];
     var context = canvas.getContext('2d');
 
@@ -63,9 +63,8 @@ function addThumbnailToCanvas(imageURI, indexCanvas, self, isFileCanvas) {
 }
 
 
-
 // Wait for form fields to be ready, as they get defined after translations are initialized
-Fliplet().then(function () {
+Fliplet().then(function() {
   Fliplet.Widget.instance('form-builder', function(data) {
     var saveDelay = 1000; // save progress after 1s from last input
     var selector = '[data-form-builder-id="' + data.id + '"]';
@@ -77,7 +76,7 @@ Fliplet().then(function () {
     var isResetAction = false;
 
     var formReady;
-    var formPromise = new Promise(function (resolve) {
+    var formPromise = new Promise(function(resolve) {
       formReady = resolve;
     });
 
@@ -97,14 +96,16 @@ Fliplet().then(function () {
 
     function debounce(func, wait, immediate) {
       var timeout;
+
       return function() {
-        var context = this,
-          args = arguments;
+        var context = this;
+        var args = arguments;
         var later = function() {
           timeout = null;
           if (!immediate) func.apply(context, args);
         };
         var callNow = immediate && !timeout;
+
         clearTimeout(timeout);
         timeout = setTimeout(later, wait);
         if (callNow) func.apply(context, args);
@@ -115,7 +116,7 @@ Fliplet().then(function () {
       var fields = _.compact(JSON.parse(JSON.stringify(data.fields || [])));
       var progress = getProgress();
 
-      fields.forEach(function (field) {
+      fields.forEach(function(field) {
         field.enabled = true;
 
         // Make sure these fields are not saved or populated from progress data
@@ -146,6 +147,7 @@ Fliplet().then(function () {
                 if (!Array.isArray(fieldData)) {
                   fieldData = _.compact([fieldData]);
                 }
+
                 break;
 
               case 'flImage':
@@ -161,6 +163,7 @@ Fliplet().then(function () {
                 if (Array.isArray(fieldData)) {
                   fieldData = _.join(_.compact(fieldData), ', ');
                 }
+
                 break;
 
               case 'flTextarea':
@@ -168,13 +171,9 @@ Fliplet().then(function () {
                 if (Array.isArray(fieldData)) {
                   fieldData = _.join(_.compact(fieldData), '\n');
                 }
+
                 break;
 
-              case 'flDate':
-              case 'flRadio':
-              case 'flSelect':
-              case 'flStarRating':
-              case 'flTime':
               default:
                 if (Array.isArray(fieldData)) {
                   fieldData = fieldData[0];
@@ -191,11 +190,13 @@ Fliplet().then(function () {
                 } else {
                   field.value = moment().get().format('YYYY-MM-DD');
                 }
+
                 break;
 
               case 'flImage':
               case 'flFile':
                 var img = fieldData;
+
                 field.value = [];
 
                 if (!isResetAction) {
@@ -216,17 +217,19 @@ Fliplet().then(function () {
                 } else {
                   field.value = moment().get().format('HH:mm');
                 }
+
                 break;
 
               case 'flStarRating':
                 field.options = _.times(5, function(i) {
                   return {
-                    id: '' + (i+1)
+                    id: '' + (i + 1)
                   };
                 });
 
-              case 'flCheckbox': // There is no validation and value assignment as there is no access to checkbox options. This is implemented in the checkbox component.
-              case 'flRadio': // There is no validation and value assignment as there is no access to radio options. This is implemented in the radio component.
+                break;
+
+                // There is no validation and value assignment for checkbox and radio options as there is no access to the options. This is implemented in the checkbox and radio components respectively.
 
               default:
                 field.value = fieldData;
@@ -292,6 +295,7 @@ Fliplet().then(function () {
           if (event) {
             event.preventDefault();
           }
+
           this.isSent = false;
         },
         reset: function() {
@@ -319,6 +323,7 @@ Fliplet().then(function () {
 
             if (field._type === 'flCheckbox') {
               value = fieldSettings.defaultValue || fieldSettings.value;
+
               if (!Array.isArray(value)) {
                 value = value.split(/\n/);
               }
@@ -350,7 +355,7 @@ Fliplet().then(function () {
           Fliplet.FormBuilder.emit('reset', { id: data.id });
           this.$emit('reset');
         },
-        onError: function (fieldName, error) {
+        onError: function(fieldName, error) {
           if (!error) {
             if (this.errors[fieldName]) {
               delete this.errors[fieldName];
@@ -361,14 +366,14 @@ Fliplet().then(function () {
 
           this.errors[fieldName] = error;
         },
-        triggerChange: function (fieldName, value) {
+        triggerChange: function(fieldName, value) {
           if (changeListeners[fieldName]) {
-            changeListeners[fieldName].forEach(function (fn) {
+            changeListeners[fieldName].forEach(function(fn) {
               fn.call(this, value);
             });
           }
         },
-        onInput: function (fieldName, value, fromPasswordConfirmation, skipOnChange) {
+        onInput: function(fieldName, value, fromPasswordConfirmation, skipOnChange) {
           var $vm = this;
 
           this.fields.some(function(field) {
@@ -391,12 +396,13 @@ Fliplet().then(function () {
             this.saveProgress();
           }
         },
-        onChange: function (fieldName, fn, runOnBind) {
+        onChange: function(fieldName, fn, runOnBind) {
           var field;
 
-          this.fields.some(function (f) {
+          this.fields.some(function(f) {
             if (f.name === fieldName) {
               field = f;
+
               return true;
             }
           });
@@ -420,23 +426,25 @@ Fliplet().then(function () {
             fn.call(this, field.value);
           }
         },
-        toggleField: function (fieldName, isEnabled) {
-          this.fields.some(function (field) {
+        toggleField: function(fieldName, isEnabled) {
+          this.fields.some(function(field) {
             if (field.name === fieldName) {
               field.enabled = !!isEnabled;
+
               return true;
             }
           });
         },
-        getWidgetInstanceData: function () {
+        getWidgetInstanceData: function() {
           return data;
         },
-        getField: function (fieldName) {
+        getField: function(fieldName) {
           var found;
 
           this.fields.some(function(field) {
             if (field.name === fieldName) {
               found = field;
+
               return true;
             }
           });
@@ -451,6 +459,7 @@ Fliplet().then(function () {
          * pressing enter instead of the submit button (in this case, the input does not lose
          * focus and its data is not updated) In order to work as expected, we need to manually
          * trigger the blur event on the input paths.
+         * @returns {undefined}
          */
         triggerBlurEventOnInputs: function() {
           $(this.$el).find('input').blur();
@@ -475,7 +484,7 @@ Fliplet().then(function () {
 
           var invalidFields = [];
 
-          $vm.$children.forEach(function (inputField) {
+          $vm.$children.forEach(function(inputField) {
             // checks if component have vuelidate validation object
             if (inputField.$v) {
               inputField.$v.$touch();
@@ -485,7 +494,7 @@ Fliplet().then(function () {
                   inputField.isValid = !inputField.$v.value.$invalid;
                   inputField.isPasswordConfirmed = !inputField.$v.value.$invalid && !inputField.$v.passwordConfirmation.$invalid;
                 } else {
-                  inputField.isValid = false
+                  inputField.isValid = false;
                 }
 
                 invalidFields.push(inputField);
@@ -539,8 +548,8 @@ Fliplet().then(function () {
                     default:
                       return reject();
                   }
-                })
-            })
+                });
+            });
           }
 
           function onFormSubmission() {
@@ -568,7 +577,7 @@ Fliplet().then(function () {
             var fieldErrors = [];
 
             if (errorFields.length) {
-              errorFields.forEach(function (fieldName) {
+              errorFields.forEach(function(fieldName) {
                 fieldErrors.push(errorFields[fieldName]);
               });
 
@@ -612,7 +621,7 @@ Fliplet().then(function () {
                 }
 
                 if (type === 'flEmail' && typeof value === 'string') {
-                    value = value.toLowerCase();
+                  value = value.toLowerCase();
                 }
 
                 // Other inputs
@@ -620,7 +629,7 @@ Fliplet().then(function () {
               }
             });
 
-            formPromise.then(function (form) {
+            formPromise.then(function(form) {
               return Fliplet.Hooks.run('beforeFormSubmit', formData, form);
             }).then(function() {
               if (data.dataSourceId) {
@@ -655,15 +664,15 @@ Fliplet().then(function () {
 
               return;
             }).then(function(result) {
-              return formPromise.then(function (form) {
-                return Fliplet.Hooks.run('afterFormSubmit', { formData: formData, result: result }, form).then(function () {
+              return formPromise.then(function(form) {
+                return Fliplet.Hooks.run('afterFormSubmit', { formData: formData, result: result }, form).then(function() {
                   if (entryId !== 'session') {
                     return;
                   }
 
                   // If the user just updated his/her profile
                   // let's update the cached session.
-                  return Fliplet.Session.get().catch(function () {
+                  return Fliplet.Session.get().catch(function() {
                     // silent failure
                   });
                 });
@@ -691,16 +700,16 @@ Fliplet().then(function () {
               }
 
               if (data.linkAction && data.redirect) {
-                return operation.then(function () {
-                  return trackEventOp.then(function () {
+                return operation.then(function() {
+                  return trackEventOp.then(function() {
                     Fliplet.Navigate.to(data.linkAction);
                   });
-                }).catch(function (err) {
+                }).catch(function(err) {
                   Fliplet.Modal.alert({
                     message: Fliplet.parseError(err)
                   });
                   Fliplet.Navigate.to(data.linkAction);
-                })
+                });
               }
 
               $vm.isSent = true;
@@ -744,7 +753,7 @@ Fliplet().then(function () {
 
             var loadEntry = typeof fn === 'function'
               ? fn(entryId)
-              : Fliplet.DataSources.connect(data.dataSourceId, { offline: false }).then(function (ds) {
+              : Fliplet.DataSources.connect(data.dataSourceId, { offline: false }).then(function(ds) {
                 return ds.findById(entryId);
               });
 
@@ -752,7 +761,7 @@ Fliplet().then(function () {
               loadEntry = Promise.resolve(loadEntry);
             }
 
-            return loadEntry.then(function (record) {
+            return loadEntry.then(function(record) {
               if (!record) {
                 $vm.error = 'This entry has not been found';
               }
@@ -761,7 +770,7 @@ Fliplet().then(function () {
                 record = { data: record };
               }
 
-              record.data = _.omitBy(record.data, function (value) {
+              record.data = _.omitBy(record.data, function(value) {
                 return _.isNil(value)
                   || (_.isObject(value) && _.isEmpty(value))
                   || (_.isString(value) && !value.length);
@@ -771,8 +780,9 @@ Fliplet().then(function () {
               $vm.fields = getFields(true);
               $vm.isLoading = false;
               $vm.$forceUpdate();
-            }).catch(function (err) {
+            }).catch(function(err) {
               var error = Fliplet.parseError(err);
+
               $vm.error = error;
               $vm.isLoading = false;
               $vm.$forceUpdate();
@@ -790,7 +800,7 @@ Fliplet().then(function () {
           if (data.autobindProfileEditing) {
             $vm.isLoading = true;
 
-            return Fliplet.Session.get().then(function (session) {
+            return Fliplet.Session.get().then(function(session) {
               var isEditMode = false;
 
               if (session.entries && session.entries.dataSource) {
@@ -801,8 +811,9 @@ Fliplet().then(function () {
 
               // Re-render fields
               $vm.fields = [];
-              return new Promise(function (resolve) {
-                setTimeout(function () {
+
+              return new Promise(function(resolve) {
+                setTimeout(function() {
                   $vm.fields = getFields(isEditMode);
                   $vm.isLoading = false;
                   resolve();
@@ -849,8 +860,8 @@ Fliplet().then(function () {
           });
         }
 
-        this.loadEntryForUpdate().then(function () {
-          var debouncedUpdate = _.debounce(function () {
+        this.loadEntryForUpdate().then(function() {
+          var debouncedUpdate = _.debounce(function() {
             $form.$forceUpdate();
             $vm.saveProgress();
           }, 10);
@@ -883,20 +894,20 @@ Fliplet().then(function () {
           formReady({
             name: data.name,
             instance: $form,
-            data: function () {
+            data: function() {
               return data;
             },
-            load: function (fn) {
+            load: function(fn) {
               return $form.loadEntryForUpdate(fn);
             },
-            on: function (event, fn) {
+            on: function(event, fn) {
               return $form.$on(event, fn);
             },
             fields: {
-              get: function () {
+              get: function() {
                 return $form.fields;
               },
-              set: function (fields) {
+              set: function(fields) {
                 if (!Array.isArray(fields)) {
                   throw new Error('fields must be an array');
                 }
@@ -905,7 +916,7 @@ Fliplet().then(function () {
                 $form.fields = getFields();
               }
             },
-            field: function (key) {
+            field: function(key) {
               var field = $form.getField(key);
 
               if (!field) {
@@ -913,7 +924,7 @@ Fliplet().then(function () {
               }
 
               return {
-                val: function (value) {
+                val: function(value) {
                   if (typeof value === 'undefined') {
                     return field.value;
                   }
@@ -925,7 +936,7 @@ Fliplet().then(function () {
                   field.value = value;
                   debouncedUpdate();
                 },
-                set: function (data) {
+                set: function(data) {
                   var result;
 
                   if (field._type === 'flCheckbox') {
@@ -974,6 +985,7 @@ Fliplet().then(function () {
                       var storage = data.source === 'storage'
                         ? Fliplet.Storage
                         : Fliplet.App.Storage;
+
                       result = storage.get(data.key);
 
                       break;
@@ -993,7 +1005,7 @@ Fliplet().then(function () {
                     result = Promise.resolve(result);
                   }
 
-                  return result.then(function (value) {
+                  return result.then(function(value) {
                     if (typeof value === 'undefined') {
                       value = '';
                     }
@@ -1011,19 +1023,20 @@ Fliplet().then(function () {
                 get: function() {
                   return field.value;
                 },
-                change: function (fn, runOnBind) {
+                change: function(fn, runOnBind) {
                   return $form.onChange(field.name, fn, runOnBind);
                 },
                 /**
                  * Toggles a field visibility
                  * @param {Boolean} isEnabled - toggles the field visibility on and off
                  * @param {Boolean} revertValueToDefault - defaults to true - Whether the value should be reverted to its original value when showing the field
+                 * @returns {undefined}
                  */
-                toggle: function (isEnabled, revertValueToDefault) {
+                toggle: function(isEnabled, revertValueToDefault) {
                   field.enabled = !!isEnabled;
 
                   if (!field.enabled && revertValueToDefault !== false) {
-                    JSON.parse(JSON.stringify(data.fields || [])).some(function (f) {
+                    JSON.parse(JSON.stringify(data.fields || [])).some(function(f) {
                       if (field.name === f.name) {
                         field.value = f.value;
 
@@ -1032,7 +1045,7 @@ Fliplet().then(function () {
                     });
                   }
                 },
-                options: function (values) {
+                options: function(values) {
                   if (typeof values === 'undefined') {
                     return field.options;
                   }
@@ -1048,7 +1061,7 @@ Fliplet().then(function () {
                     });
                   }
 
-                  var options = values.map(function (option) {
+                  var options = values.map(function(option) {
                     if (typeof option === 'object') {
                       if (typeof option.value !== 'undefined') {
                         option.id = option.value;
@@ -1075,6 +1088,8 @@ Fliplet().then(function () {
 
                         field.value = selectedValueInOptions ? field.value : '';
                         break;
+                      default:
+                        break;
                     }
                   }
 
@@ -1096,15 +1111,15 @@ Fliplet().then(function () {
   });
 });
 
-Fliplet.FormBuilder.get = function (name) {
-  return Fliplet().then(function () {
-    return Promise.all(formBuilderInstances).then(function (forms) {
+Fliplet.FormBuilder.get = function(name) {
+  return Fliplet().then(function() {
+    return Promise.all(formBuilderInstances).then(function(forms) {
       var form;
 
       if (typeof name === 'undefined') {
         form = forms.length ? forms[0] : undefined;
       } else {
-        forms.some(function (vueForm) {
+        forms.some(function(vueForm) {
           if (vueForm.name === name) {
             form = vueForm;
 
@@ -1118,8 +1133,8 @@ Fliplet.FormBuilder.get = function (name) {
   });
 };
 
-Fliplet.FormBuilder.getAll = function (name) {
-  return Fliplet().then(function () {
+Fliplet.FormBuilder.getAll = function(name) {
+  return Fliplet().then(function() {
     return Promise.all(formBuilderInstances).then(function(forms) {
       if (typeof name === 'undefined') {
         return forms;
