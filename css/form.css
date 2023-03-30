@@ -1,6 +1,5 @@
 .fl-form {
   position: relative;
-  padding: 15px;
 }
 
 .fl-form.form-offline button[type="submit"] {
@@ -344,7 +343,11 @@ html[dir="rtl"] .checkbox.checkbox-icon input[type="checkbox"] + label {
   transform: translate3d(0, 0, 0);
 }
 
-html[dir="rtl"] .checkbox.checkbox-icon input[type="checkbox"] + label > span.check {
+html[dir="rtl"]
+  .checkbox.checkbox-icon
+  input[type="checkbox"]
+  + label
+  > span.check {
   left: auto;
   right: 0;
 }
@@ -370,7 +373,11 @@ html[dir="rtl"] .checkbox.checkbox-icon input[type="checkbox"] + label > span.ch
   transition: all 0.25s ease;
 }
 
-.checkbox.checkbox-icon input[type="checkbox"]:checked + label span.check > i.fa {
+.checkbox.checkbox-icon
+  input[type="checkbox"]:checked
+  + label
+  span.check
+  > i.fa {
   color: #fff;
   -webkit-transform: scale(1);
   transform: scale(1);
@@ -386,7 +393,10 @@ html[dir="rtl"] .checkbox.checkbox-icon input[type="checkbox"] + label > span.ch
   border-radius: 4px;
 }
 
-.checkbox.checkbox-icon.readonly input[type="checkbox"]:checked + label > span.check {
+.checkbox.checkbox-icon.readonly
+  input[type="checkbox"]:checked
+  + label
+  > span.check {
   border: 1px solid #e1e1e1;
   border-radius: 4px;
   background-color: #e1e1e1;
@@ -485,7 +495,6 @@ html[dir="rtl"] .radio.radio-icon input[type="radio"] + label > span.check {
   -webkit-transform: scale(1);
   transform: scale(1);
 }
-
 
 /* Picture choice */
 .picture-choice {
@@ -1011,7 +1020,11 @@ html[dir="rtl"] .radio.radio-icon input[type="radio"] + label > span.check {
   flex-direction: column;
 }
 
-[data-widget-package="com.fliplet.form-builder"] [_type="flSignature"] .signature-editor.readonly .field-signature canvas {
+[data-widget-package="com.fliplet.form-builder"]
+  [_type="flSignature"]
+  .signature-editor.readonly
+  .field-signature
+  canvas {
   background-color: transparent;
   border-radius: 0%;
   border: none !important;
@@ -1108,7 +1121,9 @@ html[dir="rtl"] .radio.radio-icon input[type="radio"] + label > span.check {
   opacity: 0;
 }
 
-.tinymce-mobile-outer-container .tinymce-mobile-disabled-mask .tinymce-mobile-content-container,
+.tinymce-mobile-outer-container
+  .tinymce-mobile-disabled-mask
+  .tinymce-mobile-content-container,
 .tinymce-mobile-outer-container
   .tinymce-mobile-disabled-mask
   .tinymce-mobile-content-container
@@ -1132,32 +1147,49 @@ html[dir="rtl"] .radio.radio-icon input[type="radio"] + label > span.check {
 
 /* SLIDER FIELD */
 
-[data-widget-package="com.fliplet.form-builder"] .form-group.fl-range-slider .range-slider {
+[data-widget-package="com.fliplet.form-builder"]
+  .form-group.fl-range-slider
+  .range-slider {
   background-color: #eeeeee;
 }
 
-[data-widget-package="com.fliplet.form-builder"] .form-group.fl-range-slider .range-slider-fill {
+[data-widget-package="com.fliplet.form-builder"]
+  .form-group.fl-range-slider
+  .range-slider-fill {
   background-color: #ed9119;
 }
 
-[data-widget-package="com.fliplet.form-builder"] .form-group.fl-range-slider .range-slider-handle,
-[data-widget-package="com.fliplet.form-builder"] .form-group.fl-range-slider .range-slider-handle-value {
+[data-widget-package="com.fliplet.form-builder"]
+  .form-group.fl-range-slider
+  .range-slider-handle,
+[data-widget-package="com.fliplet.form-builder"]
+  .form-group.fl-range-slider
+  .range-slider-handle-value {
   background-color: #00abd1;
 }
 
-[data-widget-package="com.fliplet.form-builder"] .form-group.fl-range-slider .range-slider-handle-value:before {
+[data-widget-package="com.fliplet.form-builder"]
+  .form-group.fl-range-slider
+  .range-slider-handle-value:before {
   border-top-color: #00abd1;
 }
 
-[data-widget-package="com.fliplet.form-builder"] .form-group.fl-range-slider .range-slider-handle-value {
+[data-widget-package="com.fliplet.form-builder"]
+  .form-group.fl-range-slider
+  .range-slider-handle-value {
   color: #ffffff;
 }
 
-[data-widget-package="com.fliplet.form-builder"] .form-group.fl-range-slider .range-slider.range-slider-active .range-slider-handle {
+[data-widget-package="com.fliplet.form-builder"]
+  .form-group.fl-range-slider
+  .range-slider.range-slider-active
+  .range-slider-handle {
   box-shadow: 0px 0px 0px 2px rgb(0 171 209 / 25%);
 }
 
-[data-widget-package="com.fliplet.form-builder"] .form-group.fl-range-slider > input {
+[data-widget-package="com.fliplet.form-builder"]
+  .form-group.fl-range-slider
+  > input {
   width: 100% !important;
 }
 

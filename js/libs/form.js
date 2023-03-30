@@ -597,7 +597,7 @@ Fliplet().then(function () {
                 }
               } else {
                 // Remove spaces and dashes from value (when it's a string)
-                if (typeof value === 'string' && ['flNumber', 'flTelephone', 'flPictureChoice'].indexOf(type) !== -1) {
+                if (typeof value === 'string' && ['flNumber', 'flTelephone'].indexOf(type) !== -1) {
                   value = value.replace(/-|\s/g, '');
                 }
 
@@ -612,11 +612,11 @@ Fliplet().then(function () {
                 }
 
                 if (type === 'flPictureChoice' && value ==='') {
-                  value = {}
+                  value = {};
                 }
 
                 if (type === 'flEmail' && typeof value === 'string') {
-                    value = value.toLowerCase();
+                  value = value.toLowerCase();
                 }
 
                 // Other inputs

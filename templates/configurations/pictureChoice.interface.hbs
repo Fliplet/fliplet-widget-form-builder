@@ -4,7 +4,7 @@
   </div>
   <div
     class="form-group"
-    id="componentsAccordion"
+    id="components-accordion"
     role="tabpanel"
     v-sortable="{ group: { name: 'items', pull: false }, scrollSensitivity: 116, scrollSpeed: 10, onUpdate: onSortItems }"
   >
@@ -20,7 +20,7 @@
           v-bind:class="{ collapsed: idx !== 0}"
           role="button"
           data-toggle="collapse"
-          data-parent="#componentsAccordion"
+          data-parent="#components-accordion"
           :href="'#category' + idx"
           :aria-expanded="idx === 0"
           :aria-controls="'category' + idx"

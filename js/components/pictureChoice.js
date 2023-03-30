@@ -38,18 +38,18 @@ Fliplet.FormBuilder.field('pictureChoice', {
       this.clickHandler(this.items[newIndex]);
     },
     attachObservers: function() {
-      var $accordion = $('#componentsAccordion');
+      var $accordion = $('#components-accordion');
 
       var recalculateHeight = function(obj) {
+        var $panelBody = obj.children('.panel-body');
         var $panelHeading = $('.panel-heading');
         var tabsHeight = $panelHeading.outerHeight() * $panelHeading.length;
         var borders = $panelHeading.length * 3;
-        var wrapperHeight =
-          $('.components-list .form-html').innerHeight() - tabsHeight;
+        var wrapperHeight = $('.components-list .form-html').innerHeight() - tabsHeight;
 
-        obj.children('.panel-body').css('height', wrapperHeight - borders);
-        obj.children('.panel-body').fadeIn(250);
-        obj.children('.panel-body').animate(
+        $panelBody.css('height', wrapperHeight - borders);
+        $panelBody.fadeIn(250);
+        $panelBody.animate(
           {
             scrollTop: 0
           },
