@@ -35,7 +35,7 @@ this["Fliplet"]["Widget"]["Templates"]["templates.components.email"] = Handlebar
 this["Fliplet"]["Widget"]["Templates"]["templates.components.field"] = Handlebars.template({"compiler":[7,">= 4.0.0"],"main":function(container,depth0,helpers,partials,data) {
     var stack1, helper;
 
-  return "<div v-show=\"_showField\" class=\"form-group row clearfix\" :class=\"{'has-error': !isValid}\" :data-field=\"name\">\r\n  <div class=\"col-xs-12\" v-if=\"_isFormField\">\r\n    <label class=\"control-label\" :for=\"name\">\r\n      {{ label }} <template v-if=\"required\"><span class=\"required-info\">*</span></template>\r\n    </label>\r\n  </div>\r\n  <div class=\"col-xs-12\">\r\n    "
+  return "<div v-show=\"_showField\" class=\"form-group row clearfix\" :class=\"{'has-error': !isValid}\" :data-field=\"name\">\r\n  <div class=\"col-xs-12\" v-if=\"_isFormField\">\r\n    <label class=\"control-label\" :for=\"_labelName\">\r\n      {{ label }} <template v-if=\"required\"><span class=\"required-info\">*</span></template>\r\n    </label>\r\n  </div>\r\n  <div class=\"col-xs-12\">\r\n    "
     + ((stack1 = ((helper = (helper = helpers.template || (depth0 != null ? depth0.template : depth0)) != null ? helper : helpers.helperMissing),(typeof helper === "function" ? helper.call(depth0 != null ? depth0 : (container.nullContext || {}),{"name":"template","hash":{},"data":data}) : helper))) != null ? stack1 : "")
     + "\r\n  </div>\r\n</div>\r\n";
 },"useData":true});
