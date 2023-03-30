@@ -17,13 +17,11 @@ function drawImageOnCanvas(img, canvas) {
       imgHeight = canvasHeight;
       imgWidth = imgHeight * imgRatio;
     }
-  } else {
+  } else if (imgWidth > canvasWidth) {
     // IMAGE RATIO is wider than CANVAS RATIO, i.e. margin on the top & bottom
-    if (imgWidth > canvasWidth) {
-      // Image is wider. Resize image to fit width in canvas first.
-      imgWidth = canvasWidth;
-      imgHeight = imgWidth / imgRatio;
-    }
+    // Image is wider. Resize image to fit width in canvas first.
+    imgWidth = canvasWidth;
+    imgHeight = imgWidth / imgRatio;
   }
 
   var drawX = (canvasWidth > imgWidth) ? (canvasWidth - imgWidth) / 2 : 0;
@@ -731,6 +729,7 @@ Fliplet().then(function() {
 
               $vm.loadEntryForUpdate();
             }, function(err) {
+              /* eslint-disable-next-line */
               console.error(err);
               $vm.error = Fliplet.parseError(err);
               $vm.isSending = false;
