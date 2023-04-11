@@ -160,22 +160,16 @@ Fliplet.FormBuilder.field('file', {
         this.value = [];
       }
     },
-    processImage: function(file, isAddElem, index) {
+    processImage: function(file, isAddElem) {
       var $vm = this;
-      var mimeType = file.type || 'image/png';
 
       loadImage.parseMetaData(file, function(data) {
         loadImage(
           file,
-          function(img) {
-            var imgBase64Url = img.toDataURL(mimeType, $vm.jpegQuality);
-
+          function() {
             if (isAddElem) {
               $vm.value.push(file);
-              addThumbnailToCanvas(imgBase64Url, $vm.value.length - 1, $vm, true);
               $vm.$emit('_input', $vm.name, $vm.value);
-            } else {
-              addThumbnailToCanvas(imgBase64Url, index, $vm, true);
             }
           }, {
             canvas: true,
@@ -196,9 +190,9 @@ Fliplet.FormBuilder.field('file', {
 
       $vm.value.splice(index, 1);
 
-      $vm.value.forEach(function(file, index) {
+      $vm.value.forEach(function(file) {
         if ($vm.isFileImage(file)) {
-          $vm.processImage(file, false, index);
+          $vm.processImage(file, false);
         }
       });
 

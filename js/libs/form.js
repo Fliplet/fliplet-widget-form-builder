@@ -44,8 +44,12 @@ function addThumbnailToCanvas(imageURI, indexCanvas, self, isFileCanvas) {
     imageURI = Fliplet.Media.authenticate(imageURI);
   }
 
-  $vm.$nextTick(function () {
-    var canvas = isFileCanvas ? $vm.$refs.canvasWrap[indexCanvas].children[0].children[0] : this.$refs.canvas[indexCanvas];
+  $vm.$nextTick(function() {
+    if (!this.$refs.canvas) {
+      return;
+    }
+
+    var canvas = this.$refs.canvas[indexCanvas];
     var context = canvas.getContext('2d');
 
     canvas.width = canvas.clientWidth;
