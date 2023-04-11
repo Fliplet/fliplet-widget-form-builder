@@ -1,0 +1,480 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Form component",
+  "description": "This is the schema for the form component. This schema is used to create the form component in the builder and to render the form component in the frontend.",
+  "type": "object",
+  "properties": {
+    "name": {
+      "title": "The title of this form",
+      "examples": ["Edit your profile"],
+      "type": "string",
+      "required": true
+    },
+    "displayName": {
+      "type": "string",
+      "title": "The text to display at the top of the form",
+      "description": "This is typically the same as the name of the form, but can be different if you want to display a different title at the top of the form.",
+      "examples": ["Edit your profile"],
+      "required": true
+    },
+
+    "onSubmit": {
+      "type": "array",
+      "title": "The actions to perform when the form is submitted",
+      "default": [],
+      "required": true
+    },
+    "resultHtml": {
+      "type": "string",
+      "title": "The HTML to display when the form is submitted",
+      "default": "Thank you for submitting the form."
+    },
+    "saveProgress": {
+      "type": "boolean",
+      "title": "Save the progress of the form when the user leaves the page",
+      "default": true
+    },
+    "offline": {
+      "type": "boolean",
+      "title": "Allow the form to be used offline",
+      "default": true
+    },
+    "fields": {
+      "title": "The fields of this form",
+      "description": "This is an array of fields that make up the form. The order of the fields in this array will be the order in which they appear on the form. The last field in this array should always be the 'flButtons' field.",
+      "type": "array",
+      "required": true,
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "title": "The name of the field",
+            "type": "string"
+          },
+          "_type": {
+            "title": "The type of the field",
+            "type": "string"
+          },
+          "label": {
+            "title": "The label of the field to display in the screen",
+            "type": "string"
+          },
+          "_submit": {
+            "type": "boolean",
+            "title": "Whether this field should be submitted with the form",
+            "default": true
+          },
+          "canHide": {
+            "type": "boolean",
+            "title": "Whether this field can be hidden",
+            "default": false
+          },
+          "isHidden": {
+            "type": "boolean",
+            "title": "Whether this field is hidden by default",
+            "default": false
+          },
+          "readonly": {
+            "type": "boolean",
+            "title": "Whether this field is readonly",
+            "default": false
+          },
+          "required": {
+            "type": "boolean",
+            "title": "Whether this field is required to submit the form",
+            "default": false
+          },
+          "showLabel": {
+            "type": "boolean",
+            "title": "Whether this field should show the label",
+            "default": true
+          },
+          "description": {
+            "title": "The description of the field",
+            "type": "string"
+          },
+          "placeholder": {
+            "title": "The placeholder of the field when there is no content added",
+            "type": "string"
+          },
+          "defaultValueSource": {
+            "type": "string",
+            "title": "The source of the default value",
+            "enum": ["default", "profile", "appStorage", "query"]
+          },
+          "defaultValueKey": {
+            "type": "string",
+            "title": "The key of the default value to look up in the defined source"
+          }
+        },
+        "required": [
+          "name",
+          "_type",
+          "label",
+          "_submit",
+          "canHide",
+          "isValid",
+          "isHidden",
+          "readonly",
+          "required",
+          "showLabel"
+        ],
+        "oneOf": [
+          {
+            "title": "A generic input for text",
+            "description": "This is the most basic input field. It can be used for any text input.",
+            "properties": {
+              "_type": {
+                "enum": ["flInput"]
+              },
+              "generateGuid": {
+                "type": "boolean"
+              },
+              "idType": {
+                "type": "string"
+              }
+            },
+            "required": ["_type"]
+          },
+          {
+            "title": "A input to enter an email address",
+            "description": "This is a special input field that is used to enter an email address. It will validate the email address to ensure it is in the correct format.",
+            "properties": {
+              "_type": {
+                "enum": ["flEmail"]
+              }
+            },
+            "required": ["_type"]
+          },
+          {
+            "title": "A generic input for numbers",
+            "description": "This is a special input field that is used to enter a number. It will validate the number to ensure it is in the correct format.",
+            "properties": {
+              "_type": {
+                "enum": ["flNumber"]
+              },
+              "decimals": {
+                "type": "number"
+              },
+              "positiveOnly": {
+                "type": "boolean"
+              }
+            },
+            "required": ["_type"]
+          },
+          {
+            "title": "A generic input for telephone numbers",
+            "description": "This is a special input field that is used to enter a telephone number. It will validate the telephone number to ensure it is in the correct format.",
+            "properties": {
+              "_type": {
+                "enum": ["flTelephone"]
+              }
+            },
+            "required": ["_type"]
+          },
+          {
+            "title": "A generic input for urls and links",
+            "description": "This is a special input field that is used to enter a url or link. It will validate the url to ensure it is in the correct format.",
+            "properties": {
+              "_type": {
+                "enum": ["flUrl"]
+              }
+            },
+            "required": ["_type"]
+          },
+          {
+            "title": "The required form submit buttons.",
+            "description": "This is a special field that is required for the form to function properly. It should always be present as the last field of the form.",
+            "properties": {
+              "_type": {
+                "enum": ["flButtons"]
+              },
+              "clearType": {
+                "type": "string",
+                "default": "button"
+              },
+              "clearValue": {
+                "type": "string",
+                "default": "Clear"
+              },
+              "showClear": {
+                "type": "boolean",
+                "default": true
+              },
+              "showSubmit": {
+                "type": "boolean",
+                "default": true
+              },
+              "submitType": {
+                "type": "string",
+                "default": "submit"
+              },
+              "submitValue": {
+                "type": "string",
+                "default": "Submit"
+              }
+            },
+            "required": [
+              "_type",
+              "clearType",
+              "clearValue",
+              "showClear",
+              "showSubmit",
+              "submitType",
+              "submitValue"
+            ]
+          },
+          {
+            "title": "A generic input for passwords",
+            "description": "This is a special input field that is used to enter a password. It will validate the password to ensure it is in the correct format. It will also have an optional confirmation field to ensure the password was entered correctly.",
+            "properties": {
+              "_type": {
+                "enum": ["flPassword"]
+              },
+              "autogenerate": {
+                "type": "boolean"
+              },
+              "hash": {
+                "type": "boolean",
+                "title": "Whether the password should be securely hashed before being saved to the database.",
+                "default": true
+              },
+              "confirm": {
+                "title": "Whether a confirmation field should be shown for this password field.",
+                "type": "boolean"
+              },
+              "saveProgress": {
+                "type": "boolean",
+                "default": false
+              },
+              "submitWhenFalsy": {
+                "type": "boolean",
+                "title": "Whether the form should be submitted when the password field is empty.",
+                "default": false
+              },
+              "populateOnUpdate": {
+                "type": "boolean",
+                "default": false
+              },
+              "autogenerateLength": {
+                "title": "The length of the password to autogenerate.",
+                "type": "number"
+              },
+              "hasConfirmationError": {
+                "type": "boolean",
+                "default": false
+              }
+            },
+            "required": [
+              "_type",
+              "autogenerate",
+              "confirm",
+              "saveProgress",
+              "submitWhenFalsy",
+              "populateOnUpdate",
+              "autogenerateLength",
+              "hasConfirmationError",
+              "passwordConfirmation"
+            ]
+          },
+          {
+            "title": "A wysiwyg textarea editor with rich content text editing capabilities",
+            "properties": {
+              "_type": {
+                "enum": ["flWysiwyg"]
+              },
+              "rows": {
+                "type": "number",
+                "default": 5
+              }
+            },
+            "required": ["_type", "rows"]
+          },
+          {
+            "title": "A textarea editor with basic text editing capabilities",
+            "properties": {
+              "_type": {
+                "enum": ["flTextarea"]
+              },
+              "rows": {
+                "type": "number",
+                "default": 5
+              }
+            },
+            "required": ["_type", "rows"]
+          },
+          {
+            "title": "A field to select a date",
+            "properties": {
+              "_type": {
+                "enum": ["flDate"]
+              }
+            },
+            "required": ["_type"]
+          },
+          {
+            "title": "A field to select a time",
+            "properties": {
+              "_type": {
+                "enum": ["flTime"]
+              }
+            },
+            "required": ["_type"]
+          },
+          {
+            "title": "A select field to choose one option from a list",
+            "properties": {
+              "_type": {
+                "enum": ["flSelect"]
+              },
+              "options": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "title": "The options to choose from",
+                  "properties": {
+                    "label": {
+                      "title": "The label to display for the option",
+                      "type": "string"
+                    },
+                    "value": {
+                      "title": "The value to save for the option",
+                      "type": "string"
+                    }
+                  },
+                  "required": ["label", "value"]
+                }
+              }
+            },
+            "required": ["_type", "options"]
+          },
+          {
+            "title": "A radio field to choose one option from a list",
+            "properties": {
+              "_type": {
+                "enum": ["flRadio"]
+              },
+              "options": {
+                "title": "The options to choose from",
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "label": {
+                      "title": "The label to display for the option",
+                      "type": "string"
+                    },
+                    "value": {
+                      "title": "The value to save for the option",
+                      "type": "string"
+                    }
+                  },
+                  "required": ["label", "value"]
+                }
+              }
+            }
+          },
+          {
+            "title": "A multi-select checkbox field to choose one or more options from a list",
+            "properties": {
+              "_type": {
+                "enum": ["flCheckbox"]
+              },
+              "value": {
+                "type": "array",
+                "title": "The list of selected values",
+                "default": [],
+                "required": true
+              },
+              "options": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "label": {
+                      "title": "The label to display for the option",
+                      "type": "string"
+                    },
+                    "value": {
+                      "title": "The value to save for the option",
+                      "type": "string"
+                    }
+                  },
+                  "required": ["label", "value"]
+                }
+              }
+            }
+          },
+          {
+            "title": "A field to select an image to upload",
+            "description": "This is a special input field that is used to upload an image. It will validate the image to ensure it is in the correct format.",
+            "properties": {
+              "_type": {
+                "enum": ["flImage"]
+              }
+            },
+            "required": ["_type"]
+          },
+          {
+            "title": "A field to select a file to upload",
+            "description": "This is a special input field that is used to upload a file. It will validate the file to ensure it is in the correct format.",
+            "properties": {
+              "_type": {
+                "enum": ["flFile"]
+              }
+            },
+            "required": ["_type"]
+          },
+          {
+            "title": "A field to add a read-only text string displayed as a title",
+            "description": "This is a special input field that is used to display a title. It will not be saved to the database.",
+            "properties": {
+              "_type": {
+                "enum": ["flTitle"]
+              },
+              "value": {
+                "title": "The text to display",
+                "type": "string"
+              }
+            },
+            "required": ["_type"]
+          },
+          {
+            "title": "A field to add a read-only text string displayed as a paragraph",
+            "description": "This is a special input field that is used to display a paragraph. It will not be saved to the database.",
+            "properties": {
+              "_type": {
+                "enum": ["flParagraph"]
+              },
+              "value": {
+                "title": "The text to display",
+                "type": "string"
+              }
+            },
+            "required": ["_type"]
+          },
+          {
+            "title": "A field to select a rating from 1 to 5 stars",
+            "description": "This is a special input field that is used to let the user select a rating.",
+            "properties": {
+              "_type": {
+                "enum": ["flStarRating"]
+              }
+            },
+            "required": ["_type"]
+          },
+          {
+            "title": "A field to write a signature",
+            "description": "This is a special input field that is used by the user write a signature using their finger.",
+            "properties": {
+              "_type": {
+                "enum": ["flSignature"]
+              }
+            },
+            "required": ["_type"]
+          }
+        ]
+      }
+    }
+  }
+}
