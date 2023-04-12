@@ -254,6 +254,87 @@ Fliplet().then(function() {
           }
         });
       },
+      generate: function() {
+        var $vm = this;
+
+        Fliplet.Modal.prompt({ title: `Describe the form you want to generate.
+
+        e.g. "I want to generate a form for the user to accept the terms and conditions. The form should have a checkbox field and a submit button."
+        ` }).then(function (msg) {
+
+          $('.spinner-holder p').text('Please wait while we generate your form...');
+          $(selector).addClass('is-loading');
+
+          Fliplet.Widget.getSchema("com.fliplet.form-builder").then(async function (schema) {
+            const message = `I want you to act as a JSON code generator. Below within ### you will find the a JSON schema of a Form Builder widget. This is the schema that defines the structure of the JSON code that is used to generate the form. The schema is as follows:
+            ###
+            ${JSON.stringify(schema)}
+            ###
+
+            Do not provide any explanations.
+
+            Generate the JSON code for the following form:
+
+            ${msg}
+            `;
+
+            const chat = Fliplet.AI();
+
+            const gptSettings = JSON.parse(await chat.ask(message));
+
+            var formTemplate = _.first(this.templates) || { settings: {} };
+
+            var settings = _.extend(formTemplate.settings, gptSettings);
+
+            settings.templateId = formTemplate.id;
+            settings.isPlaceholder = false;
+
+            $vm.settings = generateFormDefaults(settings);
+            $vm.fields.splice(0, $vm.fields.length);
+
+            gptSettings.fields.forEach(function (field) {
+              $vm.fields.push(field);
+            })
+
+            $vm.$nextTick(function() {
+              $vm.save(true).then(function onSettingsSaved() {
+                Fliplet.Studio.emit('reload-widget-instance', Fliplet.Widget.getDefaultId());
+
+                $(selector).removeClass('is-loading');
+              });
+            });
+
+
+
+            return;
+
+            data.fields = settings.fields;
+
+            this.settings = generateFormDefaults(settings);
+            this.fields = this.settings.fields;
+
+            console.log('new settings', this.settings);
+            console.log('new fields', this.fields);
+
+            $(selector).removeClass('is-loading');
+
+            return $vm.$forceUpdate();
+
+            $vm.save(true).then(function onSettingsSaved() {
+              $(selector).removeClass('is-loading');
+              Fliplet.Studio.emit('reload-widget-instance', Fliplet.Widget.getDefaultId());
+
+              // Save and close
+              Fliplet.Studio.emit('reload-page-preview');
+
+              $vm.$forceUpdate();
+            });
+          }).catch(function (err) {
+            console.error(err);
+            $(selector).removeClass('is-loading');
+          });
+        })
+      },
       onFieldClick: function(field) {
         this.activeFieldConfigType = field._type.toString() + 'Config';
         this.activeFieldName = Fliplet.FormBuilder.components()[field._type].name;

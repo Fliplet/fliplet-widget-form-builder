@@ -117,6 +117,14 @@ nav > .btn {
   right: 15px;
 }
 
+.add-field .btn, .add-field .btn + .btn {
+  margin-top: 0;
+}
+
+.add-field .btn + .btn {
+  background-color: #ffba19;
+}
+
 .hide-fields {
   position: absolute;
   top: 4px;
