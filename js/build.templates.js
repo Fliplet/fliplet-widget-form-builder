@@ -35,9 +35,9 @@ this["Fliplet"]["Widget"]["Templates"]["templates.components.email"] = Handlebar
 this["Fliplet"]["Widget"]["Templates"]["templates.components.field"] = Handlebars.template({"compiler":[7,">= 4.0.0"],"main":function(container,depth0,helpers,partials,data) {
     var stack1, helper;
 
-  return "<div v-show=\"_showField\" class=\"form-group row clearfix\" :class=\"{'has-error': !isValid}\" :data-field=\"name\">\r\n  <div class=\"col-xs-12\" v-if=\"_isFormField\">\r\n    <label class=\"control-label\" :for=\"_labelName\">\r\n      {{ label }} <template v-if=\"required\"><span class=\"required-info\">*</span></template>\r\n    </label>\r\n  </div>\r\n  <div class=\"col-xs-12\">\r\n    "
+  return "<div v-show=\"_showField\" class=\"form-group row clearfix\" :class=\"{'has-error': !isValid}\" :data-field=\"name\">\n  <div class=\"col-xs-12\" v-if=\"_isFormField\">\n    <label class=\"control-label\" :for=\"_labelName\">\n      {{ label }} <template v-if=\"required\"><span class=\"required-info\">*</span></template>\n    </label>\n  </div>\n  <div class=\"col-xs-12\">\n    "
     + ((stack1 = ((helper = (helper = helpers.template || (depth0 != null ? depth0.template : depth0)) != null ? helper : helpers.helperMissing),(typeof helper === "function" ? helper.call(depth0 != null ? depth0 : (container.nullContext || {}),{"name":"template","hash":{},"data":data}) : helper))) != null ? stack1 : "")
-    + "\r\n  </div>\r\n</div>\r\n";
+    + "\n  </div>\n</div>\n";
 },"useData":true});
 
 this["Fliplet"]["Widget"]["Templates"]["templates.components.file"] = Handlebars.template({"compiler":[7,">= 4.0.0"],"main":function(container,depth0,helpers,partials,data) {
@@ -49,7 +49,7 @@ this["Fliplet"]["Widget"]["Templates"]["templates.components.file"] = Handlebars
     + alias3((helpers.T || (depth0 && depth0.T) || alias2).call(alias1,"widgets.form.file.uploadMessage",{"name":"T","hash":{},"data":data}))
     + "</span>\n            </span>\n            <span v-show=\"file.size\" class=\"file-info-size\">&ndash; <strong>{{ humanFileSize(file.size) }}</strong></span>\n          </div>\n        </div>\n        <div class=\"file-icon\" @click=\"readonly ? false : removeFile(index)\">\n          <i class=\"fa fa-times\"></i>\n        </div>\n      </li>\n    </ul>\n  </div>\n  <label class=\"btn btn-primary focus-outline\" tabindex=\"0\" v-on:keydown.space.prevent=\"readonly ? false : openFileDialog()\">\n    <i class=\"fa fa-plus\" :class=\"{ 'hidden' : readonly }\" aria-hidden=\"true\"></i>\n    <span>"
     + alias3((helpers.T || (depth0 && depth0.T) || alias2).call(alias1,"widgets.form.file.instruction",{"name":"T","hash":{},"data":data}))
-    + "</span>\n    <input type=\"file\" ref=\"fileInput\" :id=\"name\" :name=\"name\" :data-folder-id=\"mediaFolderId\" class=\"input-file selectfile\" :class=\"{ 'hidden' : readonly }\" v-on:change=\"updateValue()\" multiple tabindex=\"-1\">\n  </label>\n  <p class=\"text-danger\" v-if=\"$v.value.required === false && $v.value.$dirty\">"
+    + "</span>\n    <input type=\"file\" ref=\"fileInput\" :id=\"name\" :name=\"name\" :data-folder-id=\"mediaFolderId\" class=\"input-file selectfile\" :class=\"{ 'hidden' : readonly }\" v-on:change=\"updateValue($event)\" multiple tabindex=\"-1\">\n  </label>\n  <p class=\"text-danger\" v-if=\"$v.value.required === false && $v.value.$dirty\">"
     + alias3((helpers.T || (depth0 && depth0.T) || alias2).call(alias1,"widgets.form.errors.required",{"name":"T","hash":{},"data":data}))
     + "</p>\n</div>\n";
 },"useData":true});
@@ -63,7 +63,7 @@ this["Fliplet"]["Widget"]["Templates"]["templates.components.image"] = Handlebar
 
   return "<div v-if=\"description\" class=\"help-block description\">{{ description }}</div>\n<div class=\"fileUpload\" :class=\"{ 'fileUpload-disabled' : readonly, 'fileUpload-padding-top': value.length }\">\n  <div class=\"row\">\n    <div v-for=\"(image, index) in value\">\n      <div class=\"canvas-holder\">\n        <canvas ref=\"canvas\"></canvas>\n        <button class=\"canvas-remove\" :class=\"{ 'hidden' : readonly }\" type=\"button\" v-on:click=\"removeImage(index)\"></button>\n      </div>\n    </div>\n  </div>\n  <label\n    class=\"btn btn-primary focus-outline\"\n    :class=\"{ 'hidden' : readonly }\"\n    tabindex=\"0\"\n    v-on:keydown.space.prevent=\"openFileDialog()\"\n  >\n    <i class=\"fa fa-plus\" aria-hidden=\"true\"></i>\n    <span>"
     + alias3((helpers.T || (depth0 && depth0.T) || alias2).call(alias1,"widgets.form.image.instruction",{"name":"T","hash":{},"data":data}))
-    + "</span>\n    <input\n      multiple\n      type=\"file\"\n      ref=\"imageInput\"\n      :id=\"name\"\n      :name=\"name\"\n      class=\"input-file selectfile\"\n      accept=\"image/gif, image/jpg, image/jpeg, image/tiff, image/png\"\n      :data-folder-id=\"mediaFolderId\"\n      v-on:click=\"onFileClick\"\n      v-on:change=\"onFileChange\"\n      tabindex=\"-1\"\n    />\n  </label>\n  <p class=\"text-danger\" v-if=\"hasCorruptedImage\">"
+    + "</span>\n    <input\n      multiple\n      type=\"file\"\n      ref=\"imageInput\"\n      :id=\"name\"\n      :name=\"name\"\n      class=\"input-file selectfile\"\n      accept=\"image/gif, image/jpg, image/jpeg, image/tiff, image/png\"\n      :data-folder-id=\"mediaFolderId\"\n      v-on:click=\"onFileClick\"\n      v-on:change=\"onFileChange($event)\"\n      tabindex=\"-1\"\n    />\n  </label>\n  <p class=\"text-danger\" v-if=\"hasCorruptedImage\">"
     + alias3((helpers.T || (depth0 && depth0.T) || alias2).call(alias1,"widgets.form.image.invalid",{"name":"T","hash":{},"data":data}))
     + "</p>\n  <p class=\"text-danger\" v-if=\"$v.value.required === false && $v.value.$dirty\">"
     + alias3((helpers.T || (depth0 && depth0.T) || alias2).call(alias1,"widgets.form.errors.required",{"name":"T","hash":{},"data":data}))

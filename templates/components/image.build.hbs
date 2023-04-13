@@ -26,7 +26,7 @@
       accept="image/gif, image/jpg, image/jpeg, image/tiff, image/png"
       :data-folder-id="mediaFolderId"
       v-on:click="onFileClick"
-      v-on:change="onFileChange"
+      v-on:change="onFileChange($event)"
       tabindex="-1"
     />
   </label>

@@ -286,12 +286,14 @@ Fliplet.FormBuilder.field('image', {
         console.error(error);
       });
     },
-    onFileChange: function() {
+    onFileChange: function(e) {
       var files = this.$refs.imageInput.files;
 
       for (var i = 0; i < files.length; i++) {
         this.processImage(files.item(i), true);
       }
+
+      e.target.value = '';
     },
     onImageClick: function(index) {
       var imagesData = {

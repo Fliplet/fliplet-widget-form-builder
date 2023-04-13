@@ -198,7 +198,7 @@ Fliplet.FormBuilder.field('file', {
 
       $vm.$emit('_input', $vm.name, $vm.value);
     },
-    updateValue: function() {
+    updateValue: function(e) {
       var $vm = this;
       var files = $vm.$refs.fileInput.files;
 
@@ -215,6 +215,7 @@ Fliplet.FormBuilder.field('file', {
       }
 
       $vm.$emit('_input', $vm.name, $vm.value);
+      e.target.value = '';
     },
     openFileDialog: function() {
       this.$refs.fileInput.click();
