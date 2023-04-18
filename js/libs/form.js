@@ -423,7 +423,7 @@ Fliplet().then(function() {
 
           changeListeners[fieldName].push(fn);
 
-          // also run it once for initialisation
+          // also run it once for initialization
           if (runOnBind !== false) {
             fn.call(this, field.value);
           }

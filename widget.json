@@ -57,6 +57,7 @@
       "js/components/starRating.js",
       "js/components/date.js",
       "js/components/time.js",
+      "js/components/timeRange.js",
       "js/components/slider.js",
       "js/components/signature.js",
 
@@ -81,6 +82,7 @@
       "js/configurations/starRating.js",
       "js/configurations/date.js",
       "js/configurations/time.js",
+      "js/configurations/timeRange.js",
       "js/configurations/slider.js",
       "js/configurations/signature.js",
       "js/configurations/wysiwyg.js",
@@ -136,6 +138,7 @@
       "js/components/starRating.js",
       "js/components/date.js",
       "js/components/time.js",
+      "js/components/timeRange.js",
       "js/components/slider.js",
       "js/components/signature.js",
       "js/components/wysiwyg.js",

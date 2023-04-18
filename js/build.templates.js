@@ -200,6 +200,12 @@ this["Fliplet"]["Widget"]["Templates"]["templates.components.time"] = Handlebars
     + "\n</p>\n";
 },"useData":true});
 
+this["Fliplet"]["Widget"]["Templates"]["templates.components.timeRange"] = Handlebars.template({"compiler":[7,">= 4.0.0"],"main":function(container,depth0,helpers,partials,data) {
+    return "<template>\n  <div v-if=\"description\" class=\"help-block description\">{{ description }}</div>\n  <div class=\"fl-time-range form-html\" ref=\"timeRange\" :class=\"{ 'readonly' : readonly }\">\n    <div class=\"form-group fl-time-picker time-picker-start focus-outline\">\n      <i class=\"fa fa-clock-o fa-fw\"></i>\n      <input type=\"time\" class=\"form-control\" :name=\"name\" :id=\"name\"/>\n      <input type=\"text\" class=\"form-control\" :tabindex=\"readonly ? -1 : 0\"/>\n      <i class=\"fa fa-times fa-fw\"></i>\n    </div>\n    <div class=\"arrow-right\">\n      <i class=\"icon fa fa-long-arrow-right fa-fw\"></i>\n    </div>\n    <div class=\"form-group fl-time-picker time-picker-end focus-outline\">\n      <i class=\"fa fa-clock-o fa-fw\"></i>\n      <input type=\"time\" class=\"form-control\" :name=\"name\" :id=\"name\"/>\n      <input type=\"text\" class=\"form-control\" :tabindex=\"readonly ? -1 : 0\"/>\n      <i class=\"fa fa-times fa-fw\"></i>\n    </div>\n  </div>\n</template>\n<p class=\"text-danger\" v-if=\"$v.value.required === false && $v.value.$dirty\">\n  "
+    + container.escapeExpression((helpers.T || (depth0 && depth0.T) || helpers.helperMissing).call(depth0 != null ? depth0 : (container.nullContext || {}),"widgets.form.errors.required",{"name":"T","hash":{},"data":data}))
+    + "\n</p>\n";
+},"useData":true});
+
 this["Fliplet"]["Widget"]["Templates"]["templates.components.title"] = Handlebars.template({"compiler":[7,">= 4.0.0"],"main":function(container,depth0,helpers,partials,data) {
     return "<h2>{{ value }}</h2>";
 },"useData":true});
