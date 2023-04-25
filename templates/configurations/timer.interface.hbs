@@ -1,0 +1,47 @@
+<div v-if="type === 'timer'" class="form-group">
+  <label class="control-label">Start time</label>
+  <div class="text-danger" v-if="errors.requiredField"> \{{ errors.requiredField }} </div>
+  <div class="form-group fl-timer">
+    <div>
+      <input type="number" name="hours" id="hours" class="form-control" v-model="hours" min="0"/>
+      <span>hours</label>
+    </div>
+    <div>
+      <input type="number" name="minutes" id="minutes" class="form-control" v-model="minutes" min="0" max="60"/>
+      <span>minutes</span>
+    </div>
+    <div>
+      <input type="number" name="seconds" id="seconds" class="form-control" v-model="seconds" min="0" max="60"/>
+      <span>seconds</span>
+    </div>
+  </div>
+</div>
+
+<div class="form-group">
+  <label class="control-label">Autostart when form is loaded </label>
+  <div class="help-block description">If autostart is not selected, user will need to activate timer with “Start” button</div>
+  <div class="checkbox checkbox-icon">
+    <input type="checkbox" id="autostart" name="autostart" v-model="autostart">
+    <label for="autostart">
+      <span class="check"><i class="fa fa-check"></i></span> Enable autostart
+    </label>
+  </div>
+</div>
+
+<div class="form-group">
+  <label class="control-label">Timer controls</label>
+  <div>
+    <div class="radio radio-icon">
+      <input type="radio" id="unable" name="unable" v-bind:value="true" v-model="readonly">
+      <label for="unable">
+        <span class="check"><i class="fa fa-circle"></i></span> \{{ T('widgets.form.timer.controls.unable') }}
+      </label>
+    </div>
+    <div class="radio radio-icon">
+      <input type="radio" id="able" name="able" v-bind:value="false" v-model="readonly">
+      <label for="able">
+        <span class="check"><i class="fa fa-circle"></i></span> \{{ T('widgets.form.timer.controls.able') }}
+      </label>
+    </div>
+  </div>
+</div>

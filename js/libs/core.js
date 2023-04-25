@@ -366,6 +366,12 @@ Fliplet.FormBuilder = (function() {
           }
         }
 
+        if (this._componentName === 'flTimer') {
+          data.hours = !data.hours ? 0 : +data.hours;
+          data.minutes = !data.minutes ? 0 : +data.minutes;
+          data.seconds = !data.seconds ? 0 : +data.seconds;
+        }
+
         if (this._componentName === 'flSlider') {
           data.max = !data.max ? 100 : Number(data.max);
           data.min = !data.min ? 0 : Number(data.min);
@@ -399,7 +405,7 @@ Fliplet.FormBuilder = (function() {
 
       component.props._componentsWithDescription = {
         type: Array,
-        default: ['flInput', 'flCheckbox', 'flRadio', 'flEmail', 'flNumber', 'flTelephone', 'flUrl', 'flTextarea', 'flWysiwyg', 'flSelect', 'flDate', 'flTime', 'flStarRating', 'flSignature', 'flImage', 'flFile', 'flSlider', 'flMatrix']
+        default: ['flInput', 'flCheckbox', 'flRadio', 'flEmail', 'flNumber', 'flTelephone', 'flUrl', 'flTextarea', 'flWysiwyg', 'flSelect', 'flDate', 'flTime', 'flTimer', 'flStarRating', 'flSignature', 'flImage', 'flFile', 'flSlider', 'flMatrix']
       };
 
       component.props._readOnlyComponents = {
@@ -704,6 +710,7 @@ Fliplet.FormBuilder = (function() {
       var hasSelectAll = component.props.addSelectAll && typeof component.props.addSelectAll.default === 'boolean';
       var isSlider = component.props._componentName.default === 'flSlider';
       var isMatrix = component.props._componentName.default === 'flMatrix';
+      var isTimer = component.props._componentName.default === 'flTimer';
 
       /**
       * Generate text configurations for radio/checkbox options, separated by new lines
@@ -778,7 +785,8 @@ Fliplet.FormBuilder = (function() {
         template: template && template() || '',
         hasOptions: hasOptions,
         hasSelectAll: hasSelectAll,
-        isSlider: isSlider
+        isSlider: isSlider,
+        isTimer: isTimer
       });
 
       Vue.component(componentName + 'Config', component);

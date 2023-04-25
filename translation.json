@@ -95,6 +95,16 @@
           "lastMonth": "Last month"
         }
       },
+      "timer": {
+        "types": {
+          "timer": "Countdown timer",
+          "stopwatch": "Stopwatch"
+        },
+        "controls": {
+          "able": "User can start, stop and reset the timer",
+          "unable": "User cannot control the timer"
+        }
+      },
       "signature": {
         "actions": {
           "clear": "Clear",
