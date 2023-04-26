@@ -626,6 +626,13 @@ Fliplet().then(function() {
                   value = value.toLowerCase();
                 }
 
+                if (type === 'flDateRange' && typeof value === 'object') {
+                  value = {
+                    start: value.start,
+                    end: value.end
+                  };
+                }
+
                 // Other inputs
                 appendField(field.name, value);
               }

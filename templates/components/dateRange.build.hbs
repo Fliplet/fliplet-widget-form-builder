@@ -14,12 +14,12 @@
       @blur="onBlur()"
     >
       <option value="">\{{ placeholder }}</option>
-      <option v-for="option in predefinedRanges" :value="option.value" :disabled="option.disabled">
+      <option v-for="option in predefinedRanges" :value="option" :disabled="option.disabled">
         \{{ option.label || option.id }}
       </option>
     </select>
     <span class="icon fa fa-chevron-down"></span>
-    <span class="select-value-proxy"><template v-if="selectedRange && selectedRange !== ''">\{{ selectedRange }}</template><template v-else>\{{ placeholder }}</template></span>
+    <span class="select-value-proxy"><template v-if="selectedRange && selectedRange !== {}">\{{ selectedRange.label }}</template><template v-else>\{{ placeholder }}</template></span>
   </label>
   <div class="fl-date-range form-html" ref="dateRange">
     <div class="form-group fl-date-picker date-picker-start focus-outline">

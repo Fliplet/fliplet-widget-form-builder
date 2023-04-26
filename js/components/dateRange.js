@@ -38,7 +38,10 @@ Fliplet.FormBuilder.field('dateRange', {
       isInputFocused: false,
       isPreview: Fliplet.Env.get('preview'),
       today: this.formatLocaleDate(moment()),
-      selectedRange: '',
+      selectedRange: {
+        label: T('widgets.form.dateRange.rangePlaceholder'),
+        value: ''
+      },
       predefinedRanges: [
         {
           label: T('widgets.form.dateRange.predefinedRanges.today'),
@@ -72,6 +75,8 @@ Fliplet.FormBuilder.field('dateRange', {
     };
   },
   mounted: function() {
+    this.initDaterange();
+
     if (this.defaultValueSource !== 'default') {
       this.setValueFromDefaultSettings({
         source: this.defaultValueSource,
@@ -94,8 +99,6 @@ Fliplet.FormBuilder.field('dateRange', {
       default:
         break;
     }
-
-    this.initDaterange();
 
     this.$emit('_input', this.name, this.value, false, true);
     this.$v.$reset();
@@ -136,7 +139,7 @@ Fliplet.FormBuilder.field('dateRange', {
       this.$emit('_input', this.name, val, false, true);
     },
     selectedRange: function(range) {
-      var newDate = this.getDate(range);
+      var newDate = this.getDate(range.value);
 
       this.value = newDate;
     }
@@ -170,7 +173,10 @@ Fliplet.FormBuilder.field('dateRange', {
       });
 
       this.dateRange.change(function(value) {
-        this.selectedRange = '';
+        this.selectedRange = {
+          label: T('widgets.form.dateRange.rangePlaceholder'),
+          value: ''
+        };
 
         $vm.value = value;
         $vm.updateValue();
