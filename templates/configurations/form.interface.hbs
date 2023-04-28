@@ -115,13 +115,13 @@
         </div>
         <div class="col-xs-12">
           <div class="radio radio-icon">
-            <input type="radio" id="stopwatch" name="stopwatch" v-bind:value="'stopwatch'" v-model="type">
+            <input type="radio" id="stopwatch" name="stopwatch" value="stopwatch" v-model="type">
             <label for="stopwatch">
               <span class="check"><i class="fa fa-circle"></i></span> \{{ T('widgets.form.timer.types.stopwatch') }}
             </label>
           </div>
           <div class="radio radio-icon">
-            <input type="radio" id="countdown" name="countdown" v-bind:value="'timer'" v-model="type">
+            <input type="radio" id="countdown" name="countdown" value="timer" v-model="type">
             <label for="countdown">
               <span class="check"><i class="fa fa-circle"></i></span> \{{ T('widgets.form.timer.types.timer') }}
             </label>
