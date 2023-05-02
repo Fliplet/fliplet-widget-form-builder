@@ -11,11 +11,15 @@ Fliplet.FormBuilder.field('dateRange', {
     },
     autofill: {
       type: String,
-      default: 'always'
+      default: 'default'
     },
     defaultSource: {
       type: String,
-      default: 'submission'
+      default: 'load'
+    },
+    empty: {
+      type: Boolean,
+      default: true
     },
     defaultRangeDuration: {
       type: Number,
