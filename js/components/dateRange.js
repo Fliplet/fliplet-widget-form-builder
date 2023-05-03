@@ -88,20 +88,21 @@ Fliplet.FormBuilder.field('dateRange', {
       });
     }
 
-    switch (this.autofill) {
-      case 'default':
-      case 'always':
-        this.value = {
-          start: this.today,
-          end: this.today
-        };
-        this.empty = false;
-        break;
-      case 'empty':
-        this.value = null;
-        break;
-      default:
-        break;
+    if ((!this.value && this.autofill === 'default') || this.autofill === 'always') {
+      this.value = {
+        start: this.today,
+        end: this.today
+      };
+      this.empty = false;
+    }
+
+    if (this.autofill === 'empty') {
+      this.value = {
+        start: '',
+        end: ''
+      };
+
+      return;
     }
 
     this.$emit('_input', this.name, this.value, false, true);
@@ -125,15 +126,17 @@ Fliplet.FormBuilder.field('dateRange', {
   },
   watch: {
     value: function(val) {
-      if (!val && ['default', 'always'].indexOf(this.autofill) > -1 && (this.required || this.autofill === 'always')) {
+      if ((!val.start || !val.end) && ['default', 'always'].indexOf(this.autofill) > -1 && (this.required || this.autofill === 'always')) {
         this.value = {
           start: this.today,
           end: this.today
         };
+
+        return;
       }
 
       if (this.dateRange) {
-        this.dateRange.set(val, true);
+        this.dateRange.set(val, false);
       }
 
       if (this.isPreview && this.$v.value.$invalid) {
@@ -149,12 +152,30 @@ Fliplet.FormBuilder.field('dateRange', {
     }
   },
   created: function() {
+    Fliplet.FormBuilder.on('reset', this.onReset);
     Fliplet.Hooks.on('beforeFormSubmit', this.onBeforeSubmit);
   },
   destroyed: function() {
+    Fliplet.FormBuilder.off('reset', this.onReset);
     Fliplet.Hooks.off('beforeFormSubmit', this.onBeforeSubmit);
   },
   methods: {
+    onReset: function(data) {
+      if (data.id === this.$parent.id) {
+        if (this.defaultValueSource !== 'default') {
+          this.setValueFromDefaultSettings({
+            source: this.defaultValueSource,
+            key: this.defaultValueKey
+          });
+        }
+
+        this.dateRange.set(this.value);
+        this.selectedRange = {
+          label: T('widgets.form.dateRange.rangePlaceholder'),
+          value: ''
+        };
+      }
+    },
     initDaterange: function() {
       var $vm = this;
 
@@ -170,11 +191,6 @@ Fliplet.FormBuilder.field('dateRange', {
       });
 
       this.dateRange.change(function(value) {
-        this.selectedRange = {
-          label: T('widgets.form.dateRange.rangePlaceholder'),
-          value: ''
-        };
-
         $vm.value = value;
         $vm.updateValue();
       });

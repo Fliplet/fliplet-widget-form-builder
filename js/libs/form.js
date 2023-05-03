@@ -195,6 +195,11 @@ Fliplet().then(function() {
 
                 break;
 
+              case 'flDateRange':
+                field.value = moment(fieldData).isValid() ? moment(fieldData).format('YYYY-MM-DD') : moment().get().format('YYYY-MM-DD');
+
+                break;
+
               case 'flImage':
               case 'flFile':
                 var img = fieldData;
@@ -628,11 +633,20 @@ Fliplet().then(function() {
                   value = value.toLowerCase();
                 }
 
-                if (type === 'flDateRange' && typeof value === 'object') {
-                  value = JSON.stringify({
-                    start: value.start,
-                    end: value.end
-                  });
+                if (type === 'flDateRange') {
+                  if (typeof value === 'object') {
+                    value = JSON.stringify({
+                      start: moment(value.start).isValid() ? moment(value.start).format('YYYY-MM-DD') : moment().format('YYYY-MM-DD'),
+                      end: moment(value.end).isValid() ? moment(value.end).format('YYYY-MM-DD') : moment().format('YYYY-MM-DD')
+                    });
+                  } else if (moment(value).isValid()) {
+                    value = JSON.stringify({
+                      start: moment(value).format('YYYY-MM-DD'),
+                      end: moment(value).format('YYYY-MM-DD')
+                    });
+                  } else {
+                    value = null;
+                  }
                 }
 
                 // Other inputs
@@ -956,6 +970,10 @@ Fliplet().then(function() {
                   }
 
                   if (field._type === 'flDate') {
+                    data = data && moment(data).isValid() ? data : '';
+                  }
+
+                  if (field._type === 'flDateRange') {
                     data = data && moment(data).isValid() ? data : '';
                   }
 
