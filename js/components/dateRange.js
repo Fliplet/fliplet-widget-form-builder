@@ -128,12 +128,12 @@ Fliplet.FormBuilder.field('dateRange', {
         };
       }
 
-      if (this.isPreview && this.$v.value.$invalid) {
-        this.highlightError();
-      }
-
       if (this.dateRange) {
         this.dateRange.set(val, true);
+      }
+
+      if (this.isPreview && this.$v.value.$invalid) {
+        this.highlightError();
       }
 
       this.$emit('_input', this.name, val, false, true);
@@ -156,13 +156,6 @@ Fliplet.FormBuilder.field('dateRange', {
 
       if (this.dateRange && !this.$refs.dateRange) {
         return;
-      }
-
-      if (!this.value.start || !this.value.end && ['default', 'always'].indexOf(this.autofill) > -1 && (this.required || this.autofill === 'always')) {
-        $vm.value = {
-          start: this.today,
-          end: this.today
-        };
       }
 
       this.dateRange = Fliplet.UI.DateRange(this.$refs.dateRange, {
@@ -233,8 +226,8 @@ Fliplet.FormBuilder.field('dateRange', {
       // Empty date fields are validated to null before this hook is called
       if (this.autofill === 'always' && data[this.name] === null) {
         data[this.name] = this.defaultSource === 'submission'
-          ? { start: this.formatLocaleDate(moment()), end: this.formatLocaleDate(moment()) }
-          : { start: this.today, end: this.today };
+          ? { start: '', end: '' }
+          : JSON.stringify({ start: this.today, end: this.today });
       }
     }
   }
