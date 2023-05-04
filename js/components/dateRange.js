@@ -145,12 +145,30 @@ Fliplet.FormBuilder.field('dateRange', {
     }
   },
   created: function() {
+    Fliplet.FormBuilder.on('reset', this.onReset);
     Fliplet.Hooks.on('beforeFormSubmit', this.onBeforeSubmit);
   },
   destroyed: function() {
+    Fliplet.FormBuilder.off('reset', this.onReset);
     Fliplet.Hooks.off('beforeFormSubmit', this.onBeforeSubmit);
   },
   methods: {
+    onReset: function(data) {
+      if (data.id === this.$parent.id) {
+        if (this.defaultValueSource !== 'default') {
+          this.setValueFromDefaultSettings({
+            source: this.defaultValueSource,
+            key: this.defaultValueKey
+          });
+        }
+
+        this.dateRange.set(this.value);
+        this.selectedRange = {
+          label: T('widgets.form.dateRange.rangePlaceholder'),
+          value: ''
+        };
+      }
+    },
     initDaterange: function() {
       var $vm = this;
 
