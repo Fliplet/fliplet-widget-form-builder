@@ -2,9 +2,9 @@
 <template>
   <div class="form-group fl-timer" ref="timer" :aria-label="T(`widgets.form.timer.types.${type}`)">
     <input type="text" class="form-control" readonly="true" tabindex="0" v-model="stringValue" />
-    <button v-if="!readonly && timerStatus === 'paused'" class="btn btn-primary" v-on:click.prevent="onReset">Reset</button>
-    <button v-if="!readonly && (timerStatus === 'initial' || timerStatus === 'paused')" class="btn btn-primary" v-on:click.prevent="onStart">Start</button>
-    <button v-if="!readonly && timerStatus === 'running'" class="btn btn-primary" v-on:click.prevent="onStop">Stop</button>
+    <button v-if="!readonly && timerStatus === 'paused'" class="btn btn-primary" v-on:click.prevent="reset">Reset</button>
+    <button v-if="!readonly && (timerStatus === 'initial' || timerStatus === 'paused')" class="btn btn-primary" v-on:click.prevent="start">Start</button>
+    <button v-if="!readonly && timerStatus === 'running'" class="btn btn-primary" v-on:click.prevent="stop">Stop</button>
   </div>
 </template>
 <p class="text-danger" v-if="$v.value.required === false && $v.value.$dirty">

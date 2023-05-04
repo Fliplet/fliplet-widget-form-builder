@@ -31,7 +31,8 @@ Fliplet.FormBuilder.field('timer', {
       timer: null,
       isPreview: Fliplet.Env.get('preview'),
       timerStatus: 'initial',
-      startValue: 0
+      startValue: 0,
+      runningTimer: null
     };
   },
   validations: function() {
@@ -49,6 +50,12 @@ Fliplet.FormBuilder.field('timer', {
     stringValue: function() {
       return this.getStringTime(this.hours, this.minutes, this.seconds);
     }
+  },
+  created: function() {
+    Fliplet.Hooks.on('beforeFormSubmit', this.onBeforeSubmit);
+  },
+  destroyed: function() {
+    Fliplet.Hooks.off('beforeFormSubmit', this.onBeforeSubmit);
   },
   methods: {
     initTimer: function() {
@@ -71,8 +78,7 @@ Fliplet.FormBuilder.field('timer', {
         type: this.type
       });
 
-      this.timer.change(function(value, status) {
-        $vm.timerStatus = status;
+      this.timer.change(function(value) {
         $vm.value = value;
         $vm.updateValue();
       });
@@ -90,20 +96,60 @@ Fliplet.FormBuilder.field('timer', {
     toSeconds: function(hours, minutes, seconds) {
       return (+hours * 60 * 60) + (+minutes * 60) + +seconds;
     },
-    onStart: function() {
-      // this.timer.run('formTimerStarted');
+    start: function() {
+      var $vm = this;
+
+      if (this.timerStatus === 'running') {
+        return;
+      }
+
+      this.timerStatus = 'running';
       Fliplet.App.Storage.set(this.name, moment());
-      this.timer.start();
+
+      if (this.type === 'stopwatch') {
+        this.runningTimer = setInterval(function() {
+          $vm.value++;
+        }, 1000);
+      } else if (this.type === 'timer') {
+        this.runningTimer = setInterval(function() {
+          if ($vm.value === 0) {
+            Fliplet.UI.Toast({
+              type: 'minimal',
+              message: 'Countdown Timer has reached 0',
+              actions: [{
+                label: 'Dismiss',
+                action: () => {
+                  Fliplet.UI.Toast.dismiss();
+                  $vm.reset();
+                }
+              }],
+              duration: false, // Ensures the toast message doesn't auto-dismiss
+              tapToDismiss: false // Ensures the toast message is only dismissed through the action button
+            });
+
+            $vm.stop();
+          } else {
+            $vm.value--;
+          }
+        }, 1000);
+      }
     },
-    onStop: function() {
-      // this.timer.run('formTimerStopped');
+    stop: function() {
+      if (this.timerStatus === 'paused') {
+        return;
+      }
+
+      clearInterval(this.runningTimer);
+      this.timerStatus = 'paused';
       Fliplet.App.Storage.remove(this.name);
-      this.timer.stop();
     },
-    onReset: function() {
-      // this.timer.run('formTimerReset');
+    reset: function() {
+      this.timerStatus = 'initial';
+      this.value = this.startValue;
       Fliplet.App.Storage.remove(this.name);
-      this.timer.reset();
+    },
+    onBeforeSubmit: function() {
+      this.reset();
     }
   },
   mounted: async function() {
@@ -131,7 +177,7 @@ Fliplet.FormBuilder.field('timer', {
     });
 
     if (this.autostart) {
-      this.timer.start();
+      this.start();
     }
 
     this.$emit('_input', this.name, +this.value);
@@ -148,8 +194,8 @@ Fliplet.FormBuilder.field('timer', {
       this.$emit('_input', this.name, +val);
     },
     timerStatus: function(val) {
-      if (val === 'running') {
-        this.onStart();
+      if (val === 'running' && this.runningTimer) {
+        this.start();
       }
     }
   }
