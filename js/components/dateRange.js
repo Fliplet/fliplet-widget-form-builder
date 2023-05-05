@@ -17,10 +17,6 @@ Fliplet.FormBuilder.field('dateRange', {
       type: String,
       default: 'submission'
     },
-    defaultRangeDuration: {
-      type: Number,
-      default: 2
-    },
     showPredefinedRanges: {
       type: Boolean,
       default: true
