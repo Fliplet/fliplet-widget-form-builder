@@ -41,7 +41,7 @@ Fliplet.FormBuilder.field('dateRange', {
       dateRange: null,
       isInputFocused: false,
       isPreview: Fliplet.Env.get('preview'),
-      today: this.formatLocaleDate(moment()),
+      today: this.formatLocaleDate(),
       selectedRange: {
         label: T('widgets.form.dateRange.rangePlaceholder'),
         value: ''
@@ -92,8 +92,8 @@ Fliplet.FormBuilder.field('dateRange', {
       case 'default':
       case 'always':
         this.value = {
-          start: this.today,
-          end: this.today
+          start: this.value && this.value.start ? this.value.start : this.today,
+          end: this.value && this.value.end ? this.value.end : this.today
         };
         this.empty = false;
         break;
@@ -128,6 +128,8 @@ Fliplet.FormBuilder.field('dateRange', {
   },
   watch: {
     value: function(val) {
+      val = this.validateValue(val);
+
       if (!val && ['default', 'always'].indexOf(this.autofill) > -1 && (this.required || this.autofill === 'always')) {
         this.value = {
           start: this.today,
@@ -136,7 +138,7 @@ Fliplet.FormBuilder.field('dateRange', {
       }
 
       if (this.dateRange) {
-        this.dateRange.set(val, true);
+        this.dateRange.set(val, false);
       }
 
       if (this.isPreview && this.$v.value.$invalid) {
@@ -186,8 +188,8 @@ Fliplet.FormBuilder.field('dateRange', {
       switch (option) {
         case 'today':
           return {
-            start: this.formatLocaleDate(moment()),
-            end: this.formatLocaleDate(moment())
+            start: this.formatLocaleDate(),
+            end: this.formatLocaleDate()
           };
         case 'yesterday':
           return {
@@ -221,13 +223,33 @@ Fliplet.FormBuilder.field('dateRange', {
           };
         default:
           return {
-            start: this.formatLocaleDate(moment()),
-            end: this.formatLocaleDate(moment())
+            start: this.formatLocaleDate(),
+            end: this.formatLocaleDate()
           };
       }
     },
     formatLocaleDate: function(date) {
-      return date.locale('en').format('YYYY-MM-DD');
+      return date ? moment(date).locale('en').format('YYYY-MM-DD') : moment(date).locale('en').format('YYYY-MM-DD');
+    },
+    validateValue: function(value) {
+      if (!value || (!value.start && !value.end)) {
+        value = {
+          start: '',
+          end: ''
+        };
+      } else if (typeof value !== 'object') {
+        value = {
+          start: moment(value, 'YYYY-MM-DD', true).isValid() ? this.formatLocaleDate(value) : this.formatLocaleDate(),
+          end: moment(value, 'YYYY-MM-DD', true).isValid() ? this.formatLocaleDate(value) : this.formatLocaleDate()
+        };
+      } else if (!value.start || !value.end) {
+        value = {
+          start: value.start || value.end,
+          end: value.end || value.start
+        };
+      }
+
+      return value;
     },
     onBeforeSubmit: function(data) {
       // Empty date fields are validated to null before this hook is called
