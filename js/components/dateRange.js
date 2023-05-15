@@ -4,7 +4,18 @@ Fliplet.FormBuilder.field('dateRange', {
   props: {
     value: {
       type: Object,
-      default: null
+      default: {
+        start: '',
+        end: ''
+      }
+    },
+    startValue: {
+      type: String,
+      default: ''
+    },
+    endValue: {
+      type: String,
+      default: ''
     },
     description: {
       type: String
@@ -37,7 +48,7 @@ Fliplet.FormBuilder.field('dateRange', {
       dateRange: null,
       isInputFocused: false,
       isPreview: Fliplet.Env.get('preview'),
-      today: this.formatLocaleDate(),
+      today: this.formatDate(),
       selectedRange: {
         label: T('widgets.form.dateRange.rangePlaceholder'),
         value: ''
@@ -85,6 +96,12 @@ Fliplet.FormBuilder.field('dateRange', {
     }
 
     switch (this.autofill) {
+      case 'custom':
+        this.value = {
+          start: this.startValue,
+          end: this.endValue
+        };
+        break;
       case 'default':
       case 'always':
         this.value = {
@@ -104,7 +121,6 @@ Fliplet.FormBuilder.field('dateRange', {
     }
 
     this.$emit('_input', this.name, this.value, false, true);
-    this.$v.$reset();
   },
   validations: function() {
     var rules = {
@@ -184,11 +200,6 @@ Fliplet.FormBuilder.field('dateRange', {
       });
 
       this.dateRange.change(function(value) {
-        this.selectedRange = {
-          label: T('widgets.form.dateRange.rangePlaceholder'),
-          value: ''
-        };
-
         $vm.value = value;
         $vm.updateValue();
       });
@@ -197,47 +208,47 @@ Fliplet.FormBuilder.field('dateRange', {
       switch (option) {
         case 'today':
           return {
-            start: this.formatLocaleDate(),
-            end: this.formatLocaleDate()
+            start: this.formatDate(),
+            end: this.formatDate()
           };
         case 'yesterday':
           return {
-            start: this.formatLocaleDate(moment().subtract(1, 'days')),
-            end: this.formatLocaleDate(moment().subtract(1, 'days'))
+            start: this.formatDate(moment().subtract(1, 'days')),
+            end: this.formatDate(moment().subtract(1, 'days'))
           };
         case 'tomorrow':
           return {
-            start: this.formatLocaleDate(moment().add(1, 'days')),
-            end: this.formatLocaleDate(moment().add(1, 'days'))
+            start: this.formatDate(moment().add(1, 'days')),
+            end: this.formatDate(moment().add(1, 'days'))
           };
         case 'nextWeek':
           return {
-            start: this.formatLocaleDate(moment().add(1, 'days')),
-            end: this.formatLocaleDate(moment().add(7, 'days'))
+            start: this.formatDate(moment().add(1, 'days')),
+            end: this.formatDate(moment().add(7, 'days'))
           };
         case 'lastWeek':
           return {
-            start: this.formatLocaleDate(moment().subtract(7, 'days')),
-            end: this.formatLocaleDate(moment().subtract(1, 'days'))
+            start: this.formatDate(moment().subtract(7, 'days')),
+            end: this.formatDate(moment().subtract(1, 'days'))
           };
         case 'nextMonth':
           return {
-            start: this.formatLocaleDate(moment().add(1, 'days')),
-            end: this.formatLocaleDate(moment().add(30, 'days'))
+            start: this.formatDate(moment().add(1, 'days')),
+            end: this.formatDate(moment().add(30, 'days'))
           };
         case 'lastMonth':
           return {
-            start: this.formatLocaleDate(moment().subtract(30, 'days')),
-            end: this.formatLocaleDate(moment().subtract(1, 'days'))
+            start: this.formatDate(moment().subtract(30, 'days')),
+            end: this.formatDate(moment().subtract(1, 'days'))
           };
         default:
           return {
-            start: this.formatLocaleDate(),
-            end: this.formatLocaleDate()
+            start: this.formatDate(),
+            end: this.formatDate()
           };
       }
     },
-    formatLocaleDate: function(date) {
+    formatDate: function(date) {
       return date ? moment(date).locale('en').format('YYYY-MM-DD') : moment(date).locale('en').format('YYYY-MM-DD');
     },
     validateValue: function(value) {
@@ -248,8 +259,8 @@ Fliplet.FormBuilder.field('dateRange', {
         };
       } else if (typeof value !== 'object') {
         value = {
-          start: moment(value, 'YYYY-MM-DD', true).isValid() ? this.formatLocaleDate(value) : this.formatLocaleDate(),
-          end: moment(value, 'YYYY-MM-DD', true).isValid() ? this.formatLocaleDate(value) : this.formatLocaleDate()
+          start: moment(value, 'YYYY-MM-DD', true).isValid() ? this.formatDate(value) : this.formatDate(),
+          end: moment(value, 'YYYY-MM-DD', true).isValid() ? this.formatDate(value) : this.formatDate()
         };
       } else if (!value.start || !value.end) {
         value = {
