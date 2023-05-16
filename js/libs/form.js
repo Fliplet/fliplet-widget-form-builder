@@ -613,6 +613,25 @@ Fliplet().then(function() {
                   value = value.toLowerCase();
                 }
 
+                if (type === 'flDateRange' && typeof value === 'object') {
+                  value = JSON.stringify({
+                    start: value.start,
+                    end: value.end
+                  });
+                }
+
+                if (type === 'flFile') {
+                  var result = _.map(value, function(val) {
+                    if (!val) {
+                      return '';
+                    }
+
+                    return val instanceof File || !val.url ? val : val.url;
+                  });
+
+                  value = result;
+                }
+
                 // Other inputs
                 appendField(field.name, value);
               }
