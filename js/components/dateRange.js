@@ -4,10 +4,7 @@ Fliplet.FormBuilder.field('dateRange', {
   props: {
     value: {
       type: Object,
-      default: {
-        start: '',
-        end: ''
-      }
+      default: null
     },
     startValue: {
       type: String,
@@ -111,10 +108,7 @@ Fliplet.FormBuilder.field('dateRange', {
         this.empty = false;
         break;
       case 'empty':
-        this.value = {
-          start: '',
-          end: ''
-        };
+        this.value = null;
         break;
       default:
         break;
@@ -140,8 +134,6 @@ Fliplet.FormBuilder.field('dateRange', {
   },
   watch: {
     value: function(val) {
-      val = this.validateValue(val);
-
       if (!val && ['default', 'always'].indexOf(this.autofill) > -1 && (this.required || this.autofill === 'always')) {
         this.value = {
           start: this.today,
@@ -249,27 +241,7 @@ Fliplet.FormBuilder.field('dateRange', {
       }
     },
     formatDate: function(date) {
-      return date ? moment(date).locale('en').format('YYYY-MM-DD') : moment(date).locale('en').format('YYYY-MM-DD');
-    },
-    validateValue: function(value) {
-      if (!value || (!value.start && !value.end)) {
-        value = {
-          start: '',
-          end: ''
-        };
-      } else if (typeof value !== 'object') {
-        value = {
-          start: moment(value, 'YYYY-MM-DD', true).isValid() ? this.formatDate(value) : this.formatDate(),
-          end: moment(value, 'YYYY-MM-DD', true).isValid() ? this.formatDate(value) : this.formatDate()
-        };
-      } else if (!value.start || !value.end) {
-        value = {
-          start: value.start || value.end,
-          end: value.end || value.start
-        };
-      }
-
-      return value;
+      return typeof date !== 'undefined' && moment(date).isValid() ? moment(date).locale('en').format('YYYY-MM-DD') : moment(date).locale('en').format('YYYY-MM-DD');
     },
     onBeforeSubmit: function(data) {
       // Empty date fields are validated to null before this hook is called
