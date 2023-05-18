@@ -539,6 +539,10 @@ nav > .btn {
   color: #e1e1e1;
 }
 
+.fl-time-range {
+  column-gap: 15px;
+}
+
 input[type="time"].form-control {
   line-height: 44px;
   padding-top: 0;

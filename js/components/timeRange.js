@@ -1,6 +1,6 @@
 Fliplet.FormBuilder.field('timeRange', {
   name: 'Time range',
-  category: 'Text inputs',
+  category: 'Date & time',
   props: {
     value: {
       type: Object,
@@ -8,14 +8,18 @@ Fliplet.FormBuilder.field('timeRange', {
     },
     autofill: {
       type: String,
-      default: 'always'
+      default: 'default'
     },
     description: {
       type: String
     },
     defaultSource: {
       type: String,
-      default: 'submission'
+      default: 'load'
+    },
+    empty: {
+      type: Boolean,
+      default: true
     }
   },
   data: function() {
@@ -80,7 +84,7 @@ Fliplet.FormBuilder.field('timeRange', {
   },
   watch: {
     value: function(val) {
-      if ((!val || !val.start || !val.end) && ['default', 'always'].indexOf(this.autofill) > -1 && (this.required || this.autofill === 'always')) {
+      if (!val && ['default', 'always'].indexOf(this.autofill) > -1 && (this.required || this.autofill === 'always')) {
         this.value = {
           start: val.start || this.now,
           end: val.end || this.now
@@ -95,7 +99,7 @@ Fliplet.FormBuilder.field('timeRange', {
         this.timeRange.set(this.value, true);
       }
 
-      this.$emit('_input', this.name, this.value, false, true);
+      this.$emit('_input', this.name, val, false, true);
     }
   },
   created: function() {

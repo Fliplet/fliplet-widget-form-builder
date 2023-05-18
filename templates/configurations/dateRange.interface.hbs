@@ -4,6 +4,12 @@
   </div>
   <div>
     <div class="radio radio-icon">
+      <input type="radio" id="specific-date" name="specific-date" value="custom" v-model="autofill">
+      <label for="specific-date">
+        <span class="check"><i class="fa fa-circle"></i></span>Autofill with a specific date if it's empty
+      </label>
+    </div>
+    <div class="radio radio-icon">
       <input type="radio" id="default" name="default" value='default' v-model="autofill">
       <label for="default">
         <span class="check"><i class="fa fa-circle"></i></span>Autofill with current date if it's empty
@@ -38,6 +44,22 @@
   </div>
 </div>
 
+<div v-else class="form-group">
+  <label>Default value</label>
+  <div class="text-danger" v-if="errors.requiredField"> \{{ errors.requiredField }} </div>
+  <div class="fl-date-range form-html">
+    <div class="form-group focus-outline">
+      <input class="form-control" type="date" v-model.trim="startValue" />
+    </div>
+    <div class="arrow-right">
+      <i class="icon fa fa-long-arrow-right fa-fw"></i>
+    </div>
+    <div class="form-group focus-outline">
+      <input class="form-control" type="date" v-model.trim="endValue" />
+    </div>
+  </div>
+</div>
+
 <div class="form-group">
   <div class="checkbox checkbox-icon">
     <input
@@ -51,10 +73,4 @@
       <span class="hide-field">Show predefined ranges</span>
     </label>
   </div>
-</div>
-
-<div v-else class="form-group">
-  <label>Default value</label>
-  <div class="text-danger" v-if="errors.requiredField"> \{{ errors.requiredField }} </div>
-  <input class="form-control" type="date" v-model.trim="value" />
 </div>

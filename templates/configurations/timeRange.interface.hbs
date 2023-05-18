@@ -4,6 +4,12 @@
   </div>
   <div>
     <div class="radio radio-icon">
+      <input type="radio" id="specific-date" name="specific-date" value="custom" v-model="autofill">
+      <label for="specific-date">
+        <span class="check"><i class="fa fa-circle"></i></span>Autofill with a specific date if it's empty
+      </label>
+    </div>
+    <div class="radio radio-icon">
       <input type="radio" id="default" name="default" value='default' v-model="autofill">
       <label for="default">
         <span class="check"><i class="fa fa-circle"></i></span>Autofill with current time if it's empty
@@ -41,5 +47,12 @@
 <div v-else class="form-group">
   <label>Default value</label>
   <div class="text-danger" v-if="errors.requiredField"> \{{ errors.requiredField }} </div>
-  <input type="time" class="form-control basic-time-picker" v-model.trim="value" />
+  <div class="fl-time-range form-html">
+    <div class="focus-outline">
+      <input class="form-control basic-time-picker" type="time" v-model.trim="value.start" />
+    </div>
+    <div class="focus-outline">
+      <input class="form-control basic-time-picker" type="time" v-model.trim="value.end" />
+    </div>
+  </div>
 </div>
