@@ -155,7 +155,6 @@ Fliplet.FormBuilder = (function() {
         });
       };
 
-
       // Define method to highlight Error on blur form field
       component.methods.highlightError = function() {
         var $vm = this;

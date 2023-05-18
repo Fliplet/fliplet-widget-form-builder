@@ -540,7 +540,7 @@ nav > .btn {
 }
 
 .fl-time-range {
-  column-gap: 15px;
+  column-gap: 7px;
 }
 
 input[type="time"].form-control {
