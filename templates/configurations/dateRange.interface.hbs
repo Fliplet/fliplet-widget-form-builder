@@ -49,13 +49,13 @@
   <div class="text-danger" v-if="errors.requiredField"> \{{ errors.requiredField }} </div>
   <div class="fl-date-range form-html">
     <div class="form-group focus-outline">
-      <input class="form-control" type="date" v-model.trim="startValue" />
+      <input class="form-control" type="date" v-model.trim="value.start" />
     </div>
     <div class="arrow-right">
       <i class="icon fa fa-long-arrow-right fa-fw"></i>
     </div>
     <div class="form-group focus-outline">
-      <input class="form-control" type="date" v-model.trim="endValue" />
+      <input class="form-control" type="date" v-model.trim="value.end" />
     </div>
   </div>
 </div>
