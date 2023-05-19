@@ -221,6 +221,7 @@ Fliplet().then(function() {
                 }
 
                 break;
+              case 'flDateRange':
               case 'flTimeRange':
                 field.value = fieldData.includes('start') ? JSON.parse(fieldData) : fieldData;
                 break;
