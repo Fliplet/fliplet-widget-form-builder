@@ -76,7 +76,7 @@ Fliplet.FormBuilder = (function() {
       }
 
       /**
-       * This function is responsible personalizating a default value when we need to get it from user personalized data
+       * This function is responsible personalizing a default value when we need to get it from user personalized data
        * For example: set default value to the user email
        *
        * @param {Object} data - an object with source and key properties
@@ -405,12 +405,12 @@ Fliplet.FormBuilder = (function() {
 
       component.props._componentsWithDescription = {
         type: Array,
-        default: ['flInput', 'flCheckbox', 'flRadio', 'flEmail', 'flNumber', 'flTelephone', 'flUrl', 'flTextarea', 'flWysiwyg', 'flSelect', 'flDate', 'flTime', 'flDateRange', 'flTimer', 'flStarRating', 'flSignature', 'flImage', 'flFile', 'flSlider', 'flMatrix']
+        default: ['flInput', 'flCheckbox', 'flRadio', 'flEmail', 'flNumber', 'flTelephone', 'flUrl', 'flTextarea', 'flWysiwyg', 'flSelect', 'flDate', 'flTime', 'flDateRange', 'flTimeRange', 'flTimer', 'flStarRating', 'flSignature', 'flImage', 'flFile', 'flSlider', 'flMatrix']
       };
 
       component.props._readOnlyComponents = {
         type: Array,
-        default: ['flInput', 'flCheckbox', 'flRadio', 'flEmail', 'flNumber', 'flTelephone', 'flUrl', 'flTextarea', 'flWysiwyg', 'flSelect', 'flDate', 'flTime', 'flDateRange', 'flStarRating', 'flSignature', 'flImage', 'flFile', 'flSlider', 'flMatrix']
+        default: ['flInput', 'flCheckbox', 'flRadio', 'flEmail', 'flNumber', 'flTelephone', 'flUrl', 'flTextarea', 'flWysiwyg', 'flSelect', 'flDate', 'flTime', 'flDateRange', 'flTimeRange', 'flTimer', 'flStarRating', 'flSignature', 'flImage', 'flFile', 'flSlider', 'flMatrix']
       };
 
       component.props._idx = {

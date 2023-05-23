@@ -539,6 +539,10 @@ nav > .btn {
   color: #e1e1e1;
 }
 
+.fl-time-range {
+  column-gap: 7px;
+}
+
 input[type="time"].form-control {
   line-height: 44px;
   padding-top: 0;
@@ -549,6 +553,10 @@ input[type="time"]::-webkit-inner-spin-button,
 input[type="time"]:not(.basic-time-picker)::-webkit-calendar-picker-indicator {
   -webkit-appearance: none;
   opacity: 0;
+}
+
+.fl-timer {
+  column-gap: 8px;
 }
 
 /* SLIDER FIELD */

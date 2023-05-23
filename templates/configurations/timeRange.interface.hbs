@@ -12,13 +12,13 @@
     <div class="radio radio-icon">
       <input type="radio" id="default" name="default" value='default' v-model="autofill">
       <label for="default">
-        <span class="check"><i class="fa fa-circle"></i></span>Autofill with current date if it's empty
+        <span class="check"><i class="fa fa-circle"></i></span>Autofill with current time if it's empty
       </label>
     </div>
     <div class="radio radio-icon">
       <input type="radio" id="always" name="always" value='always' v-model="autofill">
       <label for="always">
-        <span class="check"><i class="fa fa-circle"></i></span>Always autofill with current date
+        <span class="check"><i class="fa fa-circle"></i></span>Always autofill with current time
       </label>
     </div>
   </div>
@@ -26,19 +26,19 @@
 
 <div v-if="isApplyCurrentDateField" class="form-group">
   <div>
-    <label class="control-label">When applying the current date</label>
+    <label class="control-label">When applying the current time</label>
   </div>
   <div>
     <div class="radio radio-icon">
       <input type="radio" id="load" name="load" value='load' v-model="defaultSource">
       <label for="load">
-        <span class="check"><i class="fa fa-circle"></i></span>Use the date when form is loaded
+        <span class="check"><i class="fa fa-circle"></i></span>Use the time when form is loaded
       </label>
     </div>
     <div class="radio radio-icon">
       <input type="radio" id="submission" name="submission" value='submission' v-model="defaultSource">
       <label for="submission">
-        <span class="check"><i class="fa fa-circle"></i></span>Use the date when form is submitted
+        <span class="check"><i class="fa fa-circle"></i></span>Use the time when form is submitted
       </label>
     </div>
   </div>
@@ -47,30 +47,21 @@
 <div v-else class="form-group">
   <label>Default value</label>
   <div class="text-danger" v-if="errors.requiredField"> \{{ errors.requiredField }} </div>
-  <div class="fl-date-range form-html">
-    <div class="form-group focus-outline">
-      <input class="form-control" type="date" v-model.trim="startValue" />
+  <div class="fl-time-range form-html" ref="timeRange">
+    <div class="form-group fl-time-picker time-picker-start focus-outline">
+      <i class="fa fa-clock-o fa-fw"></i>
+      <input type="time" class="form-control" v-model.trim="value.start"/>
+      <input type="text" class="form-control" :tabindex="readonly ? -1 : 0"/>
+      <i class="fa fa-times fa-fw"></i>
     </div>
     <div class="arrow-right">
       <i class="icon fa fa-long-arrow-right fa-fw"></i>
     </div>
-    <div class="form-group focus-outline">
-      <input class="form-control" type="date" v-model.trim="endValue" />
+    <div class="form-group fl-time-picker time-picker-end focus-outline">
+      <i class="fa fa-clock-o fa-fw"></i>
+      <input type="time" class="form-control" v-model.trim="value.end"/>
+      <input type="text" class="form-control" :tabindex="readonly ? -1 : 0"/>
+      <i class="fa fa-times fa-fw"></i>
     </div>
-  </div>
-</div>
-
-<div class="form-group">
-  <div class="checkbox checkbox-icon">
-    <input
-      type="checkbox"
-      name="predefinedRanges"
-      id="predefinedRanges"
-      v-model="showPredefinedRanges"
-    />
-    <label for="predefinedRanges">
-      <span class="check"><i class="fa fa-check"></i></span>
-      <span class="hide-field">Show predefined ranges</span>
-    </label>
   </div>
 </div>

@@ -28,11 +28,11 @@ Fliplet.FormBuilder.field('timer', {
   },
   data: function() {
     return {
-      timer: null,
       isPreview: Fliplet.Env.get('preview'),
-      timerStatus: 'initial',
-      startValue: 0,
-      runningTimer: null
+      timerStatus: 'stopped',
+      initialValue: 0,
+      timerInterval: null,
+      startTimestamp: moment().unix()
     };
   },
   validations: function() {
@@ -48,45 +48,19 @@ Fliplet.FormBuilder.field('timer', {
   },
   computed: {
     stringValue: function() {
-      return this.getStringTime(this.hours, this.minutes, this.seconds);
+      return `${this.hours < 10 ? '0' + this.hours : this.hours} : ${this.minutes < 10 ? '0' + this.minutes : this.minutes} : ${this.seconds < 10 ? '0' + this.seconds : this.seconds}`;
     }
   },
   created: function() {
-    Fliplet.Hooks.on('beforeFormSubmit', this.onBeforeSubmit);
+    Fliplet.FormBuilder.on('reset', this.reset);
+    Fliplet.Hooks.on('beforeFormSubmit', this.stop);
   },
   destroyed: function() {
-    Fliplet.Hooks.off('beforeFormSubmit', this.onBeforeSubmit);
+    Fliplet.FormBuilder.off('reset', this.reset);
+    Fliplet.Hooks.off('beforeFormSubmit', this.stop);
   },
   methods: {
-    initTimer: function() {
-      if (this.timer || !this.$refs.timer) {
-        return;
-      }
-
-      var $vm = this;
-
-      if (this.type === 'timer') {
-        this.value = this.toSeconds(this.hours, this.minutes, this.seconds);
-      } else {
-        this.toHoursAndMinutes(this.value);
-      }
-
-      this.timer = Fliplet.UI.Timer(this.$refs.timer, {
-        forceRequire: false,
-        value: +this.value,
-        readonly: this.readonly,
-        type: this.type
-      });
-
-      this.timer.change(function(value) {
-        $vm.value = value;
-        $vm.updateValue();
-      });
-    },
-    getStringTime: function(hours, minutes, seconds) {
-      return `${hours < 10 ? '0' + hours : hours} : ${minutes < 10 ? '0' + minutes : minutes} : ${seconds < 10 ? '0' + seconds : seconds}`;
-    },
-    toHoursAndMinutes: function(totalSeconds) {
+    setDisplayValues: function(totalSeconds) {
       const totalMinutes = Math.floor(totalSeconds / 60);
 
       this.seconds = totalSeconds % 60;
@@ -97,22 +71,48 @@ Fliplet.FormBuilder.field('timer', {
       return (+hours * 60 * 60) + (+minutes * 60) + +seconds;
     },
     start: function() {
-      var $vm = this;
-
       if (this.timerStatus === 'running') {
         return;
       }
 
       this.timerStatus = 'running';
-      Fliplet.App.Storage.set(this.name, moment());
+      this.startTimestamp = moment().unix();
+      Fliplet.App.Storage.set(this.name, this.startTimestamp);
+      this.setInterval();
+    },
+    stop: function() {
+      if (this.timerStatus === 'stopped') {
+        return;
+      }
+
+      this.value = this.updateValue();
+      Fliplet.App.Storage.remove(this.name);
+      this.timerStatus = 'stopped';
+      this.stopInterval();
+    },
+    reset: function() {
+      this.value = 0;
+
+      if (this.timerStatus === 'running') {
+        Fliplet.App.Storage.remove(this.name);
+        this.timerStatus = 'stopped';
+        this.stopInterval();
+      }
+
+      this.setDisplayValues(this.initialValue);
+    },
+    setInterval: function() {
+      var $vm = this;
 
       if (this.type === 'stopwatch') {
-        this.runningTimer = setInterval(function() {
-          $vm.value++;
-        }, 1000);
+        this.timerInterval = setInterval(function() {
+          var totalSeconds = $vm.updateValue();
+
+          $vm.setDisplayValues(totalSeconds);
+        }, 500);
       } else if (this.type === 'timer') {
-        this.runningTimer = setInterval(function() {
-          if ($vm.value === 0) {
+        this.timerInterval = setInterval(function() {
+          if (!$vm.hours && !$vm.minutes && !$vm.seconds) {
             Fliplet.UI.Toast({
               type: 'minimal',
               message: 'Countdown Timer has reached 0',
@@ -129,74 +129,66 @@ Fliplet.FormBuilder.field('timer', {
 
             $vm.stop();
           } else {
-            $vm.value--;
+            var totalSeconds = $vm.initialValue - $vm.updateValue();
+
+            $vm.setDisplayValues(totalSeconds);
           }
-        }, 1000);
+        }, 500);
       }
     },
-    stop: function() {
-      if (this.timerStatus === 'paused') {
+    stopInterval: function() {
+      clearInterval(this.timerInterval);
+      this.timerInterval = null;
+    },
+    get: function() {
+      return this.updateValue();
+    },
+    set: function(data) {
+      if (!/^(\d+.)*(\d+)$/.test(data)) {
         return;
       }
 
-      clearInterval(this.runningTimer);
-      this.timerStatus = 'paused';
-      Fliplet.App.Storage.remove(this.name);
+      data = parseFloat(data).toFixed(3);
+
+      this.value = this.type === 'timer' ? Math.min(this.initialValue, data) : Math.max(data, 0);
+      this.setDisplayValues(this.value);
+
+      if (this.timerStatus === 'running') {
+        this.startTimestamp = moment().unix();
+        Fliplet.App.Storage.set(this.name, this.startTimestamp);
+      }
     },
-    reset: function() {
-      this.timerStatus = 'initial';
-      this.value = this.startValue;
-      Fliplet.App.Storage.remove(this.name);
-    },
-    onBeforeSubmit: function() {
-      this.reset();
+    updateValue() {
+      return Math.floor(this.value) + (moment().unix() - this.startTimestamp);
     }
   },
   mounted: async function() {
-    if (this.type === 'stopwatch' && !this.value) {
-      this.hours = 0;
-      this.minutes = 0;
-      this.seconds = 0;
-    }
-
-    this.initTimer();
-
     var $vm = this;
 
     if (this.defaultValueSource !== 'default') {
       this.setValueFromDefaultSettings({ source: this.defaultValueSource, key: this.defaultValueKey });
     }
 
+    if (this.type === 'timer') {
+      this.initialValue = this.toSeconds(this.hours, this.minutes, this.seconds);
+    } else {
+      this.initialValue = 0;
+    }
+
     await Fliplet.App.Storage.get(this.name).then(function(value) {
       if (value) {
+        $vm.startTimestamp = value;
         $vm.timerStatus = 'running';
-        $vm.value = $vm.type === 'timer' ? $vm.value - moment().diff(value, 'seconds') : $vm.value + moment().diff(value, 'seconds');
+        $vm.setInterval();
       }
-
-      this.value = $vm.value;
     });
+
+    this.setDisplayValues(+this.initialValue);
 
     if (this.autostart) {
       this.start();
     }
 
-    this.$emit('_input', this.name, +this.value);
     this.$v.$reset();
-  },
-  watch: {
-    value: function(val) {
-      this.toHoursAndMinutes(val);
-
-      if (this.timer) {
-        this.timer.set(val, false);
-      }
-
-      this.$emit('_input', this.name, +val);
-    },
-    timerStatus: function(val) {
-      if (val === 'running' && this.runningTimer) {
-        this.start();
-      }
-    }
   }
 });

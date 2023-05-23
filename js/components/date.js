@@ -1,6 +1,6 @@
 Fliplet.FormBuilder.field('date', {
   name: 'Date picker',
-  category: 'Text inputs',
+  category: 'Date & time',
   props: {
     placeholder: {
       type: String
