@@ -339,7 +339,9 @@ Fliplet().then(function() {
             } else if (field._type === 'flDateRange' && ['default', 'always'].indexOf(fieldSettings.autofill) > -1) {
               value = fieldSettings.defaultSource === 'submission' ? moment().locale('en').format('YYYY-MM-DD') : $vm.today;
             } else if (field._type === 'flTimeRange' && ['default', 'always'].indexOf(fieldSettings.autofill) > -1) {
-              value = fieldSettings.defaultSource === 'submission' ? moment().locale('en').format('HH:mm') : $vm.now;
+              value = fieldSettings.defaultSource === 'submission'
+                ? { start: moment().locale('en').format('HH:mm'), end: moment().locale('en').format('HH:mm') }
+                : { start: $vm.now, end: $vm.now };
             } else {
               value = fieldSettings.value;
             }
