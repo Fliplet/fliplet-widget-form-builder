@@ -95,12 +95,6 @@
           "lastMonth": "Last month"
         }
       },
-      "timer": {
-        "types": {
-          "timer": "Countdown timer",
-          "stopwatch": "Stopwatch"
-        }
-      },
       "signature": {
         "actions": {
           "clear": "Clear",
