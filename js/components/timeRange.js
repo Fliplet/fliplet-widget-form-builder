@@ -96,19 +96,28 @@ Fliplet.FormBuilder.field('timeRange', {
       }
 
       if (this.timeRange) {
-        this.timeRange.set(this.value, true);
+        this.timeRange.set(val, true);
       }
 
       this.$emit('_input', this.name, val, false, true);
     }
   },
   created: function() {
+    Fliplet.FormBuilder.on('reset', this.onReset);
     Fliplet.Hooks.on('beforeFormSubmit', this.onBeforeSubmit);
   },
   destroyed: function() {
+    Fliplet.FormBuilder.off('reset', this.onReset);
     Fliplet.Hooks.off('beforeFormSubmit', this.onBeforeSubmit);
   },
   methods: {
+    onReset: function(data) {
+      if (!data || data.id !== this.$parent.id) {
+        return;
+      }
+
+      this.timeRange.set(this.value);
+    },
     initTimeRange: function() {
       var $vm = this;
 

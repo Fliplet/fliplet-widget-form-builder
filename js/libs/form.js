@@ -629,7 +629,17 @@ Fliplet().then(function() {
                   if (moment(value).isValid()) {
                     value = value.format('YYYY-MM-DD');
                   } else {
-                    value = null;
+                    value = ['default', 'always'].indexOf(field.autofill) > -1 ? $vm.today : null;
+                  }
+                }
+
+                if (type === 'flTime') {
+                  value = moment(value);
+
+                  if (moment(value).isValid()) {
+                    value = value.format('HH:mm');
+                  } else {
+                    value = ['default', 'always'].indexOf(field.autofill) > -1 ? $vm.now : null;
                   }
                 }
 
@@ -639,15 +649,15 @@ Fliplet().then(function() {
 
                 if (type === 'flTimeRange' && typeof value === 'object') {
                   value = JSON.stringify({
-                    start: value.start,
-                    end: value.end
+                    start: !value.start && ['default', 'always'].indexOf(field.autofill) > -1 ? $vm.now : value.start,
+                    end: !value.end && ['default', 'always'].indexOf(field.autofill) > -1 ? $vm.now : value.end
                   });
                 }
 
                 if (type === 'flDateRange' && typeof value === 'object') {
                   value = JSON.stringify({
-                    start: value.start,
-                    end: value.end
+                    start: !value.start && ['default', 'always'].indexOf(field.autofill) > -1 ? $vm.today : value.start,
+                    end: !value.end && ['default', 'always'].indexOf(field.autofill) > -1 ? $vm.today : value.end
                   });
                 }
 
