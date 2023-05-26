@@ -63,7 +63,7 @@ Fliplet.FormBuilder.field('timeRange', {
 
     this.initTimeRange();
 
-    this.$emit('_input', this.name, this.value, false, true);
+    this.$emit('_input', this.name, this.value);
     this.$v.$reset();
   },
   validations: function() {
@@ -86,8 +86,8 @@ Fliplet.FormBuilder.field('timeRange', {
     value: function(val) {
       if (!val && ['default', 'always'].indexOf(this.autofill) > -1 && (this.required || this.autofill === 'always')) {
         this.value = {
-          start: val.start || this.now,
-          end: val.end || this.now
+          start: this.now,
+          end: this.now
         };
       }
 
@@ -96,40 +96,24 @@ Fliplet.FormBuilder.field('timeRange', {
       }
 
       if (this.timeRange) {
-        this.timeRange.set(val, true);
+        this.timeRange.set(val, false);
       }
 
-      this.$emit('_input', this.name, val, false, true);
+      this.$emit('_input', this.name, this.value, false, true);
     }
   },
   created: function() {
-    Fliplet.FormBuilder.on('reset', this.onReset);
     Fliplet.Hooks.on('beforeFormSubmit', this.onBeforeSubmit);
   },
   destroyed: function() {
-    Fliplet.FormBuilder.off('reset', this.onReset);
     Fliplet.Hooks.off('beforeFormSubmit', this.onBeforeSubmit);
   },
   methods: {
-    onReset: function(data) {
-      if (!data || data.id !== this.$parent.id) {
-        return;
-      }
-
-      this.timeRange.set(this.value);
-    },
     initTimeRange: function() {
       var $vm = this;
 
       if (this.timeRange && !this.$refs.timeRange) {
         return;
-      }
-
-      if (!this.value && ['default', 'always'].indexOf(this.autofill) > -1 && (this.required || this.autofill === 'always')) {
-        $vm.value = {
-          start: this.now,
-          end: this.now
-        };
       }
 
       this.timeRange = Fliplet.UI.TimeRange(this.$refs.timeRange, {
