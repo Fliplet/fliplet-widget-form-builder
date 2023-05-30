@@ -63,7 +63,7 @@ Fliplet.FormBuilder.field('timeRange', {
 
     this.initTimeRange();
 
-    this.$emit('_input', this.name, this.value, false, true);
+    this.$emit('_input', this.name, this.value);
     this.$v.$reset();
   },
   validations: function() {
@@ -86,8 +86,8 @@ Fliplet.FormBuilder.field('timeRange', {
     value: function(val) {
       if (!val && ['default', 'always'].indexOf(this.autofill) > -1 && (this.required || this.autofill === 'always')) {
         this.value = {
-          start: val.start || this.now,
-          end: val.end || this.now
+          start: this.now,
+          end: this.now
         };
       }
 
@@ -96,10 +96,10 @@ Fliplet.FormBuilder.field('timeRange', {
       }
 
       if (this.timeRange) {
-        this.timeRange.set(this.value, true);
+        this.timeRange.set(val, false);
       }
 
-      this.$emit('_input', this.name, val, false, true);
+      this.$emit('_input', this.name, this.value, false, true);
     }
   },
   created: function() {
@@ -114,13 +114,6 @@ Fliplet.FormBuilder.field('timeRange', {
 
       if (this.timeRange && !this.$refs.timeRange) {
         return;
-      }
-
-      if (!this.value && ['default', 'always'].indexOf(this.autofill) > -1 && (this.required || this.autofill === 'always')) {
-        $vm.value = {
-          start: this.now,
-          end: this.now
-        };
       }
 
       this.timeRange = Fliplet.UI.TimeRange(this.$refs.timeRange, {

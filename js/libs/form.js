@@ -221,9 +221,6 @@ Fliplet().then(function() {
                 }
 
                 break;
-              case 'flTimeRange':
-                field.value = fieldData.includes('start') ? JSON.parse(fieldData) : fieldData;
-                break;
               case 'flStarRating':
                 field.options = _.times(5, function(i) {
                   return {
@@ -336,9 +333,13 @@ Fliplet().then(function() {
             } else if (field._type === 'flTime' && ['default', 'always'].indexOf(fieldSettings.autofill) > -1) {
               value = fieldSettings.defaultSource === 'submission' ? moment().locale('en').format('HH:mm') : $vm.now;
             } else if (field._type === 'flDateRange' && ['default', 'always'].indexOf(fieldSettings.autofill) > -1) {
-              value = fieldSettings.defaultSource === 'submission' ? moment().locale('en').format('YYYY-MM-DD') : $vm.today;
+              value = fieldSettings.defaultSource === 'submission'
+                ? { start: moment().locale('en').format('YYYY-MM-DD'), end: moment().locale('en').format('YYYY-MM-DD') }
+                : { start: $vm.today, end: $vm.today };
             } else if (field._type === 'flTimeRange' && ['default', 'always'].indexOf(fieldSettings.autofill) > -1) {
-              value = fieldSettings.defaultSource === 'submission' ? moment().locale('en').format('HH:mm') : $vm.now;
+              value = fieldSettings.defaultSource === 'submission'
+                ? { start: moment().locale('en').format('HH:mm'), end: moment().locale('en').format('HH:mm') }
+                : { start: $vm.now, end: $vm.now };
             } else {
               value = fieldSettings.value;
             }
@@ -624,7 +625,17 @@ Fliplet().then(function() {
                   if (moment(value).isValid()) {
                     value = value.format('YYYY-MM-DD');
                   } else {
-                    value = null;
+                    value = ['default', 'always'].indexOf(field.autofill) > -1 ? $vm.today : null;
+                  }
+                }
+
+                if (type === 'flTime') {
+                  value = moment(value);
+
+                  if (moment(value).isValid()) {
+                    value = value.format('HH:mm');
+                  } else {
+                    value = ['default', 'always'].indexOf(field.autofill) > -1 ? $vm.now : null;
                   }
                 }
 
@@ -633,17 +644,46 @@ Fliplet().then(function() {
                 }
 
                 if (type === 'flTimeRange' && typeof value === 'object') {
-                  value = JSON.stringify({
-                    start: value.start,
-                    end: value.end
-                  });
+                  if (!value.start && !value.end) {
+                    switch (field.autofill) {
+                      case 'default':
+                      case 'always':
+                        value = {
+                          start: field.defaultSource === 'submission' ? moment().format('HH:mm') : $vm.now,
+                          end: field.defaultSource === 'submission' ? moment().format('HH:mm') : $vm.now
+                        };
+
+                        break;
+                      case 'custom':
+                        value = null;
+                        break;
+                      default:
+                        break;
+                    }
+                  }
                 }
 
                 if (type === 'flDateRange' && typeof value === 'object') {
-                  value = JSON.stringify({
-                    start: value.start,
-                    end: value.end
-                  });
+                  if (!value.start && !value.end) {
+                    switch (field.autofill) {
+                      case 'default':
+                      case 'always':
+                        value = {
+                          start: field.defaultSource === 'submission' ? moment().format('YYYY-MM-DD') : $vm.today,
+                          end: field.defaultSource === 'submission' ? moment().format('YYYY-MM-DD') : $vm.today
+                        };
+
+                        break;
+
+                      case 'custom':
+                        value = null;
+
+                        break;
+
+                      default:
+                        break;
+                    }
+                  }
                 }
 
                 if (type === 'flFile') {
