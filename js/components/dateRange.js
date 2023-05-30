@@ -234,10 +234,7 @@ Fliplet.FormBuilder.field('dateRange', {
             end: this.formatDate(moment().subtract(1, 'days'))
           };
         default:
-          return {
-            start: this.formatDate(),
-            end: this.formatDate()
-          };
+          return this.value;
       }
     },
     formatDate: function(date) {
