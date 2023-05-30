@@ -6,6 +6,14 @@ Fliplet.FormBuilder.field('dateRange', {
       type: Object,
       default: null
     },
+    startValue: {
+      type: String,
+      default: ''
+    },
+    endValue: {
+      type: String,
+      default: ''
+    },
     description: {
       type: String
     },
@@ -83,6 +91,12 @@ Fliplet.FormBuilder.field('dateRange', {
     }
 
     switch (this.autofill) {
+      case 'custom':
+        this.value = {
+          start: this.startValue,
+          end: this.endValue
+        };
+        break;
       case 'default':
       case 'always':
         this.value = {
@@ -138,10 +152,9 @@ Fliplet.FormBuilder.field('dateRange', {
       this.$emit('_input', this.name, val, false, true);
     },
     selectedRange: function(range) {
-      var $vm = this;
       var newDate = this.getDate(range.value);
 
-      $vm.value = newDate;
+      this.value = newDate;
     }
   },
   created: function() {
@@ -222,13 +235,13 @@ Fliplet.FormBuilder.field('dateRange', {
     formatDate: function(date) {
       return typeof date !== 'undefined' && moment(date).isValid()
         ? moment(date).locale('en').format('YYYY-MM-DD')
-        : moment(date).locale('en').format('YYYY-MM-DD');
+        : moment().locale('en').format('YYYY-MM-DD');
     },
     onBeforeSubmit: function(data) {
       // Empty date fields are validated to null before this hook is called
       if (this.autofill === 'always' && data[this.name] === null) {
         data[this.name] = this.defaultSource === 'submission'
-          ? { start: '', end: '' }
+          ? { start: this.formatDate(), end: this.formatDate() }
           : { start: this.today, end: this.today };
       }
     }
