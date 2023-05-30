@@ -20,6 +20,14 @@ Fliplet.FormBuilder.field('timeRange', {
     empty: {
       type: Boolean,
       default: true
+    },
+    startValue: {
+      type: String,
+      default: ''
+    },
+    endValue: {
+      type: String,
+      default: ''
     }
   },
   data: function() {
@@ -46,6 +54,12 @@ Fliplet.FormBuilder.field('timeRange', {
     }
 
     switch (this.autofill) {
+      case 'custom':
+        this.value = {
+          start: this.startValue,
+          end: this.endValue
+        };
+        break;
       case 'default':
       case 'always':
         this.value = {
@@ -96,7 +110,7 @@ Fliplet.FormBuilder.field('timeRange', {
       }
 
       if (this.timeRange) {
-        this.timeRange.set(val, false);
+        this.timeRange.set(val, true);
       }
 
       this.$emit('_input', this.name, this.value, false, true);

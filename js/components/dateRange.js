@@ -83,8 +83,6 @@ Fliplet.FormBuilder.field('dateRange', {
     };
   },
   mounted: function() {
-    this.initDaterange();
-
     if (this.defaultValueSource !== 'default') {
       this.setValueFromDefaultSettings({
         source: this.defaultValueSource,
@@ -102,8 +100,8 @@ Fliplet.FormBuilder.field('dateRange', {
       case 'default':
       case 'always':
         this.value = {
-          start: this.value && this.value.start ? this.value.start : this.today,
-          end: this.value && this.value.end ? this.value.end : this.today
+          start: this.today,
+          end: this.today
         };
         this.empty = false;
         break;
@@ -113,6 +111,8 @@ Fliplet.FormBuilder.field('dateRange', {
       default:
         break;
     }
+
+    this.initDaterange();
 
     this.$emit('_input', this.name, this.value, false, true);
   },
@@ -166,12 +166,7 @@ Fliplet.FormBuilder.field('dateRange', {
     Fliplet.Hooks.off('beforeFormSubmit', this.onBeforeSubmit);
   },
   methods: {
-    onReset: function(data) {
-      if (!data || data.id !== this.$parent.id) {
-        return;
-      }
-
-      this.dateRange.set(this.value);
+    onReset: function() {
       this.selectedRange = {
         label: T('widgets.form.dateRange.rangePlaceholder'),
         value: ''
@@ -234,21 +229,20 @@ Fliplet.FormBuilder.field('dateRange', {
             end: this.formatDate(moment().subtract(1, 'days'))
           };
         default:
-          return {
-            start: this.formatDate(),
-            end: this.formatDate()
-          };
+          return this.value;
       }
     },
     formatDate: function(date) {
-      return typeof date !== 'undefined' && moment(date).isValid() ? moment(date).locale('en').format('YYYY-MM-DD') : moment(date).locale('en').format('YYYY-MM-DD');
+      return typeof date !== 'undefined' && moment(date).isValid()
+        ? moment(date).locale('en').format('YYYY-MM-DD')
+        : moment().locale('en').format('YYYY-MM-DD');
     },
     onBeforeSubmit: function(data) {
       // Empty date fields are validated to null before this hook is called
       if (this.autofill === 'always' && data[this.name] === null) {
         data[this.name] = this.defaultSource === 'submission'
-          ? { start: '', end: '' }
-          : JSON.stringify({ start: this.today, end: this.today });
+          ? { start: this.formatDate(), end: this.formatDate() }
+          : { start: this.today, end: this.today };
       }
     }
   }
