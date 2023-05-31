@@ -48,14 +48,8 @@
   <label>Default value</label>
   <div class="text-danger" v-if="errors.requiredField"> \{{ errors.requiredField }} </div>
   <div class="fl-time-range form-html">
-    <div class="form-group focus-outline">
-      <input class="form-control basic-time-picker" type="time" v-model.trim="startValue" />
-    </div>
-    <div class="arrow-right">
-      <i class="icon fa fa-long-arrow-right fa-fw"></i>
-    </div>
-    <div class="form-group focus-outline">
-      <input class="form-control basic-time-picker" type="time" v-model.trim="endValue" />
-    </div>
+    <input class="form-control basic-time-picker" type="time" v-model.trim="startValue" />
+    <i class="icon fa fa-long-arrow-right fa-fw"></i>
+    <input class="form-control basic-time-picker" type="time" v-model.trim="endValue" />
   </div>
 </div>

@@ -281,6 +281,10 @@ nav > .btn {
   border: 1px solid #ccc;
 }
 
+.form-preview .fl-date-range .fl-date-picker {
+  min-width: 100px;
+}
+
 .components-list {
   overflow: auto;
   height: 100%;
@@ -539,8 +543,9 @@ nav > .btn {
   color: #e1e1e1;
 }
 
-.fl-time-range {
-  column-gap: 7px;
+.fl-time-range,
+.fl-date-range {
+  column-gap: 5px;
 }
 
 input[type="time"].form-control {
