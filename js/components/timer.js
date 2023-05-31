@@ -2,6 +2,10 @@ Fliplet.FormBuilder.field('timer', {
   name: 'Timer',
   category: 'Date & time',
   props: {
+    value: {
+      type: Number,
+      default: 0
+    },
     description: {
       type: String
     },
@@ -30,9 +34,10 @@ Fliplet.FormBuilder.field('timer', {
     return {
       isPreview: Fliplet.Env.get('preview'),
       timerStatus: 'stopped',
-      initialValue: 0,
+      initialTimerValue: 0,
       timerInterval: null,
-      startTimestamp: moment().unix()
+      startTimestamp: moment().valueOf() / 1000,
+      stringValue: ''
     };
   },
   validations: function() {
@@ -46,11 +51,6 @@ Fliplet.FormBuilder.field('timer', {
 
     return rules;
   },
-  computed: {
-    stringValue: function() {
-      return `${this.hours < 10 ? '0' + this.hours : this.hours} : ${this.minutes < 10 ? '0' + this.minutes : this.minutes} : ${this.seconds < 10 ? '0' + this.seconds : this.seconds}`;
-    }
-  },
   created: function() {
     Fliplet.FormBuilder.on('reset', this.reset);
     Fliplet.Hooks.on('beforeFormSubmit', this.stop);
@@ -60,12 +60,17 @@ Fliplet.FormBuilder.field('timer', {
     Fliplet.Hooks.off('beforeFormSubmit', this.stop);
   },
   methods: {
-    setDisplayValues: function(totalSeconds) {
-      const totalMinutes = Math.floor(totalSeconds / 60);
+    formatSeconds: function(seconds) {
+      var hours = Math.floor(seconds / 3600);
+      var minutes = Math.floor((seconds % 3600) / 60);
+      var remainingSeconds = Math.floor(seconds % 60);
 
-      this.seconds = totalSeconds % 60;
-      this.hours = Math.floor(totalMinutes / 60);
-      this.minutes = totalMinutes % 60;
+      // Add leading zeros if necessary
+      var hoursStr = hours.toString().padStart(2, '0');
+      var minutesStr = minutes.toString().padStart(2, '0');
+      var secondsStr = remainingSeconds.toString().padStart(2, '0');
+
+      return hoursStr + ' : ' + minutesStr + ' : ' + secondsStr;
     },
     toSeconds: function(hours, minutes, seconds) {
       return (+hours * 60 * 60) + (+minutes * 60) + +seconds;
@@ -76,7 +81,7 @@ Fliplet.FormBuilder.field('timer', {
       }
 
       this.timerStatus = 'running';
-      this.startTimestamp = moment().unix();
+      this.startTimestamp = moment().valueOf() / 1000;
       Fliplet.App.Storage.set(this.name, this.startTimestamp);
       this.setInterval();
     },
@@ -99,7 +104,7 @@ Fliplet.FormBuilder.field('timer', {
         this.stopInterval();
       }
 
-      this.setDisplayValues(this.initialValue);
+      this.stringValue = this.formatSeconds(this.initialTimerValue);
     },
     setInterval: function() {
       var $vm = this;
@@ -108,11 +113,13 @@ Fliplet.FormBuilder.field('timer', {
         this.timerInterval = setInterval(function() {
           var totalSeconds = $vm.updateValue();
 
-          $vm.setDisplayValues(totalSeconds);
+          $vm.stringValue = $vm.formatSeconds(totalSeconds);
         }, 500);
       } else if (this.type === 'timer') {
         this.timerInterval = setInterval(function() {
-          if (!$vm.hours && !$vm.minutes && !$vm.seconds) {
+          var totalSeconds = $vm.initialTimerValue - $vm.updateValue();
+
+          if (Math.round(totalSeconds) === 0) {
             Fliplet.UI.Toast({
               type: 'minimal',
               message: 'Countdown Timer has reached 0',
@@ -129,9 +136,7 @@ Fliplet.FormBuilder.field('timer', {
 
             $vm.stop();
           } else {
-            var totalSeconds = $vm.initialValue - $vm.updateValue();
-
-            $vm.setDisplayValues(totalSeconds);
+            $vm.stringValue = $vm.formatSeconds(totalSeconds);
           }
         }, 500);
       }
@@ -150,16 +155,18 @@ Fliplet.FormBuilder.field('timer', {
 
       data = parseFloat(data).toFixed(3);
 
-      this.value = this.type === 'timer' ? Math.min(this.initialValue, data) : Math.max(data, 0);
-      this.setDisplayValues(this.value);
+      this.value = this.type === 'timer'
+        ? Math.max(Math.min(this.initialTimerValue, data), 0)
+        : Math.max(data, 0);
+      this.stringValue = this.formatSeconds(this.value);
 
       if (this.timerStatus === 'running') {
-        this.startTimestamp = moment().unix();
+        this.startTimestamp = moment().valueOf() / 1000;
         Fliplet.App.Storage.set(this.name, this.startTimestamp);
       }
     },
     updateValue() {
-      return Math.floor(this.value) + (moment().unix() - this.startTimestamp);
+      return (+this.value + +(moment().valueOf() / 1000 - +this.startTimestamp)).toFixed(3);
     }
   },
   mounted: async function() {
@@ -170,12 +177,12 @@ Fliplet.FormBuilder.field('timer', {
     }
 
     if (this.type === 'timer') {
-      this.initialValue = this.toSeconds(this.hours, this.minutes, this.seconds);
+      this.initialTimerValue = this.toSeconds(this.hours, this.minutes, this.seconds);
     } else {
-      this.initialValue = 0;
+      this.initialTimerValue = 0;
     }
 
-    await Fliplet.App.Storage.get(this.name).then(function(value) {
+    Fliplet.App.Storage.get(this.name).then(function(value) {
       if (value) {
         $vm.startTimestamp = value;
         $vm.timerStatus = 'running';
@@ -183,12 +190,18 @@ Fliplet.FormBuilder.field('timer', {
       }
     });
 
-    this.setDisplayValues(+this.initialValue);
+    this.stringValue = this.formatSeconds(this.initialTimerValue);
 
     if (this.autostart) {
       this.start();
     }
 
+    this.$emit('_input', this.name, this.value);
     this.$v.$reset();
+  },
+  watch: {
+    value: function() {
+      this.$emit('_input', this.name, this.value, false, true);
+    }
   }
 });

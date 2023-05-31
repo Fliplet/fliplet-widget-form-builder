@@ -492,7 +492,14 @@ Fliplet.FormBuilder = (function() {
             }
 
             break;
+          case 'flTimer':
+            if (this.type === 'timer' && this.hours === 0 && this.minutes === 0 && this.seconds === 0) {
+              _.assignIn(this.errors, {
+                requiredField: 'This field is required*'
+              });
+            }
 
+            break;
           case 'flSlider':
             var max = !this.max ? 100 : Number(this.max);
             var min = !this.min ? 0 : Number(this.min);

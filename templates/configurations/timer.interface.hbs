@@ -1,17 +1,17 @@
 <div v-if="type === 'timer'" class="form-group">
   <label class="control-label">Start time</label>
   <div class="text-danger" v-if="errors.requiredField"> \{{ errors.requiredField }} </div>
-  <div class="form-group fl-timer">
-    <div>
-      <input type="number" name="hours" id="hours" class="form-control" v-model="hours" min="0"/>
+  <div class="fl-timer">
+    <div class="col-sm-4">
+      <input type="number" name="hours" class="form-control" v-model="hours" min="0"/>
       <span>hours</label>
     </div>
-    <div>
-      <input type="number" name="minutes" id="minutes" class="form-control" v-model="minutes" min="0" max="60"/>
+    <div class="col-sm-4">
+      <input type="number" name="minutes" class="form-control" v-model="minutes" min="0" max="60"/>
       <span>minutes</span>
     </div>
-    <div>
-      <input type="number" name="seconds" id="seconds" class="form-control" v-model="seconds" min="0" max="60"/>
+    <div class="col-sm-4">
+      <input type="number" name="seconds" class="form-control" v-model="seconds" min="0" max="60"/>
       <span>seconds</span>
     </div>
   </div>
@@ -25,23 +25,5 @@
     <label for="autostart">
       <span class="check"><i class="fa fa-check"></i></span> Enable autostart
     </label>
-  </div>
-</div>
-
-<div class="form-group">
-  <label class="control-label">Timer controls</label>
-  <div>
-    <div class="radio radio-icon">
-      <input type="radio" id="unable" name="unable" v-bind:value="true" v-model="readonly">
-      <label for="unable">
-        <span class="check"><i class="fa fa-circle"></i></span>User can start, stop and reset the timer
-      </label>
-    </div>
-    <div class="radio radio-icon">
-      <input type="radio" id="able" name="able" v-bind:value="false" v-model="readonly">
-      <label for="able">
-        <span class="check"><i class="fa fa-circle"></i></span>User cannot control the timer
-      </label>
-    </div>
   </div>
 </div>

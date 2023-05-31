@@ -556,7 +556,15 @@ input[type="time"]:not(.basic-time-picker)::-webkit-calendar-picker-indicator {
 }
 
 .fl-timer {
-  column-gap: 8px;
+  width: 100%;
+  display: flex;
+  column-gap: 10px;
+  margin-top: 5px;
+}
+
+.fl-timer > div{
+  padding-right: 0;
+  padding-left: 0;
 }
 
 /* SLIDER FIELD */

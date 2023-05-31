@@ -190,6 +190,27 @@
       {{{ template }}}
     </div>
 
+    {{#if isTimer}}
+    <div class="form-group">
+      <div class="col-xs-12">
+        <label class="control-label">Timer controls</label>
+      </div>
+      <div class="col-xs-12">
+        <div class="radio radio-icon">
+          <input type="radio" id="unable" name="unable" v-bind:value="false" v-model="readonly">
+          <label for="unable">
+            <span class="check"><i class="fa fa-circle"></i></span>User can start, stop and reset the timer
+          </label>
+        </div>
+        <div class="radio radio-icon">
+          <input type="radio" id="able" name="able" v-bind:value="true" v-model="readonly">
+          <label for="able">
+            <span class="check"><i class="fa fa-circle"></i></span>User cannot control the timer
+          </label>
+        </div>
+      </div>
+    </div>
+    {{else}}
     <div v-if='_readOnlyComponents.includes(_componentName)' class="col-xs-12 form-group">
       <div class="checkbox checkbox-icon">
         <input type="checkbox" id="readonly" name="readonly" v-model="readonly">
@@ -198,7 +219,7 @@
         </label>
       </div>
     </div>
-
+    {{/if}}
   </div>
 
   <div class="footer">
