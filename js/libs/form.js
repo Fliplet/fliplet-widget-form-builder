@@ -114,6 +114,45 @@ Fliplet().then(function() {
       };
     }
 
+    function loadFieldValueFromSource(field) {
+      var result;
+
+      switch (field.defaultValueSource) {
+        case 'appStorage':
+          var storage = field.source === 'storage'
+            ? Fliplet.Storage
+            : Fliplet.App.Storage;
+
+          result = storage.get(field.defaultValueKey);
+
+          break;
+
+        case 'query':
+          result = Fliplet.Navigate.query[field.defaultValueKey];
+
+          break;
+
+        default:
+          break;
+      }
+
+
+      if (!(result instanceof Promise)) {
+        result = Promise.resolve(result);
+      }
+
+      result.then(function(val) {
+        if (field._type === 'flCheckbox') {
+          if (!Array.isArray(val)) {
+            val = _.compact([val]);
+          }
+        }
+
+        field.value = val;
+        debounce();
+      });
+    }
+
     function getFields(isEditMode) {
       var fields = _.compact(JSON.parse(JSON.stringify(data.fields || [])));
       var progress = getProgress();
@@ -135,9 +174,17 @@ Fliplet().then(function() {
       if (fields.length && (data.saveProgress && typeof progress === 'object') || entry) {
         fields.forEach(function(field) {
           if (entry && entry.data && field.populateOnUpdate !== false) {
-            var fieldData = entry.data[field.defaultValueKey || field.name];
+            var fieldKey = isResetAction
+              ? field.defaultValueKey || field.name
+              : field.name || field.defaultValueKey;
 
-            if (typeof fieldData === 'undefined' && field._submit) {
+            var fieldData = entry.data[fieldKey];
+
+            if (typeof fieldData === 'undefined') {
+              fieldData = entry.data[field.name] || entry.data[field.defaultValueKey];
+            }
+
+            if (!field._submit) {
               return; // do not update the field value
             }
 
@@ -227,6 +274,10 @@ Fliplet().then(function() {
                     id: '' + (i + 1)
                   };
                 });
+
+                if (!isResetAction) {
+                  field.value = fieldData;
+                }
 
                 break;
 
@@ -328,10 +379,22 @@ Fliplet().then(function() {
               if (!Array.isArray(value)) {
                 value = value.split(/\n/);
               }
-            } else if (field._type === 'flDate' && ['default', 'always'].indexOf(fieldSettings.autofill) > -1) {
-              value = fieldSettings.defaultSource === 'submission' ? moment().locale('en').format('YYYY-MM-DD') : $vm.today;
-            } else if (field._type === 'flTime' && ['default', 'always'].indexOf(fieldSettings.autofill) > -1) {
-              value = fieldSettings.defaultSource === 'submission' ? moment().locale('en').format('HH:mm') : $vm.now;
+            } else if (field._type === 'flDate') {
+              if (['default', 'always'].indexOf(fieldSettings.autofill) > -1) {
+                value = fieldSettings.defaultSource === 'submission' ? moment().locale('en').format('YYYY-MM-DD') : $vm.today;
+              } else if (fieldSettings.autofill === 'empty' && fieldSettings.defaultSource === 'load') {
+                $vm.loadEntryForUpdate();
+              } else {
+                value = fieldSettings.value;
+              }
+            } else if (field._type === 'flTime') {
+              if (['default', 'always'].indexOf(fieldSettings.autofill) > -1) {
+                value = fieldSettings.defaultSource === 'submission' ? moment().locale('en').format('HH:mm') : $vm.now;
+              } else if (fieldSettings.autofill === 'empty' && fieldSettings.defaultSource === 'load') {
+                $vm.loadEntryForUpdate();
+              } else {
+                value = fieldSettings.value;
+              }
             } else if (field._type === 'flDateRange') {
               if (['default', 'always'].indexOf(fieldSettings.autofill) > -1) {
                 value = fieldSettings.defaultSource === 'submission'
@@ -363,9 +426,34 @@ Fliplet().then(function() {
               value = value.slice(0);
             }
 
-            if (typeof field.defaultValueSource !== 'undefined' && field.defaultValueSource !== 'default' && !entryLoaded) {
-              $vm.loadEntryForUpdate();
-              entryLoaded = true;
+            if (typeof field.defaultValueSource !== 'undefined') {
+              switch (field.defaultValueSource) {
+                case 'profile':
+                  if (!entryLoaded) {
+                    $vm.loadEntryForUpdate();
+                    entryLoaded = true;
+                  }
+
+                  break;
+                case 'appStorage':
+                  if (!field.defaultValueKey) {
+                    throw new Error('A key is required to fetch data from the storage');
+                  }
+
+                  loadFieldValueFromSource(field);
+
+                  break;
+                case 'query':
+                  if (!field.defaultValueKey) {
+                    throw new Error('A key is required to fetch data from the navigation query parameters');
+                  }
+
+                  loadFieldValueFromSource(field);
+
+                  break;
+                default:
+                  break;
+              }
             }
 
             field.value = value;
@@ -644,7 +732,7 @@ Fliplet().then(function() {
                 }
 
                 if (type === 'flTime') {
-                  value = moment(value);
+                  value = moment(value, 'HH:mm a');
 
                   if (moment(value).isValid()) {
                     value = value.format('HH:mm');

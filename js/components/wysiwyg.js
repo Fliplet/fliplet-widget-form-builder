@@ -190,7 +190,7 @@ Fliplet.FormBuilder.field('wysiwyg', {
           $vm.addPlaceholder();
           $vm.addBulletedListShortcutsWindows();
 
-          if ($vm.defaultValueSource !== 'default') {
+          if ($vm.defaultValueSource !== 'default' && !$vm.value) {
             $vm.setValueFromDefaultSettings({ source: $vm.defaultValueSource, key: $vm.defaultValueKey });
           }
 

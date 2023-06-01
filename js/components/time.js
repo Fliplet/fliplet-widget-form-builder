@@ -75,6 +75,9 @@ Fliplet.FormBuilder.field('time', {
   computed: {
     isApplyCurrentDateField: function() {
       return this.autofill === 'always' || this.autofill === 'default';
+    },
+    isDefaultValueField: function() {
+      return this.autofill === 'custom';
     }
   },
   beforeUpdate: function() {
