@@ -3,15 +3,15 @@
   <div class="text-danger" v-if="errors.requiredField"> \{{ errors.requiredField }} </div>
   <div class="fl-timer">
     <div class="col-sm-4">
-      <input type="number" name="hours" class="form-control" v-model="hours" min="0"/>
+      <input type="number" name="hours" class="form-control" v-model.number="hours" min="0"/>
       <span>hours</label>
     </div>
     <div class="col-sm-4">
-      <input type="number" name="minutes" class="form-control" v-model="minutes" min="0" max="60"/>
+      <input type="number" name="minutes" class="form-control" v-model.number="minutes" min="0" max="60"/>
       <span>minutes</span>
     </div>
     <div class="col-sm-4">
-      <input type="number" name="seconds" class="form-control" v-model="seconds" min="0" max="60"/>
+      <input type="number" name="seconds" class="form-control" v-model.number="seconds" min="0" max="60"/>
       <span>seconds</span>
     </div>
   </div>

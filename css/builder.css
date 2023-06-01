@@ -567,7 +567,7 @@ input[type="time"]:not(.basic-time-picker)::-webkit-calendar-picker-indicator {
   margin-top: 5px;
 }
 
-.fl-timer > div{
+.fl-timer > div {
   padding-right: 0;
   padding-left: 0;
 }

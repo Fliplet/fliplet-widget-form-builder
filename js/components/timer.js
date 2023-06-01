@@ -28,13 +28,16 @@ Fliplet.FormBuilder.field('timer', {
     seconds: {
       type: Number,
       default: 0
+    },
+    initialTimerValue: {
+      type: Number,
+      default: 0
     }
   },
   data: function() {
     return {
       isPreview: Fliplet.Env.get('preview'),
       timerStatus: 'stopped',
-      initialTimerValue: 0,
       timerInterval: null,
       startTimestamp: moment().valueOf() / 1000,
       stringValue: ''
@@ -166,20 +169,16 @@ Fliplet.FormBuilder.field('timer', {
       }
     },
     updateValue() {
-      return (+this.value + +(moment().valueOf() / 1000 - +this.startTimestamp)).toFixed(3);
+      return this.value + (moment().valueOf() / 1000 - this.startTimestamp);
     }
   },
   mounted: async function() {
     var $vm = this;
 
+    this.value = 0;
+
     if (this.defaultValueSource !== 'default') {
       this.setValueFromDefaultSettings({ source: this.defaultValueSource, key: this.defaultValueKey });
-    }
-
-    if (this.type === 'timer') {
-      this.initialTimerValue = this.toSeconds(this.hours, this.minutes, this.seconds);
-    } else {
-      this.initialTimerValue = 0;
     }
 
     Fliplet.App.Storage.get(this.name).then(function(value) {
@@ -201,6 +200,8 @@ Fliplet.FormBuilder.field('timer', {
   },
   watch: {
     value: function() {
+      this.value = Math.round(this.value * 1000) / 1000;
+
       this.$emit('_input', this.name, this.value, false, true);
     }
   }

@@ -367,9 +367,15 @@ Fliplet.FormBuilder = (function() {
         }
 
         if (this._componentName === 'flTimer') {
-          data.hours = !data.hours ? 0 : +data.hours;
-          data.minutes = !data.minutes ? 0 : +data.minutes;
-          data.seconds = !data.seconds ? 0 : +data.seconds;
+          if (data.type === 'timer') {
+            data.initialTimerValue = (data.hours * 60 * 60) + (data.minutes * 60) + data.seconds;
+          } else {
+            data.initialTimerValue = 0;
+          }
+
+          delete data.hours;
+          delete data.minutes;
+          delete data.seconds;
         }
 
         if (this._componentName === 'flSlider') {
@@ -487,7 +493,7 @@ Fliplet.FormBuilder = (function() {
           case 'flTime':
             if (this.autofill === 'custom' && !this.value) {
               _.assignIn(this.errors, {
-                requiredField: 'This field is required*'
+                requiredField: 'This field is required'
               });
             }
 
@@ -495,7 +501,7 @@ Fliplet.FormBuilder = (function() {
           case 'flTimer':
             if (this.type === 'timer' && this.hours === 0 && this.minutes === 0 && this.seconds === 0) {
               _.assignIn(this.errors, {
-                requiredField: 'This field is required*'
+                requiredField: 'This field is required'
               });
             }
 
