@@ -1095,6 +1095,7 @@ Fliplet().then(function() {
             },
             field: function(key) {
               var field = $form.getField(key);
+              var instance = _.find($form.$children, { name: field.name });
 
               if (!field) {
                 throw new Error('The field ' + key + ' has not been found.');
@@ -1276,7 +1277,44 @@ Fliplet().then(function() {
                   // Update live field
                   field.options = options;
                 },
-                instance: field
+                on: function(eventName, fn) {
+                  var eventListeners = data.fieldEventListeners;
+
+                  if (!eventListeners) {
+                    eventListeners = {};
+                  }
+
+                  eventListeners[field.name] = eventListeners[field.name] || {};
+                  eventListeners[field.name][eventName] = eventListeners[field.name][eventName] || [];
+                  eventListeners[field.name][eventName].push(fn);
+
+                  data.fieldEventListeners = eventListeners;
+                },
+                off: function(eventName, fn) {
+                  var eventListeners = data.fieldEventListeners[field.name][eventName];
+
+                  if (!eventListeners) {
+                    return;
+                  }
+
+                  // No function provided. Clear all hook callbacks.
+                  if (typeof fn === 'undefined') {
+                    eventListeners = [];
+
+                    return;
+                  }
+
+                  // Remove matching handler
+                  eventListeners.forEach(function(handler, i) {
+                    if (handler === fn) {
+                      eventListeners.splice(i, 1);
+                    }
+                  });
+
+                  data.fieldEventListeners[field.name][eventName] = eventListeners;
+                },
+                instance: field,
+                $instance: instance
               };
             }
           });

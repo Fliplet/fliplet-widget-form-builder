@@ -572,22 +572,42 @@ input[type="time"]:not(.basic-time-picker)::-webkit-calendar-picker-indicator {
   padding-left: 0;
 }
 
+.form-group.fl-timer .btn {
+  margin-bottom: 0;
+}
 /* SLIDER FIELD */
 
-[data-widget-package="com.fliplet.form-builder"] .form-group.fl-range-slider.readonly .range-slider-handle-value,
-[data-widget-package="com.fliplet.form-builder"] .form-group.fl-range-slider.disabled .range-slider-handle-value,
-[data-widget-package="com.fliplet.form-builder"] .form-group.fl-range-slider.readonly .range-slider-handle,
-[data-widget-package="com.fliplet.form-builder"] .form-group.fl-range-slider.disabled .range-slider-handle,
-[data-widget-package="com.fliplet.form-builder"] .form-group.fl-range-slider.readonly .range-slider-fill,
-[data-widget-package="com.fliplet.form-builder"] .form-group.fl-range-slider.disabled .range-slider-fill {
+[data-widget-package="com.fliplet.form-builder"]
+  .form-group.fl-range-slider.readonly
+  .range-slider-handle-value,
+[data-widget-package="com.fliplet.form-builder"]
+  .form-group.fl-range-slider.disabled
+  .range-slider-handle-value,
+[data-widget-package="com.fliplet.form-builder"]
+  .form-group.fl-range-slider.readonly
+  .range-slider-handle,
+[data-widget-package="com.fliplet.form-builder"]
+  .form-group.fl-range-slider.disabled
+  .range-slider-handle,
+[data-widget-package="com.fliplet.form-builder"]
+  .form-group.fl-range-slider.readonly
+  .range-slider-fill,
+[data-widget-package="com.fliplet.form-builder"]
+  .form-group.fl-range-slider.disabled
+  .range-slider-fill {
   background-color: #e1e1e1;
 }
 
-[data-widget-package="com.fliplet.form-builder"] .form-group.fl-range-slider.readonly .range-slider-handle-value::before {
+[data-widget-package="com.fliplet.form-builder"]
+  .form-group.fl-range-slider.readonly
+  .range-slider-handle-value::before {
   border-top-color: #e1e1e1;
 }
 
-[data-widget-package="com.fliplet.form-builder"] .form-group.fl-range-slider .range-slider.range-slider-active .range-slider-handle {
+[data-widget-package="com.fliplet.form-builder"]
+  .form-group.fl-range-slider
+  .range-slider.range-slider-active
+  .range-slider-handle {
   box-shadow: 0px 0px 0px 2px rgb(0 171 209 / 25%);
 }
 
@@ -598,12 +618,12 @@ input[type="time"]:not(.basic-time-picker)::-webkit-calendar-picker-indicator {
 .form-group.fl-range-slider .range-slider-handle-value,
 .form-group.fl-range-slider .range-slider-handle,
 .form-group.fl-range-slider .range-slider-fill {
-  color: #2D2D2D;
-  background-color: #E1E1E1;
+  color: #2d2d2d;
+  background-color: #e1e1e1;
 }
 
 .form-group.fl-range-slider .range-slider-handle-value:before {
-  border-top-color: #E1E1E1;
+  border-top-color: #e1e1e1;
 }
 
 /* STAR RATING */
@@ -759,7 +779,11 @@ input[type="time"]:not(.basic-time-picker)::-webkit-calendar-picker-indicator {
   border-radius: 5px;
 }
 
-[data-widget-package="com.fliplet.form-builder"] [_type="flSignature"] .signature-editor.readonly .field-signature canvas {
+[data-widget-package="com.fliplet.form-builder"]
+  [_type="flSignature"]
+  .signature-editor.readonly
+  .field-signature
+  canvas {
   background-color: transparent;
   border-radius: 0%;
   border: none !important;

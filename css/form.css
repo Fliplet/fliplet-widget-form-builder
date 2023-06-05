@@ -1032,6 +1032,15 @@ html[dir="rtl"] .radio.radio-icon input[type="radio"] + label > span.check {
   color: #e1e1e1;
 }
 
+.fl-timer {
+  display: flex;
+  column-gap: 8px;
+}
+
+.form-group.fl-timer .btn {
+  margin-bottom: 0;
+}
+
 /* SLIDER FIELD */
 
 [data-widget-package="com.fliplet.form-builder"] .form-group.fl-range-slider .range-slider {

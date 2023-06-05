@@ -37,7 +37,7 @@ Fliplet.FormBuilder.field('timer', {
   data: function() {
     return {
       isPreview: Fliplet.Env.get('preview'),
-      timerStatus: 'stopped',
+      status: 'stopped',
       timerInterval: null,
       startTimestamp: moment().valueOf() / 1000,
       stringValue: ''
@@ -79,35 +79,38 @@ Fliplet.FormBuilder.field('timer', {
       return (+hours * 60 * 60) + (+minutes * 60) + +seconds;
     },
     start: function() {
-      if (this.timerStatus === 'running') {
+      if (this.status === 'running') {
         return;
       }
 
-      this.timerStatus = 'running';
+      this.status = 'running';
       this.startTimestamp = moment().valueOf() / 1000;
       Fliplet.App.Storage.set(this.name, this.startTimestamp);
       this.setInterval();
     },
     stop: function() {
-      if (this.timerStatus === 'stopped') {
+      if (this.status === 'stopped') {
         return;
       }
 
       this.value = this.updateValue();
       Fliplet.App.Storage.remove(this.name);
-      this.timerStatus = 'stopped';
+      this.status = 'stopped';
       this.stopInterval();
     },
     reset: function() {
       this.value = 0;
 
-      if (this.timerStatus === 'running') {
+      if (this.status === 'running') {
         Fliplet.App.Storage.remove(this.name);
-        this.timerStatus = 'stopped';
+        this.status = 'stopped';
         this.stopInterval();
       }
 
       this.stringValue = this.formatSeconds(this.initialTimerValue);
+    },
+    isRunning: function() {
+      return this.status === 'running';
     },
     setInterval: function() {
       var $vm = this;
@@ -163,7 +166,7 @@ Fliplet.FormBuilder.field('timer', {
         : Math.max(data, 0);
       this.stringValue = this.formatSeconds(this.value);
 
-      if (this.timerStatus === 'running') {
+      if (this.status === 'running') {
         this.startTimestamp = moment().valueOf() / 1000;
         Fliplet.App.Storage.set(this.name, this.startTimestamp);
       }
@@ -184,7 +187,7 @@ Fliplet.FormBuilder.field('timer', {
     Fliplet.App.Storage.get(this.name).then(function(value) {
       if (value) {
         $vm.startTimestamp = value;
-        $vm.timerStatus = 'running';
+        $vm.status = 'running';
         $vm.setInterval();
       }
     });
@@ -192,8 +195,10 @@ Fliplet.FormBuilder.field('timer', {
     this.stringValue = this.formatSeconds(this.initialTimerValue);
 
     if (this.autostart) {
-      this.start();
+      this.status = 'running';
     }
+
+    $(this.$refs.timer).data('flTimer', this);
 
     this.$emit('_input', this.name, this.value);
     this.$v.$reset();
