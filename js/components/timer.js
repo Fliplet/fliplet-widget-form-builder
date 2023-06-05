@@ -198,8 +198,6 @@ Fliplet.FormBuilder.field('timer', {
       this.status = 'running';
     }
 
-    $(this.$refs.timer).data('flTimer', this);
-
     this.$emit('_input', this.name, this.value);
     this.$v.$reset();
   },

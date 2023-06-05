@@ -1072,7 +1072,10 @@ Fliplet().then(function() {
             name: data.name,
             instance: $form,
             data: function() {
-              return data;
+              return {
+                data,
+                $instance: $form
+              };
             },
             load: function(fn) {
               return $form.loadEntryForUpdate(fn);
@@ -1095,9 +1098,14 @@ Fliplet().then(function() {
             },
             field: function(key) {
               var field = $form.getField(key);
-              var instance = _.find($form.$children, { name: field.name });
 
               if (!field) {
+                throw new Error('The field ' + key + ' has not been found.');
+              }
+
+              var $field = _.find($form.$children, { name: field.name });
+
+              if (!$field) {
                 throw new Error('The field ' + key + ' has not been found.');
               }
 
@@ -1291,7 +1299,7 @@ Fliplet().then(function() {
                   data.fieldEventListeners = eventListeners;
                 },
                 off: function(eventName, fn) {
-                  var eventListeners = data.fieldEventListeners[field.name][eventName];
+                  var eventListeners = _.get(data, ['fieldEventListeners', field.name, eventName]);
 
                   if (!eventListeners) {
                     return;
@@ -1300,6 +1308,7 @@ Fliplet().then(function() {
                   // No function provided. Clear all hook callbacks.
                   if (typeof fn === 'undefined') {
                     eventListeners = [];
+                    data.fieldEventListeners[field.name][eventName] = eventListeners;
 
                     return;
                   }
@@ -1314,7 +1323,7 @@ Fliplet().then(function() {
                   data.fieldEventListeners[field.name][eventName] = eventListeners;
                 },
                 instance: field,
-                $instance: instance
+                $instance: $field
               };
             }
           });
