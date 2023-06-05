@@ -1070,12 +1070,11 @@ Fliplet().then(function() {
           // This data is available through "Fliplet.FormBuilder.get()"
           formReady({
             name: data.name,
+            // Deprecated property but kept for legacy support
             instance: $form,
+            $instance: $form,
             data: function() {
-              return {
-                data,
-                $instance: $form
-              };
+              return data;
             },
             load: function(fn) {
               return $form.loadEntryForUpdate(fn);
