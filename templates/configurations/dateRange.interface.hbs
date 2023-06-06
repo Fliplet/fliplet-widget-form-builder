@@ -4,6 +4,12 @@
   </div>
   <div>
     <div class="radio radio-icon">
+      <input type="radio" id="no-default" name="no-default" value="empty" v-model="autofill">
+      <label for="no-default">
+        <span class="check"><i class="fa fa-circle"></i></span>No default value
+      </label>
+    </div>
+    <div class="radio radio-icon">
       <input type="radio" id="specific-date" name="specific-date" value="custom" v-model="autofill">
       <label for="specific-date">
         <span class="check"><i class="fa fa-circle"></i></span>Autofill with a specific date if it's empty
@@ -44,7 +50,7 @@
   </div>
 </div>
 
-<div v-else class="form-group">
+<div v-else-if="isDefaultValueField" class="form-group">
   <label>Default value</label>
   <div class="text-danger" v-if="errors.requiredField"> \{{ errors.requiredField }} </div>
   <div class="fl-date-range form-html">
