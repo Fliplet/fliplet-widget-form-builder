@@ -1111,7 +1111,7 @@ Fliplet().then(function() {
       });
 
       Fliplet.Studio.onMessage((event) => {
-        if (event && event.data && event.data.type === 'device-changed') {
+        if (event && event.data && event.data.type === 'set-preview-device') {
           this.deviceType = event.data.deviceType || 'tablet';
         }
       });
