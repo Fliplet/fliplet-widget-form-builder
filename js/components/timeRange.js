@@ -94,6 +94,9 @@ Fliplet.FormBuilder.field('timeRange', {
   computed: {
     isApplyCurrentDateField: function() {
       return this.autofill === 'always' || this.autofill === 'default';
+    },
+    isDefaultValueField: function() {
+      return this.autofill === 'custom';
     }
   },
   watch: {
@@ -110,7 +113,7 @@ Fliplet.FormBuilder.field('timeRange', {
       }
 
       if (this.timeRange) {
-        this.timeRange.set(val, true);
+        this.timeRange.set(val, false);
       }
 
       this.$emit('_input', this.name, this.value, false, true);

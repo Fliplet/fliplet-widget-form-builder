@@ -451,6 +451,8 @@ Fliplet().then(function() {
                 value = fieldSettings.defaultSource === 'submission'
                   ? { start: moment().locale('en').format('YYYY-MM-DD'), end: moment().locale('en').format('YYYY-MM-DD') }
                   : { start: $vm.today, end: $vm.today };
+              } else if (fieldSettings.autofill === 'empty' && fieldSettings.defaultSource === 'load') {
+                $vm.loadEntryForUpdate();
               } else {
                 value = {
                   start: field.startValue,
@@ -462,6 +464,8 @@ Fliplet().then(function() {
                 value = fieldSettings.defaultSource === 'submission'
                   ? { start: moment().locale('en').format('HH:mm'), end: moment().locale('en').format('HH:mm') }
                   : { start: $vm.now, end: $vm.now };
+              } else if (fieldSettings.autofill === 'empty' && fieldSettings.defaultSource === 'load') {
+                $vm.loadEntryForUpdate();
               } else {
                 value = {
                   start: field.startValue,
@@ -797,7 +801,9 @@ Fliplet().then(function() {
                 }
 
                 if (type === 'flTimeRange' && typeof value === 'object') {
-                  if (!value.start && !value.end) {
+                  if (!value) {
+                    value = null;
+                  } else if (!value.start && !value.end) {
                     switch (field.autofill) {
                       case 'default':
                       case 'always':
@@ -809,6 +815,7 @@ Fliplet().then(function() {
                         break;
                       case 'custom':
                         value = null;
+
                         break;
                       default:
                         break;
@@ -817,7 +824,9 @@ Fliplet().then(function() {
                 }
 
                 if (type === 'flDateRange' && typeof value === 'object') {
-                  if (!value.start && !value.end) {
+                  if (!value) {
+                    value = null;
+                  } else if (!value.start && !value.end) {
                     switch (field.autofill) {
                       case 'default':
                       case 'always':
@@ -827,12 +836,10 @@ Fliplet().then(function() {
                         };
 
                         break;
-
                       case 'custom':
                         value = null;
 
                         break;
-
                       default:
                         break;
                     }

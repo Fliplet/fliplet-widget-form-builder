@@ -10,11 +10,10 @@
   </div>
   <label
     class="btn btn-primary focus-outline"
-    :class="{ 'hidden' : readonly }"
     tabindex="0"
     v-on:keydown.space.prevent="openFileDialog()"
   >
-    <i class="fa fa-plus" aria-hidden="true"></i>
+    <i class="fa fa-plus" :class="{ 'hidden' : readonly }" aria-hidden="true"></i>
     <span>{{T "widgets.form.image.instruction"}}</span>
     <input
       multiple
@@ -34,12 +33,4 @@
   <p class="text-danger" v-if="$v.value.required === false && $v.value.$dirty">{{T
       "widgets.form.errors.required"
     }}</p>
-  <div class="row" :class="{ 'hidden' : !readonly }">
-    <label
-      class="btn btn-primary focus-outline"
-      tabindex="0"
-    >
-      <span :disabled="readonly">{{T "widgets.form.image.instruction"}}</span>
-    </label>
-  </div>
 </div>

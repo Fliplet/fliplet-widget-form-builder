@@ -130,6 +130,9 @@ Fliplet.FormBuilder.field('dateRange', {
   computed: {
     isApplyCurrentDateField: function() {
       return this.autofill === 'always' || this.autofill === 'default';
+    },
+    isDefaultValueField: function() {
+      return this.autofill === 'custom';
     }
   },
   watch: {

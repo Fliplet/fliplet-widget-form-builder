@@ -577,6 +577,11 @@ Fliplet.FormBuilder = (function() {
         this.initTooltip();
       };
 
+      component.methods._onDefaultValueSourceChanged = function() {
+        this.defaultValueKey = '';
+        this.value = '';
+      };
+
       if (!component.methods.disableAutomatch) {
         component.methods.disableAutomatch = component.methods._disableAutomatch;
       }

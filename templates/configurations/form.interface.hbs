@@ -165,7 +165,7 @@
     <div v-if="_componentsWithPersonalization.includes(_componentName)" class="form-group cleafix">
       <div class="col-xs-12">
         <label>Default value type</label>
-        <select class="form-control" :value="defaultValueSource" v-model="defaultValueSource">
+        <select class="form-control" :value="defaultValueSource" v-model="defaultValueSource" @change="_onDefaultValueSourceChanged">
           <option value="default">Enter a value</option>
           <option value="profile">User profile data</option>
           <option value="appStorage">App storage variable</option>
