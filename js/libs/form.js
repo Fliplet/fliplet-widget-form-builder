@@ -401,11 +401,11 @@ Fliplet().then(function() {
                   ? { start: moment().locale('en').format('YYYY-MM-DD'), end: moment().locale('en').format('YYYY-MM-DD') }
                   : { start: $vm.today, end: $vm.today };
               } else if (fieldSettings.autofill === 'empty' && fieldSettings.defaultSource === 'load') {
-                $vm.loadEntryForUpdate();
+                value = null;
               } else {
                 value = {
-                  start: field.startValue,
-                  end: field.endValue
+                  start: fieldSettings.startValue,
+                  end: fieldSettings.endValue
                 };
               }
             } else if (field._type === 'flTimeRange') {
@@ -414,11 +414,11 @@ Fliplet().then(function() {
                   ? { start: moment().locale('en').format('HH:mm'), end: moment().locale('en').format('HH:mm') }
                   : { start: $vm.now, end: $vm.now };
               } else if (fieldSettings.autofill === 'empty' && fieldSettings.defaultSource === 'load') {
-                $vm.loadEntryForUpdate();
+                value = null;
               } else {
                 value = {
-                  start: field.startValue,
-                  end: field.endValue
+                  start: fieldSettings.startValue,
+                  end: fieldSettings.endValue
                 };
               }
             } else {

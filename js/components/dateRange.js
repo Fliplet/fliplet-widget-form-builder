@@ -174,6 +174,8 @@ Fliplet.FormBuilder.field('dateRange', {
         label: T('widgets.form.dateRange.rangePlaceholder'),
         value: ''
       };
+
+      this.dateRange.clear();
     },
     initDaterange: function() {
       var $vm = this;
