@@ -56,11 +56,11 @@ Fliplet.FormBuilder.field('timer', {
   },
   created: function() {
     Fliplet.FormBuilder.on('reset', this.reset);
-    Fliplet.Hooks.on('beforeFormSubmit', this.stop);
+    Fliplet.Hooks.on('beforeFormSubmit', this.beforeFormSubmit);
   },
   destroyed: function() {
     Fliplet.FormBuilder.off('reset', this.reset);
-    Fliplet.Hooks.off('beforeFormSubmit', this.stop);
+    Fliplet.Hooks.off('beforeFormSubmit', this.beforeFormSubmit);
   },
   methods: {
     formatSeconds: function(seconds) {
@@ -173,6 +173,13 @@ Fliplet.FormBuilder.field('timer', {
     },
     updateValue() {
       return this.value + (moment().valueOf() / 1000 - this.startTimestamp);
+    },
+    beforeFormSubmit: function(data) {
+      if (this.status === 'running') {
+        this.stop();
+
+        data[this.name] = Math.round(this.value * 1000) / 1000;
+      }
     }
   },
   mounted: async function() {
