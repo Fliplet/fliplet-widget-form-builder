@@ -337,6 +337,51 @@ nav > .btn {
   margin-bottom: 0;
 }
 
+.component .form-group .btn + .btn {
+  margin-right: 15px;
+}
+
+#app[data-device-type="mobile"] .component .form-group .btn {
+  margin-bottom: 15px;
+}
+
+#app[data-device-type="mobile"] .component .form-group .btn + .btn {
+  margin-right: 0;
+}
+
+#app[data-device-type="mobile"] .component .form-group .btn:last-child {
+  margin-bottom: 0;
+}
+
+#app[data-device-type="mobile"] .component .form-group .btn.btn-primary {
+  display: flex !important;
+  clear: both;
+  width: 100%;
+  padding: 10px 16px;
+  line-height: 24px;
+  border: none;
+  text-align: center;
+  cursor: pointer;
+  border-radius: 6px;
+  align-items: center;
+  justify-content: center;
+}
+
+#app[data-device-type="mobile"] .component .form-group .btn.btn-secondary {
+  display: block;
+  clear: both;
+  width: 100%;
+  padding: 10px 16px;
+  line-height: 24px;
+  border: none;
+  border-radius: 6px;
+  text-align: center;
+  cursor: pointer;
+  background-color: #c0c0c0;
+  white-space: initial;
+  color: #fff;
+}
+
 .component .overlay-screen {
   background: rgba(255, 255, 255, 0.8);
   position: absolute;
@@ -427,6 +472,7 @@ nav > .btn {
 
 .fileUpload span {
   padding-right: 10px;
+  color: #fff;
 }
 
 .fileUpload .canvas-holder {
@@ -1069,10 +1115,6 @@ input[type="time"]:not(.basic-time-picker)::-webkit-calendar-picker-indicator {
 
 form hr {
   border-top: 2px solid #dddddd;
-}
-
-.component .btn + .btn {
-  margin-right: 15px;
 }
 
 .hidden-settings {
