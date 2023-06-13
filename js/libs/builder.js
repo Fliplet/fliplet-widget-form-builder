@@ -142,6 +142,7 @@ Fliplet().then(function() {
         showExtraAdd: formSettings.dataSourceId && formSettings.dataStore.indexOf('dataSource') > -1,
         showExtraEdit: formSettings.dataSourceId && formSettings.dataStore.indexOf('editDataSource') > -1,
         userData: {},
+        deviceType: 'tablet',
         defaultEmailSettings: {
           subject: '',
           html: '',
@@ -1057,6 +1058,14 @@ Fliplet().then(function() {
 
       Fliplet.FormBuilder.on('field-settings-changed', this.onFieldSettingChanged);
 
+      Fliplet.Studio.getPreviewDevice().then(function(data) {
+        data = data || {};
+
+        if (data.deviceType) {
+          $vm.deviceType = data.deviceType;
+        }
+      });
+
       this.loadTemplates().then(function() {
         if ($vm.organizationTemplates.length || data.fields) {
           $(selector).removeClass('is-loading');
@@ -1094,9 +1103,16 @@ Fliplet().then(function() {
           }, 500);
         }
       });
+
       Fliplet.Studio.onEvent(function(evt) {
         if (evt.detail.type === 'widgetCancel') {
           this.settings = generateFormDefaults(data);
+        }
+      });
+
+      Fliplet.Studio.onMessage((event) => {
+        if (event && event.data && event.data.type === 'set-preview-device') {
+          this.deviceType = event.data.deviceType || 'tablet';
         }
       });
     },
