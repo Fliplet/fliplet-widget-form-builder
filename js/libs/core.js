@@ -376,10 +376,6 @@ Fliplet.FormBuilder = (function() {
           } else {
             data.initialTimerValue = 0;
           }
-
-          delete data.hours;
-          delete data.minutes;
-          delete data.seconds;
         }
 
         if (this._componentName === 'flSlider') {
