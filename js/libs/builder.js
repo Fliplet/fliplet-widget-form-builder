@@ -1064,16 +1064,6 @@ Fliplet().then(function() {
     created: function() {
       var $vm = this;
 
-      this.settings.fields.forEach(function(field) {
-        if (field._type === 'flTimer') {
-          var displayValues = formatSeconds(field.initialTimerValue);
-
-          field.hours = displayValues.hours;
-          field.minutes = displayValues.minutes;
-          field.seconds = displayValues.seconds;
-        }
-      });
-
       Fliplet.FormBuilder.on('field-settings-changed', this.onFieldSettingChanged);
 
       Fliplet.Studio.getPreviewDevice().then(function(data) {
@@ -1146,6 +1136,16 @@ Fliplet().then(function() {
       var $vm = this;
 
       $vm.settings.name = $vm.settings.name || 'Untitled form';
+
+      $vm.settings.fields.forEach(function(field) {
+        if (field._type === 'flTimer') {
+          var displayValues = formatSeconds(field.initialTimerValue);
+
+          field.hours = displayValues.hours;
+          field.minutes = displayValues.minutes;
+          field.seconds = displayValues.seconds;
+        }
+      });
 
       if (!$vm.showDataSourceSettings) {
         $vm.settings.dataStore = [];
