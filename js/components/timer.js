@@ -202,17 +202,17 @@ Fliplet.FormBuilder.field('timer', {
     this.stringValue = this.formatSeconds(this.initialTimerValue);
 
     if (this.autostart) {
-      this.status = 'running';
+      this.start();
     }
 
     this.$emit('_input', this.name, this.value);
     this.$v.$reset();
   },
   watch: {
-    value: function() {
-      this.value = Math.round(this.value * 1000) / 1000;
+    value: function(val) {
+      val = Math.round(val * 1000) / 1000;
 
-      this.$emit('_input', this.name, this.value, false, true);
+      this.$emit('_input', this.name, val, false, true);
     }
   }
 });
