@@ -68,6 +68,14 @@ function attachObservers() {
   });
 }
 
+function formatSeconds(seconds) {
+  var hours = Math.floor(seconds / 3600);
+  var minutes = Math.floor((seconds % 3600) / 60);
+  var remainingSeconds = Math.floor(seconds % 60);
+
+  return { hours, minutes, seconds: remainingSeconds };
+}
+
 Vue.directive('sortable', {
   inserted: function(el, binding) {
     if (Sortable) {
@@ -1055,6 +1063,16 @@ Fliplet().then(function() {
     },
     created: function() {
       var $vm = this;
+
+      this.settings.fields.forEach(function(field) {
+        if (field._type === 'flTimer') {
+          var displayValues = formatSeconds(field.initialTimerValue);
+
+          field.hours = displayValues.hours;
+          field.minutes = displayValues.minutes;
+          field.seconds = displayValues.seconds;
+        }
+      });
 
       Fliplet.FormBuilder.on('field-settings-changed', this.onFieldSettingChanged);
 
