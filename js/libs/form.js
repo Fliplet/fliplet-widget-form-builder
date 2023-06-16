@@ -169,6 +169,10 @@ Fliplet().then(function() {
             delete progress[field.name];
           }
         }
+
+        if (field._type === 'flTimer' && !data.saveProgress) {
+          Fliplet.App.Storage.remove(field.name);
+        }
       });
 
       if (fields.length && (data.saveProgress && typeof progress === 'object') || entry) {
