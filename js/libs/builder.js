@@ -916,7 +916,7 @@ Fliplet().then(function() {
           .value();
 
         fields.forEach(function(field) {
-          if (field._type === 'flDateRange') {
+          if (field._type === 'flDateRange' || field._type === 'flTimeRange') {
             fieldNames.push(`${field.name} [Start]`);
             fieldNames.push(`${field.name} [End]`);
           } else {
