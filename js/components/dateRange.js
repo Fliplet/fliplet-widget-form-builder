@@ -36,7 +36,7 @@ Fliplet.FormBuilder.field('dateRange', {
     placeholder: {
       type: String,
       default: function() {
-        return '-- ' + T('widgets.form.dateRange.rangePlaceholder');
+        return '-- Select range';
       }
     }
   },
@@ -46,37 +46,34 @@ Fliplet.FormBuilder.field('dateRange', {
       isInputFocused: false,
       isPreview: Fliplet.Env.get('preview'),
       today: this.formatDate(),
-      selectedRange: {
-        label: T('widgets.form.dateRange.rangePlaceholder'),
-        value: ''
-      },
+      selectedRange: null,
       predefinedRanges: [
         {
-          label: T('widgets.form.dateRange.predefinedRanges.today'),
+          label: 'Today',
           value: 'today'
         },
         {
-          label: T('widgets.form.dateRange.predefinedRanges.yesterday'),
+          label: 'Yesterday',
           value: 'yesterday'
         },
         {
-          label: T('widgets.form.dateRange.predefinedRanges.tomorrow'),
+          label: 'Tomorrow',
           value: 'tomorrow'
         },
         {
-          label: T('widgets.form.dateRange.predefinedRanges.nextWeek'),
+          label: 'Next week',
           value: 'nextWeek'
         },
         {
-          label: T('widgets.form.dateRange.predefinedRanges.lastWeek'),
+          label: 'Last week',
           value: 'lastWeek'
         },
         {
-          label: T('widgets.form.dateRange.predefinedRanges.nextMonth'),
+          label: 'Next month',
           value: 'nextMonth'
         },
         {
-          label: T('widgets.form.dateRange.predefinedRanges.lastMonth'),
+          label: 'Last month',
           value: 'lastMonth'
         }
       ]
@@ -155,7 +152,7 @@ Fliplet.FormBuilder.field('dateRange', {
       this.$emit('_input', this.name, val, false, true);
     },
     selectedRange: function(range) {
-      var newDate = this.getDate(range.value);
+      var newDate = range ? this.getDate(range.value) : this.getDate();
 
       this.value = newDate;
     }
@@ -170,10 +167,7 @@ Fliplet.FormBuilder.field('dateRange', {
   },
   methods: {
     onReset: function() {
-      this.selectedRange = {
-        label: T('widgets.form.dateRange.rangePlaceholder'),
-        value: ''
-      };
+      this.selectedRange = null;
 
       this.dateRange.clear();
     },
