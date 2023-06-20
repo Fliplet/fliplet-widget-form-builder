@@ -145,7 +145,7 @@ Fliplet.FormBuilder.field('dateRange', {
       }
 
       if (this.dateRange) {
-        this.dateRange.set(val, false);
+        this.dateRange.set(val, true);
       }
 
       if (this.isPreview && this.$v.value.$invalid) {
