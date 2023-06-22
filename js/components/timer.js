@@ -175,6 +175,10 @@ Fliplet.FormBuilder.field('timer', {
       return this.value + (moment().valueOf() / 1000 - this.startTimestamp);
     },
     beforeFormSubmit: function(data) {
+      if (this.required && !this.value) {
+        return Promise.reject('Please start the timer before submitting the form');
+      }
+
       if (this.status === 'running') {
         this.stop();
 
