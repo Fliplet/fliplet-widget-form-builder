@@ -36,7 +36,7 @@ Fliplet.FormBuilder.field('dateRange', {
     placeholder: {
       type: String,
       default: function() {
-        return '-- Select range';
+        return '-- ' + T('widgets.form.dateRange.rangePlaceholder');
       }
     }
   },
@@ -49,31 +49,31 @@ Fliplet.FormBuilder.field('dateRange', {
       selectedRange: null,
       predefinedRanges: [
         {
-          label: 'Today',
+          label: T('widgets.form.dateRange.predefinedRanges.today'),
           value: 'today'
         },
         {
-          label: 'Yesterday',
+          label: T('widgets.form.dateRange.predefinedRanges.yesterday'),
           value: 'yesterday'
         },
         {
-          label: 'Tomorrow',
+          label: T('widgets.form.dateRange.predefinedRanges.tomorrow'),
           value: 'tomorrow'
         },
         {
-          label: 'Next week',
+          label: T('widgets.form.dateRange.predefinedRanges.nextWeek'),
           value: 'nextWeek'
         },
         {
-          label: 'Last week',
+          label: T('widgets.form.dateRange.predefinedRanges.lastWeek'),
           value: 'lastWeek'
         },
         {
-          label: 'Next month',
+          label: T('widgets.form.dateRange.predefinedRanges.nextMonth'),
           value: 'nextMonth'
         },
         {
-          label: 'Last month',
+          label: T('widgets.form.dateRange.predefinedRanges.lastMonth'),
           value: 'lastMonth'
         }
       ]
