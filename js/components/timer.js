@@ -175,14 +175,14 @@ Fliplet.FormBuilder.field('timer', {
       return this.value + (moment().valueOf() / 1000 - this.startTimestamp);
     },
     beforeFormSubmit: function(data) {
-      if (this.required && !this.value) {
-        return Promise.reject('Please start the timer before submitting the form');
-      }
-
       if (this.status === 'running') {
         this.stop();
 
         data[this.name] = Math.round(this.value * 1000) / 1000;
+      }
+
+      if (this.required && !this.value) {
+        return Promise.reject('');
       }
     }
   },

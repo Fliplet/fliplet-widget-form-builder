@@ -95,6 +95,9 @@
           "lastMonth": "Last month"
         }
       },
+      "timer": {
+        "required": "Please start the timer before submitting the form"
+      },
       "signature": {
         "actions": {
           "clear": "Clear",
