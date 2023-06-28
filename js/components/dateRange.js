@@ -46,10 +46,7 @@ Fliplet.FormBuilder.field('dateRange', {
       isInputFocused: false,
       isPreview: Fliplet.Env.get('preview'),
       today: this.formatDate(),
-      selectedRange: {
-        label: T('widgets.form.dateRange.rangePlaceholder'),
-        value: ''
-      },
+      selectedRange: null,
       predefinedRanges: [
         {
           label: T('widgets.form.dateRange.predefinedRanges.today'),
@@ -155,7 +152,7 @@ Fliplet.FormBuilder.field('dateRange', {
       this.$emit('_input', this.name, val, false, true);
     },
     selectedRange: function(range) {
-      var newDate = this.getDate(range.value);
+      var newDate = range ? this.getDate(range.value) : this.getDate();
 
       this.value = newDate;
     }
@@ -170,10 +167,7 @@ Fliplet.FormBuilder.field('dateRange', {
   },
   methods: {
     onReset: function() {
-      this.selectedRange = {
-        label: T('widgets.form.dateRange.rangePlaceholder'),
-        value: ''
-      };
+      this.selectedRange = null;
 
       this.dateRange.clear();
     },

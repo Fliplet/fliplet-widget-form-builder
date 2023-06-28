@@ -13,10 +13,10 @@ Fliplet.FormBuilder.field('matrix', {
       default: function() {
         return [
           {
-            label: T('widgets.form.matrix.defaultOptions.row1')
+            label: 'Row 1'
           },
           {
-            label: T('widgets.form.matrix.defaultOptions.row2')
+            label: 'Row 2'
           }
         ];
       }
@@ -26,10 +26,10 @@ Fliplet.FormBuilder.field('matrix', {
       default: function() {
         return [
           {
-            label: T('widgets.form.matrix.defaultOptions.column1')
+            label: 'Column 1'
           },
           {
-            label: T('widgets.form.matrix.defaultOptions.column2')
+            label: 'Column 2'
           }
         ];
       }

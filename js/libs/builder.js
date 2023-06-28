@@ -908,12 +908,21 @@ Fliplet().then(function() {
         });
       },
       setNewColumns: function(columns) {
-        var fieldNames = _.chain(this.fields)
+        var fieldNames = [];
+        var fields = _.chain(this.fields)
           .filter(function(field) {
             return field._submit !== false;
           })
-          .map('name')
           .value();
+
+        fields.forEach(function(field) {
+          if (field._type === 'flDateRange' || field._type === 'flTimeRange') {
+            fieldNames.push(`${field.name} [Start]`);
+            fieldNames.push(`${field.name} [End]`);
+          } else {
+            fieldNames.push(field.name);
+          }
+        });
 
         if (!columns.length) {
           this.newColumns = fieldNames;
