@@ -7,10 +7,10 @@ Fliplet.FormBuilder.field('select', {
       default: function() {
         return [
           {
-            label: T('widgets.form.select.defaultOptions.option1')
+            label: 'Option 1'
           },
           {
-            label: T('widgets.form.select.defaultOptions.option2')
+            label: 'Option 2'
           }
         ];
       }
@@ -21,7 +21,7 @@ Fliplet.FormBuilder.field('select', {
     placeholder: {
       type: String,
       default: function() {
-        return '-- ' + T('widgets.form.select.placeholder');
+        return '-- Select one';
       }
     },
     description: {

@@ -1,12 +1,13 @@
 <div v-if="description" class="help-block description">\{{ description }}</div>
 <template>
-  <div class="form-group fl-timer" ref="timer" :aria-label="T(`widgets.form.timer.types.${type}`)">
-    <input type="text" class="form-control" readonly="true" tabindex="0" v-model="stringValue" />
+  <div class="form-group fl-timer" ref="timer">
+    <input type="text" class="form-control focus-outline" readonly="true" tabindex="0" v-model="stringValue"/>
     <button v-if="!readonly && (status === 'stopped' && value)" class="btn btn-primary" v-on:click.prevent="reset">Reset</button>
     <button v-if="!readonly && status === 'stopped'" class="btn btn-primary" v-on:click.prevent="start">Start</button>
     <button v-if="!readonly && status === 'running'" class="btn btn-primary" v-on:click.prevent="stop">Stop</button>
   </div>
 </template>
+<p class="text-danger" v-if="$v.value.required && $v.value.$dirty">{{T "widgets.form.timer.required"}}</p>
 <p class="text-danger" v-if="$v.value.required === false && $v.value.$dirty">
   {{T "widgets.form.errors.required"}}
 </p>

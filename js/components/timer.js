@@ -180,6 +180,10 @@ Fliplet.FormBuilder.field('timer', {
 
         data[this.name] = Math.round(this.value * 1000) / 1000;
       }
+
+      if (this.required && !this.value) {
+        return Promise.reject('');
+      }
     }
   },
   mounted: async function() {
