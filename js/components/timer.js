@@ -125,7 +125,7 @@ Fliplet.FormBuilder.field('timer', {
         this.timerInterval = setInterval(function() {
           var totalSeconds = $vm.initialTimerValue - $vm.updateValue();
 
-          if (totalSeconds < 0) {
+          if (totalSeconds <= 0) {
             Fliplet.UI.Toast({
               type: 'minimal',
               message: 'Countdown Timer has reached 0',
