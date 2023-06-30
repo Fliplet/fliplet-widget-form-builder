@@ -1,0 +1,7 @@
+<div v-if="description" class="help-block description">\{{ description }}</div>
+<template>
+  <div class="form-group fl-typeahead" ref="typeahead">
+    <select multiple placeholder="Start typing ..."></select>
+  </div>
+</template>
+<p class="text-danger" v-if="$v.value.required === false && $v.value.$dirty">{{T "widgets.form.errors.required"}}</p>
