@@ -9,6 +9,9 @@ Fliplet.FormBuilder.field('typeahead', {
     description: {
       type: String
     },
+    placeholder: {
+      type: String
+    },
     optionsType: {
       type: String,
       default: 'dataSource'
@@ -48,6 +51,11 @@ Fliplet.FormBuilder.field('typeahead', {
       typeahead: null
     };
   },
+  computed: {
+    reachedMaxItems: function() {
+      return this.value && this.value.length === this.maxItems;
+    }
+  },
   validations: function() {
     var rules = {
       value: {}
@@ -60,9 +68,11 @@ Fliplet.FormBuilder.field('typeahead', {
     return rules;
   },
   created: function() {
+    Fliplet.FormBuilder.on('reset', this.onReset);
     Fliplet.Hooks.on('beforeFormSubmit', this.onBeforeSubmit);
   },
   destroyed: function() {
+    Fliplet.FormBuilder.on('reset', this.onReset);
     Fliplet.Hooks.off('beforeFormSubmit', this.onBeforeSubmit);
   },
   mounted: function() {
@@ -79,19 +89,30 @@ Fliplet.FormBuilder.field('typeahead', {
   },
   methods: {
     initTypeahead: function() {
+      var $vm = this;
+
       if (this.typeahead && !this.$refs.typeahead) {
         return;
       }
 
       this.typeahead = Fliplet.UI.Typeahead(this.$refs.typeahead, {
+        readonly: this.readonly,
         value: this.value,
         options: this.options,
         freeInput: this.freeInput,
         maxItems: this.maxItems
       });
+
+      this.typeahead.change(function(value) {
+        $vm.value = value;
+        $vm.updateValue();
+      });
     },
     onBeforeSubmit: function() {
       this.typeahead.get();
+    },
+    onReset: function() {
+      this.typeahead.clear();
     }
   }
 });

@@ -806,6 +806,19 @@ input[type="time"]:not(.basic-time-picker)::-webkit-calendar-picker-indicator {
   padding-left: 57px;
 }
 
+.form-group .secondary-label {
+  font-size: 11px;
+  color: #777777;
+  font-weight: 400;
+  line-height: 16px;
+  margin-top: 9px;
+}
+
+.form-group hr {
+  border-top: 1px solid #dddddd;
+  margin: 20px -15px;
+}
+
 /* SIGNATURE FIELD */
 
 .field-signature {

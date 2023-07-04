@@ -410,7 +410,7 @@ Fliplet.FormBuilder = (function() {
 
       component.props._componentsWithPersonalization = {
         type: Array,
-        default: ['flInput', 'flCheckbox', 'flRadio', 'flEmail', 'flNumber', 'flTelephone', 'flUrl', 'flTextarea', 'flWysiwyg', 'flSelect', 'flSlider', 'flMatrix']
+        default: ['flInput', 'flCheckbox', 'flRadio', 'flEmail', 'flNumber', 'flTelephone', 'flUrl', 'flTextarea', 'flWysiwyg', 'flSelect', 'flSlider', 'flMatrix', 'flTypeahead']
       };
 
       component.props._componentsWithDescription = {
@@ -733,6 +733,7 @@ Fliplet.FormBuilder = (function() {
       var isSlider = component.props._componentName.default === 'flSlider';
       var isMatrix = component.props._componentName.default === 'flMatrix';
       var isTimer = component.props._componentName.default === 'flTimer';
+      var isTypeahead = component.props._componentName.default === 'flTypeahead';
 
       /**
       * Generate text configurations for radio/checkbox options, separated by new lines
@@ -808,7 +809,8 @@ Fliplet.FormBuilder = (function() {
         hasOptions: hasOptions,
         hasSelectAll: hasSelectAll,
         isSlider: isSlider,
-        isTimer: isTimer
+        isTimer: isTimer,
+        isTypeahead: isTypeahead
       });
 
       Vue.component(componentName + 'Config', component);
