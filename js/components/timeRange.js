@@ -113,7 +113,7 @@ Fliplet.FormBuilder.field('timeRange', {
       }
 
       if (this.timeRange) {
-        this.timeRange.set(val, false);
+        this.timeRange.set(val, true);
       }
 
       this.$emit('_input', this.name, this.value, false, true);

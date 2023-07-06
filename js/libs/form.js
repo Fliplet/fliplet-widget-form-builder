@@ -185,6 +185,10 @@ Fliplet().then(function() {
             delete progress[field.name];
           }
         }
+
+        if (field._type === 'flTimer' && !data.saveProgress) {
+          Fliplet.App.Storage.remove(field.name);
+        }
       });
 
       if (fields.length && (data.saveProgress && typeof progress === 'object') || entry) {
@@ -901,9 +905,10 @@ Fliplet().then(function() {
               // Append schema as private variable
               formData._flSchema = {};
               $vm.fields.forEach(function(field) {
-                if (field.mediaFolderId) {
+                if (field.mediaFolderId || ['flImage', 'flFile'].indexOf(field._type) > -1) {
                   formData._flSchema[field.name] = {
-                    mediaFolderId: field.mediaFolderId
+                    mediaFolderId: field.mediaFolderId,
+                    append: false
                   };
                 }
               });

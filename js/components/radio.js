@@ -10,10 +10,10 @@ Fliplet.FormBuilder.field('radio', {
       default: function() {
         return [
           {
-            label: T('widgets.form.radio.defaultOptions.option1')
+            label: 'Option 1'
           },
           {
-            label: T('widgets.form.radio.defaultOptions.option2')
+            label: 'Option 2'
           }
         ];
       }
