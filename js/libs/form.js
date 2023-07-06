@@ -142,7 +142,7 @@ Fliplet().then(function() {
       }
 
       result.then(function(val) {
-        if (field._type === 'flCheckbox') {
+        if (field._type === 'flCheckbox' || field._type === 'flTypeahead') {
           if (!Array.isArray(val)) {
             val = _.compact([val]);
           }
@@ -242,6 +242,7 @@ Fliplet().then(function() {
             // Typecast field data to ensure data type is suitable for each field
             switch (field._type) {
               case 'flCheckbox':
+              case 'flTypeahead':
                 if (!Array.isArray(fieldData)) {
                   fieldData = _.compact([fieldData]);
                 }
@@ -1334,6 +1335,10 @@ Fliplet().then(function() {
                       }
 
                       return option;
+                    }
+
+                    if (field._type === 'flTypeahead') {
+                      return { label: option };
                     }
 
                     return { id: option };

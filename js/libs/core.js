@@ -141,7 +141,7 @@ Fliplet.FormBuilder = (function() {
             value = '';
           }
 
-          if (componentName === 'flCheckbox') {
+          if (componentName === 'flCheckbox' || componentName === 'flTypeahead') {
             value = Array.isArray(value) ? value : [value];
           }
 

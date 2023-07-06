@@ -6,6 +6,10 @@ Fliplet.FormBuilder.field('typeahead', {
       type: Array,
       default: null
     },
+    defaultValue: {
+      type: String,
+      default: ''
+    },
     description: {
       type: String
     },
@@ -111,8 +115,29 @@ Fliplet.FormBuilder.field('typeahead', {
     onBeforeSubmit: function() {
       this.typeahead.get();
     },
-    onReset: function() {
-      this.typeahead.clear();
+    onReset: function(data) {
+      if (data.id === this.$parent.id) {
+        if (this.defaultValueSource !== 'default') {
+          this.setValueFromDefaultSettings({
+            source: this.defaultValueSource,
+            key: this.defaultValueKey
+          });
+        }
+
+        this.typeahead.set(this.value);
+      }
+    }
+  },
+  watch: {
+    value: function(val) {
+      if (this.typeahead) {
+        this.typeahead.set(val);
+      }
+    },
+    options: function(val) {
+      if (this.typeahead) {
+        this.typeahead.options(val);
+      }
     }
   }
 });
