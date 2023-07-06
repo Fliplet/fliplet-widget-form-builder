@@ -125,7 +125,7 @@ Fliplet.FormBuilder.field('timer', {
         this.timerInterval = setInterval(function() {
           var totalSeconds = $vm.initialTimerValue - $vm.updateValue();
 
-          if (Math.round(totalSeconds) === 0) {
+          if (totalSeconds <= 0) {
             Fliplet.UI.Toast({
               type: 'minimal',
               message: 'Countdown Timer has reached 0',
@@ -159,7 +159,7 @@ Fliplet.FormBuilder.field('timer', {
         return;
       }
 
-      data = parseFloat(data).toFixed(3);
+      data = Math.round(data * 1000) / 1000;
 
       this.value = this.type === 'timer'
         ? Math.max(Math.min(this.initialTimerValue, data), 0)
