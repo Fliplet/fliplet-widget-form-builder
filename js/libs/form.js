@@ -248,7 +248,6 @@ Fliplet().then(function() {
                 }
 
                 break;
-
               case 'flImage':
               case 'flFile':
                 // Don't change the data types for Image and File fields
@@ -449,7 +448,7 @@ Fliplet().then(function() {
               return;
             }
 
-            if (field._type === 'flCheckbox') {
+            if (field._type === 'flCheckbox' || field._type === 'flTypeahead') {
               value = fieldSettings.defaultValue || fieldSettings.value;
 
               if (typeof value !== 'undefined' && !Array.isArray(value)) {
