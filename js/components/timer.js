@@ -64,7 +64,7 @@ Fliplet.FormBuilder.field('timer', {
     Fliplet.Hooks.off('beforeFormSubmit', this.beforeFormSubmit);
   },
   computed: {
-    runningRequired: function() {
+    hasRequiredError: function() {
       return this.hasError;
     }
   },
