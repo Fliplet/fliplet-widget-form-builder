@@ -9,11 +9,23 @@ Fliplet.FormBuilder.field('url', {
       type: String
     }
   },
+  data: function() {
+    return {
+      rules: {
+        // URL regex taken form https://www.regextester.com/94502 and added % sign
+        urlCase: new RegExp(/^(?:http(s)?:\/\/)?[\w.-]+(?:\.[\w\.-]+)+[\w\-\._~:/?#[\]@%!\$&'\*\+,;=.]+$/i)
+      }
+    };
+  },
   validations: function() {
     var rules = {
       value: {
-        // URL regex taken form https://www.regextester.com/94502 and added % sign
-        url: window.validators.helpers.regex('', /^(?:http(s)?:\/\/)?[\w.-]+(?:\.[\w\.-]+)+[\w\-\._~:/?#[\]@%!\$&'\*\+,;=.]+$/i)
+        url: function(value) {
+          // Normalize()ing to NFD Unicode normal form decomposes combined graphemes into the combination of simple ones using a regex character class to match the U+0300 → U+036F range
+          value = value.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+
+          return value ? this.rules.urlCase.test(value) : false;
+        }
       }
     };
 

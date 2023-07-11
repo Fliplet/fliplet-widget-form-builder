@@ -40,7 +40,8 @@ Fliplet.FormBuilder.field('timer', {
       status: 'stopped',
       timerInterval: null,
       startTimestamp: moment().valueOf() / 1000,
-      stringValue: ''
+      stringValue: '',
+      hasError: false
     };
   },
   validations: function() {
@@ -61,6 +62,11 @@ Fliplet.FormBuilder.field('timer', {
   destroyed: function() {
     Fliplet.FormBuilder.off('reset', this.reset);
     Fliplet.Hooks.off('beforeFormSubmit', this.beforeFormSubmit);
+  },
+  computed: {
+    hasRequiredError: function() {
+      return this.hasError;
+    }
   },
   methods: {
     formatSeconds: function(seconds) {
@@ -182,6 +188,8 @@ Fliplet.FormBuilder.field('timer', {
       }
 
       if (this.required && !this.value) {
+        this.hasError = true;
+
         return Promise.reject('');
       }
     }
