@@ -47,6 +47,10 @@ Fliplet.FormBuilder.field('typeahead', {
     },
     column: {
       type: String
+    },
+    columnOptions: {
+      type: Array,
+      default: null
     }
   },
   data: function() {
@@ -97,11 +101,9 @@ Fliplet.FormBuilder.field('typeahead', {
       this.updateValue(this.name, this.value);
     }
 
-    Fliplet.FormBuilder.on('reset', this.onReset);
     Fliplet.Hooks.on('beforeFormSubmit', this.onBeforeSubmit);
   },
   destroyed: function() {
-    Fliplet.FormBuilder.on('reset', this.onReset);
     Fliplet.Hooks.off('beforeFormSubmit', this.onBeforeSubmit);
   },
   mounted: function() {
@@ -138,19 +140,7 @@ Fliplet.FormBuilder.field('typeahead', {
       });
     },
     onBeforeSubmit: function() {
-      this.typeahead.get();
-    },
-    onReset: function(data) {
-      if (data.id === this.$parent.id) {
-        if (this.defaultValueSource !== 'default') {
-          this.setValueFromDefaultSettings({
-            source: this.defaultValueSource,
-            key: this.defaultValueKey
-          });
-        }
-
-        this.typeahead.set(this.value);
-      }
+      this.value = this.typeahead.get();
     }
   },
   watch: {
@@ -158,6 +148,8 @@ Fliplet.FormBuilder.field('typeahead', {
       if (this.typeahead) {
         this.typeahead.set(val);
       }
+
+      this.$emit('_input', this.name, val);
     },
     options: function(val) {
       if (this.typeahead) {

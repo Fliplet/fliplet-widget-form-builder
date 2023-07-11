@@ -2,13 +2,13 @@
   <label class="control-label">Select type of suggested values</label>
   <div>
     <div class="radio radio-icon">
-      <input type="radio" id="manual-option" name="manual-option" v-bind:value="'manual'" v-model="optionsType">
+      <input type="radio" id="manual-option" name="manual-option" value="manual" v-model="optionsType" v-on:click="removeDataProvider">
       <label for="manual-option">
         <span class="check"><i class="fa fa-circle"></i></span> <strong>List of values</strong>
       </label>
     </div>
     <div class="radio radio-icon">
-      <input type="radio" id="data-source-option" name="data-source-option" v-bind:value="'dataSource'" v-model="optionsType">
+      <input type="radio" id="data-source-option" name="data-source-option" value="dataSource" v-model="optionsType" v-on:click="initDataProvider">
       <label for="data-source-option">
         <span class="check"><i class="fa fa-circle"></i></span> <strong>From a data source</strong>
       </label>
@@ -16,7 +16,7 @@
   </div>
 </div>
 
-<div class="form-group">
+<div class="form-group clearfix">
   <div class="checkbox checkbox-icon">
     <input type="checkbox" name="free-input" v-model="freeInput" id="free-input">
     <label for="free-input">
@@ -26,19 +26,23 @@
   </div>
 </div>
 
-
-<div v-if="optionsType === 'manual'" class="form-group">
+<div v-show="optionsType === 'dataSource'" class="form-group clearfix">
+  <div id="data-provider"></div>
+  <label>Data field name</label>
+  <select class="form-control" :value="column" v-model="column" @change="_getDataSourceColumnValues">
+    <option value="">--- Select a data field</option>
+    <option v-for="(opt, index) in columnOptions" :value="opt">\{{opt}}</option>
+  </select>
+</div>
+<div v-if="optionsType === 'manual'" class="form-group clearfix">
   <label class="control-label">Value options (one per line)</label>
   <textarea v-on:input="_setOptions($event.target.value, 'options')" class="form-control">\{{ _options }}</textarea>
-</div>
-<div v-else class="form-group">
-
 </div>
 
 <div class="form-group">
   <label>Number of list items user can select or add</label>
   <input class="form-control" type="text" v-model.number="maxItems" />
-  <div class="secondary-label">Leave  it blank to allow any amount of items or enter a number</div>
+  <div class="secondary-label">Leave it blank to allow any amount of items or enter a number</div>
 </div>
 
 <div class="form-group">

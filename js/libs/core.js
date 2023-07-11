@@ -13,6 +13,17 @@ Fliplet.FormBuilder = (function() {
     return 'fl' + component.charAt(0).toUpperCase() + component.slice(1);
   }
 
+  var dataSourceColumnValues = {
+    224: {
+      'Dropdown (single-select)': ['Lunch', 'Breakfast', 'Branch'],
+      'Typeahead (multi-select)': ['Option 1', 'Option 2', 'Option 3', 'Option 4'],
+      'Checkboxes (multi-select)': ['One', 'Two', 'Tree']
+    },
+    456: {
+      column2: ['foo', 'bar']
+    }
+  };
+
   return {
     on: function(eventName, fn) {
       eventHub.$on(eventName, fn);
@@ -569,6 +580,8 @@ Fliplet.FormBuilder = (function() {
           if (this.browserSupport('IE11') || this.browserSupport('safari')) {
             this.initTimePicker();
           }
+
+          this.initDataProvider();
         };
       }
 
@@ -580,6 +593,58 @@ Fliplet.FormBuilder = (function() {
       component.methods._onDefaultValueSourceChanged = function() {
         this.defaultValueKey = '';
         this.value = '';
+      };
+
+      component.methods._getDataSourceColumnValues = function() {
+        var id = this.dataSourceId;
+        var column = this.column;
+
+        // id and column can be used for managing cache based on data source ID and column name
+        var result = dataSourceColumnValues[id][column];
+
+        Fliplet.Cache.get({
+          key: id + '-' + column,
+          platform: 'native',
+          expire: 60
+        }, function() {
+          return new Promise(function(resolve) {
+            var result = dataSourceColumnValues[id][column];
+
+            setTimeout(function() {
+              resolve(result);
+            }, 500);
+          });
+        });
+
+        // If there's cache found, return value from cache
+
+        // If there's no cache, return new values, i.e.
+        this.options = _.compact(result, function(option) {
+          if (option !== '') {
+            return option.trim();
+          }
+        }).map(function(rawOption) {
+          if (rawOption) {
+            rawOption = rawOption.trim();
+
+            var regex = /<.*>$/g;
+            var match = rawOption.match(regex);
+            var option = {};
+
+            if (match) {
+              option.label = rawOption.replace(regex, '').trim();
+
+              var value = match[0].substring(1, match[0].length - 1).trim();
+
+              option.id = value || option.label;
+            } else {
+              option.label = rawOption;
+              option.id = rawOption;
+            }
+
+            return option;
+          }
+        });
       };
 
       if (!component.methods.disableAutomatch) {
@@ -702,6 +767,55 @@ Fliplet.FormBuilder = (function() {
 
       if (!component.methods.openFilePicker) {
         component.methods.openFilePicker = component.methods._openFilePicker;
+      }
+
+      component.methods._initDataProvider = function() {
+        var $vm = this;
+
+        var dataSourceData = {
+          dataSourceTitle: 'Your list data',
+          dataSourceId: $vm.dataSourceId,
+          appId: Fliplet.Env.get('appId'),
+          default: {
+            name: 'Form data for ' + $vm.name,
+            entries: [],
+            columns: []
+          },
+          accessRules: [
+            { allow: 'all', type: ['select'] }
+          ]
+        };
+
+
+        window.dataProvider = Fliplet.Widget.open('com.fliplet.data-source-provider', {
+          selector: '#data-provider',
+          data: dataSourceData,
+          onEvent: function(event, dataSource) {
+            if (event === 'dataSourceSelect') {
+              $vm.dataSourceId = dataSource.id;
+              $vm.columnOptions = dataSource.columns;
+            }
+          }
+        });
+
+        window.dataProvider.then(function(dataSource) {
+          $vm.dataSourceId = dataSource.data.id;
+          window.dataProvider = null;
+          $vm.triggerSave();
+        });
+      };
+
+      if (!component.methods.initDataProvider) {
+        component.methods.initDataProvider = component.methods._initDataProvider;
+      }
+
+      component.methods._removeDataProvider = function() {
+        window.dataProvider.close();
+        window.dataProvider = null;
+      };
+
+      if (!component.methods.removeDataProvider) {
+        component.methods.removeDataProvider = component.methods._removeDataProvider;
       }
 
       component.methods._openFileManager = function() {
