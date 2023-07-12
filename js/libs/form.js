@@ -153,23 +153,8 @@ Fliplet().then(function() {
       });
     }
 
-    function saveProgress() {
-      var progress = {};
-
-      data.fields.forEach(function(field) {
-        if (field.saveProgress !== false && field.enabled) {
-          progress[field.name] = field.value;
-        }
-      });
-
-      localStorage.setItem(progressKey, JSON.stringify(progress));
-    }
-
     function getFields(isEditMode) {
       var fields = _.compact(JSON.parse(JSON.stringify(data.fields || [])));
-
-      // Make sure all updated values are stored in localstorage before get them
-      saveProgress();
 
       var progress = getProgress();
 
@@ -418,6 +403,17 @@ Fliplet().then(function() {
         }
       },
       methods: {
+        saveProgress: function() {
+          var progress = {};
+
+          this.fields.forEach(function(field) {
+            if (field.saveProgress !== false && field.enabled) {
+              progress[field.name] = field.value;
+            }
+          });
+
+          localStorage.setItem(progressKey, JSON.stringify(progress));
+        },
         start: function(event) {
           if (event) {
             event.preventDefault();
@@ -583,8 +579,8 @@ Fliplet().then(function() {
             }
           });
 
-          if (data.saveProgress && typeof this.saveProgress === 'function') {
-            this.saveProgress();
+          if (data.saveProgress && typeof this.saveProgressed === 'function') {
+            this.saveProgressed();
           }
         },
         onChange: function(fieldName, fn, runOnBind) {
@@ -1096,7 +1092,7 @@ Fliplet().then(function() {
       mounted: function() {
         var $vm = this;
 
-        this.saveProgressed = debounce(saveProgress, saveDelay);
+        this.saveProgressed = debounce(this.saveProgress, saveDelay);
 
         $(selector).removeClass('hidden');
 
