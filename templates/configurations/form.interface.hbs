@@ -66,7 +66,7 @@
       </div>
     </div>
 
-    <div class="form-group cleafix" v-if="_supportsRowOptions" :class="{ 'has-error': errors.matrixRowOptions }">
+    <div class="form-group cleafix" v-if="_supportsRowOptions" :class="{ 'has-error': errors.matrixRowOptions || errors.matrixRowInvalidOptions }">
       <div class="col-xs-12">
         <label class="control-label">Row options (one per line)</label>
       </div>
@@ -74,6 +74,7 @@
         <textarea v-on:input="_setOptions($event.target.value, 'rowOptions')" class="form-control" rows="5">\{{ _rowOptions }}</textarea>
       </div>
       <p class="col-xs-12 help-block" v-if="errors.matrixRowOptions">\{{ errors.matrixRowOptions }}</p>
+      <p class="col-xs-12 help-block" v-if="errors.matrixRowInvalidOptions">\{{ errors.matrixRowInvalidOptions }}</p>
     </div>
 
     <div class="form-group cleafix" v-if="_supportsColumnOptions" :class="{ 'has-error': errors.matrixColumnOptions }">

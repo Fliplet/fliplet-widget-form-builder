@@ -114,6 +114,47 @@ Fliplet().then(function() {
       };
     }
 
+    function getMatrixValue(value, field) {
+      var matrixValue = {};
+
+      if (!value || typeof value === 'object') {
+        return value;
+      }
+
+      if (value.indexOf('[') > -1 || value.indexOf(']') > -1) {
+        _.forEach(value.split(/\r?\n/), function(rowOption) {
+          if (!rowOption) {
+            return;
+          }
+
+          rowOption = rowOption.trim();
+
+          var regex = /\[(.*)\]/g;
+          var match = rowOption.split(regex).filter(r => r !== '');
+
+          if (match.length > 1) {
+            matrixValue[match[0].trim()] =  match[1].trim();
+
+            return;
+          }
+
+          _.forEach(field.rowOptions, function(row) {
+            if (_.has(matrixValue, row.label)) {
+              return;
+            }
+
+            matrixValue[row.label] = match[0].trim();
+          });
+        });
+      } else {
+        _.forEach(field.rowOptions, function(row) {
+          matrixValue[row.label] = value;
+        });
+      }
+
+      return matrixValue;
+    }
+
     function loadFieldValueFromSource(field) {
       var result;
 
@@ -146,9 +187,12 @@ Fliplet().then(function() {
           if (!Array.isArray(val)) {
             val = _.compact([val]);
           }
+        } else if (field._type === 'flMatrix') {
+          field.value = getMatrixValue(val, field);
+        } else {
+          field.value = val;
         }
 
-        field.value = val;
         debounce();
       });
     }
@@ -207,6 +251,28 @@ Fliplet().then(function() {
                   fieldData = null;
                 }
 
+                break;
+              case 'flMatrix':
+                var option = {};
+
+                if (_.isEmpty(entry.data)) {
+                  return;
+                }
+
+                _.forEach(field.rowOptions, function(row) {
+                  var val = row.id ? row.id : row.label;
+                  var matrixKey = entry.data[`${fieldKey} [${val}]`] ? entry.data[`${fieldKey} [${val}]`] : entry.data[`${fieldKey}`];
+
+                  if (isResetAction) {
+                    if ((!field.defaultValueKey && matrixKey) || (field.defaultValueKey.indexOf(val) !== -1 && matrixKey)) {
+                      option[val] = matrixKey;
+                    }
+                  } else if (matrixKey) {
+                    option[val] = matrixKey;
+                  }
+                });
+
+                fieldData = option;
                 break;
               default:
                 fieldData = entry.data[fieldKey];
@@ -351,7 +417,20 @@ Fliplet().then(function() {
             return field.value;
           }
 
-          if (progress && !isEditMode) {
+          if (field._type === 'flMatrix') {
+            switch (field.defaultValueSource) {
+              case 'default' :
+                field.value = getMatrixValue(field.value, field);
+                break;
+
+              case 'query':
+                loadFieldValueFromSource(field);
+                break;
+
+              default:
+                break;
+            }
+          } else if (progress && !isEditMode) {
             var savedValue = progress[field.name];
 
             if (typeof savedValue !== 'undefined') {
@@ -531,7 +610,11 @@ Fliplet().then(function() {
               }
             }
 
-            field.value = value;
+            if (field.defaultValueSource === 'default' && field._type === 'flMatrix') {
+              field.value = getMatrixValue(value, field);
+            } else {
+              field.value = value;
+            }
 
             $vm.triggerChange(field.name, field.value);
           });
@@ -883,6 +966,22 @@ Fliplet().then(function() {
                   if (value) {
                     appendField(`${field.name} [Start]`, value.start);
                     appendField(`${field.name} [End]`, value.end);
+                  }
+                } else if (type === 'flMatrix') {
+                  if (!_.isEmpty(value)) {
+                    _.forEach(value, function(col, row) {
+                      if (!row || !col) {
+                        return '';
+                      }
+
+                      appendField(`${field.name} [${row}]`, col);
+                    });
+                  } else {
+                    _.forEach(field.rowOptions, function(row) {
+                      var val = row.id ? row.id : row.label;
+
+                      appendField(`${field.name} [${val}]`, '');
+                    });
                   }
                 } else {
                   // Other inputs
@@ -1274,7 +1373,24 @@ Fliplet().then(function() {
 
                     var hasChanged = field.value !== value;
 
-                    field.value = value;
+                    if (field._type === 'flMatrix') {
+                      var options = {};
+
+                      _.some(field.rowOptions, function(row) {
+                        return _.some(_.keys(value), function(key) {
+                          if (row.label === key) {
+                            options[key] = value[key];
+
+                            return true;
+                          }
+                        });
+                      });
+
+                      field.value = options;
+                    } else {
+                      field.value = value;
+                    }
+
                     debouncedUpdate();
 
                     if (hasChanged) {

@@ -551,6 +551,20 @@ Fliplet.FormBuilder = (function() {
               _.assignIn(this.errors, {
                 matrixRowOptions: 'Please enter row options for the matrix field'
               });
+            } else {
+              var $vm = this;
+
+              _.some(this.rowOptions, function(row) {
+                var val = row.id ? row.id : row.label;
+
+                if (val.indexOf('[') > -1 || val.indexOf(']') > -1) {
+                  _.assignIn($vm.errors, {
+                    matrixRowInvalidOptions: '[ ] characters are not allowed in row options'
+                  });
+
+                  return true;
+                }
+              });
             }
 
             break;
