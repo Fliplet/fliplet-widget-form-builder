@@ -1424,62 +1424,72 @@ Fliplet().then(function() {
                   }
                 },
                 options: function(values) {
-                  if (typeof values === 'undefined') {
+                  var result = typeof values === 'function' ? values() : values;
+
+                  if (typeof result === 'undefined') {
                     return field.options;
                   }
 
-                  if (!Array.isArray(values)) {
-                    throw new Error('Options must be an array');
+                  if (!(result instanceof Promise)) {
+                    result = Promise.resolve(result);
                   }
 
-                  if (field._type === 'flSelect') {
-                    // remove all invalid options
-                    _.remove(values, function(val) {
-                      return !(_.isObject(val) || _.isNumber(val) || (_.isString(val) && val.trim()));
-                    });
-                  }
+                  return result.then(function(newOptions) {
+                    if (!Array.isArray(newOptions)) {
+                      throw new Error('Options must be an array');
+                    }
 
-                  var options = values.map(function(option) {
-                    if (typeof option === 'object') {
-                      if (typeof option.value !== 'undefined') {
-                        option.id = option.value;
+                    values = newOptions || [];
+
+                    if (field._type === 'flSelect') {
+                      // remove all invalid options
+                      _.remove(values, function(val) {
+                        return !(_.isObject(val) || _.isNumber(val) || (_.isString(val) && val.trim()));
+                      });
+                    }
+
+                    var options = values.map(function(option) {
+                      if (typeof option === 'object') {
+                        if (typeof option.value !== 'undefined') {
+                          option.id = option.value;
+                        }
+
+                        return option;
                       }
 
-                      return option;
+                      if (field._type === 'flTypeahead') {
+                        return { label: option };
+                      }
+
+                      return { id: option };
+                    });
+
+                    if (!_.isEmpty(field.value)) {
+                      switch (field._type) {
+                        case 'flCheckbox':
+                          var selectedValues = _.difference(field.value, values);
+
+                          field.value = selectedValues.length ? [] : field.value;
+                          break;
+                        case 'flRadio':
+                        case 'flSelect':
+                          var selectedValueInOptions = _.some(values, function(option) {
+                            return option === field.value;
+                          });
+
+                          field.value = selectedValueInOptions ? field.value : '';
+                          break;
+                        default:
+                          break;
+                      }
                     }
 
-                    if (field._type === 'flTypeahead') {
-                      return { label: option };
-                    }
+                    // Update options in field definition so they are kept between renderings
+                    _.find(data.fields, { name: field.name }).options = options;
 
-                    return { id: option };
+                    // Update live field
+                    field.options = options;
                   });
-
-                  if (!_.isEmpty(field.value)) {
-                    switch (field._type) {
-                      case 'flCheckbox':
-                        var selectedValues = _.difference(field.value, values);
-
-                        field.value = selectedValues.length ? [] : field.value;
-                        break;
-                      case 'flRadio':
-                      case 'flSelect':
-                        var selectedValueInOptions = _.some(values, function(option) {
-                          return option === field.value;
-                        });
-
-                        field.value = selectedValueInOptions ? field.value : '';
-                        break;
-                      default:
-                        break;
-                    }
-                  }
-
-                  // Update options in field definition so they are kept between renderings
-                  _.find(data.fields, { name: field.name }).options = options;
-
-                  // Update live field
-                  field.options = options;
                 },
                 on: function(eventName, fn) {
                   var eventListeners = data.fieldEventListeners;

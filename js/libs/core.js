@@ -595,7 +595,9 @@ Fliplet.FormBuilder = (function() {
             this.initTimePicker();
           }
 
-          this.initDataProvider();
+          if (componentName === 'flTypeahead') {
+            this.initDataProvider();
+          }
         };
       }
 
