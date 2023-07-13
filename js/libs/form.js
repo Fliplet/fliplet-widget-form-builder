@@ -1284,10 +1284,6 @@ Fliplet().then(function() {
 
               var $field = _.find($form.$children, { name: field.name });
 
-              if (!$field) {
-                throw new Error('The field ' + key + ' has not been found.');
-              }
-
               return {
                 val: function(value) {
                   if (typeof value === 'undefined') {
