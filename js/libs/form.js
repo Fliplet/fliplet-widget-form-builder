@@ -1454,11 +1454,15 @@ Fliplet().then(function() {
                           option.id = option.value;
                         }
 
+                        if (field._type === 'flTypeahead' && typeof option.id === 'undefined') {
+                          option.id = option.label;
+                        }
+
                         return option;
                       }
 
                       if (field._type === 'flTypeahead') {
-                        return { label: option };
+                        return { id: option, label: option };
                       }
 
                       return { id: option };
