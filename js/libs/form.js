@@ -200,7 +200,7 @@ Fliplet().then(function() {
     function saveProgress() {
       var progress = {};
 
-      data.fields.forEach(function(field) {
+      (data.fields || []).forEach(function(field) {
         if (field.saveProgress !== false && field.enabled) {
           progress[field.name] = field.value;
         }
