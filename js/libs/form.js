@@ -1426,11 +1426,7 @@ Fliplet().then(function() {
                     return field.options;
                   }
 
-                  if (!(result instanceof Promise)) {
-                    result = Promise.resolve(result);
-                  }
-
-                  return result.then(function(newOptions) {
+                  return Promise.resolve(result).then(function(newOptions) {
                     if (!Array.isArray(newOptions)) {
                       throw new Error('Options must be an array');
                     }
