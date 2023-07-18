@@ -119,7 +119,35 @@ Fliplet.FormBuilder = (function() {
               throw new Error('A key is required to fetch data from the navigation query parameters');
             }
 
-            result = Fliplet.Navigate.query[data.key];
+            if (this._componentName === 'flMatrix') {
+              var matrixValue = {};
+
+              _.mapKeys(Fliplet.Navigate.query, function(value, key) {
+                if (key === data.key) {
+                  _.forEach(this.rowOptions, function(row) {
+                    var val = row.id ? row.id : row.label;
+
+                    if (!_.has(matrixValue, val)) {
+                      matrixValue[val] = value;
+                    }
+                  });
+                } else if (_.includes(key, data.key)) {
+                  var regex = /\[(.*)\]/g;
+                  var match = key.split(regex).filter(r => r !== '');
+
+                  if (match.length > 1) {
+                    matrixValue[match[1]] = value;
+                  } else {
+                    matrixValue = value;
+                  }
+                }
+              });
+
+              result = matrixValue;
+            } else {
+              result = Fliplet.Navigate.query[data.key];
+            }
+
             break;
           case 'appStorage':
             if (!data.key) {
