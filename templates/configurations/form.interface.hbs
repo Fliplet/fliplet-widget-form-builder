@@ -66,7 +66,7 @@
       </div>
     </div>
 
-    <div class="form-group cleafix" v-if="_supportsRowOptions" :class="{ 'has-error': errors.matrixRowOptions || errors.matrixRowInvalidOptions }">
+    <div class="form-group cleafix" v-if="_supportsRowOptions" :class="{ 'has-error': errors.matrixRowOptions ||  errors.matrixDuplicateRowOptions || errors.matrixRowInvalidOptions }">
       <div class="col-xs-12">
         <label class="control-label">Row options (one per line)</label>
       </div>
@@ -74,10 +74,11 @@
         <textarea v-on:input="_setOptions($event.target.value, 'rowOptions')" class="form-control" rows="5">\{{ _rowOptions }}</textarea>
       </div>
       <p class="col-xs-12 help-block" v-if="errors.matrixRowOptions">\{{ errors.matrixRowOptions }}</p>
+      <p class="col-xs-12 help-block" v-if="errors.matrixDuplicateRowOptions">\{{ errors.matrixDuplicateRowOptions }}</p>
       <p class="col-xs-12 help-block" v-if="errors.matrixRowInvalidOptions">\{{ errors.matrixRowInvalidOptions }}</p>
     </div>
 
-    <div class="form-group cleafix" v-if="_supportsColumnOptions" :class="{ 'has-error': errors.matrixColumnOptions }">
+    <div class="form-group cleafix" v-if="_supportsColumnOptions" :class="{ 'has-error': errors.matrixColumnOptions || errors.matrixDuplicateColumnOptions }">
       <div class="col-xs-12">
         <label class="control-label">Column options (one per line)</label>
       </div>
@@ -85,6 +86,7 @@
         <textarea v-on:input="_setOptions($event.target.value, 'columnOptions')" class="form-control" rows="5">\{{ _columnOptions }}</textarea>
       </div>
       <p class="col-xs-12 help-block" v-if="errors.matrixColumnOptions">\{{ errors.matrixColumnOptions }}</p>
+      <p class="col-xs-12 help-block" v-if="errors.matrixDuplicateColumnOptions">\{{ errors.matrixDuplicateColumnOptions }}</p>
     </div>
 
     {{#hasSelectAll}}
@@ -99,13 +101,19 @@
     {{/hasSelectAll}}
 
     {{#hasOptions}}
-      <div class="form-group cleafix">
+      <div class="form-group cleafix" :class="{ 'has-error': errors.selectOptions || errors.checkboxOptions || errors.radioOptions || errors.selectDuplicateOptions|| errors.radioDuplicateOptions || errors.checkboxDuplicateOptions }">
         <div class="col-xs-12">
           <label class="control-label">Options <small>(One per line)</small></label>
         </div>
         <div class="col-xs-12">
           <textarea v-on:input="_setOptions($event.target.value, 'options')" class="form-control">\{{ _options }}</textarea>
         </div>
+        <p class="col-xs-12 help-block" v-if="errors.selectOptions">\{{ errors.selectOptions }}</p>
+        <p class="col-xs-12 help-block" v-if="errors.checkboxOptions">\{{ errors.checkboxOptions }}</p>
+        <p class="col-xs-12 help-block" v-if="errors.radioOptions">\{{ errors.radioOptions }}</p>
+        <p class="col-xs-12 help-block" v-if="errors.selectDuplicateOptions">\{{ errors.selectDuplicateOptions }}</p>
+        <p class="col-xs-12 help-block" v-if="errors.radioDuplicateOptions">\{{ errors.radioDuplicateOptions }}</p>
+        <p class="col-xs-12 help-block" v-if="errors.checkboxDuplicateOptions">\{{ errors.checkboxDuplicateOptions }}</p>
       </div>
     {{/hasOptions}}
 
