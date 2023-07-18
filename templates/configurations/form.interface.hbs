@@ -57,7 +57,7 @@
 
       <div class="form-group-cleafix">
         <div class="checkbox checkbox-icon form-hide-checkbox">
-          <input type="checkbox" :name="name" v-model="isHidden" id="form-hide-checkbox" v-on:input="required = false">
+          <input type="checkbox" :name="name" v-model="isHidden" id="form-hide-checkbox" v-on:click="_hideField" >
           <label for="form-hide-checkbox">
             <span class="check"><i class="fa fa-check"></i></span>
             <span class="hide-field">Hide this field from users.</span>

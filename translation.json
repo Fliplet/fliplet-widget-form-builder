@@ -104,6 +104,14 @@
           "edit": "Edit"
         }
       },
+      "geolocation": {
+        "getLocation": "Get my location",
+        "updateLocation": "Update my location",
+        "permissionDenied": "Location features are disabled. Please enable them in settings to submit this form.",
+        "positionUnavailable": "Location information is unavailable.",
+        "timeout": "The request to get user location timed out. Please try again.",
+        "unknownError": "An unknown error occurred."
+      },
       "telephone": {
         "instruction": "Phone number can only contain <b>; , . ( ) - + SPACE * #</b> and numbers."
       },

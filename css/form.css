@@ -1413,3 +1413,9 @@ form hr {
 .fl-matrix table tbody tr:last-child td {
   border-bottom-width: 0;
 }
+
+/* Geolocation */
+
+.geolocation.btn {
+  column-gap: 10px;
+}

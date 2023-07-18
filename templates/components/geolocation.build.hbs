@@ -1,0 +1,9 @@
+<template>
+  <div v-if="description" class="help-block description">\{{ description }}</div>
+  <button class="geolocation btn btn-primary focus-outline">
+    \{{ buttonContent }}
+  </button>
+  <p class="text-danger" v-if="$v.value.required === false && $v.value.$dirty">
+    {{T "widgets.form.errors.required"}}
+  </p>
+</template>

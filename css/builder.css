@@ -1272,3 +1272,9 @@ form hr {
 .fl-matrix table .radio.radio-icon input[type="radio"] + label > span {
   left: 45px;
 }
+
+/* Geolocation */
+
+.geolocation.btn-primary {
+  column-gap: 10px;
+}
