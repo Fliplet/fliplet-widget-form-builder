@@ -83,6 +83,36 @@ Fliplet.FormBuilder.field('geolocation', {
       }).catch(function(err) {
         $vm.openToastMessage(err.code);
       });
+    },
+    getErrorMessage: function(code) {
+      switch (code) {
+        case 'PERMISSION_DENIED':
+          return T('widgets.form.geolocation.permissionDenied');
+        case 'POSITION_UNAVAILABLE':
+          return T('widgets.form.geolocation.positionUnavailable');
+        case 'TIMEOUT':
+          return T('widgets.form.geolocation.timeout');
+        case 'UNKNOWN_ERROR':
+          return T('widgets.form.geolocation.unknownError');
+        default:
+          break;
+      }
+    },
+    openToastMessage: function(code) {
+      var permission = Fliplet.Navigator.supportsAppSettings();
+
+      Fliplet.UI.Toast({
+        type: 'minimal',
+        message: this.getErrorMessage(code),
+        actions: code === 'PERMISSION_DENIED' && permission ? [{
+          label: 'SETTINGS',
+          action: function() {
+            Fliplet.Navigator.openAppSettings();
+          }
+        }] : null,
+        duration: false, // Ensures the toast message doesn't auto-dismiss
+        tapToDismiss: false // Ensures the toast message is only dismissed through the action button
+      });
     }
   },
   watch: {
