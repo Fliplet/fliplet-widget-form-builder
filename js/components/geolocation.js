@@ -45,7 +45,11 @@ Fliplet.FormBuilder.field('geolocation', {
       $vm.buttonClicked = true;
       $vm.isLoading = true;
 
-      var location = Fliplet.Navigator.location();
+      var location = Fliplet.Navigator.location({
+        maximumAge: 0,
+        timeout: 30000,
+        enableHighAccuracy: true
+      });
 
       location.then(function(result) {
         $vm.value = $vm.setValue(result);
@@ -53,7 +57,31 @@ Fliplet.FormBuilder.field('geolocation', {
         setTimeout(function() {
           $vm.isLoading = false;
           $vm.firstTimeSaved = true;
-        }, 500);
+        }, 3000);
+      }).catch(function(err) {
+        $vm.openToastMessage(err.code);
+      });
+    },
+    updateLocation: function() {
+      var $vm = this;
+
+      $vm.buttonClicked = true;
+      $vm.isLoading = true;
+
+      var location = Fliplet.Navigator.location({
+        maximumAge: 0,
+        timeout: 30000,
+        enableHighAccuracy: true
+      });
+
+      location.then(function(res) {
+        $vm.value = $vm.setValue(res);
+
+        setTimeout(function() {
+          $vm.isLoading = false;
+        }, 3000);
+      }).catch(function(err) {
+        $vm.openToastMessage(err.code);
       });
     }
   },
