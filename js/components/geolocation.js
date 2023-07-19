@@ -2,6 +2,9 @@ Fliplet.FormBuilder.field('geolocation', {
   name: 'Geolocation',
   category: 'Advanced',
   props: {
+    value: {
+      type: String
+    },
     description: {
       type: String
     },
@@ -16,7 +19,9 @@ Fliplet.FormBuilder.field('geolocation', {
   },
   data: function() {
     return {
-      buttonContent: T('widgets.form.geolocation.getLocation')
+      firstTimeSaved: false,
+      isLoading: false,
+      buttonClicked: false
     };
   },
   validations: function() {
@@ -29,5 +34,32 @@ Fliplet.FormBuilder.field('geolocation', {
     }
 
     return rules;
+  },
+  methods: {
+    setValue: function(result) {
+      return `${result.coords.latitude}, ${result.coords.longitude}`;
+    },
+    getLocation: function() {
+      var $vm = this;
+
+      $vm.buttonClicked = true;
+      $vm.isLoading = true;
+
+      var location = Fliplet.Navigator.location();
+
+      location.then(function(result) {
+        $vm.value = $vm.setValue(result);
+
+        setTimeout(function() {
+          $vm.isLoading = false;
+          $vm.firstTimeSaved = true;
+        }, 500);
+      });
+    }
+  },
+  watch: {
+    value: function(val) {
+      this.$emit('_input', this.name, val, false, true);
+    }
   }
 });
