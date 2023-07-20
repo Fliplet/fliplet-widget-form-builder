@@ -228,7 +228,7 @@ Fliplet.FormBuilder.field('matrix', {
           });
         }
 
-        if (result.length === 0 || columnOpt.length === 0) {
+        if (result.length === 0 && columnOpt.length === 0) {
           checkFlag = 'clear';
         }
       }
