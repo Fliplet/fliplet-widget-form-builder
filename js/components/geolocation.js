@@ -35,6 +35,17 @@ Fliplet.FormBuilder.field('geolocation', {
 
     return rules;
   },
+  mounted: function() {
+    if (this.autofill) {
+      this.getLocation();
+    }
+  },
+  created: function() {
+    Fliplet.Hooks.on('beforeFormSubmit', this.onBeforeSubmit);
+  },
+  destroyed: function() {
+    Fliplet.Hooks.off('beforeFormSubmit', this.onBeforeSubmit);
+  },
   methods: {
     setValue: function(result) {
       return `${result.coords.latitude}, ${result.coords.longitude}`;
@@ -113,6 +124,24 @@ Fliplet.FormBuilder.field('geolocation', {
         duration: false, // Ensures the toast message doesn't auto-dismiss
         tapToDismiss: false // Ensures the toast message is only dismissed through the action button
       });
+    },
+    onBeforeSubmit: function() {
+      if (!this.value || this.value === '') {
+        Fliplet.UI.Toast({
+          type: 'regular',
+          message: 'Loading location ...',
+          actions: [
+            {
+              label: 'Ok',
+              action: function() {
+                Fliplet.UI.Toast.dismiss();
+              }
+            }
+          ]
+        });
+
+        return Promise.reject('');
+      }
     }
   },
   watch: {
