@@ -924,6 +924,10 @@ Fliplet().then(function() {
                   value = value.replace(/-|\s/g, '');
                 }
 
+                if (type === 'flGeolocation' && !value && !field.required) {
+                  value = null;
+                }
+
                 if (type === 'flDate') {
                   value = moment(value);
 
