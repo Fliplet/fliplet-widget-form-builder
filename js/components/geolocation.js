@@ -122,7 +122,7 @@ Fliplet.FormBuilder.field('geolocation', {
         case 'inaccurateCoords':
           return T('widgets.form.geolocation.errors.inaccurateCoords');
         default:
-          break;
+          return T('widgets.form.geolocation.errors.unknownError');
       }
     },
     openToastMessage: function(error) {
