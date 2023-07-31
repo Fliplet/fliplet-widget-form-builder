@@ -22,7 +22,8 @@ Fliplet.FormBuilder.field('geolocation', {
       firstTimeSaved: false,
       isLoading: false,
       showFeedback: false,
-      accuracy: null
+      accuracy: null,
+      timeOut: null
     };
   },
   validations: function() {
@@ -74,7 +75,7 @@ Fliplet.FormBuilder.field('geolocation', {
         $vm.firstTimeSaved = true;
         $vm.isLoading = false;
 
-        setTimeout(function() {
+        this.timeOut = setTimeout(function() {
           $vm.showFeedback = false;
         }, 3000);
       }).catch(function(err) {
@@ -84,19 +85,22 @@ Fliplet.FormBuilder.field('geolocation', {
       });
     },
     updateLocation: function() {
+      this.timeOut = undefined;
+
       var $vm = this;
+      var location = this.getDeviceLocation();
 
       $vm.showFeedback = true;
       $vm.isLoading = true;
-
-      var location = this.getDeviceLocation();
 
       location.then(function(res) {
         $vm.accuracy = res.coords.accuracy;
         $vm.value = $vm.setValue(res);
         $vm.isLoading = false;
 
-        setTimeout(function() {
+        clearTimeout(this.timeOut);
+
+        this.timeOut = setTimeout(function() {
           $vm.showFeedback = false;
         }, 3000);
       }).catch(function(err) {
