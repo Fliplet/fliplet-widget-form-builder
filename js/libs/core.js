@@ -13,17 +13,6 @@ Fliplet.FormBuilder = (function() {
     return 'fl' + component.charAt(0).toUpperCase() + component.slice(1);
   }
 
-  var dataSourceColumnValues = {
-    224: {
-      'Dropdown (single-select)': ['Lunch', 'Breakfast', 'Branch'],
-      'Typeahead (multi-select)': ['Option 1', 'Option 2', 'Option 3', 'Option 4'],
-      'Checkboxes (multi-select)': ['One', 'Two', 'Tree']
-    },
-    456: {
-      column2: ['foo', 'bar']
-    }
-  };
-
   return {
     on: function(eventName, fn) {
       eventHub.$on(eventName, fn);
@@ -612,55 +601,51 @@ Fliplet.FormBuilder = (function() {
       };
 
       component.methods._getDataSourceColumnValues = function() {
+        var $vm = this;
         var id = this.dataSourceId;
         var column = this.column;
 
-        // id and column can be used for managing cache based on data source ID and column name
-        var result = dataSourceColumnValues[id][column];
-
         Fliplet.Cache.get({
           key: id + '-' + column,
-          platform: 'native',
           expire: 60
-        }, function() {
-          return new Promise(function(resolve) {
-            var result = dataSourceColumnValues[id][column];
+        }, function getColumnValues() {
+          // If there's no cache, return new values, i.e.
+          Fliplet.DataSources.connect(id).then(function(connection) {
+            connection.getIndex(column).then(function onSuccess(values) {
+              $vm.options = _.compact(values, function(value) {
+                if (value !== '') {
+                  return value.trim();
+                }
+              }).map(function(rawOption) {
+                if (rawOption) {
+                  rawOption = rawOption.trim();
 
-            setTimeout(function() {
-              resolve(result);
-            }, 500);
+                  var regex = /<.*>$/g;
+                  var match = rawOption.match(regex);
+                  var option = {};
+
+                  if (match) {
+                    option.label = rawOption.replace(regex, '').trim();
+
+                    var value = match[0].substring(1, match[0].length - 1).trim();
+
+                    option.id = value || option.label;
+                  } else {
+                    option.label = rawOption;
+                    option.id = rawOption;
+                  }
+
+                  return option;
+                }
+              });
+
+              return $vm.options;
+            });
           });
-        });
-
-        // If there's cache found, return value from cache
-
-        // If there's no cache, return new values, i.e.
-        this.options = _.compact(result, function(option) {
-          if (option !== '') {
-            return option.trim();
-          }
-        }).map(function(rawOption) {
-          if (rawOption) {
-            rawOption = rawOption.trim();
-
-            var regex = /<.*>$/g;
-            var match = rawOption.match(regex);
-            var option = {};
-
-            if (match) {
-              option.label = rawOption.replace(regex, '').trim();
-
-              var value = match[0].substring(1, match[0].length - 1).trim();
-
-              option.id = value || option.label;
-            } else {
-              option.label = rawOption;
-              option.id = rawOption;
-            }
-
-            return option;
-          }
-        });
+        })
+          .then(function(result) {
+            $vm.options = result;
+          });
       };
 
       if (!component.methods.disableAutomatch) {
