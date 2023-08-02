@@ -1238,9 +1238,9 @@ Fliplet().then(function() {
 
           Fliplet.Navigator.onOffline(function() {
             $vm.isOffline = true;
-            $vm.isOfflineMessage = data.dataStore && data.dataStore.indexOf('editDataSource') > -1 ?
-              T('widgets.form.errors.offlineDataError') :
-              T('widgets.form.errors.offlineFormError');
+            $vm.isOfflineMessage = data.dataStore && data.dataStore.indexOf('editDataSource') > -1
+              ? T('widgets.form.errors.offlineDataError')
+              : T('widgets.form.errors.offlineFormError');
 
             if ($vm.isEditMode && $vm.isLoading && $vm.isOffline) {
               $vm.blockScreen = true;
