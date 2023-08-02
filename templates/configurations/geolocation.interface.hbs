@@ -1,0 +1,19 @@
+<div class="form-group">
+  <label class="control-label">Load automatically</label>
+  <div class="checkbox checkbox-icon" :class="{ 'readonly' : isHidden }">
+    <input type="checkbox" id="getLocationAutomatically" name="getLocationAutomatically" v-model="autofill" :disabled="isHidden">
+    <label for="getLocationAutomatically">
+      <span class="check"><i class="fa fa-check"></i></span> Automatically populate users location
+    </label>
+  </div>
+</div>
+
+<div class="form-group">
+  <label class="control-label">Precise location</label>
+  <div class="checkbox checkbox-icon">
+    <input type="checkbox" id="preciseLocation" name="preciseLocation" v-model="preciseLocationRequired">
+    <label for="preciseLocation">
+      <span class="check"><i class="fa fa-check"></i></span> Require form to collect users precise location
+    </label>
+  </div>
+</div>

@@ -448,6 +448,16 @@ Fliplet().then(function() {
 
                 break;
 
+              case 'flGeolocation':
+                var regex = /^[-+]?([1-8]?\d(\.\d+)?|90(\.0+)?),\s*[-+]?(180(\.0+)?|((1[0-7]\d)|([1-9]?\d))(\.\d+)?)$/;
+
+                if (regex.exec(fieldData)) {
+                  field.value = fieldData;
+                } else {
+                  field.value = null;
+                }
+
+                break;
                 // There is no validation and value assignment for checkbox and radio options as there is no access to the options. This is implemented in the checkbox and radio components respectively.
 
               default:
@@ -912,6 +922,10 @@ Fliplet().then(function() {
                 // Remove spaces and dashes from value (when it's a string)
                 if (typeof value === 'string' && ['flNumber', 'flTelephone'].indexOf(type) !== -1) {
                   value = value.replace(/-|\s/g, '');
+                }
+
+                if (type === 'flGeolocation' && !value && !field.required) {
+                  value = null;
                 }
 
                 if (type === 'flDate') {

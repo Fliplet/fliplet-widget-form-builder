@@ -443,7 +443,7 @@ Fliplet.FormBuilder = (function() {
 
       component.props._componentsWithDescription = {
         type: Array,
-        default: ['flInput', 'flCheckbox', 'flRadio', 'flEmail', 'flNumber', 'flTelephone', 'flUrl', 'flTextarea', 'flWysiwyg', 'flSelect', 'flDate', 'flTime', 'flDateRange', 'flTimeRange', 'flTimer', 'flStarRating', 'flSignature', 'flImage', 'flFile', 'flSlider', 'flMatrix']
+        default: ['flInput', 'flCheckbox', 'flRadio', 'flEmail', 'flNumber', 'flTelephone', 'flUrl', 'flTextarea', 'flWysiwyg', 'flSelect', 'flDate', 'flTime', 'flDateRange', 'flTimeRange', 'flTimer', 'flStarRating', 'flSignature', 'flImage', 'flFile', 'flSlider', 'flMatrix', 'flGeolocation']
       };
 
       component.props._readOnlyComponents = {
@@ -686,6 +686,14 @@ Fliplet.FormBuilder = (function() {
           }
         };
       }
+
+      component.methods._hideField = function() {
+        this.required = false;
+
+        if (this._componentName === 'flGeolocation' && this.isHidden === false) {
+          this.autofill = true;
+        }
+      };
 
       component.methods._disableAutomatch = function() {
         this._showNameField = true;
