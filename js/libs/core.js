@@ -208,17 +208,6 @@ Fliplet.FormBuilder = (function() {
         this.highlightError();
       };
 
-      component.methods.browserSupport = function(browserType) {
-        switch (browserType) {
-          case 'IE11':
-            return navigator.userAgent.indexOf('Trident/') !== -1;
-          case 'Safari':
-            return navigator.userAgent.indexOf('Safari') !== -1;
-          default:
-            return false;
-        }
-      };
-
       // Define method to trigger the form reset from a children
       if (!component.methods.resetForm) {
         component.methods.resetForm = function() {
@@ -664,26 +653,10 @@ Fliplet.FormBuilder = (function() {
         }
       };
 
-      component.methods.browserSupport = function(browserType) {
-        switch (browserType) {
-          case 'IE11':
-            return navigator.userAgent.indexOf('Trident/') !== -1;
-          case 'Safari':
-            return /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
-          default:
-            return false;
-        }
-      };
-
       if (!component.mounted) {
         component.mounted = function() {
           this._showNameField = this.name !== this.label;
           this.initTooltip();
-          this.initDatepicker();
-
-          if (this.browserSupport('IE11') || this.browserSupport('safari')) {
-            this.initTimePicker();
-          }
         };
       }
 
@@ -730,46 +703,6 @@ Fliplet.FormBuilder = (function() {
           }
         });
       };
-
-      component.methods._initDatepicker = function() {
-        var $vm = this;
-
-        $vm.$nextTick(function() {
-          var $el = $(this.$el).find('input.date-picker').datepicker({
-            format: 'yyyy-mm-dd',
-            todayHighlight: true,
-            autoclose: true
-          }).on('changeDate', function(e) {
-            var value = moment(e.date).format(DATE_FORMAT);
-
-            $vm.value = value;
-          });
-
-          $el.datepicker('setDate', this.value || new Date());
-        });
-      };
-
-      if (!component.methods.initDatepicker) {
-        component.methods.initDatepicker = component.methods._initDatepicker;
-      }
-
-      component.methods._initTimePicker = function() {
-        var $vm = this;
-
-        $vm.$nextTick(function() {
-          var $el = $($vm.$refs.timepicker).timeEntry({
-            show24Hour: true
-          }).on('change', function(event) {
-            $vm.value = event.target.value;
-          });
-
-          $el.timeEntry('setTime', this.value);
-        });
-      };
-
-      if (!component.methods.initTimePicker) {
-        component.methods.initTimePicker = component.methods._initTimePicker;
-      }
 
       if (!component.methods.initTooltip) {
         component.methods.initTooltip = component.methods._initTooltip;

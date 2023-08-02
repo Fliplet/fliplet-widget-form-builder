@@ -31,8 +31,6 @@
       "js/interface.templates.js",
       "js/libs/core.js",
       "js/libs/templates.js",
-      "vendor/jquery.plugin.min.js",
-      "vendor/jquery.timeentry.min.js",
       "vendor/signature-pad.js",
 
       "js/components/input.js",
@@ -116,7 +114,6 @@
       "vendor/load-image.all.min.js",
       "js/build.templates.js",
       "js/libs/core.js",
-      "vendor/jquery.plugin.min.js",
       "vendor/signature-pad.js",
 
       "js/components/input.js",
