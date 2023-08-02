@@ -54,9 +54,11 @@ Fliplet.FormBuilder.field('geolocation', {
     setValue: function(result) {
       if (!result || !result.coords) {
         this.value = null;
-      } else {
-        this.value = `${result.coords.latitude},${result.coords.longitude}`;
+
+        return;
       }
+
+      this.value = `${result.coords.latitude},${result.coords.longitude}`;
     },
     getDeviceLocation: function() {
       return Fliplet.Navigator.location({
