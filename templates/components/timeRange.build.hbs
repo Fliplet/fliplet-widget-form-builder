@@ -1,6 +1,6 @@
 <template>
   <div v-if="description" class="help-block description">\{{ description }}</div>
-  <div class="fl-time-range form-html" ref="timeRange" :class="{ 'readonly' : readonly }">
+  <div class="fl-time-range" ref="timeRange" :class="{ 'readonly' : readonly }">
     <div class="form-group fl-time-picker time-picker-start focus-outline">
       <i class="fa fa-clock-o fa-fw"></i>
       <input type="time" class="form-control" :name="name" :id="name"/>

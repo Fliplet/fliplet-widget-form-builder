@@ -219,7 +219,57 @@
         </div>
       </div>
     </div>
-    {{else}}
+    {{/if}}
+
+    <div v-if='_flexibleWidthComponents.includes(_componentName)' class="col-xs-12 form-group">
+      <label class="control-label">Custom field width</label>
+      <div class="checkbox checkbox-icon">
+        <input type="checkbox" id="customWidth" name="customWidth" v-model="customWidth">
+        <label for="customWidth">
+          <span class="check"><i class="fa fa-check"></i></span> Make this field custom width
+        </label>
+      </div>
+    </div>
+    <div v-if="customWidth" class="col-xs-12 form-group">
+      <div class="form-group cleafix">
+        <div class="col-xs-12">
+          <label class="control-label">Select field width</label>
+          <div class="help-block description">Fields will format in one row until 100% width is met.
+            e.g. 75% & 25% will fit in one row.
+          </div>
+        </div>
+        <div class="col-xs-12">
+          <div class="radio radio-icon">
+            <input type="radio" id="25-percent" name="width" v-bind:value="25" v-model="width">
+            <label for="25-percent">
+              <span class="check"><i class="fa fa-circle"></i></span> 25%
+            </label>
+          </div>
+          <div class="radio radio-icon">
+            <input type="radio" id="50-percent" name="width" v-bind:value="50" v-model="width">
+            <label for="50-percent">
+              <span class="check"><i class="fa fa-circle"></i></span> 50%
+            </label>
+          </div>
+          <div class="radio radio-icon">
+            <input type="radio" id="75-percent" name="width" v-bind:value="75" v-model="width">
+            <label for="75-percent">
+              <span class="check"><i class="fa fa-circle"></i></span> 75%
+            </label>
+          </div>
+        </div>
+      </div>
+      <div class="col-xs-12 form-group">
+        <div class="checkbox checkbox-icon">
+          <input type="checkbox" id="ownRow" name="ownRow" v-model="ownRow">
+          <label for="ownRow">
+            <span class="check"><i class="fa fa-check"></i></span> Form field will be placed on a separate row
+          </label>
+        </div>
+      </div>
+    </div>
+
+    {{#unless isTimer}}
     <div v-if='_readOnlyComponents.includes(_componentName)' class="col-xs-12 form-group">
       <div class="checkbox checkbox-icon">
         <input type="checkbox" id="readonly" name="readonly" v-model="readonly">
@@ -228,7 +278,7 @@
         </label>
       </div>
     </div>
-    {{/if}}
+    {{/unless}}
   </div>
 
   <div class="footer">

@@ -21,7 +21,7 @@
     <span class="icon fa fa-chevron-down"></span>
     <span class="select-value-proxy"><template v-if="selectedRange && selectedRange !== {}">\{{ selectedRange.label }}</template><template v-else>\{{ placeholder }}</template></span>
   </label>
-  <div class="fl-date-range form-html" ref="dateRange">
+  <div class="fl-date-range" ref="dateRange">
     <div class="form-group fl-date-picker date-picker-start focus-outline">
       <i class="fa fa-calendar fa-fw"></i>
       <input type="date" class="form-control" :name="`start-${name}`" :id="`start-${name}`"/>
