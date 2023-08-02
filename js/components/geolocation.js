@@ -52,7 +52,11 @@ Fliplet.FormBuilder.field('geolocation', {
   },
   methods: {
     setValue: function(result) {
-      return `${result.coords.latitude}, ${result.coords.longitude}`;
+      if (!result || !result.coords) {
+        this.value = null;
+      } else {
+        this.value = `${result.coords.latitude},${result.coords.longitude}`;
+      }
     },
     getDeviceLocation: function() {
       return Fliplet.Navigator.location({
@@ -71,7 +75,7 @@ Fliplet.FormBuilder.field('geolocation', {
 
       location.then(function(result) {
         $vm.accuracy = result.coords.accuracy;
-        $vm.value = $vm.setValue(result);
+        $vm.setValue(result);
         $vm.firstTimeSaved = true;
         $vm.isLoading = false;
 
@@ -95,7 +99,7 @@ Fliplet.FormBuilder.field('geolocation', {
 
       location.then(function(res) {
         $vm.accuracy = res.coords.accuracy;
-        $vm.value = $vm.setValue(res);
+        $vm.setValue(res);
         $vm.isLoading = false;
 
         clearTimeout(this.timeOut);
