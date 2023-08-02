@@ -3,8 +3,6 @@ Fliplet.FormBuilder = (function() {
   var components = {};
   var eventHub = new Vue();
 
-  var DATE_FORMAT = 'YYYY-MM-DD';
-
   Vue.use(window.vuelidate.default);
 
   var templates = Fliplet.Widget.Templates;

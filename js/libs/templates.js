@@ -22,9 +22,9 @@ var systemTemplates = [{
 Fliplet.FormBuilder.templates = function() {
   var organizationId = Fliplet.Env.get('organizationId');
 
-  var operation = Fliplet.Env.get('development') || !organizationId ?
-    Promise.resolve([]) :
-    Fliplet.API.request({
+  var operation = Fliplet.Env.get('development') || !organizationId
+    ? Promise.resolve([])
+    : Fliplet.API.request({
       url: [
         'v1/widget-instances',
         '?organizationId=' + organizationId,
