@@ -1189,6 +1189,7 @@ Fliplet().then(function() {
               entry = record;
 
               $vm.fields = getFields(true);
+              Fliplet.Hooks.run('afterFormEntryLoad', { entry: entry });
               $vm.isLoading = false;
               $vm.$forceUpdate();
             }).catch(function(err) {
