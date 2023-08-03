@@ -276,9 +276,9 @@ Fliplet.FormBuilder.field('image', {
       this.validateValue();
 
       getPicture.then(function onSelectedPicture(imgBase64Url) {
-        imgBase64Url = (imgBase64Url.indexOf('base64') > -1) ?
-          imgBase64Url :
-          'data:image/jpeg;base64,' + imgBase64Url;
+        imgBase64Url = (imgBase64Url.indexOf('base64') > -1)
+          ? imgBase64Url
+          : 'data:image/jpeg;base64,' + imgBase64Url;
         $vm.value.push(imgBase64Url);
         addThumbnailToCanvas(imgBase64Url, $vm.value.length - 1, $vm);
         $vm.$emit('_input', $vm.name, $vm.value);

@@ -104,6 +104,22 @@
           "edit": "Edit"
         }
       },
+      "geolocation": {
+        "getLocation": "Get my location",
+        "updateLocation": "Update my location",
+        "locationSaved": "Location saved",
+        "loadingLocation": "Loading location ...",
+        "accept": "Ok",
+        "settings": "Settings",
+        "errors": {
+          "permissionDenied": "Location features are disabled. Please enable them in settings to submit this form.",
+          "positionUnavailable": "Location information is unavailable due to technical reasons. Please ensure that location features are enabled in your device settings and that your internet connection is stable.",
+          "timeout": "The connection couldn't be established within the expected timeframe. Please reload and try again.",
+          "unknownError": "An unknown error occurred. Please contact support if issue persists",
+          "inaccurateCoords": "Precise location is disabled. Please enable it in settings to submit this form.",
+          "locationRequired": "Please allow location services to use this feature"
+        }
+      },
       "telephone": {
         "instruction": "Phone number can only contain <b>; , . ( ) - + SPACE * #</b> and numbers."
       },

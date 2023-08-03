@@ -3,8 +3,6 @@ Fliplet.FormBuilder = (function() {
   var components = {};
   var eventHub = new Vue();
 
-  var DATE_FORMAT = 'YYYY-MM-DD';
-
   Vue.use(window.vuelidate.default);
 
   var templates = Fliplet.Widget.Templates;
@@ -206,17 +204,6 @@ Fliplet.FormBuilder = (function() {
       component.methods.onBlur = function() {
         this.$v.value.$touch();
         this.highlightError();
-      };
-
-      component.methods.browserSupport = function(browserType) {
-        switch (browserType) {
-          case 'IE11':
-            return navigator.userAgent.indexOf('Trident/') !== -1;
-          case 'Safari':
-            return navigator.userAgent.indexOf('Safari') !== -1;
-          default:
-            return false;
-        }
       };
 
       // Define method to trigger the form reset from a children
@@ -473,7 +460,7 @@ Fliplet.FormBuilder = (function() {
 
       component.props._componentsWithDescription = {
         type: Array,
-        default: ['flInput', 'flCheckbox', 'flRadio', 'flEmail', 'flNumber', 'flTelephone', 'flUrl', 'flTextarea', 'flWysiwyg', 'flSelect', 'flDate', 'flTime', 'flDateRange', 'flTimeRange', 'flTimer', 'flStarRating', 'flSignature', 'flImage', 'flFile', 'flSlider', 'flMatrix']
+        default: ['flInput', 'flCheckbox', 'flRadio', 'flEmail', 'flNumber', 'flTelephone', 'flUrl', 'flTextarea', 'flWysiwyg', 'flSelect', 'flDate', 'flTime', 'flDateRange', 'flTimeRange', 'flTimer', 'flStarRating', 'flSignature', 'flImage', 'flFile', 'flSlider', 'flMatrix', 'flGeolocation']
       };
 
       component.props._readOnlyComponents = {
@@ -699,28 +686,20 @@ Fliplet.FormBuilder = (function() {
         }
       };
 
-      component.methods.browserSupport = function(browserType) {
-        switch (browserType) {
-          case 'IE11':
-            return navigator.userAgent.indexOf('Trident/') !== -1;
-          case 'Safari':
-            return /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
-          default:
-            return false;
-        }
-      };
-
       if (!component.mounted) {
         component.mounted = function() {
           this._showNameField = this.name !== this.label;
           this.initTooltip();
-          this.initDatepicker();
-
-          if (this.browserSupport('IE11') || this.browserSupport('safari')) {
-            this.initTimePicker();
-          }
         };
       }
+
+      component.methods._hideField = function() {
+        this.required = false;
+
+        if (this._componentName === 'flGeolocation' && this.isHidden === false) {
+          this.autofill = true;
+        }
+      };
 
       component.methods._disableAutomatch = function() {
         this._showNameField = true;
@@ -765,46 +744,6 @@ Fliplet.FormBuilder = (function() {
           }
         });
       };
-
-      component.methods._initDatepicker = function() {
-        var $vm = this;
-
-        $vm.$nextTick(function() {
-          var $el = $(this.$el).find('input.date-picker').datepicker({
-            format: 'yyyy-mm-dd',
-            todayHighlight: true,
-            autoclose: true
-          }).on('changeDate', function(e) {
-            var value = moment(e.date).format(DATE_FORMAT);
-
-            $vm.value = value;
-          });
-
-          $el.datepicker('setDate', this.value || new Date());
-        });
-      };
-
-      if (!component.methods.initDatepicker) {
-        component.methods.initDatepicker = component.methods._initDatepicker;
-      }
-
-      component.methods._initTimePicker = function() {
-        var $vm = this;
-
-        $vm.$nextTick(function() {
-          var $el = $($vm.$refs.timepicker).timeEntry({
-            show24Hour: true
-          }).on('change', function(event) {
-            $vm.value = event.target.value;
-          });
-
-          $el.timeEntry('setTime', this.value);
-        });
-      };
-
-      if (!component.methods.initTimePicker) {
-        component.methods.initTimePicker = component.methods._initTimePicker;
-      }
 
       if (!component.methods.initTooltip) {
         component.methods.initTooltip = component.methods._initTooltip;

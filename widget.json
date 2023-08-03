@@ -31,8 +31,6 @@
       "js/interface.templates.js",
       "js/libs/core.js",
       "js/libs/templates.js",
-      "vendor/jquery.plugin.min.js",
-      "vendor/jquery.timeentry.min.js",
       "vendor/signature-pad.js",
 
       "js/components/input.js",
@@ -61,6 +59,7 @@
       "js/components/starRating.js",
       "js/components/slider.js",
       "js/components/signature.js",
+      "js/components/geolocation.js",
 
       "js/configurations/input.js",
       "js/configurations/email.js",
@@ -87,6 +86,7 @@
       "js/configurations/starRating.js",
       "js/configurations/slider.js",
       "js/configurations/signature.js",
+      "js/configurations/geolocation.js",
       "js/configurations/wysiwyg.js",
 
       "js/libs/builder.js",
@@ -116,7 +116,6 @@
       "vendor/load-image.all.min.js",
       "js/build.templates.js",
       "js/libs/core.js",
-      "vendor/jquery.plugin.min.js",
       "vendor/signature-pad.js",
 
       "js/components/input.js",
@@ -144,6 +143,7 @@
       "js/components/starRating.js",
       "js/components/slider.js",
       "js/components/signature.js",
+      "js/components/geolocation.js",
       "js/components/wysiwyg.js",
 
       "js/libs/form.js",
