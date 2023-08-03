@@ -118,8 +118,8 @@ Fliplet.FormBuilder.field('signature', {
       this.isEditable = true;
     },
     getPadValueAsData: function(includeFilename) {
-      return this.pad && this.pad.toDataURL('image/png') +
-        (includeFilename
+      return this.pad && this.pad.toDataURL('image/png')
+        + (includeFilename
           ? ';filename:' + this.name + ' ' + moment().format('YYYY-MM-DD HH:mm') + '.png'
           : '');
     },

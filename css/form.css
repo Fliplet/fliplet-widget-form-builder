@@ -1413,3 +1413,22 @@ form hr {
 .fl-matrix table tbody tr:last-child td {
   border-bottom-width: 0;
 }
+
+/* Geolocation */
+
+.geolocation.btn {
+  column-gap: 10px;
+}
+
+.geolocation.text-info {
+  font-size: 12px;
+  color: #474a74;
+  font-weight: 400;
+  line-height: 16px;
+}
+
+@media screen and (min-width: 640px) {
+  .geolocation.btn-primary {
+    display: flex !important;
+  }
+}
