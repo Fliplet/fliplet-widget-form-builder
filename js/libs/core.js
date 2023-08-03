@@ -700,14 +700,12 @@ Fliplet.FormBuilder = (function() {
                 }
 
                 if (typeof option === 'object' || Array.isArray(option)) {
-                  return JSON.stringify(option);
+                  option = JSON.stringify(option);
                 }
 
-                return option.toString().trim();
-              }).map(function(rowOption) {
                 return {
-                  id: rowOption,
-                  label: rowOption
+                  id: option.toString().trim(),
+                  label: option.toString().trim()
                 };
               }));
 
