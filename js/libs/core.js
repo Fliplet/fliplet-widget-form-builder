@@ -360,6 +360,8 @@ Fliplet.FormBuilder = (function() {
 
       var template = templates['templates.configurations.' + componentName];
 
+      Handlebars.registerPartial('defaultValue', Fliplet.Widget.Templates['templates.configurations.defaultValue']());
+
       componentName = name(componentName);
 
       // Extend from base component
@@ -713,32 +715,22 @@ Fliplet.FormBuilder = (function() {
           // If there's no cache, return new values, i.e.
           Fliplet.DataSources.connect(id).then(function(connection) {
             connection.getIndex(column).then(function onSuccess(values) {
-              $vm.options = _.compact(values, function(value) {
-                if (value !== '') {
-                  return value.trim();
+              $vm.options = _.compact(_.map(values, function(option) {
+                if (!option) {
+                  return;
                 }
-              }).map(function(rawOption) {
-                if (rawOption) {
-                  rawOption = rawOption.trim();
 
-                  var regex = /<.*>$/g;
-                  var match = rawOption.match(regex);
-                  var option = {};
-
-                  if (match) {
-                    option.label = rawOption.replace(regex, '').trim();
-
-                    var value = match[0].substring(1, match[0].length - 1).trim();
-
-                    option.id = value || option.label;
-                  } else {
-                    option.label = rawOption;
-                    option.id = rawOption;
-                  }
-
-                  return option;
+                if (typeof option === 'object' || Array.isArray(option)) {
+                  return JSON.stringify(option);
                 }
-              });
+
+                return option.toString().trim();
+              }).map(function(rowOption) {
+                return {
+                  id: rowOption,
+                  label: rowOption
+                };
+              }));
 
               return $vm.options;
             });
@@ -912,6 +904,8 @@ Fliplet.FormBuilder = (function() {
       }
 
       component.methods._removeDataProvider = function() {
+        this.dataSourceId = null;
+        this.column = '';
         window.dataProvider.close();
         window.dataProvider = null;
       };

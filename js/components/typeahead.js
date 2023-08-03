@@ -28,11 +28,9 @@ Fliplet.FormBuilder.field('typeahead', {
       default: function() {
         return [
           {
-            id: '1',
             label: 'Option 1'
           },
           {
-            id: '2',
             label: 'Option 2'
           }
         ];
