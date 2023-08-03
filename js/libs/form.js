@@ -470,13 +470,17 @@ Fliplet().then(function() {
               default:
                 break;
             }
-          } else if (progress && !isEditMode) {
+          }
+
+          if (progress && !isEditMode) {
             var savedValue = progress[field.name];
 
             if (typeof savedValue !== 'undefined') {
               field.value = savedValue;
             }
           }
+
+          return field;
         });
       }
 
