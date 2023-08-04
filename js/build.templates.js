@@ -232,6 +232,12 @@ this["Fliplet"]["Widget"]["Templates"]["templates.components.title"] = Handlebar
     return "<h2>{{ value }}</h2>";
 },"useData":true});
 
+this["Fliplet"]["Widget"]["Templates"]["templates.components.typeahead"] = Handlebars.template({"compiler":[7,">= 4.0.0"],"main":function(container,depth0,helpers,partials,data) {
+    return "<div v-if=\"description\" class=\"help-block description\">{{ description }}</div>\n<template>\n  <div class=\"form-group fl-typeahead\" :class=\"{ 'readonly' : readonly }\" ref=\"typeahead\">\n    <select multiple placeholder=\"Start typing ...\"></select>\n  </div>\n  <div class=\"text-danger\" v-if=\"reachedMaxItems\">Only {{maxItems}} item(s) can be selected.</div>\n</template>\n<p class=\"text-danger\" v-if=\"$v.value.required === false && $v.value.$dirty\">"
+    + container.escapeExpression((helpers.T || (depth0 && depth0.T) || helpers.helperMissing).call(depth0 != null ? depth0 : (container.nullContext || {}),"widgets.form.errors.required",{"name":"T","hash":{},"data":data}))
+    + "</p>\n";
+},"useData":true});
+
 this["Fliplet"]["Widget"]["Templates"]["templates.components.url"] = Handlebars.template({"compiler":[7,">= 4.0.0"],"main":function(container,depth0,helpers,partials,data) {
     var alias1=depth0 != null ? depth0 : (container.nullContext || {}), alias2=helpers.helperMissing, alias3=container.escapeExpression;
 

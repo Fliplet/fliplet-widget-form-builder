@@ -101,20 +101,22 @@
     {{/hasSelectAll}}
 
     {{#hasOptions}}
-      <div class="form-group cleafix" :class="{ 'has-error': errors.selectOptions || errors.checkboxOptions || errors.radioOptions || errors.selectDuplicateOptions|| errors.radioDuplicateOptions || errors.checkboxDuplicateOptions }">
-        <div class="col-xs-12">
-          <label class="control-label">Options <small>(One per line)</small></label>
+      {{#unless isTypeahead}}
+        <div class="form-group cleafix" :class="{ 'has-error': errors.selectOptions || errors.checkboxOptions || errors.radioOptions || errors.selectDuplicateOptions|| errors.radioDuplicateOptions || errors.checkboxDuplicateOptions }">
+          <div class="col-xs-12">
+            <label class="control-label">Options <small>(One per line)</small></label>
+          </div>
+          <div class="col-xs-12">
+            <textarea v-on:input="_setOptions($event.target.value, 'options')" class="form-control">\{{ _options }}</textarea>
+          </div>
+          <p class="col-xs-12 help-block" v-if="errors.selectOptions">\{{ errors.selectOptions }}</p>
+          <p class="col-xs-12 help-block" v-if="errors.checkboxOptions">\{{ errors.checkboxOptions }}</p>
+          <p class="col-xs-12 help-block" v-if="errors.radioOptions">\{{ errors.radioOptions }}</p>
+          <p class="col-xs-12 help-block" v-if="errors.selectDuplicateOptions">\{{ errors.selectDuplicateOptions }}</p>
+          <p class="col-xs-12 help-block" v-if="errors.radioDuplicateOptions">\{{ errors.radioDuplicateOptions }}</p>
+          <p class="col-xs-12 help-block" v-if="errors.checkboxDuplicateOptions">\{{ errors.checkboxDuplicateOptions }}</p>
         </div>
-        <div class="col-xs-12">
-          <textarea v-on:input="_setOptions($event.target.value, 'options')" class="form-control">\{{ _options }}</textarea>
-        </div>
-        <p class="col-xs-12 help-block" v-if="errors.selectOptions">\{{ errors.selectOptions }}</p>
-        <p class="col-xs-12 help-block" v-if="errors.checkboxOptions">\{{ errors.checkboxOptions }}</p>
-        <p class="col-xs-12 help-block" v-if="errors.radioOptions">\{{ errors.radioOptions }}</p>
-        <p class="col-xs-12 help-block" v-if="errors.selectDuplicateOptions">\{{ errors.selectDuplicateOptions }}</p>
-        <p class="col-xs-12 help-block" v-if="errors.radioDuplicateOptions">\{{ errors.radioDuplicateOptions }}</p>
-        <p class="col-xs-12 help-block" v-if="errors.checkboxDuplicateOptions">\{{ errors.checkboxDuplicateOptions }}</p>
-      </div>
+      {{/unless}}
     {{/hasOptions}}
 
     {{#isTimer}}
@@ -171,29 +173,11 @@
     </div>
     {{/isSlider}}
 
+    {{#unless isTypeahead}}
     <div v-if="_componentsWithPersonalization.includes(_componentName)" class="form-group cleafix">
-      <div class="col-xs-12">
-        <label>Default value type</label>
-        <select class="form-control" :value="defaultValueSource" v-model="defaultValueSource" @change="_onDefaultValueSourceChanged">
-          <option value="default">Enter a value</option>
-          <option value="profile">User profile data</option>
-          <option value="appStorage">App storage variable</option>
-          <option value="query">Link query parameter</option>
-        </select>
-        <div class="col-xs-12 text-right">
-          <a href="https://help.fliplet.com/form-component/" target="_blank">Learn more about these types</a>
-        </div>
-        <div v-if="defaultValueSource !== 'default'">
-          <label>Default key</label>
-          <div v-if="!defaultValueKey" class="text-danger">
-            This field is required*
-          </div>
-          <input v-bind:class="{ 'border-danger': !defaultValueKey }" v-if="defaultValueSource === 'profile'"class="form-control" type="text" v-model.trim="defaultValueKey" placeholder="Enter user data field/column name" />
-          <input v-bind:class="{ 'border-danger': !defaultValueKey }" v-else-if="defaultValueSource === 'appStorage'"class="form-control" type="text" v-model.trim="defaultValueKey" placeholder="Enter storage key" />
-          <input v-bind:class="{ 'border-danger': !defaultValueKey }" v-else-if="defaultValueSource === 'query'"class="form-control" type="text" v-model.trim="defaultValueKey" placeholder=" Enter query name" />
-        </div>
-      </div>
+      {{> defaultValue}}
     </div>
+    {{/unless}}
 
     <div class="col-xs-12">
       {{{ template }}}
