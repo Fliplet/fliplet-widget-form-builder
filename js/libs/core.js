@@ -249,6 +249,25 @@ Fliplet.FormBuilder = (function() {
         return true;
       };
 
+      component.computed._fieldDynamicWidth = function() {
+        var $vm = this;
+
+        if ($vm.customWidth) {
+          switch ($vm.width) {
+            case 25:
+              return 'w-1_4';
+            case 50:
+              return 'w-1_2';
+            case 75:
+              return 'w-3_4';
+            default:
+              return 'w-full';
+          }
+        }
+
+        return 'w-full';
+      };
+
       component.computed._selectedLabel = function() {
         if (!this.options) {
           return this.value;
@@ -325,6 +344,17 @@ Fliplet.FormBuilder = (function() {
         isValid: {
           type: Boolean,
           default: true
+        },
+        customWidth: {
+          type: Boolean,
+          default: false
+        },
+        width: {
+          type: Number,
+          default: 50
+        },
+        ownRow: {
+          type: Boolean
         }
       }, component.props);
 
@@ -438,6 +468,11 @@ Fliplet.FormBuilder = (function() {
       component.props._readOnlyComponents = {
         type: Array,
         default: ['flInput', 'flCheckbox', 'flRadio', 'flEmail', 'flNumber', 'flTelephone', 'flUrl', 'flTextarea', 'flWysiwyg', 'flSelect', 'flDate', 'flTime', 'flDateRange', 'flTimeRange', 'flTimer', 'flStarRating', 'flSignature', 'flImage', 'flFile', 'flSlider', 'flMatrix', 'flTypeahead']
+      };
+
+      component.props._flexibleWidthComponents = {
+        type: Array,
+        default: ['flInput', 'flCheckbox', 'flRadio', 'flEmail', 'flNumber', 'flTelephone', 'flUrl', 'flTextarea', 'flWysiwyg', 'flSelect', 'flDate', 'flTime', 'flDateRange', 'flTimeRange', 'flTimer', 'flStarRating', 'flSignature', 'flImage', 'flFile', 'flSlider', 'flMatrix']
       };
 
       component.props._idx = {
@@ -704,8 +739,8 @@ Fliplet.FormBuilder = (function() {
                 }
 
                 return {
-                  id: option.toString().trim(),
-                  label: option.toString().trim()
+                  id: (typeof option === 'string' ? option : option.toString()).trim(),
+                  label: (typeof option === 'string' ? option : option.toString()).trim()
                 };
               }));
 

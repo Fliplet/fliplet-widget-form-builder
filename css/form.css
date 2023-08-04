@@ -1,5 +1,44 @@
+.w-full {
+  width: 100%;
+  grid-column-end: span 4;
+}
+
+.w-1_4 {
+  grid-column-end: span 1;
+}
+
+.w-1_4.own {
+  width: 25%;
+  grid-column-end: span 4;
+}
+
+.w-1_2 {
+  grid-column-end: span 2;
+}
+
+.w-1_2.own {
+  width: 50%;
+  grid-column-end: span 4;
+}
+
+.w-3_4 {
+  grid-column-end: span 3;
+}
+
+.w-3_4.own {
+  width: 75%;
+  grid-column-end: span 4;
+}
+
 .fl-form {
   position: relative;
+}
+
+.fl-form .form-html {
+  display: grid;
+  grid-template-columns: repeat(4, 25%);
+  column-gap: 10px;
+  padding: 0 10px;
 }
 
 .fl-form.form-offline button[type="submit"] {
