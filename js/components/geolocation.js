@@ -41,6 +41,10 @@ Fliplet.FormBuilder.field('geolocation', {
     if (this.autofill) {
       this.getLocation();
     }
+
+    if (this.value) {
+      this.firstTimeSaved = true;
+    }
   },
   created: function() {
     Fliplet.FormBuilder.on('reset', this.onReset);
@@ -188,6 +192,8 @@ Fliplet.FormBuilder.field('geolocation', {
     value: function(val) {
       if (this.value) {
         this.firstTimeSaved = true;
+      } else {
+        this.firstTimeSaved = false;
       }
 
       this.$emit('_input', this.name, val, false, true);
