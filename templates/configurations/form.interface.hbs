@@ -175,9 +175,7 @@
 
     {{#unless isTypeahead}}
     <div v-if="_componentsWithPersonalization.includes(_componentName)" class="form-group cleafix">
-      <div class="col-xs-12">
-        {{> defaultValuePartial}}
-      </div>
+      {{> defaultValue}}
     </div>
     {{/unless}}
 
