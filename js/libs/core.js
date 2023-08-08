@@ -377,7 +377,7 @@ Fliplet.FormBuilder = (function() {
 
       var template = templates['templates.configurations.' + componentName];
 
-      Handlebars.registerPartial('defaultValue', Fliplet.Widget.Templates['templates.configurations.defaultValue']());
+      Handlebars.registerPartial('defaultValuePartial', templates['templates.configurations.defaultValue']());
 
       componentName = name(componentName);
 
