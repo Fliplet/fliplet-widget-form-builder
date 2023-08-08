@@ -49,9 +49,9 @@ this["Fliplet"]["Widget"]["Templates"]["templates.configurations.form"] = Handle
 },"10":function(container,depth0,helpers,partials,data) {
     var stack1;
 
-  return "    <div v-if=\"_componentsWithPersonalization.includes(_componentName)\" class=\"form-group cleafix\">\n"
-    + ((stack1 = container.invokePartial(partials.defaultValue,depth0,{"name":"defaultValue","data":data,"indent":"      ","helpers":helpers,"partials":partials,"decorators":container.decorators})) != null ? stack1 : "")
-    + "    </div>\n";
+  return "    <div v-if=\"_componentsWithPersonalization.includes(_componentName)\" class=\"form-group cleafix\">\n      <div class=\"col-xs-12\">\n"
+    + ((stack1 = container.invokePartial(partials.defaultValuePartial,depth0,{"name":"defaultValuePartial","data":data,"indent":"        ","helpers":helpers,"partials":partials,"decorators":container.decorators})) != null ? stack1 : "")
+    + "      </div>\n    </div>\n";
 },"12":function(container,depth0,helpers,partials,data) {
     return "    <div class=\"form-group\">\n      <div class=\"col-xs-12\">\n        <label class=\"control-label\">Timer controls</label>\n      </div>\n      <div class=\"col-xs-12\">\n        <div class=\"radio radio-icon\">\n          <input type=\"radio\" id=\"unable\" name=\"unable\" v-bind:value=\"false\" v-model=\"readonly\">\n          <label for=\"unable\">\n            <span class=\"check\"><i class=\"fa fa-circle\"></i></span>User can start, stop and reset the timer\n          </label>\n        </div>\n        <div class=\"radio radio-icon\">\n          <input type=\"radio\" id=\"able\" name=\"able\" v-bind:value=\"true\" v-model=\"readonly\">\n          <label for=\"able\">\n            <span class=\"check\"><i class=\"fa fa-circle\"></i></span>User cannot control the timer\n          </label>\n        </div>\n      </div>\n    </div>\n";
 },"14":function(container,depth0,helpers,partials,data) {
