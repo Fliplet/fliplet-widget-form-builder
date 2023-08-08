@@ -179,9 +179,11 @@ Fliplet.FormBuilder.field('geolocation', {
         return Promise.reject('');
       }
     },
-    onReset: function() {
-      this.firstTimeSaved = false;
-      this.showFeedback = false;
+    onReset: function(data) {
+      if (data.id === this.$parent.id) {
+        this.firstTimeSaved = false;
+        this.showFeedback = false;
+      }
     }
   },
   watch: {
