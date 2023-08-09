@@ -169,7 +169,7 @@ Fliplet.FormBuilder.field('geolocation', {
         });
 
         return Promise.reject('');
-      } else if (this.preciseLocationRequired && this.accuracy > 100) {
+      } else if (this.preciseLocationRequired && this.value && this.accuracy > 100) {
         var error = {
           code: 'inaccurateCoords'
         };
