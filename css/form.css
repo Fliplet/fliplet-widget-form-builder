@@ -41,6 +41,10 @@
   padding: 0 10px;
 }
 
+.fl-form.placeholder .form-html {
+  display: block;
+}
+
 .fl-form.form-offline button[type="submit"] {
   pointer-events: none;
   opacity: 0.65;
