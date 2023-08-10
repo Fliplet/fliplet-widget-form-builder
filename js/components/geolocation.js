@@ -192,11 +192,7 @@ Fliplet.FormBuilder.field('geolocation', {
   },
   watch: {
     value: function(val) {
-      if (this.value) {
-        this.firstTimeSaved = true;
-      } else {
-        this.firstTimeSaved = false;
-      }
+      this.firstTimeSaved = !!this.value;
 
       this.$emit('_input', this.name, val, false, true);
     }
