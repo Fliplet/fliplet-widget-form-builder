@@ -173,7 +173,7 @@ Fliplet.FormBuilder.field('geolocation', {
         });
 
         return Promise.reject('');
-      } else if (this.preciseLocationRequired && this.accuracy > 100) {
+      } else if (this.preciseLocationRequired && this.value && this.accuracy > 100) {
         var error = {
           code: 'inaccurateCoords'
         };
@@ -183,9 +183,11 @@ Fliplet.FormBuilder.field('geolocation', {
         return Promise.reject('');
       }
     },
-    onReset: function() {
-      this.firstTimeSaved = false;
-      this.showFeedback = false;
+    onReset: function(data) {
+      if (data.id === this.$parent.id) {
+        this.firstTimeSaved = false;
+        this.showFeedback = false;
+      }
     }
   },
   watch: {
