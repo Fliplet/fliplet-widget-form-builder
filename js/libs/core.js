@@ -878,6 +878,7 @@ Fliplet.FormBuilder = (function() {
       component.methods._removeDataProvider = function() {
         this.dataSourceId = null;
         this.column = '';
+        this.columnOptions = null;
         window.dataProvider.close();
         window.dataProvider = null;
       };
