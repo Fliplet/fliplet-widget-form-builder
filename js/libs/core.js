@@ -879,6 +879,14 @@ Fliplet.FormBuilder = (function() {
         this.dataSourceId = null;
         this.column = '';
         this.columnOptions = null;
+        this.options = [
+          {
+            label: 'Option 1'
+          },
+          {
+            label: 'Option 2'
+          }
+        ];
         window.dataProvider.close();
         window.dataProvider = null;
       };
