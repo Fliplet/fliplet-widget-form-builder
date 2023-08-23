@@ -22,7 +22,7 @@
     <span class="select-value-proxy"><template v-if="selectedRange && selectedRange !== {}">\{{ selectedRange.label }}</template><template v-else>\{{ placeholder }}</template></span>
   </label>
   <div class="form-group fl-date-range" ref="dateRange">
-    <div class="form-group fl-date-picker date-picker-start">
+    <div class="form-group fl-date-picker date-picker-start focus-outline">
       <i class="fa fa-calendar fa-fw"></i>
       <input type="date" class="form-control" :name="`start-${name}`" :id="`start-${name}`"/>
       <input type="text" class="form-control" :tabindex="readonly ? -1 : 0"/>
@@ -31,7 +31,7 @@
     <div class="arrow-right">
       <i class="icon fa fa-long-arrow-right fa-fw"></i>
     </div>
-    <div class="form-group fl-date-picker date-picker-end">
+    <div class="form-group fl-date-picker date-picker-end focus-outline">
       <i class="fa fa-calendar fa-fw"></i>
       <input type="date" class="form-control" :name="`end-${name}`" :id="`end-${name}`"/>
       <input type="text" class="form-control" :tabindex="readonly ? -1 : 0"/>
