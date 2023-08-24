@@ -1,3 +1,13 @@
+.form-group.row {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.col-xs-12.grow-2 {
+  flex-grow: 2;
+}
+
 .w-full {
   width: 100%;
   grid-column-end: span 4;
