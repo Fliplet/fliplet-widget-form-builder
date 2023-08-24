@@ -594,6 +594,11 @@ nav > .btn {
   column-gap: 5px;
 }
 
+.fl-date-range .fl-date-picker,
+.fl-time-range .fl-time-picker {
+  width: calc(50% - 25px);
+}
+
 input[type="time"].form-control {
   line-height: 44px;
   padding-top: 0;
