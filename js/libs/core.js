@@ -11,6 +11,42 @@ Fliplet.FormBuilder = (function() {
     return 'fl' + component.charAt(0).toUpperCase() + component.slice(1);
   }
 
+  function getDataSourceColumnValues() {
+    var $vm = this;
+    var id = this.dataSourceId;
+    var column = this.column;
+
+    Fliplet.Cache.get({
+      key: id + '-' + column,
+      expire: 60
+    }, function getColumnValues() {
+      // If there's no cache, return new values, i.e.
+      Fliplet.DataSources.connect(id).then(function(connection) {
+        connection.getIndex(column).then(function onSuccess(values) {
+          $vm.options = _.compact(_.map(values, function(option) {
+            if (!option) {
+              return;
+            }
+
+            if (typeof option === 'object' || Array.isArray(option)) {
+              option = JSON.stringify(option);
+            }
+
+            return {
+              id: (typeof option === 'string' ? option : option.toString()).trim(),
+              label: (typeof option === 'string' ? option : option.toString()).trim()
+            };
+          }));
+
+          return $vm.options;
+        });
+      });
+    })
+      .then(function(result) {
+        $vm.options = result;
+      });
+  }
+
   return {
     on: function(eventName, fn) {
       eventHub.$on(eventName, fn);
@@ -180,6 +216,8 @@ Fliplet.FormBuilder = (function() {
           }
         });
       };
+
+      component.methods.getDataSourceColumnValues = getDataSourceColumnValues;
 
       // Define method to highlight Error on blur form field
       component.methods.highlightError = function() {
@@ -717,41 +755,7 @@ Fliplet.FormBuilder = (function() {
         this.value = '';
       };
 
-      component.methods._getDataSourceColumnValues = function() {
-        var $vm = this;
-        var id = this.dataSourceId;
-        var column = this.column;
-
-        Fliplet.Cache.get({
-          key: id + '-' + column,
-          expire: 60
-        }, function getColumnValues() {
-          // If there's no cache, return new values, i.e.
-          Fliplet.DataSources.connect(id).then(function(connection) {
-            connection.getIndex(column).then(function onSuccess(values) {
-              $vm.options = _.compact(_.map(values, function(option) {
-                if (!option) {
-                  return;
-                }
-
-                if (typeof option === 'object' || Array.isArray(option)) {
-                  option = JSON.stringify(option);
-                }
-
-                return {
-                  id: (typeof option === 'string' ? option : option.toString()).trim(),
-                  label: (typeof option === 'string' ? option : option.toString()).trim()
-                };
-              }));
-
-              return $vm.options;
-            });
-          });
-        })
-          .then(function(result) {
-            $vm.options = result;
-          });
-      };
+      component.methods._getDataSourceColumnValues = getDataSourceColumnValues;
 
       if (!component.methods.disableAutomatch) {
         component.methods.disableAutomatch = component.methods._disableAutomatch;
