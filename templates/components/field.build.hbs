@@ -1,8 +1,9 @@
 <div v-show="_showField" class="form-group row clearfix" :class="[{'has-error': !isValid, 'own': ownRow}, _fieldDynamicWidth]" :data-field="name">
-  <div class="col-xs-12" v-if="_isFormField">
+  <div class="col-xs-12 grow-2" v-if="_isFormField">
     <label class="control-label" :for="_labelName">
       \{{ label }} <template v-if="required"><span class="required-info">*</span></template>
     </label>
+    <div v-if="description" class="help-block description">\{{ description }}</div>
   </div>
   <div class="col-xs-12">
     {{{ template }}}

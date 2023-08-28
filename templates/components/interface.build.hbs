@@ -5,6 +5,7 @@
       <label class="control-label" :for="name">
         \{{ label }} <template v-if="required"><span class="required-info">*</span></template>
       </label>
+      <div v-if="description" class="help-block description">\{{ description }}</div>
     </div>
     <div class="col-xs-12">
       {{{ template }}}
