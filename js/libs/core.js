@@ -16,6 +16,10 @@ Fliplet.FormBuilder = (function() {
     var id = this.dataSourceId;
     var column = this.column;
 
+    if (!id || !column) {
+      return;
+    }
+
     Fliplet.Cache.get({
       key: id + '-' + column,
       expire: 60
