@@ -1482,7 +1482,7 @@ form hr {
 
 @media screen and (min-width: 640px) {
   .geolocation.btn-primary {
-    display: flex !important;
+    display: flex;
   }
 }
 
