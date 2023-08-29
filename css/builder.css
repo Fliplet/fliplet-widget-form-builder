@@ -1301,7 +1301,7 @@ form hr {
 
 @media screen and (min-width: 640px) {
   .geolocation.btn-primary {
-    display: flex !important;
+    display: flex;
   }
 }
 
@@ -1311,7 +1311,7 @@ form hr {
 [data-widget-package="com.fliplet.form-builder"]
   .form-group.fl-time-picker.time-picker-end
   > .form-control {
-  padding-right: 0 !important;
+  padding-right: 0;
 }
 
 @media only screen and (max-width: 340px) {
