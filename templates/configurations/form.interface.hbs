@@ -210,13 +210,13 @@
     <div v-if='_flexibleWidthComponents.includes(_componentName)' class="col-xs-12 form-group">
       <label class="control-label">Custom field width</label>
       <div class="checkbox checkbox-icon">
-        <input type="checkbox" id="customWidth" name="customWidth" v-model="customWidth">
-        <label for="customWidth">
+        <input type="checkbox" id="fieldWidth" name="fieldWidth" v-model="fieldWidth">
+        <label for="fieldWidth">
           <span class="check"><i class="fa fa-check"></i></span> Make this field custom width
         </label>
       </div>
     </div>
-    <div v-if="customWidth" class="col-xs-12 form-group">
+    <div v-if="fieldWidth" class="col-xs-12 form-group">
       <div class="form-group cleafix">
         <div class="col-xs-12">
           <label class="control-label">Select field width</label>
