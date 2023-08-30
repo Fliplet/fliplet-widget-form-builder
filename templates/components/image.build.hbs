@@ -1,5 +1,5 @@
-<div class="fileUpload" :class="{ 'fileUpload-disabled' : readonly, 'fileUpload-padding-top': value.length }">
-  <div class="row">
+<div class="form-group fileUpload" :class="{ 'fileUpload-disabled' : readonly, 'fileUpload-padding-top': value.length }">
+  <div class="row" v-if="value.length">
     <div v-for="(image, index) in value">
       <div class="canvas-holder">
         <canvas ref="canvas"></canvas>

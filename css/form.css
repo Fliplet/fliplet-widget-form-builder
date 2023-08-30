@@ -621,6 +621,10 @@ html[dir="rtl"] .radio.radio-icon input[type="radio"] + label > span.check {
   overflow: hidden;
 }
 
+.fileUpload.form-group {
+  padding: 0;
+}
+
 .fileUpload-disabled label {
   background-color: #e1e1e1;
   border-radius: 31px !important;
@@ -1094,6 +1098,11 @@ html[dir="rtl"] .radio.radio-icon input[type="radio"] + label > span.check {
   margin-bottom: 0;
 }
 
+.form-group.fl-date-range .form-group,
+.form-group.fl-time-range .form-group {
+  margin-bottom: 0;
+}
+
 /* SLIDER FIELD */
 
 [data-widget-package="com.fliplet.form-builder"] .form-group.fl-range-slider .range-slider {
@@ -1139,6 +1148,12 @@ html[dir="rtl"] .radio.radio-icon input[type="radio"] + label > span.check {
   > .form-control,
 [data-widget-package="com.fliplet.form-builder"]
   .form-group.fl-date-picker.date-picker-end
+  > .form-control,
+[data-widget-package="com.fliplet.form-builder"]
+  .form-group.fl-time-picker.time-picker-start
+  > .form-control,
+[data-widget-package="com.fliplet.form-builder"]
+  .form-group.fl-time-picker.time-picker-end
   > .form-control {
   padding-right: 0;
 }
@@ -1159,6 +1174,10 @@ form hr {
     display: table-cell !important;
     width: auto;
     max-width: 100%;
+  }
+
+  .form-group.fileUpload .btn-primary {
+    display: flex;
   }
 
   .form-html .btn {
@@ -1499,6 +1518,14 @@ form hr {
   .form-group.w-1_2 .fl-date-range .fl-date-picker,
   .form-group.w-1_2 .fl-time-range .fl-time-picker {
     width: 100%;
+  }
+
+  .form-group.w-1_4 .fl-time-picker > .form-control {
+    padding-left: 40px;
+  }
+
+  [data-widget-package="com.fliplet.form-builder"].form-group.w-1_4 .fl-time-picker > .fa {
+    width: 34px;
   }
 }
 
