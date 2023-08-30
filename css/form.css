@@ -18,7 +18,7 @@
 }
 
 .w-1_4.own {
-  width: calc(25% + 30px);
+  width: calc(25% + 23px);
   grid-column-end: span 4;
 }
 
@@ -27,7 +27,7 @@
 }
 
 .w-1_2.own {
-  width: calc(50% + 30px);
+  width: calc(50% + 25px);
   grid-column-end: span 4;
 }
 
@@ -36,7 +36,7 @@
 }
 
 .w-3_4.own {
-  width: calc(75% + 30px);
+  width: calc(75% + 27px);
   grid-column-end: span 4;
 }
 
@@ -1482,6 +1482,29 @@ form hr {
 
 @media screen and (min-width: 640px) {
   .geolocation.btn-primary {
-    display: flex !important;
+    display: flex;
+  }
+}
+
+@media screen and (max-width: 360px) {
+  .form-group.w-1_2 .fl-date-range .fl-date-picker,
+  .form-group.w-3_4 .fl-date-range .fl-date-picker,
+  .form-group.w-1_2 .fl-time-range .fl-time-picker,
+  .form-group.w-3_4 .fl-time-range .fl-time-picker {
+    width: 100%;
+  }
+}
+
+@media screen and (min-width: 360px) and (max-width: 431px) {
+  .form-group.w-1_2 .fl-date-range .fl-date-picker,
+  .form-group.w-1_2 .fl-time-range .fl-time-picker {
+    width: 100%;
+  }
+}
+
+@media screen and (max-width: 1280px) {
+  .form-group.w-1_4 .fl-date-range .fl-date-picker,
+  .form-group.w-1_4 .fl-time-range .fl-time-picker {
+    width: 100%;
   }
 }
