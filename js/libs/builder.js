@@ -564,7 +564,7 @@ Fliplet().then(function() {
           cache: false,
           attributes: 'columns'
         }).then(function(dataSource) {
-          return dataSource.columns || [];
+          return dataSource && dataSource.columns ? dataSource.columns : [];
         });
       },
       updateDataSourceHooks: function() {

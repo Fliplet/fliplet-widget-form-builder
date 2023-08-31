@@ -99,6 +99,10 @@ Fliplet.FormBuilder.field('typeahead', {
       this.updateValue(this.name, this.value);
     }
 
+    if (this.optionsType === 'dataSource') {
+      this.getDataSourceColumnValues();
+    }
+
     Fliplet.Hooks.on('beforeFormSubmit', this.onBeforeSubmit);
   },
   destroyed: function() {
@@ -129,7 +133,8 @@ Fliplet.FormBuilder.field('typeahead', {
         value: this.value,
         options: this.options,
         freeInput: this.freeInput,
-        maxItems: this.maxItems
+        maxItems: this.maxItems,
+        placeholder: this.placeholder
       });
 
       this.typeahead.change(function(value) {
