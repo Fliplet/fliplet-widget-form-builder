@@ -599,9 +599,14 @@ nav > .btn {
   flex-wrap: nowrap;
 }
 
+.fl-time-range .fl-time-picker,
+.fl-date-range .fl-date-picker {
+  width: 100%;
+}
+
 .fl-date-range .arrow-right,
 .fl-time-range .arrow-right {
-  margin-bottom: 3px;
+  margin-bottom: 15px;
 }
 
 input[type="time"].form-control {
@@ -1298,8 +1303,10 @@ form hr {
 
 /* Geolocation */
 
-.geolocation.btn-primary {
+.geolocation.btn.btn-primary {
   column-gap: 10px;
+  display: flex;
+  align-items: center;
 }
 
 .geolocation.text-info {
