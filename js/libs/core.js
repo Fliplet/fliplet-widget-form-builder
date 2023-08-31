@@ -294,7 +294,7 @@ Fliplet.FormBuilder = (function() {
       component.computed._fieldDynamicWidth = function() {
         var $vm = this;
 
-        if ($vm.customWidth) {
+        if ($vm.fieldWidth) {
           switch ($vm.width) {
             case 25:
               return 'w-1_4';
@@ -387,7 +387,7 @@ Fliplet.FormBuilder = (function() {
           type: Boolean,
           default: true
         },
-        customWidth: {
+        fieldWidth: {
           type: Boolean,
           default: false
         },
