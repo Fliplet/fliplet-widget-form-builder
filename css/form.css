@@ -1469,7 +1469,8 @@ form hr {
 
 /* Geolocation */
 
-.geolocation.btn {
+.geolocation.btn,
+.scanner.btn {
   column-gap: 10px;
 }
 
