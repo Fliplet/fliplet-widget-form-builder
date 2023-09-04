@@ -45,7 +45,9 @@ Fliplet.FormBuilder.field('codeScanner', {
       }
 
       Fliplet.Barcode.scan().then(function(result) {
-        $vm.value = result.text;
+        if (result.text) {
+          $vm.value = result.text;
+        }
       })
         .catch(function(error) {
           $vm.errorMessage = error;
