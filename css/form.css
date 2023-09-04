@@ -279,7 +279,7 @@ a {
 }
 
 textarea.form-control {
-  line-height: 16px;
+  line-height: 20px;
   padding: 15px;
   max-width: 100%;
 }
@@ -1465,6 +1465,11 @@ form hr {
 .fl-matrix table tbody tr:last-child th,
 .fl-matrix table tbody tr:last-child td {
   border-bottom-width: 0;
+}
+
+/* Code scanner */
+.scanner.btn.disabled {
+  background-color: #e1e1e1;
 }
 
 /* Geolocation */
