@@ -460,6 +460,10 @@ nav > .btn {
   overflow: hidden;
 }
 
+.fileUpload.form-group {
+  margin-bottom: 11px;
+}
+
 .fileUpload-disabled label {
   background-color: #e1e1e1;
   border-radius: 31px !important;
@@ -592,6 +596,17 @@ nav > .btn {
 .fl-time-range,
 .fl-date-range {
   column-gap: 5px;
+  flex-wrap: nowrap;
+}
+
+.fl-time-range .fl-time-picker,
+.fl-date-range .fl-date-picker {
+  width: 100%;
+}
+
+.fl-date-range .arrow-right,
+.fl-time-range .arrow-right {
+  margin-bottom: 15px;
 }
 
 input[type="time"].form-control {
@@ -1288,8 +1303,10 @@ form hr {
 
 /* Geolocation */
 
-.geolocation.btn-primary {
+.geolocation.btn.btn-primary {
   column-gap: 10px;
+  display: flex;
+  align-items: center;
 }
 
 .geolocation.text-info {

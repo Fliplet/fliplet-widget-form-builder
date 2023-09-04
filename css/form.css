@@ -1,11 +1,23 @@
+.form-group {
+  margin-bottom: 0;
+}
+
 .form-group.row {
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  margin: 0;
+}
+
+.col-xs-12 {
+  padding: 0;
 }
 
 .col-xs-12.grow-2 {
   flex-grow: 2;
+}
+
+.checkbox:last-child {
+  margin-bottom: 0;
 }
 
 .w-full {
@@ -18,7 +30,7 @@
 }
 
 .w-1_4.own {
-  width: calc(25% + 23px);
+  width: 25%;
   grid-column-end: span 4;
 }
 
@@ -27,7 +39,7 @@
 }
 
 .w-1_2.own {
-  width: calc(50% + 25px);
+  width: 50%;
   grid-column-end: span 4;
 }
 
@@ -36,7 +48,7 @@
 }
 
 .w-3_4.own {
-  width: calc(75% + 27px);
+  width: 75%;
   grid-column-end: span 4;
 }
 
@@ -47,8 +59,8 @@
 .fl-form .form-html {
   display: grid;
   grid-template-columns: repeat(4, 25%);
-  column-gap: 10px;
-  padding: 0 10px;
+  grid-gap: 10px;
+  padding: 10px;
 }
 
 .fl-form.placeholder .form-html {
@@ -556,6 +568,7 @@ html[dir="rtl"] .radio.radio-icon input[type="radio"] + label > span.check {
   line-height: 44px;
   position: relative;
   color: #333;
+  margin-bottom: -7px;
 }
 
 .select-proxy-display.readonly,
@@ -619,6 +632,10 @@ html[dir="rtl"] .radio.radio-icon input[type="radio"] + label > span.check {
 .fileUpload {
   position: relative;
   overflow: hidden;
+}
+
+.fileUpload.form-group {
+  padding: 0;
 }
 
 .fileUpload-disabled label {
@@ -856,7 +873,7 @@ html[dir="rtl"] .radio.radio-icon input[type="radio"] + label > span.check {
 /* STAR RATING */
 [_type="flStarRating"] .inverse-direction {
   overflow: hidden;
-  display: inline-block;
+  display: block;
   text-align: left;
   direction: rtl;
 }
@@ -888,6 +905,7 @@ html[dir="rtl"] .radio.radio-icon input[type="radio"] + label > span.check {
   height: 30px;
   padding: 0;
   cursor: pointer;
+  margin-bottom: 0;
 }
 
 [_type="flStarRating"] .rating-star .fa {
@@ -1094,6 +1112,11 @@ html[dir="rtl"] .radio.radio-icon input[type="radio"] + label > span.check {
   margin-bottom: 0;
 }
 
+.form-group.fl-date-range .form-group,
+.form-group.fl-time-range .form-group {
+  margin-bottom: 0;
+}
+
 /* SLIDER FIELD */
 
 [data-widget-package="com.fliplet.form-builder"] .form-group.fl-range-slider .range-slider {
@@ -1134,15 +1157,10 @@ html[dir="rtl"] .radio.radio-icon input[type="radio"] + label > span.check {
   width: 100% !important;
 }
 
-[data-widget-package="com.fliplet.form-builder"]
-  .form-group.fl-date-picker.date-picker-start
-  > .form-control,
-[data-widget-package="com.fliplet.form-builder"]
-  .form-group.fl-date-picker.date-picker-end
-  > .form-control {
-  padding-right: 0;
+.form-group.fl-date-picker > .form-control,
+.form-group.fl-time-picker > .form-control {
+  padding-right: 0 !important;
 }
-
 /* LINE BREAK */
 
 form hr {
@@ -1159,6 +1177,10 @@ form hr {
     display: table-cell !important;
     width: auto;
     max-width: 100%;
+  }
+
+  .form-group.fileUpload .btn-primary {
+    display: flex;
   }
 
   .form-html .btn {
@@ -1471,6 +1493,13 @@ form hr {
 
 .geolocation.btn {
   column-gap: 10px;
+  display: inline-block !important;
+}
+
+.geolocation.btn svg {
+  width: 20px;
+  height: 20px;
+  line-height: 20px;
 }
 
 .geolocation.text-info {
@@ -1478,12 +1507,6 @@ form hr {
   color: #474a74;
   font-weight: 400;
   line-height: 16px;
-}
-
-@media screen and (min-width: 640px) {
-  .geolocation.btn-primary {
-    display: flex;
-  }
 }
 
 @media screen and (max-width: 360px) {
@@ -1499,6 +1522,16 @@ form hr {
   .form-group.w-1_2 .fl-date-range .fl-date-picker,
   .form-group.w-1_2 .fl-time-range .fl-time-picker {
     width: 100%;
+  }
+
+  .form-group.w-1_4 .fl-time-picker > .form-control,
+  .form-group.w-1_4 .fl-date-picker > .form-control {
+    padding-left: 40px !important;
+  }
+
+  .form-group.w-1_4 .fl-time-picker > .fa,
+  .form-group.w-1_4 .fl-date-picker > .fa {
+    width: 34px;
   }
 }
 

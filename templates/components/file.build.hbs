@@ -1,5 +1,5 @@
-<div class="fileUpload file-input" :class="{ 'fileUpload-padding-top': value.length, 'fileUpload-disabled' : readonly }">
-  <div class="row">
+<div class="form-group fileUpload file-input" :class="{ 'fileUpload-padding-top': value.length, 'fileUpload-disabled' : readonly }">
+  <div class="row" v-if="value.length">
     <ul class="file-holder" :class="{ 'editable' : !readonly }">
       <li class="file-item" v-for="(file, index) in value">
         <div @click="readonly ? false : onFileItemClick(file.url)" class="file-content" :class="{ 'no-pointer-events' : !file.url }">
