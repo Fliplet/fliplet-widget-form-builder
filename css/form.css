@@ -1157,8 +1157,8 @@ html[dir="rtl"] .radio.radio-icon input[type="radio"] + label > span.check {
   width: 100% !important;
 }
 
-[data-widget-package="com.fliplet.form-builder"] .form-group.fl-date-picker > .form-control,
-[data-widget-package="com.fliplet.form-builder"] .form-group.fl-time-picker > .form-control {
+.form-group.fl-date-picker > .form-control,
+.form-group.fl-time-picker > .form-control {
   padding-right: 0 !important;
 }
 /* LINE BREAK */
@@ -1529,8 +1529,8 @@ form hr {
     padding-left: 40px !important;
   }
 
-  [data-widget-package="com.fliplet.form-builder"] .form-group.w-1_4 .fl-time-picker > .fa,
-  [data-widget-package="com.fliplet.form-builder"] .form-group.w-1_4 .fl-date-picker > .fa {
+  .form-group.w-1_4 .fl-time-picker > .fa,
+  .form-group.w-1_4 .fl-date-picker > .fa {
     width: 34px;
   }
 }
