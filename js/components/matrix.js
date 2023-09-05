@@ -301,7 +301,7 @@ Fliplet.FormBuilder.field('matrix', {
     return rules;
   },
   mounted: function() {
-    if (this.defaultValueSource !== 'default' && this.defaultValueSource !== 'profile') {
+    if (['default', 'profile'].indexOf(this.defaultValueSource) === -1) {
       this.setValueFromDefaultSettings({ source: this.defaultValueSource, key: this.defaultValueKey });
     }
   },

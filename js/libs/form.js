@@ -254,7 +254,7 @@ Fliplet().then(function() {
         fields.forEach(function(field) {
           if (entry && entry.data && field.populateOnUpdate !== false) {
             var fieldKey = isResetAction
-              ? field.defaultValueKey || field.name
+              ? field.defaultValueKey
               : field.name || field.defaultValueKey;
 
             var fieldData;
@@ -291,13 +291,18 @@ Fliplet().then(function() {
 
                 _.forEach(field.rowOptions, function(row) {
                   var val = row.id ? row.id : row.label;
-                  var matrixKey = entry.data[`${fieldKey} [${val}]`] ? entry.data[`${fieldKey} [${val}]`] : entry.data[`${fieldKey}`];
+                  var matrixKey = entry.data[`${fieldKey} [${val}]`] || entry.data[`${fieldKey}`];
 
                   if (isResetAction) {
-                    if ((!field.defaultValueKey && matrixKey) || (field.defaultValueKey.indexOf(val) !== -1 && matrixKey)) {
+                    if ((!field.defaultValueKey && matrixKey)
+                      || (field.defaultValueKey.indexOf(val) !== -1 && matrixKey)
+                      || (field.defaultValueKey.indexOf(fieldKey) !== -1 && matrixKey)) {
                       option[val] = matrixKey;
                     }
                   } else if (matrixKey) {
+                    option[val] = matrixKey;
+                  } else if (formMode === 'add' && !matrixKey) {
+                    matrixKey = entry.data[`${field.defaultValueKey} [${val}]`] || entry.data[`${field.defaultValueKey}`];
                     option[val] = matrixKey;
                   }
                 });
@@ -307,7 +312,7 @@ Fliplet().then(function() {
               default:
                 fieldData = entry.data[fieldKey];
 
-                if (typeof fieldData === 'undefined') {
+                if (typeof fieldData === 'undefined' && formMode === 'add') {
                   fieldData = entry.data[field.name] || entry.data[field.defaultValueKey];
                 }
 
@@ -515,7 +520,8 @@ Fliplet().then(function() {
           blockScreen: false,
           today: moment().locale('en').format('YYYY-MM-DD'),
           now: moment().locale('en').format('HH:mm'),
-          id: data.id
+          id: data.id,
+          entryId: entryId
         };
       },
       computed: {
@@ -1017,12 +1023,23 @@ Fliplet().then(function() {
                   }
                 } else if (type === 'flMatrix') {
                   if (!_.isEmpty(value)) {
-                    _.forEach(value, function(col, row) {
-                      if (!row || !col) {
-                        return '';
-                      }
+                    _.forEach(field.rowOptions, function(rowOpt) {
+                      var val = rowOpt.id || rowOpt.label;
+                      var rowFound = _.some(value, function(col, row) {
+                        if (!row || !col) {
+                          return;
+                        }
 
-                      appendField(`${field.name} [${row}]`, col);
+                        if (val === row) {
+                          appendField(`${field.name} [${val}]`, col);
+
+                          return true;
+                        }
+                      });
+
+                      if (!rowFound) {
+                        appendField(`${field.name} [${val}]`, '');
+                      }
                     });
                   } else {
                     _.forEach(field.rowOptions, function(row) {
@@ -1205,20 +1222,19 @@ Fliplet().then(function() {
             });
           }
 
-          if (formMode === 'add') {
-            return Promise.resolve();
-          }
-
-          if (data.autobindProfileEditing) {
+          if (data.autobindProfileEditing || formMode === 'add') {
             $vm.isLoading = true;
 
             return Fliplet.Session.get().then(function(session) {
               var isEditMode = false;
 
               if (session.entries && session.entries.dataSource) {
-                entryId = 'session'; // this works because you can use it as an ID on the backend
+                if (formMode !== 'add') {
+                  entryId = 'session'; // this works because you can use it as an ID on the backend
+                  isEditMode = true;
+                }
+
                 entry = session.entries.dataSource;
-                isEditMode = true;
               }
 
               // Re-render fields
