@@ -291,7 +291,7 @@ a {
 }
 
 textarea.form-control {
-  line-height: 16px;
+  line-height: 20px;
   padding: 15px;
   max-width: 100%;
 }
@@ -1489,11 +1489,20 @@ form hr {
   border-bottom-width: 0;
 }
 
+/* Code scanner */
+.scanner.btn.disabled {
+  background-color: #e1e1e1;
+}
+
 /* Geolocation */
 
 .geolocation.btn {
   column-gap: 10px;
   display: inline-block !important;
+}
+
+.scanner.btn {
+  column-gap: 10px;
 }
 
 .geolocation.btn svg {
@@ -1507,6 +1516,14 @@ form hr {
   color: #474a74;
   font-weight: 400;
   line-height: 16px;
+}
+
+@media screen and (min-width: 640px) {
+  .geolocation.btn.btn-primary,
+  .scanner.btn.btn-primary {
+    display: flex !important;
+    align-items: center;
+  }
 }
 
 @media screen and (max-width: 360px) {
