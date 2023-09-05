@@ -30,11 +30,9 @@ Fliplet.FormBuilder.field('codeScanner', {
   },
   created: function() {
     Fliplet.FormBuilder.on('reset', this.onReset);
-    Fliplet.Hooks.on('beforeFormSubmit', this.onBeforeSubmit);
   },
   destroyed: function() {
     Fliplet.FormBuilder.off('reset', this.onReset);
-    Fliplet.Hooks.off('beforeFormSubmit', this.onBeforeSubmit);
   },
   methods: {
     openScanner: function() {
