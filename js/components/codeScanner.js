@@ -48,7 +48,7 @@ Fliplet.FormBuilder.field('codeScanner', {
         }
       })
         .catch(function(error) {
-          $vm.errorMessage = error;
+          $vm.errorMessage = Fliplet.parseError(error);
         });
     },
     onReset: function() {
