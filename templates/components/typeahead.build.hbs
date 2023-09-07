@@ -4,4 +4,6 @@
   </div>
   <div class="text-danger" v-if="reachedMaxItems">Only \{{maxItems}} item(s) can be selected.</div>
 </template>
-<p class="text-danger" v-if="$v.value.required === false && $v.value.$dirty">{{T "widgets.form.errors.required"}}</p>
+<p class="text-danger" v-if="$v.value.required === false && $v.value.$dirty">{{T
+    "widgets.form.errors.required"
+  }}</p>
