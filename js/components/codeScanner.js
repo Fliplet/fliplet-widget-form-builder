@@ -64,5 +64,10 @@ Fliplet.FormBuilder.field('codeScanner', {
         el.rows++;
       }
     }
+  },
+  watch: {
+    value: function(val) {
+      this.$emit('_input', this.name, val, false, true);
+    }
   }
 });
