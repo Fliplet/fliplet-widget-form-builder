@@ -48,7 +48,7 @@
 }
 
 .w-3_4.own {
-  width: 75%;
+  width: calc(75% - 2px);
   grid-column-end: span 4;
 }
 
@@ -58,7 +58,7 @@
 
 .fl-form .form-html {
   display: grid;
-  grid-template-columns: repeat(4, 25%);
+  grid-template-columns: repeat(4, 24%);
   grid-gap: 10px;
   padding: 10px;
 }
@@ -1524,6 +1524,10 @@ form hr {
     display: flex !important;
     align-items: center;
   }
+
+  .scanner.btn.btn-primary {
+    margin-bottom: 8px;
+  }
 }
 
 @media screen and (max-width: 360px) {
@@ -1549,6 +1553,26 @@ form hr {
   .form-group.w-1_4 .fl-time-picker > .fa,
   .form-group.w-1_4 .fl-date-picker > .fa {
     width: 34px;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .fl-form .form-html {
+    grid-template-columns: repeat(4, 23%);
+  }
+
+  .w-1_4.own {
+    width: calc(25% - 8px);
+  }
+
+  .w-1_2.own {
+    width: calc(50% - 5px);
+  }
+}
+
+@media screen and (min-width: 1280px) {
+  .fl-form .form-html {
+    grid-template-columns: repeat(4, 24.5%);
   }
 }
 
