@@ -64,6 +64,44 @@ function addThumbnailToCanvas(imageURI, indexCanvas, self, isFileCanvas) {
   });
 }
 
+function getDataSourceColumnValues(field) {
+  var id = field.dataSourceId;
+  var column = field.column;
+
+  if (!id || !column) {
+    return;
+  }
+
+  Fliplet.Cache.get({
+    key: id + '-' + column,
+    expire: 60
+  }, function getColumnValues() {
+    // If there's no cache, return new values, i.e.
+    Fliplet.DataSources.connect(id).then(function(connection) {
+      connection.getIndex(column).then(function onSuccess(values) {
+        field.options = _.compact(_.map(values, function(option) {
+          if (!option) {
+            return;
+          }
+
+          if (typeof option === 'object' || Array.isArray(option)) {
+            option = JSON.stringify(option);
+          }
+
+          return {
+            id: (typeof option === 'string' ? option : option.toString()).trim(),
+            label: (typeof option === 'string' ? option : option.toString()).trim()
+          };
+        }));
+
+        return field.options;
+      });
+    });
+  })
+    .then(function(result) {
+      field.options = result;
+    });
+}
 
 // Wait for form fields to be ready, as they get defined after translations are initialized
 Fliplet().then(function() {
@@ -475,6 +513,10 @@ Fliplet().then(function() {
               default:
                 break;
             }
+          }
+
+          if (field._type === 'flTypeahead' && field.optionsType === 'dataSource') {
+            getDataSourceColumnValues(field);
           }
 
           if (progress && !isEditMode) {

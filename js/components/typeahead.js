@@ -99,10 +99,6 @@ Fliplet.FormBuilder.field('typeahead', {
       this.updateValue(this.name, this.value);
     }
 
-    if (this.optionsType === 'dataSource') {
-      this.getDataSourceColumnValues();
-    }
-
     Fliplet.Hooks.on('beforeFormSubmit', this.onBeforeSubmit);
   },
   destroyed: function() {
