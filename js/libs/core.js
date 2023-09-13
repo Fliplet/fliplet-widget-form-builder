@@ -181,9 +181,9 @@ Fliplet.FormBuilder = (function() {
         });
       };
 
-      component.methods.getDataSourceColumnValues = _.debounce(function() {
+      component.methods.getDataSourceColumnValues = function() {
         this.$emit('getDataSourceColumnValues');
-      }, 200);
+      };
 
       // Define method to highlight Error on blur form field
       component.methods.highlightError = function() {
@@ -721,9 +721,9 @@ Fliplet.FormBuilder = (function() {
         this.value = '';
       };
 
-      component.methods._getDataSourceColumnValues = _.debounce(function() {
+      component.methods._getDataSourceColumnValues = function() {
         this.$emit('getDataSourceColumnValues');
-      }, 200);
+      };
 
       if (!component.methods.disableAutomatch) {
         component.methods.disableAutomatch = component.methods._disableAutomatch;
