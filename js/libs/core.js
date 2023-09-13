@@ -288,7 +288,7 @@ Fliplet.FormBuilder = (function() {
 
       if (!component.mounted) {
         component.mounted = function() {
-          if (this.defaultValueSource !== 'default' && this.defaultValueSource !== 'profile') {
+          if (this.defaultValueSource !== 'default') {
             this.setValueFromDefaultSettings({ source: this.defaultValueSource, key: this.defaultValueKey });
           }
         };
