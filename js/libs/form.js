@@ -574,6 +574,7 @@ Fliplet().then(function() {
         }
       },
       methods: {
+        getDataSourceColumnValues,
         saveProgress: function() {
           var progress = {};
 
