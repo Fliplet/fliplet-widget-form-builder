@@ -286,6 +286,10 @@ Fliplet().then(function() {
         if (field._type === 'flTimer' && !data.saveProgress) {
           Fliplet.App.Storage.remove(field.name);
         }
+
+        if (field._type === 'flTypeahead' && field.optionsType === 'dataSource') {
+          getDataSourceColumnValues(field);
+        }
       });
 
       if (fields.length && (data.saveProgress && typeof progress === 'object') || entry) {
@@ -513,10 +517,6 @@ Fliplet().then(function() {
               default:
                 break;
             }
-          }
-
-          if (field._type === 'flTypeahead' && field.optionsType === 'dataSource') {
-            getDataSourceColumnValues(field);
           }
 
           if (progress && !isEditMode) {
