@@ -519,6 +519,10 @@ Fliplet().then(function() {
             }
           }
 
+          if (field._type === 'flTypeahead' && field.optionsType === 'dataSource') {
+            getDataSourceColumnValues(field);
+          }
+
           if (progress && !isEditMode) {
             var savedValue = progress[field.name];
 
