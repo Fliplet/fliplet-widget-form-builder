@@ -182,7 +182,7 @@ Fliplet.FormBuilder = (function() {
       };
 
       component.methods.getDataSourceColumnValues = function() {
-        this.$emit('getDataSourceColumnValues');
+        this.$emit('getDataSourceColumnValues', this);
       };
 
       // Define method to highlight Error on blur form field
@@ -722,7 +722,7 @@ Fliplet.FormBuilder = (function() {
       };
 
       component.methods._getDataSourceColumnValues = function() {
-        this.$emit('getDataSourceColumnValues');
+        this.$emit('getDataSourceColumnValues', this);
       };
 
       if (!component.methods.disableAutomatch) {
