@@ -1524,10 +1524,6 @@ form hr {
     display: flex !important;
     align-items: center;
   }
-
-  .scanner.btn.btn-primary {
-    margin-bottom: 8px;
-  }
 }
 
 @media screen and (max-width: 360px) {
