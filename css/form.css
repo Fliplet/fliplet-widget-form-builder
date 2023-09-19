@@ -6,7 +6,6 @@
   display: flex;
   flex-direction: column;
   margin: 0;
-  margin-bottom: 15px;
 }
 
 .col-xs-12 {
@@ -31,7 +30,7 @@
 }
 
 .w-1_4.own {
-  width: 24%;
+  width: calc(25% - 9px);
   grid-column-end: span 4;
 }
 
@@ -40,7 +39,7 @@
 }
 
 .w-1_2.own {
-  width: 49.3333%;
+  width: calc(50% - 6px);
   grid-column-end: span 4;
 }
 
@@ -49,7 +48,7 @@
 }
 
 .w-3_4.own {
-  width: 74.666%;
+  width: calc(75% - 3px);
   grid-column-end: span 4;
 }
 
@@ -59,8 +58,8 @@
 
 .fl-form .form-html {
   display: grid;
-  grid-template-columns: repeat(4, 24%);
-  column-gap: 1.33333%;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
 }
 
 .fl-form.placeholder .form-html {
