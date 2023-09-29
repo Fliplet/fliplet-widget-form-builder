@@ -668,6 +668,8 @@ Fliplet().then(function() {
                   end: fieldSettings.endValue
                 };
               }
+            } else if (field._type === 'flGeolocation') {
+              value = null;
             } else {
               value = fieldSettings.value;
             }
@@ -1095,6 +1097,9 @@ Fliplet().then(function() {
                       appendField(`${field.name} [${val}]`, '');
                     });
                   }
+                } else if (type === 'flGeolocation') {
+                  appendField(field.name, value[0]);
+                  appendField(`${field.name} (accuracy)`, value[1]);
                 } else {
                   // Other inputs
                   appendField(field.name, value);
