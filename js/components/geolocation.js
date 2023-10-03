@@ -174,7 +174,7 @@ Fliplet.FormBuilder.field('geolocation', {
         });
 
         return Promise.reject('');
-      } else if (this.preciseLocationRequired && this.value[0] && this.value[1] > 100) {
+      } else if (this.preciseLocationRequired && this.value && this.value[0] && this.value[1] > 100) {
         var error = {
           code: 'inaccurateCoords'
         };
