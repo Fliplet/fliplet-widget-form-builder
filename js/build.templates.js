@@ -51,7 +51,7 @@ this["Fliplet"]["Widget"]["Templates"]["templates.components.email"] = Handlebar
 this["Fliplet"]["Widget"]["Templates"]["templates.components.field"] = Handlebars.template({"compiler":[7,">= 4.0.0"],"main":function(container,depth0,helpers,partials,data) {
     var stack1, helper;
 
-  return "<div v-show=\"_showField\" class=\"form-group row clearfix\" :class=\"[{'has-error': !isValid, 'own': ownRow}, _fieldDynamicWidth]\" :data-field=\"name\">\n  <div class=\"col-xs-12 grow-2\" v-if=\"_isFormField\">\n    <label class=\"control-label\" :for=\"_labelName\">\n      {{ label }} <template v-if=\"required\"><span class=\"required-info\">*</span></template>\n    </label>\n    <div v-if=\"description\" class=\"help-block description\">{{ description }}</div>\n  </div>\n  <div class=\"col-xs-12\">\n    "
+  return "<div\n  v-show=\"_showField\"\n  class=\"form-group row clearfix\"\n  :class=\"[{'has-error': !isValid, 'own': ownRow}, _fieldDynamicWidth]\"\n  :data-field=\"name\"\n  data-form-field\n>\n  <div class=\"col-xs-12 grow-2\" v-if=\"_isFormField\">\n    <label class=\"control-label\" :for=\"_labelName\">\n      {{ label }}\n      <template v-if=\"required\"><span class=\"required-info\">*</span></template>\n    </label>\n    <div v-if=\"description\" class=\"help-block description\">{{ description }}</div>\n  </div>\n  <div class=\"col-xs-12\">\n    "
     + ((stack1 = ((helper = (helper = helpers.template || (depth0 != null ? depth0.template : depth0)) != null ? helper : helpers.helperMissing),(typeof helper === "function" ? helper.call(depth0 != null ? depth0 : (container.nullContext || {}),{"name":"template","hash":{},"data":data}) : helper))) != null ? stack1 : "")
     + "\n  </div>\n</div>\n";
 },"useData":true});
