@@ -83,7 +83,7 @@ Fliplet.FormBuilder = (function() {
        *
        * @return {void} - this method does not return anything but updates the value directly on the target field.
        */
-      component.methods.setValueFromDefaultSettings = function(data) {
+      component.methods.setValueFromDefaultSettings = async function(data) {
         var result;
         var $vm = this;
 
@@ -93,7 +93,7 @@ Fliplet.FormBuilder = (function() {
               throw new Error('A key is required to fetch data from the user\'s profile');
             }
 
-            result = Fliplet.User.getCachedSession({ force: true })
+            result = await Fliplet.User.getCachedSession({ force: true })
               .then(function(session) {
                 if (session && session.entries) {
                   if (session.entries.dataSource) {

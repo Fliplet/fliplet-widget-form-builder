@@ -72,35 +72,32 @@ function getDataSourceColumnValues(field) {
     return;
   }
 
-  Fliplet.Cache.get({
-    key: id + '-' + column,
+  return Fliplet.Cache.get({
+    key: `${id}-${column}-options`,
     expire: 60
   }, function getColumnValues() {
     // If there's no cache, return new values, i.e.
-    Fliplet.DataSources.connect(id).then(function(connection) {
-      connection.getIndex(column).then(function onSuccess(values) {
-        field.options = _.compact(_.map(values, function(option) {
-          if (!option) {
-            return;
-          }
+    return Fliplet.DataSources.connect(id).then(function(connection) {
+      return connection.getIndex(column);
+    }).then(function onSuccess(values) {
+      field.options = _.compact(_.map(values, function(option) {
+        if (!option) {
+          return;
+        }
 
-          if (typeof option === 'object' || Array.isArray(option)) {
-            option = JSON.stringify(option);
-          }
+        if (typeof option === 'object' || Array.isArray(option)) {
+          option = JSON.stringify(option);
+        }
 
-          return {
-            id: (typeof option === 'string' ? option : option.toString()).trim(),
-            label: (typeof option === 'string' ? option : option.toString()).trim()
-          };
-        }));
+        return {
+          id: (typeof option === 'string' ? option : option.toString()).trim(),
+          label: (typeof option === 'string' ? option : option.toString()).trim()
+        };
+      }));
 
-        return field.options;
-      });
+      return field.options;
     });
-  })
-    .then(function(result) {
-      field.options = result;
-    });
+  });
 }
 
 // Wait for form fields to be ready, as they get defined after translations are initialized
@@ -251,6 +248,8 @@ Fliplet().then(function() {
           if (!Array.isArray(val)) {
             val = _.compact([val]);
           }
+
+          field.value = val;
         } else if (field._type === 'flMatrix') {
           if (field.defaultValueSource === 'query' && typeof val !== 'string') {
             field.value = val;
@@ -288,7 +287,9 @@ Fliplet().then(function() {
         }
 
         if (field._type === 'flTypeahead' && field.optionsType === 'dataSource') {
-          getDataSourceColumnValues(field);
+          getDataSourceColumnValues(field).then(function(result) {
+            field.options = result;
+          });
         }
       });
 
@@ -517,10 +518,6 @@ Fliplet().then(function() {
               default:
                 break;
             }
-          }
-
-          if (field._type === 'flTypeahead' && field.optionsType === 'dataSource') {
-            getDataSourceColumnValues(field);
           }
 
           if (progress && !isEditMode) {
