@@ -1182,10 +1182,6 @@ form hr {
     display: flex;
   }
 
-  .form-html .btn {
-    margin-bottom: 0;
-  }
-
   .form-html .btn + .btn {
     margin-right: 15px;
   }
