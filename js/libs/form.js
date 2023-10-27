@@ -104,13 +104,20 @@ function getDataSourceColumnValues(field) {
         return field.options;
       });
     });
-  }).then(function(result) {
-    field.options = result;
-
-    return result;
   });
 
   return dataSourceColumnPromises[key];
+}
+
+function setTypeaheadFieldValue(field, value) {
+  if (field.optionsType === 'dataSource') {
+    getDataSourceColumnValues(field).then(function(result) {
+      field.options = result;
+      field.value = value;
+    });
+  } else {
+    field.value = value;
+  }
 }
 
 // Wait for form fields to be ready, as they get defined after translations are initialized
@@ -257,10 +264,16 @@ Fliplet().then(function() {
       }
 
       result.then(function(val) {
-        if (field._type === 'flCheckbox' || field._type === 'flTypeahead') {
+        if (field._type === 'flCheckbox') {
           if (!Array.isArray(val)) {
             val = _.compact([val]);
           }
+        } else if (field._type === 'flTypeahead') {
+          if (!Array.isArray(val)) {
+            val = _.compact([val]);
+          }
+
+          setTypeaheadFieldValue(field, val);
         } else if (field._type === 'flMatrix') {
           if (field.defaultValueSource === 'query' && typeof val !== 'string') {
             field.value = val;
@@ -298,7 +311,9 @@ Fliplet().then(function() {
         }
 
         if (field._type === 'flTypeahead' && field.optionsType === 'dataSource') {
-          getDataSourceColumnValues(field);
+          getDataSourceColumnValues(field).then(function(result) {
+            field.options = result;
+          });
         }
       });
 
@@ -502,10 +517,7 @@ Fliplet().then(function() {
                 break;
                 // There is no validation and value assignment for checkbox and radio options as there is no access to the options. This is implemented in the checkbox and radio components respectively.
               case 'flTypeahead':
-                getDataSourceColumnValues(field).then(function(result) {
-                  field.options = result;
-                  field.value = fieldData;
-                });
+                setTypeaheadFieldValue(field, fieldData);
                 break;
               default:
                 if (!fieldData) {
@@ -539,10 +551,7 @@ Fliplet().then(function() {
 
             if (typeof savedValue !== 'undefined') {
               if (field._type === 'flTypeahead') {
-                getDataSourceColumnValues(field).then(function(result) {
-                  field.options = result;
-                  field.value = savedValue;
-                });
+                setTypeaheadFieldValue(field, savedValue);
               } else {
                 field.value = savedValue;
               }
@@ -1516,10 +1525,7 @@ Fliplet().then(function() {
 
                       field.value = options;
                     } else if (field._type === 'flTypeahead') {
-                      getDataSourceColumnValues(field).then(function(result) {
-                        field.options = result;
-                        field.value = value;
-                      });
+                      setTypeaheadFieldValue(field, value);
                     } else {
                       field.value = value;
                     }
