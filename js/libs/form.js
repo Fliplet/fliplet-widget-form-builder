@@ -1,4 +1,5 @@
 var formBuilderInstances = [];
+var dataSourceColumnPromises = {};
 
 function drawImageOnCanvas(img, canvas) {
   var imgWidth = img.width;
@@ -69,16 +70,22 @@ function getDataSourceColumnValues(field) {
   var column = field.column;
 
   if (!id || !column) {
-    return;
+    return Promise.resolve([]);
   }
 
-  Fliplet.Cache.get({
-    key: id + '-' + column,
+  var key = `${id}-${column}-index`;
+
+  if (dataSourceColumnPromises[key]) {
+    return dataSourceColumnPromises[key];
+  }
+
+  dataSourceColumnPromises[key] = Fliplet.Cache.get({
+    key,
     expire: 60
   }, function getColumnValues() {
     // If there's no cache, return new values, i.e.
-    Fliplet.DataSources.connect(id).then(function(connection) {
-      connection.getIndex(column).then(function onSuccess(values) {
+    return Fliplet.DataSources.connect(id).then(function(connection) {
+      return connection.getIndex(column).then(function onSuccess(values) {
         field.options = _.compact(_.map(values, function(option) {
           if (!option) {
             return;
@@ -97,10 +104,20 @@ function getDataSourceColumnValues(field) {
         return field.options;
       });
     });
-  })
-    .then(function(result) {
+  });
+
+  return dataSourceColumnPromises[key];
+}
+
+function setTypeaheadFieldValue(field, value) {
+  if (field.optionsType === 'dataSource') {
+    getDataSourceColumnValues(field).then(function(result) {
       field.options = result;
+      field.value = value;
     });
+  } else {
+    field.value = value;
+  }
 }
 
 // Wait for form fields to be ready, as they get defined after translations are initialized
@@ -247,10 +264,16 @@ Fliplet().then(function() {
       }
 
       result.then(function(val) {
-        if (field._type === 'flCheckbox' || field._type === 'flTypeahead') {
+        if (field._type === 'flCheckbox') {
           if (!Array.isArray(val)) {
             val = _.compact([val]);
           }
+        } else if (field._type === 'flTypeahead') {
+          if (!Array.isArray(val)) {
+            val = _.compact([val]);
+          }
+
+          setTypeaheadFieldValue(field, val);
         } else if (field._type === 'flMatrix') {
           if (field.defaultValueSource === 'query' && typeof val !== 'string') {
             field.value = val;
@@ -288,7 +311,9 @@ Fliplet().then(function() {
         }
 
         if (field._type === 'flTypeahead' && field.optionsType === 'dataSource') {
-          getDataSourceColumnValues(field);
+          getDataSourceColumnValues(field).then(function(result) {
+            field.options = result;
+          });
         }
       });
 
@@ -486,7 +511,9 @@ Fliplet().then(function() {
 
                 break;
                 // There is no validation and value assignment for checkbox and radio options as there is no access to the options. This is implemented in the checkbox and radio components respectively.
-
+              case 'flTypeahead':
+                setTypeaheadFieldValue(field, fieldData);
+                break;
               default:
                 if (!fieldData) {
                   return;
@@ -514,15 +541,15 @@ Fliplet().then(function() {
             }
           }
 
-          if (field._type === 'flTypeahead' && field.optionsType === 'dataSource') {
-            getDataSourceColumnValues(field);
-          }
-
           if (progress && !isEditMode) {
             var savedValue = progress[field.name];
 
             if (typeof savedValue !== 'undefined') {
-              field.value = savedValue;
+              if (field._type === 'flTypeahead') {
+                setTypeaheadFieldValue(field, savedValue);
+              } else {
+                field.value = savedValue;
+              }
             }
           }
 
@@ -1219,7 +1246,9 @@ Fliplet().then(function() {
               loadEntry = Promise.resolve(loadEntry);
             }
 
-            return loadEntry.then(function(record) {
+            return Promise.all([loadEntry].concat(_.values(dataSourceColumnPromises))).then(function(results) {
+              var record = results[0];
+
               if (!record) {
                 $vm.error = 'This entry has not been found';
               }
@@ -1479,6 +1508,8 @@ Fliplet().then(function() {
                       });
 
                       field.value = options;
+                    } else if (field._type === 'flTypeahead') {
+                      setTypeaheadFieldValue(field, value);
                     } else {
                       field.value = value;
                     }
