@@ -36,11 +36,14 @@ Fliplet.FormBuilder.field('matrix', {
     }
   },
   watch: {
-    value: function(val) {
-      this.clearValue();
+    value: {
+      deep: true,
+      handler: function(val) {
+        this.clearValue();
 
-      if (this.checkValue(val) === 'set') {
-        this.setValue();
+        if (this.checkValue(val) === 'set') {
+          this.setValue();
+        }
       }
     }
   },
