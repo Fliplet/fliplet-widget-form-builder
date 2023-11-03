@@ -376,6 +376,9 @@ Fliplet().then(function() {
 
                 fieldData = option;
                 break;
+              case 'flGeolocation':
+                fieldData = [entry.data[`${fieldKey}`], entry.data[`${fieldKey} (accuracy)`]];
+                break;
               default:
                 fieldData = entry.data[fieldKey];
 
@@ -403,6 +406,7 @@ Fliplet().then(function() {
                 break;
               case 'flImage':
               case 'flFile':
+              case 'flGeolocation':
                 // Don't change the data types for Image and File fields
                 break;
 
@@ -508,7 +512,7 @@ Fliplet().then(function() {
               case 'flGeolocation':
                 var regex = /^[-+]?([1-8]?\d(\.\d+)?|90(\.0+)?),\s*[-+]?(180(\.0+)?|((1[0-7]\d)|([1-9]?\d))(\.\d+)?)$/;
 
-                if (regex.exec(fieldData)) {
+                if (fieldData && regex.exec(fieldData[0])) {
                   field.value = fieldData;
                 } else {
                   field.value = null;
@@ -695,6 +699,8 @@ Fliplet().then(function() {
                   end: fieldSettings.endValue
                 };
               }
+            } else if (field._type === 'flGeolocation') {
+              value = null;
             } else {
               value = fieldSettings.value;
             }
@@ -1122,6 +1128,9 @@ Fliplet().then(function() {
                       appendField(`${field.name} [${val}]`, '');
                     });
                   }
+                } else if (type === 'flGeolocation') {
+                  appendField(field.name, value ? value[0] : null);
+                  appendField(`${field.name} (accuracy)`, value ? value[1] : null);
                 } else {
                   // Other inputs
                   appendField(field.name, value);

@@ -3,7 +3,8 @@ Fliplet.FormBuilder.field('geolocation', {
   category: 'Advanced',
   props: {
     value: {
-      type: String
+      type: Array,
+      default: null
     },
     description: {
       type: String
@@ -22,7 +23,6 @@ Fliplet.FormBuilder.field('geolocation', {
       firstTimeSaved: false,
       isLoading: false,
       showFeedback: false,
-      accuracy: null,
       timeOut: null
     };
   },
@@ -42,7 +42,7 @@ Fliplet.FormBuilder.field('geolocation', {
       this.getLocation();
     }
 
-    if (this.value) {
+    if (this.value && this.value.length) {
       this.firstTimeSaved = true;
     }
   },
@@ -62,7 +62,10 @@ Fliplet.FormBuilder.field('geolocation', {
         return;
       }
 
-      this.value = `${result.coords.latitude},${result.coords.longitude}`;
+      this.value = [
+        `${result.coords.latitude},${result.coords.longitude}`,
+        result.coords.accuracy
+      ];
     },
     getDeviceLocation: function() {
       return Fliplet.Navigator.location({
@@ -80,7 +83,6 @@ Fliplet.FormBuilder.field('geolocation', {
       var location = this.getDeviceLocation();
 
       location.then(function(result) {
-        $vm.accuracy = result.coords.accuracy;
         $vm.setValue(result);
         $vm.firstTimeSaved = true;
         $vm.isLoading = false;
@@ -104,7 +106,6 @@ Fliplet.FormBuilder.field('geolocation', {
       $vm.isLoading = true;
 
       location.then(function(res) {
-        $vm.accuracy = res.coords.accuracy;
         $vm.setValue(res);
         $vm.isLoading = false;
 
@@ -173,7 +174,7 @@ Fliplet.FormBuilder.field('geolocation', {
         });
 
         return Promise.reject('');
-      } else if (this.preciseLocationRequired && this.value && this.accuracy > 100) {
+      } else if (this.preciseLocationRequired && this.value && this.value[0] && this.value[1] > 100) {
         var error = {
           code: 'inaccurateCoords'
         };
