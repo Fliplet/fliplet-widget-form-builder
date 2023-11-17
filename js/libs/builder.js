@@ -820,10 +820,15 @@ Fliplet().then(function() {
 
         tinymce.init({
           target: $vm.$refs.resulthtml,
-          theme: 'silver',
+          theme: 'modern',
+          mobile: {
+            theme: 'mobile',
+            plugins: ['autosave', 'lists', 'autolink'],
+            toolbar: ['bold', 'italic', 'underline', 'bullist', 'numlist', 'removeformat']
+          },
           plugins: [
             'advlist autolink lists link directionality',
-            'autoresize fullscreen code'
+            'autoresize fullscreen code paste'
           ].join(' '),
           toolbar: [
             'bold italic underline',
@@ -1101,10 +1106,10 @@ Fliplet().then(function() {
           $(selector).removeClass('is-loading');
         }
 
-        tinymce.init({
-          target: $vm.$refs.templateDescription,
-          plugins: ['lists', 'advlist', 'image', 'charmap', 'code',
-            'searchreplace', 'wordcount', 'insertdatetime', 'table'
+        $($vm.$refs.templateDescription).tinymce({
+          plugins: [
+            'lists advlist image charmap hr code',
+            'searchreplace wordcount insertdatetime table textcolor colorpicker'
           ],
           toolbar: [
             'formatselect |',

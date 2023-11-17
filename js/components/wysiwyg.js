@@ -33,6 +33,9 @@ Fliplet.FormBuilder.field('wysiwyg', {
     }
   },
   watch: {
+    placeholder: function(val) {
+      $(this.editor.contentAreaContainer).find('p').text(val);
+    },
     value: function(val) {
       // This happens when the value is updated programmatically via the FormBuilder field().val() method
       val = _.isNumber(val) ? _.toString(val) : val;
@@ -55,6 +58,69 @@ Fliplet.FormBuilder.field('wysiwyg', {
           // nothing
         }
       }
+    },
+    placeholderLabel: function() {
+      var placeholderText = this.editor.getElement().getAttribute('placeholder') || this.editor.settings.placeholder;
+      var contentAreaContainer = this.editor.getContentAreaContainer();
+      var defaultStyles = {
+        style: {
+          position: 'absolute',
+          top: '17px',
+          left: '8px',
+          color: '#888',
+          lineHeight: '19px',
+          padding: tinymce.DOM.getStyle(contentAreaContainer, 'padding', true),
+          width: '98%',
+          overflow: 'hidden',
+          'white-space': 'pre-wrap',
+          'font-weight': 'normal',
+          'font-size': '16px'
+        }
+      };
+      var placeholderAttrs = this.editor.settings.placeholderAttrs || defaultStyles;
+
+      tinymce.DOM.setStyle(contentAreaContainer, 'position', 'relative');
+
+      // Create label element in the TinyMCE editor
+      this.labelElement = tinymce.DOM.add(contentAreaContainer, this.editor.settings.placeholderTag || 'p', placeholderAttrs, placeholderText);
+    },
+    hidePlaceholderLabel: function() {
+      tinymce.DOM.setStyle(this.labelElement, 'display', 'none');
+    },
+    showPlaceholderLabel: function() {
+      tinymce.DOM.setStyle(this.labelElement, 'display', '');
+    },
+    onPlaceholderFocus: function() {
+      if (!this.editor.settings.readonly) {
+        this.hidePlaceholderLabel();
+      }
+
+      // for readonly rich text make placeholder text unselectable
+      if (this.editor.settings.readonly) {
+        tinymce.DOM.setStyle(this.labelElement, 'pointer-events', 'none');
+      }
+
+      this.editor.execCommand('mceFocus', false);
+    },
+    onPlaceholderBlur: function() {
+      if (!this.editor.getContent()) {
+        this.showPlaceholderLabel();
+      } else {
+        this.hidePlaceholderLabel();
+      }
+    },
+    addPlaceholder: function() {
+      // Init placeholder
+      this.placeholderLabel();
+      this.onPlaceholderBlur();
+
+      // Add placeholder listeners
+      tinymce.DOM.bind(this.labelElement, 'click', this.onPlaceholderFocus);
+      this.editor.on('focus', this.onPlaceholderFocus);
+      this.editor.on('blur', this.onPlaceholderBlur);
+      this.editor.on('change', this.onPlaceholderBlur);
+      this.editor.on('setContent', this.onPlaceholderBlur);
+      this.editor.on('keydown', this.hidePlaceholderLabel);
     },
     addBulletedListShortcutsWindows: function() {
       var $vm = this;
@@ -79,20 +145,24 @@ Fliplet.FormBuilder.field('wysiwyg', {
 
     var config = {
       target: this.$refs.textarea,
-      theme: 'silver',
-      placeholder: this.placeholder,
-      readonly: this.readonly,
+      theme: 'modern',
       mobile: {
-        menubar: true,
-        plugins: 'autosave lists autolink',
-        toolbar: 'undo bold italic styles'
+        theme: 'mobile',
+        plugins: [ 'autosave', 'lists', 'autolink' ],
+        toolbar: [ 'bold', 'italic', 'underline', 'bullist', 'numlist', 'removeformat' ]
       },
-      plugins: 'advlist autolink lists link directionality autoresize fullscreen code',
-      toolbar: [
-        'bold italic underline',
-        'alignleft aligncenter alignright alignjustify | bullist numlist outdent indent',
-        'ltr rtl | link | removeformat code fullscreen'
-      ].join(' | '),
+      readonly: this.readonly,
+      plugins: [
+        'advlist autolink lists link directionality',
+        'autoresize fullscreen code paste'
+      ].join(' '),
+      toolbar: this.readonly
+        ? false
+        : [
+          'bold italic underline',
+          'alignleft aligncenter alignright alignjustify | bullist numlist outdent indent',
+          'ltr rtl | link | removeformat code fullscreen'
+        ].join(' | '),
       image_advtab: true,
       menubar: false,
       statusbar: false,
@@ -103,9 +173,9 @@ Fliplet.FormBuilder.field('wysiwyg', {
       convert_urls: true,
       inline: false,
       resize: false,
-      bottom_margin: 0,
-      max_height: lineHeight * this.rows,
-      min_height: lineHeight * this.rows,
+      autoresize_bottom_margin: 0,
+      autoresize_max_height: lineHeight * this.rows,
+      autoresize_min_height: lineHeight * this.rows,
       autofocus: false,
       branding: false,
       content_style: 'body { background-color: transparent; }',
@@ -113,6 +183,13 @@ Fliplet.FormBuilder.field('wysiwyg', {
         $vm.editor = editor;
 
         editor.on('init', function() {
+          if (editor.settings.theme === 'mobile' && $vm.readonly) {
+            editor.editorContainer.style.pointerEvents = 'none';
+          }
+
+          $vm.addPlaceholder();
+          $vm.addBulletedListShortcutsWindows();
+
           if ($vm.defaultValueSource !== 'default' && !$vm.value) {
             $vm.setValueFromDefaultSettings({ source: $vm.defaultValueSource, key: $vm.defaultValueKey });
           }
