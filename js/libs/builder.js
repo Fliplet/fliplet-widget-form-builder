@@ -1109,7 +1109,7 @@ Fliplet().then(function() {
         $($vm.$refs.templateDescription).tinymce({
           plugins: [
             'lists advlist image charmap hr code',
-            'searchreplace wordcount insertdatetime table textcolor colorpicker'
+            'searchreplace wordcount insertdatetime table'
           ],
           toolbar: [
             'formatselect |',
