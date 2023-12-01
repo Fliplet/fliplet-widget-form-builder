@@ -85,7 +85,7 @@ Fliplet.FormBuilder.field('wysiwyg', {
       placeholder: this.placeholder,
       plugins: [
         'advlist', 'autolink', 'lists', 'link', 'directionality',
-        'autoresize', 'fullscreen', 'code'
+        'autoresize', 'fullscreen', 'code', 'wordcount'
       ],
       toolbar: this.readonly
         ? false
