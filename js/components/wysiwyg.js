@@ -80,30 +80,23 @@ Fliplet.FormBuilder.field('wysiwyg', {
     var config = {
       target: this.$refs.textarea,
       theme: 'silver',
-      mobile: {
-        theme: 'mobile',
-        plugins: [ 'autosave', 'lists', 'autolink' ],
-        toolbar: [ 'undo', 'redo', 'bold', 'italic', 'underline', 'bullist', 'numlist', 'removeformat' ]
-      },
+      mobile: true,
       readonly: this.readonly,
       placeholder: this.placeholder,
       plugins: [
-        'advlist autolink lists link directionality',
-        'autoresize fullscreen code paste wordcount',
-        'table'
-      ].join(' '),
+        'advlist', 'autolink', 'lists', 'link', 'directionality',
+        'autoresize', 'fullscreen', 'code'
+      ],
       toolbar: this.readonly
         ? false
         : [
-          'undo redo',
           'bold italic underline',
           'alignleft aligncenter alignright alignjustify | bullist numlist outdent indent',
-          'ltr rtl | link | removeformat code fullscreen',
-          'table tabledelete | tableprops tablerowprops tablecellprops | tableinsertrowbefore tableinsertrowafter tabledeleterow | tableinsertcolbefore tableinsertcolafter tabledeletecol'
+          'ltr rtl | link | removeformat code fullscreen'
         ].join(' | '),
       image_advtab: true,
       menubar: false,
-      statusbar: 'wordcount',
+      statusbar: true,
       elementpath: false,
       // Prevent URLs from being altered
       // https://stackoverflow.com/questions/3796942
@@ -121,10 +114,6 @@ Fliplet.FormBuilder.field('wysiwyg', {
         $vm.editor = editor;
 
         editor.on('init', function() {
-          if (editor.settings.theme === 'mobile' && $vm.readonly) {
-            editor.editorContainer.style.pointerEvents = 'none';
-          }
-
           $vm.addBulletedListShortcutsWindows();
 
           if ($vm.defaultValueSource !== 'default' && !$vm.value) {
