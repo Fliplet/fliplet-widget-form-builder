@@ -85,14 +85,16 @@ Fliplet.FormBuilder.field('wysiwyg', {
       placeholder: this.placeholder,
       plugins: [
         'advlist', 'autolink', 'lists', 'link', 'directionality',
-        'autoresize', 'fullscreen', 'code', 'wordcount'
+        'autoresize', 'fullscreen', 'code', 'wordcount', 'table'
       ],
       toolbar: this.readonly
         ? false
         : [
           'bold italic underline',
           'alignleft aligncenter alignright alignjustify | bullist numlist outdent indent',
-          'ltr rtl | link | removeformat code fullscreen'
+          'ltr rtl | link | removeformat code fullscreen',
+          'table tabledelete | tableprops tablerowprops tablecellprops',
+          'tableinsertrowbefore tableinsertrowafter tabledeleterow | tableinsertcolbefore tableinsertcolafter tabledeletecol'
         ].join(' | '),
       image_advtab: true,
       menubar: false,
