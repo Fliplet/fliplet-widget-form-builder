@@ -23,7 +23,8 @@ Fliplet.FormBuilder.field('geolocation', {
       firstTimeSaved: false,
       isLoading: false,
       showFeedback: false,
-      timeOut: null
+      timeOut: null,
+      errorOccurred: false
     };
   },
   validations: function() {
@@ -79,6 +80,7 @@ Fliplet.FormBuilder.field('geolocation', {
 
       $vm.showFeedback = true;
       $vm.isLoading = true;
+      $vm.errorOccurred = false;
 
       var location = this.getDeviceLocation();
 
@@ -104,6 +106,7 @@ Fliplet.FormBuilder.field('geolocation', {
 
       $vm.showFeedback = true;
       $vm.isLoading = true;
+      $vm.errorOccurred = false;
 
       location.then(function(res) {
         $vm.setValue(res);
@@ -143,6 +146,8 @@ Fliplet.FormBuilder.field('geolocation', {
     openToastMessage: function(error) {
       var supportsSettings = Fliplet.Navigator.supportsAppSettings();
 
+      this.errorOccurred = true;
+
       Fliplet.UI.Toast({
         type: 'minimal',
         message: this.getErrorMessage(error),
@@ -181,6 +186,8 @@ Fliplet.FormBuilder.field('geolocation', {
 
         this.openToastMessage(error);
 
+        return Promise.reject('');
+      } else if (this.errorOccurred) {
         return Promise.reject('');
       }
     },
