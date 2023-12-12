@@ -166,6 +166,15 @@ Fliplet.FormBuilder.field('wysiwyg', {
         field: this,
         config: config
       }).then(function() {
+        // Use array of plugins (as TinyMCE's preferred format) if string is provided
+        if (typeof config.plugins === 'string') {
+          config.plugins = config.plugins.split(' ');
+        }
+
+        if (typeof config.mobile.plugins === 'string') {
+          config.mobile.plugins = config.mobile.plugins.split(' ');
+        }
+
         tinymce.init(config);
       });
     });
