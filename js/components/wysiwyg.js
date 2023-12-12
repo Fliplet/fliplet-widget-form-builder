@@ -166,6 +166,26 @@ Fliplet.FormBuilder.field('wysiwyg', {
         field: this,
         config: config
       }).then(function() {
+        var pluginPaths = ['plugins', 'mobile.plugins'];
+        var tinymceVersion = tinymce.majorVersion + '.' + tinymce.minorVersion;
+        var deprecatedPlugins = {
+          '6.8.1': ['paste']
+        };
+
+        _.forEach(pluginPaths, function(path) {
+          var plugins = _.get(config, path);
+
+          if (typeof plugins === 'string') {
+            // Use array of plugins (as TinyMCE's preferred format) if string is provided
+            plugins = plugins.split(' ');
+
+            // Remove deprecated plugins
+            plugins = _.difference(plugins, deprecatedPlugins[tinymceVersion]);
+
+            _.set(config, path, plugins);
+          }
+        });
+
         tinymce.init(config);
       });
     });
