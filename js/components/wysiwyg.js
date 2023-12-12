@@ -171,6 +171,9 @@ Fliplet.FormBuilder.field('wysiwyg', {
         var deprecatedPlugins = {
           '6.8.1': ['paste']
         };
+        var deprecatedProperties = {
+          '6.8.1': ['theme']
+        };
 
         _.forEach(pluginPaths, function(path) {
           var plugins = _.get(config, path);
@@ -184,6 +187,13 @@ Fliplet.FormBuilder.field('wysiwyg', {
           plugins = _.difference(plugins, deprecatedPlugins[tinymceVersion]);
 
           _.set(config, path, plugins);
+        });
+
+        // Assess config to remove deprecated properties
+        _.forEach(deprecatedProperties[tinymceVersion], function(property) {
+          if (typeof config[property] !== 'undefined') {
+            delete config[property];
+          }
         });
 
         tinymce.init(config);
