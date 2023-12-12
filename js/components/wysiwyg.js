@@ -84,7 +84,7 @@ Fliplet.FormBuilder.field('wysiwyg', {
       placeholder: this.placeholder,
       plugins: [
         'advlist', 'autolink', 'lists', 'link', 'directionality',
-        'autoresize', 'fullscreen', 'code', 'wordcount', 'table'
+        'autoresize', 'fullscreen', 'code', 'paste', 'wordcount', 'table'
       ],
       toolbar: this.readonly
         ? false
@@ -178,12 +178,12 @@ Fliplet.FormBuilder.field('wysiwyg', {
           if (typeof plugins === 'string') {
             // Use array of plugins (as TinyMCE's preferred format) if string is provided
             plugins = plugins.split(' ');
-
-            // Remove deprecated plugins
-            plugins = _.difference(plugins, deprecatedPlugins[tinymceVersion]);
-
-            _.set(config, path, plugins);
           }
+
+          // Remove deprecated plugins
+          plugins = _.difference(plugins, deprecatedPlugins[tinymceVersion]);
+
+          _.set(config, path, plugins);
         });
 
         tinymce.init(config);
