@@ -115,6 +115,12 @@ Fliplet.FormBuilder.field('wysiwyg', {
       setup: function(editor) {
         $vm.editor = editor;
 
+        editor.on('click', function() {
+          if (tinymce.activeEditor.queryCommandState('ToggleToolbarDrawer')) {
+            tinymce.activeEditor.execCommand('ToggleToolbarDrawer');
+          }
+        });
+
         editor.on('init', function() {
           $vm.addBulletedListShortcutsWindows();
 
