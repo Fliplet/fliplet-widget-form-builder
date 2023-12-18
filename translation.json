@@ -120,6 +120,9 @@
           "locationRequired": "Please allow location services to use this feature"
         }
       },
+      "codeScanner": {
+        "scanCode": "Scan Code"
+      },
       "telephone": {
         "instruction": "Phone number can only contain <b>; , . ( ) - + SPACE * #</b> and numbers."
       },

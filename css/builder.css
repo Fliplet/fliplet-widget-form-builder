@@ -1303,7 +1303,8 @@ form hr {
 
 /* Geolocation */
 
-.geolocation.btn.btn-primary {
+.geolocation.btn-primary,
+.scanner.btn.btn-primary {
   column-gap: 10px;
   display: flex;
   align-items: center;
@@ -1317,8 +1318,10 @@ form hr {
 }
 
 @media screen and (min-width: 640px) {
-  .geolocation.btn-primary {
-    display: flex;
+  .geolocation.btn-primary,
+  .scanner.btn.btn-primary {
+    display: flex !important;
+    align-items: center;
   }
 }
 
