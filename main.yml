@@ -1,28 +1,23 @@
 name: Run ESLint on Pull Requests
 
 on:
-  pull_request:
-    branches:
-      - "*"
+  - push
 
 jobs:
-  lint:
-    name: ESLint
+  build:
+    name: Linting
     runs-on: ubuntu-latest
-
     steps:
-      - name: Check out the repository
-        uses: actions/checkout@v2
+      # Check out the repository
+      - uses: actions/checkout@v1
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
+      # Install Node.js
+      - uses: actions/setup-node@v1
         with:
-          node-version: 14 # or any version higher than 14
+          node-version: 18
 
-      - name: Install dependencies
-        run: npm ci
+      # Install dependencies
+      - run: npm ci
 
-      - name: Run ESLint
-        uses: eslint/github-action@v0
-        with:
-          args: --fix
+      # Run ESLint
+      - uses: eslint/github-action@v0
