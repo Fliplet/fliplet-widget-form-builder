@@ -73,32 +73,6 @@ Fliplet.FormBuilder.field('typeahead', {
     return rules;
   },
   created: function() {
-    var $vm = this;
-
-    if (this.value && this.value.length > 0) {
-      var selectedOptions = [];
-
-      this.value.forEach(function(value) {
-        var selectedOption = _.find($vm.options, function(option) {
-          return (_.has(option, 'label') && _.has(option, 'id')) ? option.id === value : option.label === value;
-        });
-
-        if (selectedOption) {
-          selectedOptions.push(selectedOption);
-        }
-      });
-
-      this.value = selectedOptions.length ? _.uniqWith(this.value, _.isEqual) : [];
-    }
-
-    if (!!this.defaultValue) {
-      this.value = this.defaultValue.split(/\n/);
-      this.updateValue(this.name, this.value);
-    } else if (!Array.isArray(this.value)) {
-      this.value = [];
-      this.updateValue(this.name, this.value);
-    }
-
     Fliplet.Hooks.on('beforeFormSubmit', this.onBeforeSubmit);
   },
   destroyed: function() {
@@ -129,7 +103,8 @@ Fliplet.FormBuilder.field('typeahead', {
         value: this.value,
         options: this.options,
         freeInput: this.freeInput,
-        maxItems: this.maxItems
+        maxItems: this.maxItems,
+        placeholder: this.placeholder
       });
 
       this.typeahead.change(function(value) {

@@ -36,11 +36,14 @@ Fliplet.FormBuilder.field('matrix', {
     }
   },
   watch: {
-    value: function(val) {
-      this.clearValue();
+    value: {
+      deep: true,
+      handler: function(val) {
+        this.clearValue();
 
-      if (this.checkValue(val) === 'set') {
-        this.setValue();
+        if (this.checkValue(val) === 'set') {
+          this.setValue();
+        }
       }
     }
   },
@@ -301,7 +304,7 @@ Fliplet.FormBuilder.field('matrix', {
     return rules;
   },
   mounted: function() {
-    if (this.defaultValueSource !== 'default' && this.defaultValueSource !== 'profile') {
+    if (['default', 'profile'].indexOf(this.defaultValueSource) === -1) {
       this.setValueFromDefaultSettings({ source: this.defaultValueSource, key: this.defaultValueKey });
     }
   },

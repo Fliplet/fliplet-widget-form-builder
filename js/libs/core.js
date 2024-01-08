@@ -181,6 +181,10 @@ Fliplet.FormBuilder = (function() {
         });
       };
 
+      component.methods.getDataSourceColumnValues = function() {
+        this.$emit('getDataSourceColumnValues', this);
+      };
+
       // Define method to highlight Error on blur form field
       component.methods.highlightError = function() {
         var $vm = this;
@@ -252,7 +256,7 @@ Fliplet.FormBuilder = (function() {
       component.computed._fieldDynamicWidth = function() {
         var $vm = this;
 
-        if ($vm.customWidth) {
+        if ($vm.fieldWidth) {
           switch ($vm.width) {
             case 25:
               return 'w-1_4';
@@ -345,7 +349,7 @@ Fliplet.FormBuilder = (function() {
           type: Boolean,
           default: true
         },
-        customWidth: {
+        fieldWidth: {
           type: Boolean,
           default: false
         },
@@ -457,22 +461,22 @@ Fliplet.FormBuilder = (function() {
 
       component.props._componentsWithPersonalization = {
         type: Array,
-        default: ['flInput', 'flCheckbox', 'flRadio', 'flEmail', 'flNumber', 'flTelephone', 'flUrl', 'flTextarea', 'flWysiwyg', 'flSelect', 'flSlider', 'flMatrix', 'flTypeahead']
+        default: ['flInput', 'flCheckbox', 'flRadio', 'flEmail', 'flNumber', 'flTelephone', 'flUrl', 'flTextarea', 'flWysiwyg', 'flSelect', 'flSlider', 'flMatrix', 'flTypeahead', 'flCodeScanner']
       };
 
       component.props._componentsWithDescription = {
         type: Array,
-        default: ['flInput', 'flCheckbox', 'flRadio', 'flEmail', 'flNumber', 'flTelephone', 'flUrl', 'flTextarea', 'flWysiwyg', 'flSelect', 'flDate', 'flTime', 'flDateRange', 'flTimeRange', 'flTimer', 'flStarRating', 'flSignature', 'flImage', 'flFile', 'flSlider', 'flMatrix', 'flTypeahead']
+        default: ['flInput', 'flCheckbox', 'flRadio', 'flEmail', 'flNumber', 'flTelephone', 'flUrl', 'flTextarea', 'flWysiwyg', 'flSelect', 'flDate', 'flTime', 'flDateRange', 'flTimeRange', 'flTimer', 'flStarRating', 'flSignature', 'flImage', 'flFile', 'flSlider', 'flMatrix', 'flTypeahead', 'flGeolocation', 'flCodeScanner']
       };
 
       component.props._readOnlyComponents = {
         type: Array,
-        default: ['flInput', 'flCheckbox', 'flRadio', 'flEmail', 'flNumber', 'flTelephone', 'flUrl', 'flTextarea', 'flWysiwyg', 'flSelect', 'flDate', 'flTime', 'flDateRange', 'flTimeRange', 'flTimer', 'flStarRating', 'flSignature', 'flImage', 'flFile', 'flSlider', 'flMatrix', 'flTypeahead']
+        default: ['flInput', 'flCheckbox', 'flRadio', 'flEmail', 'flNumber', 'flTelephone', 'flUrl', 'flTextarea', 'flWysiwyg', 'flSelect', 'flDate', 'flTime', 'flDateRange', 'flTimeRange', 'flTimer', 'flStarRating', 'flSignature', 'flImage', 'flFile', 'flSlider', 'flMatrix', 'flTypeahead', 'flCodeScanner']
       };
 
       component.props._flexibleWidthComponents = {
         type: Array,
-        default: ['flInput', 'flCheckbox', 'flRadio', 'flEmail', 'flNumber', 'flTelephone', 'flUrl', 'flTextarea', 'flWysiwyg', 'flSelect', 'flDate', 'flTime', 'flDateRange', 'flTimeRange', 'flTimer', 'flStarRating', 'flSignature', 'flImage', 'flFile', 'flSlider', 'flMatrix', 'flTypeahead', 'flGeolocation']
+        default: ['flInput', 'flCheckbox', 'flRadio', 'flEmail', 'flNumber', 'flTelephone', 'flUrl', 'flTextarea', 'flWysiwyg', 'flSelect', 'flDate', 'flTime', 'flDateRange', 'flTimeRange', 'flTimer', 'flStarRating', 'flSignature', 'flImage', 'flFile', 'flSlider', 'flMatrix', 'flTypeahead', 'flGeolocation', 'flPassword', 'flCodeScanner']
       };
 
       component.props._idx = {
@@ -718,39 +722,7 @@ Fliplet.FormBuilder = (function() {
       };
 
       component.methods._getDataSourceColumnValues = function() {
-        var $vm = this;
-        var id = this.dataSourceId;
-        var column = this.column;
-
-        Fliplet.Cache.get({
-          key: id + '-' + column,
-          expire: 60
-        }, function getColumnValues() {
-          // If there's no cache, return new values, i.e.
-          Fliplet.DataSources.connect(id).then(function(connection) {
-            connection.getIndex(column).then(function onSuccess(values) {
-              $vm.options = _.compact(_.map(values, function(option) {
-                if (!option) {
-                  return;
-                }
-
-                if (typeof option === 'object' || Array.isArray(option)) {
-                  option = JSON.stringify(option);
-                }
-
-                return {
-                  id: (typeof option === 'string' ? option : option.toString()).trim(),
-                  label: (typeof option === 'string' ? option : option.toString()).trim()
-                };
-              }));
-
-              return $vm.options;
-            });
-          });
-        })
-          .then(function(result) {
-            $vm.options = result;
-          });
+        this.$emit('getDataSourceColumnValues', this);
       };
 
       if (!component.methods.disableAutomatch) {
@@ -878,6 +850,15 @@ Fliplet.FormBuilder = (function() {
       component.methods._removeDataProvider = function() {
         this.dataSourceId = null;
         this.column = '';
+        this.columnOptions = null;
+        this.options = [
+          {
+            label: 'Option 1'
+          },
+          {
+            label: 'Option 2'
+          }
+        ];
         window.dataProvider.close();
         window.dataProvider = null;
       };

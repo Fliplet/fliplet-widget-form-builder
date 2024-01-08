@@ -33,9 +33,6 @@ Fliplet.FormBuilder.field('wysiwyg', {
     }
   },
   watch: {
-    placeholder: function(val) {
-      $(this.editor.contentAreaContainer).find('p').text(val);
-    },
     value: function(val) {
       // This happens when the value is updated programmatically via the FormBuilder field().val() method
       val = _.isNumber(val) ? _.toString(val) : val;
@@ -58,69 +55,6 @@ Fliplet.FormBuilder.field('wysiwyg', {
           // nothing
         }
       }
-    },
-    placeholderLabel: function() {
-      var placeholderText = this.editor.getElement().getAttribute('placeholder') || this.editor.settings.placeholder;
-      var contentAreaContainer = this.editor.getContentAreaContainer();
-      var defaultStyles = {
-        style: {
-          position: 'absolute',
-          top: '17px',
-          left: '8px',
-          color: '#888',
-          lineHeight: '19px',
-          padding: tinymce.DOM.getStyle(contentAreaContainer, 'padding', true),
-          width: '98%',
-          overflow: 'hidden',
-          'white-space': 'pre-wrap',
-          'font-weight': 'normal',
-          'font-size': '16px'
-        }
-      };
-      var placeholderAttrs = this.editor.settings.placeholderAttrs || defaultStyles;
-
-      tinymce.DOM.setStyle(contentAreaContainer, 'position', 'relative');
-
-      // Create label element in the TinyMCE editor
-      this.labelElement = tinymce.DOM.add(contentAreaContainer, this.editor.settings.placeholderTag || 'p', placeholderAttrs, placeholderText);
-    },
-    hidePlaceholderLabel: function() {
-      tinymce.DOM.setStyle(this.labelElement, 'display', 'none');
-    },
-    showPlaceholderLabel: function() {
-      tinymce.DOM.setStyle(this.labelElement, 'display', '');
-    },
-    onPlaceholderFocus: function() {
-      if (!this.editor.settings.readonly) {
-        this.hidePlaceholderLabel();
-      }
-
-      // for readonly rich text make placeholder text unselectable
-      if (this.editor.settings.readonly) {
-        tinymce.DOM.setStyle(this.labelElement, 'pointer-events', 'none');
-      }
-
-      this.editor.execCommand('mceFocus', false);
-    },
-    onPlaceholderBlur: function() {
-      if (!this.editor.getContent()) {
-        this.showPlaceholderLabel();
-      } else {
-        this.hidePlaceholderLabel();
-      }
-    },
-    addPlaceholder: function() {
-      // Init placeholder
-      this.placeholderLabel();
-      this.onPlaceholderBlur();
-
-      // Add placeholder listeners
-      tinymce.DOM.bind(this.labelElement, 'click', this.onPlaceholderFocus);
-      this.editor.on('focus', this.onPlaceholderFocus);
-      this.editor.on('blur', this.onPlaceholderBlur);
-      this.editor.on('change', this.onPlaceholderBlur);
-      this.editor.on('setContent', this.onPlaceholderBlur);
-      this.editor.on('keydown', this.hidePlaceholderLabel);
     },
     addBulletedListShortcutsWindows: function() {
       var $vm = this;
@@ -145,27 +79,27 @@ Fliplet.FormBuilder.field('wysiwyg', {
 
     var config = {
       target: this.$refs.textarea,
-      theme: 'modern',
-      mobile: {
-        theme: 'mobile',
-        plugins: [ 'autosave', 'lists', 'autolink' ],
-        toolbar: [ 'bold', 'italic', 'underline', 'bullist', 'numlist', 'removeformat' ]
-      },
+      mobile: true,
       readonly: this.readonly,
+      placeholder: this.placeholder,
       plugins: [
-        'advlist autolink lists link directionality',
-        'autoresize fullscreen code paste'
-      ].join(' '),
+        'advlist', 'autolink', 'lists', 'link', 'directionality',
+        'autoresize', 'fullscreen', 'code', 'paste', 'wordcount', 'table'
+      ],
       toolbar: this.readonly
         ? false
         : [
+          'undo redo',
           'bold italic underline',
           'alignleft aligncenter alignright alignjustify | bullist numlist outdent indent',
-          'ltr rtl | link | removeformat code fullscreen'
+          'ltr rtl | link | removeformat code fullscreen',
+          'table tabledelete | tableprops tablerowprops tablecellprops',
+          'tableinsertrowbefore tableinsertrowafter tabledeleterow | tableinsertcolbefore tableinsertcolafter tabledeletecol'
         ].join(' | '),
       image_advtab: true,
       menubar: false,
-      statusbar: false,
+      statusbar: true,
+      elementpath: false,
       // Prevent URLs from being altered
       // https://stackoverflow.com/questions/3796942
       relative_urls: false,
@@ -173,21 +107,21 @@ Fliplet.FormBuilder.field('wysiwyg', {
       convert_urls: true,
       inline: false,
       resize: false,
-      autoresize_bottom_margin: 0,
-      autoresize_max_height: lineHeight * this.rows,
-      autoresize_min_height: lineHeight * this.rows,
+      bottom_margin: 0,
+      max_height: lineHeight * this.rows,
+      min_height: lineHeight * this.rows,
       autofocus: false,
       branding: false,
-      content_style: 'body { background-color: transparent; }',
       setup: function(editor) {
         $vm.editor = editor;
 
-        editor.on('init', function() {
-          if (editor.settings.theme === 'mobile' && $vm.readonly) {
-            editor.editorContainer.style.pointerEvents = 'none';
+        editor.on('click', function() {
+          if (tinymce.activeEditor.queryCommandState('ToggleToolbarDrawer')) {
+            tinymce.activeEditor.execCommand('ToggleToolbarDrawer');
           }
+        });
 
-          $vm.addPlaceholder();
+        editor.on('init', function() {
           $vm.addBulletedListShortcutsWindows();
 
           if ($vm.defaultValueSource !== 'default' && !$vm.value) {
@@ -238,6 +172,36 @@ Fliplet.FormBuilder.field('wysiwyg', {
         field: this,
         config: config
       }).then(function() {
+        var pluginPaths = ['plugins', 'mobile.plugins'];
+        var tinymceVersion = tinymce.majorVersion + '.' + tinymce.minorVersion;
+        var deprecatedPlugins = {
+          '6.8.1': ['paste']
+        };
+        var deprecatedProperties = {
+          '6.8.1': ['theme']
+        };
+
+        _.forEach(pluginPaths, function(path) {
+          var plugins = _.get(config, path);
+
+          if (typeof plugins === 'string') {
+            // Use array of plugins (as TinyMCE's preferred format) if string is provided
+            plugins = plugins.split(' ');
+          }
+
+          // Remove deprecated plugins
+          plugins = _.difference(plugins, deprecatedPlugins[tinymceVersion]);
+
+          _.set(config, path, plugins);
+        });
+
+        // Assess config to remove deprecated properties
+        _.forEach(deprecatedProperties[tinymceVersion], function(property) {
+          if (typeof config[property] !== 'undefined') {
+            delete config[property];
+          }
+        });
+
         tinymce.init(config);
       });
     });

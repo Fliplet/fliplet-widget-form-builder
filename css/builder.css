@@ -460,6 +460,10 @@ nav > .btn {
   overflow: hidden;
 }
 
+.fileUpload.form-group {
+  margin-bottom: 11px;
+}
+
 .fileUpload-disabled label {
   background-color: #e1e1e1;
   border-radius: 31px !important;
@@ -592,6 +596,17 @@ nav > .btn {
 .fl-time-range,
 .fl-date-range {
   column-gap: 5px;
+  flex-wrap: nowrap;
+}
+
+.fl-time-range .fl-time-picker,
+.fl-date-range .fl-date-picker {
+  width: 100%;
+}
+
+.fl-date-range .arrow-right,
+.fl-time-range .arrow-right {
+  margin-bottom: 15px;
 }
 
 input[type="time"].form-control {
@@ -1288,8 +1303,11 @@ form hr {
 
 /* Geolocation */
 
-.geolocation.btn-primary {
+.geolocation.btn-primary,
+.scanner.btn.btn-primary {
   column-gap: 10px;
+  display: flex;
+  align-items: center;
 }
 
 .geolocation.text-info {
@@ -1300,7 +1318,40 @@ form hr {
 }
 
 @media screen and (min-width: 640px) {
-  .geolocation.btn-primary {
+  .geolocation.btn-primary,
+  .scanner.btn.btn-primary {
     display: flex !important;
+    align-items: center;
+  }
+}
+
+[data-widget-package="com.fliplet.form-builder"]
+  .form-group.fl-time-picker.time-picker-start
+  > .form-control,
+[data-widget-package="com.fliplet.form-builder"]
+  .form-group.fl-time-picker.time-picker-end
+  > .form-control {
+  padding-right: 0;
+}
+
+@media only screen and (max-width: 340px) {
+  [data-widget-package="com.fliplet.form-builder"]
+    .form-group.fl-date-picker.date-picker-start
+    > .form-control,
+  [data-widget-package="com.fliplet.form-builder"]
+    .form-group.fl-date-picker.date-picker-end
+    > .form-control,
+  [data-widget-package="com.fliplet.form-builder"]
+    .form-group.fl-time-picker.time-picker-start
+    > .form-control,
+  [data-widget-package="com.fliplet.form-builder"]
+    .form-group.fl-time-picker.time-picker-end
+    > .form-control {
+    padding-left: calc(35px + 5px);
+  }
+
+  .form-group.fl-date-picker > .fa,
+  .form-group.fl-time-picker > .fa {
+    width: 35px;
   }
 }

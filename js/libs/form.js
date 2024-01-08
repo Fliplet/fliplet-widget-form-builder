@@ -1,4 +1,5 @@
 var formBuilderInstances = [];
+var dataSourceColumnPromises = {};
 
 function drawImageOnCanvas(img, canvas) {
   var imgWidth = img.width;
@@ -64,6 +65,60 @@ function addThumbnailToCanvas(imageURI, indexCanvas, self, isFileCanvas) {
   });
 }
 
+function getDataSourceColumnValues(field) {
+  var id = field.dataSourceId;
+  var column = field.column;
+
+  if (!id || !column) {
+    return Promise.resolve([]);
+  }
+
+  var key = `${id}-${column}-index`;
+
+  if (dataSourceColumnPromises[key]) {
+    return dataSourceColumnPromises[key];
+  }
+
+  dataSourceColumnPromises[key] = Fliplet.Cache.get({
+    key,
+    expire: 60
+  }, function getColumnValues() {
+    // If there's no cache, return new values, i.e.
+    return Fliplet.DataSources.connect(id).then(function(connection) {
+      return connection.getIndex(column).then(function onSuccess(values) {
+        field.options = _.compact(_.map(values, function(option) {
+          if (!option) {
+            return;
+          }
+
+          if (typeof option === 'object' || Array.isArray(option)) {
+            option = JSON.stringify(option);
+          }
+
+          return {
+            id: (typeof option === 'string' ? option : option.toString()).trim(),
+            label: (typeof option === 'string' ? option : option.toString()).trim()
+          };
+        }));
+
+        return field.options;
+      });
+    });
+  });
+
+  return dataSourceColumnPromises[key];
+}
+
+function setTypeaheadFieldValue(field, value) {
+  if (field.optionsType === 'dataSource') {
+    getDataSourceColumnValues(field).then(function(result) {
+      field.options = result;
+      field.value = value;
+    });
+  } else {
+    field.value = value;
+  }
+}
 
 // Wait for form fields to be ready, as they get defined after translations are initialized
 Fliplet().then(function() {
@@ -209,10 +264,16 @@ Fliplet().then(function() {
       }
 
       result.then(function(val) {
-        if (field._type === 'flCheckbox' || field._type === 'flTypeahead') {
+        if (field._type === 'flCheckbox') {
           if (!Array.isArray(val)) {
             val = _.compact([val]);
           }
+        } else if (field._type === 'flTypeahead') {
+          if (!Array.isArray(val)) {
+            val = _.compact([val]);
+          }
+
+          setTypeaheadFieldValue(field, val);
         } else if (field._type === 'flMatrix') {
           if (field.defaultValueSource === 'query' && typeof val !== 'string') {
             field.value = val;
@@ -248,13 +309,19 @@ Fliplet().then(function() {
         if (field._type === 'flTimer' && !data.saveProgress) {
           Fliplet.App.Storage.remove(field.name);
         }
+
+        if (field._type === 'flTypeahead' && field.optionsType === 'dataSource') {
+          getDataSourceColumnValues(field).then(function(result) {
+            field.options = result;
+          });
+        }
       });
 
       if (fields.length && (data.saveProgress && typeof progress === 'object') || entry) {
         fields.forEach(function(field) {
           if (entry && entry.data && field.populateOnUpdate !== false) {
             var fieldKey = isResetAction
-              ? field.defaultValueKey || field.name
+              ? field.defaultValueKey
               : field.name || field.defaultValueKey;
 
             var fieldData;
@@ -291,23 +358,31 @@ Fliplet().then(function() {
 
                 _.forEach(field.rowOptions, function(row) {
                   var val = row.id ? row.id : row.label;
-                  var matrixKey = entry.data[`${fieldKey} [${val}]`] ? entry.data[`${fieldKey} [${val}]`] : entry.data[`${fieldKey}`];
+                  var matrixKey = entry.data[`${fieldKey} [${val}]`] || entry.data[`${fieldKey}`];
 
                   if (isResetAction) {
-                    if ((!field.defaultValueKey && matrixKey) || (field.defaultValueKey.indexOf(val) !== -1 && matrixKey)) {
+                    if ((!field.defaultValueKey && matrixKey)
+                      || (field.defaultValueKey.indexOf(val) !== -1 && matrixKey)
+                      || (field.defaultValueKey.indexOf(fieldKey) !== -1 && matrixKey)) {
                       option[val] = matrixKey;
                     }
                   } else if (matrixKey) {
+                    option[val] = matrixKey;
+                  } else if (formMode === 'add' && !matrixKey) {
+                    matrixKey = entry.data[`${field.defaultValueKey} [${val}]`] || entry.data[`${field.defaultValueKey}`];
                     option[val] = matrixKey;
                   }
                 });
 
                 fieldData = option;
                 break;
+              case 'flGeolocation':
+                fieldData = [entry.data[`${fieldKey}`], entry.data[`${fieldKey} (accuracy)`]];
+                break;
               default:
                 fieldData = entry.data[fieldKey];
 
-                if (typeof fieldData === 'undefined') {
+                if (typeof fieldData === 'undefined' && formMode === 'add') {
                   fieldData = entry.data[field.name] || entry.data[field.defaultValueKey];
                 }
 
@@ -331,6 +406,7 @@ Fliplet().then(function() {
                 break;
               case 'flImage':
               case 'flFile':
+              case 'flGeolocation':
                 // Don't change the data types for Image and File fields
                 break;
 
@@ -436,7 +512,7 @@ Fliplet().then(function() {
               case 'flGeolocation':
                 var regex = /^[-+]?([1-8]?\d(\.\d+)?|90(\.0+)?),\s*[-+]?(180(\.0+)?|((1[0-7]\d)|([1-9]?\d))(\.\d+)?)$/;
 
-                if (regex.exec(fieldData)) {
+                if (fieldData && regex.exec(fieldData[0])) {
                   field.value = fieldData;
                 } else {
                   field.value = null;
@@ -444,7 +520,9 @@ Fliplet().then(function() {
 
                 break;
                 // There is no validation and value assignment for checkbox and radio options as there is no access to the options. This is implemented in the checkbox and radio components respectively.
-
+              case 'flTypeahead':
+                setTypeaheadFieldValue(field, fieldData);
+                break;
               default:
                 if (!fieldData) {
                   return;
@@ -476,7 +554,11 @@ Fliplet().then(function() {
             var savedValue = progress[field.name];
 
             if (typeof savedValue !== 'undefined') {
-              field.value = savedValue;
+              if (field._type === 'flTypeahead') {
+                setTypeaheadFieldValue(field, savedValue);
+              } else {
+                field.value = savedValue;
+              }
             }
           }
 
@@ -515,7 +597,8 @@ Fliplet().then(function() {
           blockScreen: false,
           today: moment().locale('en').format('YYYY-MM-DD'),
           now: moment().locale('en').format('HH:mm'),
-          id: data.id
+          id: data.id,
+          entryId: entryId
         };
       },
       computed: {
@@ -526,6 +609,7 @@ Fliplet().then(function() {
         }
       },
       methods: {
+        getDataSourceColumnValues,
         saveProgress: function() {
           var progress = {};
 
@@ -615,6 +699,8 @@ Fliplet().then(function() {
                   end: fieldSettings.endValue
                 };
               }
+            } else if (field._type === 'flGeolocation') {
+              value = null;
             } else {
               value = fieldSettings.value;
             }
@@ -1017,12 +1103,23 @@ Fliplet().then(function() {
                   }
                 } else if (type === 'flMatrix') {
                   if (!_.isEmpty(value)) {
-                    _.forEach(value, function(col, row) {
-                      if (!row || !col) {
-                        return '';
-                      }
+                    _.forEach(field.rowOptions, function(rowOpt) {
+                      var val = rowOpt.id || rowOpt.label;
+                      var rowFound = _.some(value, function(col, row) {
+                        if (!row || !col) {
+                          return;
+                        }
 
-                      appendField(`${field.name} [${row}]`, col);
+                        if (val === row) {
+                          appendField(`${field.name} [${val}]`, col);
+
+                          return true;
+                        }
+                      });
+
+                      if (!rowFound) {
+                        appendField(`${field.name} [${val}]`, '');
+                      }
                     });
                   } else {
                     _.forEach(field.rowOptions, function(row) {
@@ -1031,6 +1128,9 @@ Fliplet().then(function() {
                       appendField(`${field.name} [${val}]`, '');
                     });
                   }
+                } else if (type === 'flGeolocation') {
+                  appendField(field.name, value ? value[0] : null);
+                  appendField(`${field.name} (accuracy)`, value ? value[1] : null);
                 } else {
                   // Other inputs
                   appendField(field.name, value);
@@ -1172,7 +1272,9 @@ Fliplet().then(function() {
               loadEntry = Promise.resolve(loadEntry);
             }
 
-            return loadEntry.then(function(record) {
+            return Promise.all([loadEntry].concat(_.values(dataSourceColumnPromises))).then(function(results) {
+              var record = results[0];
+
               if (!record) {
                 $vm.error = 'This entry has not been found';
               }
@@ -1205,20 +1307,19 @@ Fliplet().then(function() {
             });
           }
 
-          if (formMode === 'add') {
-            return Promise.resolve();
-          }
-
-          if (data.autobindProfileEditing) {
+          if (data.autobindProfileEditing || formMode === 'add') {
             $vm.isLoading = true;
 
             return Fliplet.Session.get().then(function(session) {
               var isEditMode = false;
 
               if (session.entries && session.entries.dataSource) {
-                entryId = 'session'; // this works because you can use it as an ID on the backend
+                if (formMode !== 'add') {
+                  entryId = 'session'; // this works because you can use it as an ID on the backend
+                  isEditMode = true;
+                }
+
                 entry = session.entries.dataSource;
-                isEditMode = true;
               }
 
               // Re-render fields
@@ -1432,6 +1533,8 @@ Fliplet().then(function() {
                       });
 
                       field.value = options;
+                    } else if (field._type === 'flTypeahead') {
+                      setTypeaheadFieldValue(field, value);
                     } else {
                       field.value = value;
                     }
