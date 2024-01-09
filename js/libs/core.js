@@ -222,7 +222,7 @@ Fliplet.FormBuilder = (function() {
       }
 
       component.computed._isFormField = function() {
-        return this.showLabel || this.showLabel === undefined;
+        return (this.showLabel || this.showLabel === undefined) && component.props._componentName.default !== 'flCustomButton';
       };
 
       component.computed._labelName = function() {
@@ -476,7 +476,7 @@ Fliplet.FormBuilder = (function() {
 
       component.props._flexibleWidthComponents = {
         type: Array,
-        default: ['flInput', 'flCheckbox', 'flRadio', 'flEmail', 'flNumber', 'flTelephone', 'flUrl', 'flTextarea', 'flWysiwyg', 'flSelect', 'flDate', 'flTime', 'flDateRange', 'flTimeRange', 'flTimer', 'flStarRating', 'flSignature', 'flImage', 'flFile', 'flSlider', 'flMatrix', 'flTypeahead', 'flGeolocation', 'flPassword', 'flCodeScanner']
+        default: ['flInput', 'flCheckbox', 'flRadio', 'flEmail', 'flNumber', 'flTelephone', 'flUrl', 'flTextarea', 'flWysiwyg', 'flSelect', 'flDate', 'flTime', 'flDateRange', 'flTimeRange', 'flTimer', 'flStarRating', 'flSignature', 'flImage', 'flFile', 'flSlider', 'flMatrix', 'flTypeahead', 'flGeolocation', 'flPassword', 'flCodeScanner', 'flCustomButton']
       };
 
       component.props._idx = {
@@ -731,7 +731,7 @@ Fliplet.FormBuilder = (function() {
 
       component.methods._enableAutomatch = function() {
         this._showNameField = false;
-        this.name = this.label;
+        this.name = this._componentName === 'flCustomButton' ? this.buttonLabel : this.label;
         this.initTooltip();
       };
 
