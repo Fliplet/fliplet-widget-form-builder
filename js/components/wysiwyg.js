@@ -79,7 +79,9 @@ Fliplet.FormBuilder.field('wysiwyg', {
 
     var config = {
       target: this.$refs.textarea,
-      mobile: true,
+      mobile: {
+        toolbar_mode: 'floating'
+      },
       readonly: this.readonly,
       placeholder: this.placeholder,
       plugins: [

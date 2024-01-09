@@ -268,6 +268,8 @@ Fliplet().then(function() {
           if (!Array.isArray(val)) {
             val = _.compact([val]);
           }
+
+          field.value = val;
         } else if (field._type === 'flTypeahead') {
           if (!Array.isArray(val)) {
             val = _.compact([val]);
