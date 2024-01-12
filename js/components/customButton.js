@@ -6,6 +6,10 @@ Fliplet.FormBuilder.field('customButton', {
       type: String
     },
     buttonLabel: {
+      type: String,
+      default: 'Button'
+    },
+    className: {
       type: String
     }
   }

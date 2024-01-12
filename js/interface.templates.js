@@ -15,7 +15,7 @@ this["Fliplet"]["Widget"]["Templates"]["templates.configurations.codeScanner"] =
 },"useData":true});
 
 this["Fliplet"]["Widget"]["Templates"]["templates.configurations.customButton"] = Handlebars.template({"compiler":[7,">= 4.0.0"],"main":function(container,depth0,helpers,partials,data) {
-    return "";
+    return "<div class=\"form-group\">\n  <label>HTML class name</label>\n  <input class=\"form-control\" type=\"text\" v-model.trim=\"className\" />\n</div>";
 },"useData":true});
 
 this["Fliplet"]["Widget"]["Templates"]["templates.configurations.date"] = Handlebars.template({"compiler":[7,">= 4.0.0"],"main":function(container,depth0,helpers,partials,data) {
