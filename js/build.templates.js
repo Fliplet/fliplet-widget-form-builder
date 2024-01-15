@@ -27,7 +27,7 @@ this["Fliplet"]["Widget"]["Templates"]["templates.components.codeScanner"] = Han
 },"useData":true});
 
 this["Fliplet"]["Widget"]["Templates"]["templates.components.customButton"] = Handlebars.template({"compiler":[7,">= 4.0.0"],"main":function(container,depth0,helpers,partials,data) {
-    return "<template>\n  <button class=\"btn\" :class=\"[buttonStyle, className]\" tabindex=\"0\" v-html=\"buttonLabel\"></button>\n</template>";
+    return "<template>\n  <button class=\"custom-btn btn\" :class=\"[buttonStyle, className]\" tabindex=\"0\" v-html=\"buttonLabel || 'Button'\"></button>\n</template>";
 },"useData":true});
 
 this["Fliplet"]["Widget"]["Templates"]["templates.components.date"] = Handlebars.template({"compiler":[7,">= 4.0.0"],"main":function(container,depth0,helpers,partials,data) {

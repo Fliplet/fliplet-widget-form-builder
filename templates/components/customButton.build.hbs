@@ -1,3 +1,3 @@
 <template>
-  <button class="btn" :class="[buttonStyle, className]" tabindex="0" v-html="buttonLabel"></button>
+  <button class="custom-btn btn" :class="[buttonStyle, className]" tabindex="0" v-html="buttonLabel || 'Button'"></button>
 </template>

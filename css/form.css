@@ -1553,3 +1553,9 @@ form hr {
     width: 100%;
   }
 }
+
+/* Custom button*/
+
+.custom-btn {
+  gap: 8px;
+}

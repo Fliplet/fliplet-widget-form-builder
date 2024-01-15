@@ -524,6 +524,19 @@ Fliplet.FormBuilder = (function() {
           return '';
         }
 
+        if (this.buttonLabel) {
+          var regex = /<([a-z]+)([^<]+)*(?:>(.*)<\/\1>|\s+\/>)/;
+          var isValid = regex.test(this.buttonLabel);
+
+          if (/^[^<]*$/.test(this.buttonLabel)) {
+            return '';
+          }
+
+          if (!isValid) {
+            return 'Invalid HTML error';
+          }
+        }
+
         if (!this.label) {
           return 'Please provide a Field Label';
         }
