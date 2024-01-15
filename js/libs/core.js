@@ -753,7 +753,9 @@ Fliplet.FormBuilder = (function() {
       }
 
       component.methods._matchFields = function() {
-        this.name = this._showNameField ? this.name : this.label;
+        if (!this._showNameField) {
+          this.name = this._componentName === 'flCustomButton' ? this.buttonLabel : this.label;
+        }
       };
 
       if (!component.methods.matchFields) {
