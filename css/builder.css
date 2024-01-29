@@ -1361,3 +1361,7 @@ form hr {
 .custom-btn {
   gap: 8px;
 }
+
+.custom-btn svg {
+  width: 18px;
+}

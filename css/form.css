@@ -1178,6 +1178,14 @@ form hr {
     max-width: 100%;
   }
 
+  .custom-btn.btn-link,
+  .custom-btn.btn-primary,
+  .custom-btn.btn-secondary {
+    display: flex !important;
+    justify-content: center;
+    align-items: center;
+  }
+
   .form-group.fileUpload .btn-primary {
     display: flex;
   }
@@ -1558,4 +1566,8 @@ form hr {
 
 .custom-btn {
   gap: 8px;
+}
+
+.custom-btn svg {
+  width: 23px;
 }
