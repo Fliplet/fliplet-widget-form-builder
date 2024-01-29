@@ -1693,36 +1693,40 @@ Fliplet().then(function() {
 
 Fliplet.FormBuilder.get = function(name) {
   return Fliplet().then(function() {
-    return Promise.all(formBuilderInstances).then(function(forms) {
-      var form;
+    return Fliplet.Widget();
+  }).then(function() {
+    return Promise.all(formBuilderInstances);
+  }).then(function(forms) {
+    var form;
 
-      if (typeof name === 'undefined') {
-        form = forms.length ? forms[0] : undefined;
-      } else {
-        forms.some(function(vueForm) {
-          if (vueForm.name === name) {
-            form = vueForm;
+    if (typeof name === 'undefined') {
+      form = forms.length ? forms[0] : undefined;
+    } else {
+      forms.some(function(vueForm) {
+        if (vueForm.name === name) {
+          form = vueForm;
 
-            return true;
-          }
-        });
-      }
+          return true;
+        }
+      });
+    }
 
-      return form;
-    });
+    return form;
   });
 };
 
 Fliplet.FormBuilder.getAll = function(name) {
   return Fliplet().then(function() {
-    return Promise.all(formBuilderInstances).then(function(forms) {
-      if (typeof name === 'undefined') {
-        return forms;
-      }
+    return Fliplet.Widget();
+  }).then(function() {
+    return Promise.all(formBuilderInstances);
+  }).then(function(forms) {
+    if (typeof name === 'undefined') {
+      return forms;
+    }
 
-      return forms.filter(function(form) {
-        return form.name === name;
-      });
+    return forms.filter(function(form) {
+      return form.name === name;
     });
   });
 };
