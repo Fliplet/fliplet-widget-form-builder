@@ -182,12 +182,6 @@ Fliplet.FormBuilder.field('wysiwyg', {
       setup: function(editor) {
         $vm.editor = editor;
 
-        editor.on('click', function() {
-          if (tinymce.activeEditor.queryCommandState('ToggleToolbarDrawer')) {
-            tinymce.activeEditor.execCommand('ToggleToolbarDrawer');
-          }
-        });
-
         editor.on('init', function() {
           if (editor.settings.theme === 'mobile' && $vm.readonly) {
             editor.editorContainer.style.pointerEvents = 'none';

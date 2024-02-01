@@ -33,9 +33,6 @@ Fliplet.FormBuilder.field('select', {
       isInputFocused: false
     };
   },
-  created: function() {
-    Fliplet.FormBuilder.on('reset', this.onReset);
-  },
   mounted: function() {
     var $vm = this;
 
@@ -59,19 +56,5 @@ Fliplet.FormBuilder.field('select', {
     }
 
     return rules;
-  },
-  methods: {
-    onReset: function(data) {
-      if (!data || data.id !== this.$parent.id) {
-        return;
-      }
-
-      if (this.defaultValueSource !== 'default') {
-        this.setValueFromDefaultSettings({ source: this.defaultValueSource, key: this.defaultValueKey });
-      }
-    }
-  },
-  destroyed: function() {
-    Fliplet.FormBuilder.off('reset', this.onReset);
   }
 });
