@@ -556,11 +556,7 @@ Fliplet().then(function() {
             var savedValue = progress[field.name];
 
             if (typeof savedValue !== 'undefined') {
-              if (field._type === 'flTypeahead') {
-                setTypeaheadFieldValue(field, savedValue);
-              } else {
-                field.value = savedValue;
-              }
+              field.value = savedValue;
             }
           }
 

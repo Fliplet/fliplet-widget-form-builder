@@ -118,6 +118,10 @@ Fliplet.FormBuilder.field('typeahead', {
   },
   watch: {
     value: function(val) {
+      if (this.maxItems && val.length > this.maxItems) {
+        val = val.slice(0, this.maxItems);
+      }
+
       if (this.typeahead) {
         this.typeahead.set(val);
       }
