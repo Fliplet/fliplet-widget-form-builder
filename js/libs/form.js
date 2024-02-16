@@ -254,7 +254,30 @@ Fliplet().then(function() {
           }
 
           break;
+        case 'profile':
+          if (!field.defaultValueKey) {
+            throw new Error('A key is required to fetch data from the user\'s profile');
+          }
 
+          result = Fliplet.User.getCachedSession({ force: true })
+            .then(function(session) {
+              if (session && session.entries) {
+                if (session.entries.dataSource) {
+                  return session.entries.dataSource.data[field.defaultValueKey];
+                }
+
+                if (session.entries.saml2) {
+                  return session.entries.saml2.data[field.defaultValueKey];
+                }
+
+                if (session.entries.flipletLogin) {
+                  return session.entries.flipletLogin.data[field.defaultValueKey];
+                }
+              }
+
+              return Fliplet.Profile.get(field.defaultValueKey);
+            });
+          break;
         default:
           break;
       }
@@ -364,8 +387,8 @@ Fliplet().then(function() {
 
                   if (isResetAction) {
                     if ((!field.defaultValueKey && matrixKey)
-                      || (field.defaultValueKey.indexOf(val) !== -1 && matrixKey)
-                      || (field.defaultValueKey.indexOf(fieldKey) !== -1 && matrixKey)) {
+                        || (field.defaultValueKey.indexOf(val) !== -1 && matrixKey)
+                        || (field.defaultValueKey.indexOf(fieldKey) !== -1 && matrixKey)) {
                       option[val] = matrixKey;
                     }
                   } else if (matrixKey) {
@@ -544,6 +567,7 @@ Fliplet().then(function() {
                 break;
 
               case 'query':
+              case 'profile':
                 loadFieldValueFromSource(field);
                 break;
 
@@ -552,13 +576,15 @@ Fliplet().then(function() {
             }
           }
 
-          if (progress && !isEditMode) {
-            var savedValue = progress[field.name];
+          setTimeout(function() {
+            if (progress && !isEditMode) {
+              var savedValue = progress[field.name];
 
-            if (typeof savedValue !== 'undefined') {
-              field.value = savedValue;
+              if (typeof savedValue !== 'undefined') {
+                field.value = savedValue;
+              }
             }
-          }
+          }, 500);
 
           return field;
         });
@@ -1305,18 +1331,19 @@ Fliplet().then(function() {
             });
           }
 
-          if (data.autobindProfileEditing || formMode === 'add') {
+          if (formMode === 'add') {
+            return Promise.resolve();
+          }
+
+          if (data.autobindProfileEditing) {
             $vm.isLoading = true;
 
             return Fliplet.Session.get().then(function(session) {
               var isEditMode = false;
 
               if (session.entries && session.entries.dataSource) {
-                if (formMode !== 'add') {
-                  entryId = 'session'; // this works because you can use it as an ID on the backend
-                  isEditMode = true;
-                }
-
+                entryId = 'session'; // this works because you can use it as an ID on the backend
+                isEditMode = true;
                 entry = session.entries.dataSource;
               }
 
