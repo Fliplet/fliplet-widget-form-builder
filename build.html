@@ -17,8 +17,8 @@
       </div>
     </template>
     <div v-if="!isSent" class="form-html">
-      <div v-if="isOffline" class="text-danger" v-bind:class="{ 'cover-form' : blockScreen }" v-html="isOfflineMessage"></div>
-      <div v-if="hasRequiredFields" class="required-info-label w-full">\{{$t("widgets.form.sending.requiredFields")}}</div>
+      <div v-if="isOffline" class="text-danger w-full" v-bind:class="{ 'cover-form' : blockScreen }" v-html="isOfflineMessage"></div>
+      <div v-if="hasRequiredFields" class="w-full required-info-label">\{{$t("widgets.form.sending.requiredFields")}}</div>
       <template v-for="field in fields">
         <component :is="field._type" v-bind="field" v-on:_input="onInput" v-on:_error="onError" v-on:_reset="reset" v-on:getDataSourceColumnValues="getDataSourceColumnValues" v-if="field.enabled"></component>
       </template>

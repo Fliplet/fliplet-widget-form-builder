@@ -1106,10 +1106,10 @@ Fliplet().then(function() {
           $(selector).removeClass('is-loading');
         }
 
-        $($vm.$refs.templateDescription).tinymce({
-          plugins: [
-            'lists advlist image charmap hr code',
-            'searchreplace wordcount insertdatetime table textcolor colorpicker'
+        tinymce.init({
+          target: $vm.$refs.templateDescription,
+          plugins: ['lists', 'advlist', 'image', 'charmap', 'code',
+            'searchreplace', 'wordcount', 'insertdatetime', 'table'
           ],
           toolbar: [
             'formatselect |',

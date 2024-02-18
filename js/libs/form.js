@@ -254,7 +254,30 @@ Fliplet().then(function() {
           }
 
           break;
+        case 'profile':
+          if (!field.defaultValueKey) {
+            throw new Error('A key is required to fetch data from the user\'s profile');
+          }
 
+          result = Fliplet.User.getCachedSession({ force: true })
+            .then(function(session) {
+              if (session && session.entries) {
+                if (session.entries.dataSource) {
+                  return session.entries.dataSource.data[field.defaultValueKey];
+                }
+
+                if (session.entries.saml2) {
+                  return session.entries.saml2.data[field.defaultValueKey];
+                }
+
+                if (session.entries.flipletLogin) {
+                  return session.entries.flipletLogin.data[field.defaultValueKey];
+                }
+              }
+
+              return Fliplet.Profile.get(field.defaultValueKey);
+            });
+          break;
         default:
           break;
       }
@@ -268,6 +291,8 @@ Fliplet().then(function() {
           if (!Array.isArray(val)) {
             val = _.compact([val]);
           }
+
+          field.value = val;
         } else if (field._type === 'flTypeahead') {
           if (!Array.isArray(val)) {
             val = _.compact([val]);
@@ -321,7 +346,7 @@ Fliplet().then(function() {
         fields.forEach(function(field) {
           if (entry && entry.data && field.populateOnUpdate !== false) {
             var fieldKey = isResetAction
-              ? field.defaultValueKey || field.name
+              ? field.defaultValueKey
               : field.name || field.defaultValueKey;
 
             var fieldData;
@@ -358,13 +383,18 @@ Fliplet().then(function() {
 
                 _.forEach(field.rowOptions, function(row) {
                   var val = row.id ? row.id : row.label;
-                  var matrixKey = entry.data[`${fieldKey} [${val}]`] ? entry.data[`${fieldKey} [${val}]`] : entry.data[`${fieldKey}`];
+                  var matrixKey = entry.data[`${fieldKey} [${val}]`] || entry.data[`${fieldKey}`];
 
                   if (isResetAction) {
-                    if ((!field.defaultValueKey && matrixKey) || (field.defaultValueKey.indexOf(val) !== -1 && matrixKey)) {
+                    if ((!field.defaultValueKey && matrixKey)
+                        || (field.defaultValueKey.indexOf(val) !== -1 && matrixKey)
+                        || (field.defaultValueKey.indexOf(fieldKey) !== -1 && matrixKey)) {
                       option[val] = matrixKey;
                     }
                   } else if (matrixKey) {
+                    option[val] = matrixKey;
+                  } else if (formMode === 'add' && !matrixKey) {
+                    matrixKey = entry.data[`${field.defaultValueKey} [${val}]`] || entry.data[`${field.defaultValueKey}`];
                     option[val] = matrixKey;
                   }
                 });
@@ -377,7 +407,7 @@ Fliplet().then(function() {
               default:
                 fieldData = entry.data[fieldKey];
 
-                if (typeof fieldData === 'undefined') {
+                if (typeof fieldData === 'undefined' && formMode === 'add') {
                   fieldData = entry.data[field.name] || entry.data[field.defaultValueKey];
                 }
 
@@ -537,6 +567,7 @@ Fliplet().then(function() {
                 break;
 
               case 'query':
+              case 'profile':
                 loadFieldValueFromSource(field);
                 break;
 
@@ -545,17 +576,15 @@ Fliplet().then(function() {
             }
           }
 
-          if (progress && !isEditMode) {
-            var savedValue = progress[field.name];
+          setTimeout(function() {
+            if (progress && !isEditMode) {
+              var savedValue = progress[field.name];
 
-            if (typeof savedValue !== 'undefined') {
-              if (field._type === 'flTypeahead') {
-                setTypeaheadFieldValue(field, savedValue);
-              } else {
+              if (typeof savedValue !== 'undefined') {
                 field.value = savedValue;
               }
             }
-          }
+          }, 500);
 
           return field;
         });
@@ -592,7 +621,8 @@ Fliplet().then(function() {
           blockScreen: false,
           today: moment().locale('en').format('YYYY-MM-DD'),
           now: moment().locale('en').format('HH:mm'),
-          id: data.id
+          id: data.id,
+          entryId: entryId
         };
       },
       computed: {
@@ -1097,12 +1127,23 @@ Fliplet().then(function() {
                   }
                 } else if (type === 'flMatrix') {
                   if (!_.isEmpty(value)) {
-                    _.forEach(value, function(col, row) {
-                      if (!row || !col) {
-                        return '';
-                      }
+                    _.forEach(field.rowOptions, function(rowOpt) {
+                      var val = rowOpt.id || rowOpt.label;
+                      var rowFound = _.some(value, function(col, row) {
+                        if (!row || !col) {
+                          return;
+                        }
 
-                      appendField(`${field.name} [${row}]`, col);
+                        if (val === row) {
+                          appendField(`${field.name} [${val}]`, col);
+
+                          return true;
+                        }
+                      });
+
+                      if (!rowFound) {
+                        appendField(`${field.name} [${val}]`, '');
+                      }
                     });
                   } else {
                     _.forEach(field.rowOptions, function(row) {
@@ -1302,8 +1343,8 @@ Fliplet().then(function() {
 
               if (session.entries && session.entries.dataSource) {
                 entryId = 'session'; // this works because you can use it as an ID on the backend
-                entry = session.entries.dataSource;
                 isEditMode = true;
+                entry = session.entries.dataSource;
               }
 
               // Re-render fields
@@ -1379,7 +1420,7 @@ Fliplet().then(function() {
 
           // This data is available through "Fliplet.FormBuilder.get()"
           formReady({
-            name: data.name,
+            name: data.displayName,
             // Deprecated property but kept for legacy support
             instance: $form,
             $instance: $form,
@@ -1675,36 +1716,40 @@ Fliplet().then(function() {
 
 Fliplet.FormBuilder.get = function(name) {
   return Fliplet().then(function() {
-    return Promise.all(formBuilderInstances).then(function(forms) {
-      var form;
+    return Fliplet.Widget();
+  }).then(function() {
+    return Promise.all(formBuilderInstances);
+  }).then(function(forms) {
+    var form;
 
-      if (typeof name === 'undefined') {
-        form = forms.length ? forms[0] : undefined;
-      } else {
-        forms.some(function(vueForm) {
-          if (vueForm.name === name) {
-            form = vueForm;
+    if (typeof name === 'undefined') {
+      form = forms.length ? forms[0] : undefined;
+    } else {
+      forms.some(function(vueForm) {
+        if (vueForm.name === name) {
+          form = vueForm;
 
-            return true;
-          }
-        });
-      }
+          return true;
+        }
+      });
+    }
 
-      return form;
-    });
+    return form;
   });
 };
 
 Fliplet.FormBuilder.getAll = function(name) {
   return Fliplet().then(function() {
-    return Promise.all(formBuilderInstances).then(function(forms) {
-      if (typeof name === 'undefined') {
-        return forms;
-      }
+    return Fliplet.Widget();
+  }).then(function() {
+    return Promise.all(formBuilderInstances);
+  }).then(function(forms) {
+    if (typeof name === 'undefined') {
+      return forms;
+    }
 
-      return forms.filter(function(form) {
-        return form.name === name;
-      });
+    return forms.filter(function(form) {
+      return form.name === name;
     });
   });
 };
