@@ -675,10 +675,18 @@ Fliplet().then(function() {
               return;
             }
 
-            if (field._type === 'flCheckbox' || field._type === 'flTypeahead') {
+            if (field._type === 'flCheckbox') {
               value = fieldSettings.defaultValue || fieldSettings.value;
 
               if (typeof value !== 'undefined' && !Array.isArray(value)) {
+                value = value.split(/\n/);
+              }
+            } else if (field._type === 'flTypeahead') {
+              value = fieldSettings.defaultValue || fieldSettings.value;
+
+              if (value === '') {
+                value = null;
+              } else if (typeof value !== 'undefined' && !Array.isArray(value)) {
                 value = value.split(/\n/);
               }
             } else if (field._type === 'flDate') {
