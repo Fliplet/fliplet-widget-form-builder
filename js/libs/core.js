@@ -234,7 +234,7 @@ Fliplet.FormBuilder = (function() {
       };
 
       component.computed._supportsRequired = function() {
-        return this._isFormField && component.name !== 'Slider';
+        return this._isFormField && component.name !== 'Slider' && component.name !== 'Reorder list';
       };
 
       component.computed._supportsRowOptions = function() {
@@ -461,7 +461,7 @@ Fliplet.FormBuilder = (function() {
 
       component.props._componentsWithPersonalization = {
         type: Array,
-        default: ['flInput', 'flCheckbox', 'flRadio', 'flEmail', 'flNumber', 'flTelephone', 'flUrl', 'flTextarea', 'flWysiwyg', 'flSelect', 'flSlider', 'flMatrix', 'flTypeahead', 'flCodeScanner', 'flReorderList']
+        default: ['flInput', 'flCheckbox', 'flRadio', 'flEmail', 'flNumber', 'flTelephone', 'flUrl', 'flTextarea', 'flWysiwyg', 'flSelect', 'flSlider', 'flMatrix', 'flTypeahead', 'flCodeScanner']
       };
 
       component.props._componentsWithDescription = {
