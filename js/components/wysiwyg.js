@@ -126,6 +126,12 @@ Fliplet.FormBuilder.field('wysiwyg', {
         editor.on('init', function() {
           $vm.addBulletedListShortcutsWindows();
 
+          var mobileEditorSocket = $('.tinymce-mobile-editor-socket');
+
+          if (mobileEditorSocket) {
+            mobileEditorSocket.height('auto');
+          }
+
           if ($vm.defaultValueSource !== 'default' && !$vm.value) {
             $vm.setValueFromDefaultSettings({ source: $vm.defaultValueSource, key: $vm.defaultValueKey });
           }
