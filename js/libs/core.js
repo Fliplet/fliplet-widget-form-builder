@@ -697,7 +697,7 @@ Fliplet.FormBuilder = (function() {
           this._showNameField = this.name !== this.label;
           this.initTooltip();
 
-          if (componentName === 'flTypeahead') {
+          if (componentName === 'flTypeahead' || componentName === 'flReorderList') {
             this.initDataProvider();
           }
         };
@@ -897,6 +897,8 @@ Fliplet.FormBuilder = (function() {
       var isMatrix = component.props._componentName.default === 'flMatrix';
       var isTimer = component.props._componentName.default === 'flTimer';
       var isTypeahead = component.props._componentName.default === 'flTypeahead';
+      var isReorderList = component.props._componentName.default === 'flReorderList';
+      var hasCustomOptions = isTypeahead || isReorderList;
 
       /**
       * Generate text configurations for radio/checkbox options, separated by new lines
@@ -973,7 +975,8 @@ Fliplet.FormBuilder = (function() {
         hasSelectAll: hasSelectAll,
         isSlider: isSlider,
         isTimer: isTimer,
-        isTypeahead: isTypeahead
+        isTypeahead: isTypeahead,
+        hasCustomOptions: hasCustomOptions
       });
 
       Vue.component(componentName + 'Config', component);

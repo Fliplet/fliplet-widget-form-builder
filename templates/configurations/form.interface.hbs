@@ -101,7 +101,7 @@
     {{/hasSelectAll}}
 
     {{#hasOptions}}
-      {{#unless isTypeahead}}
+      {{#unless hasCustomOptions}}
         <div class="form-group cleafix" :class="{ 'has-error': errors.selectOptions || errors.checkboxOptions || errors.radioOptions || errors.selectDuplicateOptions|| errors.radioDuplicateOptions || errors.checkboxDuplicateOptions }">
           <div class="col-xs-12">
             <label class="control-label">Options <small>(One per line)</small></label>
