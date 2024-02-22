@@ -127,6 +127,8 @@
       "js/build.templates.js",
       "js/libs/core.js",
       "vendor/signature-pad.js",
+      "vendor/sortable.js",
+      "vendor/vue-sortable.js",
 
       "js/components/input.js",
       "js/components/email.js",

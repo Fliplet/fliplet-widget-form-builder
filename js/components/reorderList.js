@@ -35,5 +35,25 @@ Fliplet.FormBuilder.field('reorderList', {
       type: Array,
       default: null
     }
+  },
+  data: function() {
+    return {
+      sortableOptions: {
+        sort: true,
+        disabled: this.readonly,
+        ghostClass: 'readonly',
+        chosenClass: 'chosen-class',
+        dragClass: 'chosen-class'
+      }
+    };
+  },
+  directives: {
+    sortable: {
+      inserted(el, binding) {
+        if (Sortable) {
+          new Sortable(el, binding.value || {});
+        }
+      }
+    }
   }
 });

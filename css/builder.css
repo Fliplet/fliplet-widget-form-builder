@@ -1355,3 +1355,23 @@ form hr {
     width: 35px;
   }
 }
+
+.list-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.list-group-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  background-color: #ffffff;
+}
+
+.list-icons {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  color: #e3e1e2;
+}
