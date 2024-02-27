@@ -38,14 +38,26 @@ Fliplet.FormBuilder.field('reorderList', {
   },
   data: function() {
     return {
+      orderedOptions: _.cloneDeep(this.options),
       sortableOptions: {
         sort: true,
+        group: {
+          name: 'lists',
+          pull: false
+        },
         disabled: this.readonly,
         ghostClass: 'readonly',
         chosenClass: 'chosen-class',
-        dragClass: 'chosen-class'
+        dragClass: 'chosen-class',
+        onSort: this.onSort
       }
     };
+  },
+  created: function() {
+    Fliplet.FormBuilder.on('reset', this.onReset);
+  },
+  destroyed: function() {
+    Fliplet.FormBuilder.off('reset', this.onReset);
   },
   directives: {
     sortable: {
@@ -53,6 +65,32 @@ Fliplet.FormBuilder.field('reorderList', {
         if (Sortable) {
           new Sortable(el, binding.value || {});
         }
+      }
+    }
+  },
+  watch: {
+    value: function(val) {
+      if (val) {
+        this.orderedOptions = val.map(value => this.options.find(option => option.id === value));
+      }
+
+      this.$emit('_input', this.name, val);
+    },
+    options: function(val) {
+      this.orderedOptions = _.cloneDeep(val);
+    }
+  },
+  methods: {
+    onSort: function(event) {
+      this.orderedOptions.splice(event.newIndex, 0, this.orderedOptions.splice(event.oldIndex, 1)[0]);
+
+      this.value = this.orderedOptions.map((option) => option.id ? option.id : option.label);
+    },
+    onReset: function(data) {
+      if (data.id === this.$parent.id) {
+        this.orderedOptions = _.cloneDeep(this.options);
+
+        return;
       }
     }
   }

@@ -1,6 +1,6 @@
 <template>
   <div class="list-group col" v-sortable="sortableOptions">
-    <div class="list-group-item" v-for="option in options" :key="option.id || option.label" :class="{ 'readonly' : readonly }">
+    <div class="list-group-item" v-for="option in orderedOptions" :key="option.id || option.label" :data-id="option.id || option.label" :class="{ 'readonly' : readonly }">
       <div v-if="!readonly" class="list-icons">
         <div class="dots">
           <svg width="6" height="17" viewBox="0 0 6 17" fill="none" xmlns="http://www.w3.org/2000/svg">
