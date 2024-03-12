@@ -222,7 +222,7 @@ Fliplet.FormBuilder = (function() {
       }
 
       component.computed._isFormField = function() {
-        return (this.showLabel || this.showLabel === undefined) && component.props._componentName.default !== 'flCustomButton';
+        return this.showLabel || this.showLabel === undefined;
       };
 
       component.computed._labelName = function() {
@@ -443,64 +443,12 @@ Fliplet.FormBuilder = (function() {
           }
         }
 
-        if (this._componentName === 'flCustomButton') {
-          window.buttonProvider.forwardSaveRequest();
-
-          return;
-        }
-
         eventHub.$emit('field-settings-changed', data);
       };
 
       if (!component.methods.onSubmit) {
         component.methods.onSubmit = component.methods._onSubmit;
       }
-
-      component.methods.initButtonProvider = function() {
-        var $vm = this;
-        var page = Fliplet.Widget.getPage();
-        var omitPages = page ? [page.id] : [];
-
-        var action = $.extend(true, {
-          omitPages: omitPages,
-          functionStr: '',
-          variables: [
-            {
-              name: 'form',
-              description: 'This would be the form instance'
-            },
-            {
-              name: 'fields',
-              description: 'This would be a list of fields'
-            },
-            {
-              name: 'button',
-              description: 'This would be the instance details of the button that was clicked'
-            }
-          ]
-        }, $vm.buttonAction);
-
-        window.buttonProvider = Fliplet.Widget.open('com.fliplet.link', {
-          selector: '#customButtonAction',
-          data: action
-        });
-
-        window.buttonProvider.then(function onLinkAction(result) {
-          var data = {};
-
-          Object.keys($vm.$props).forEach(function(prop) {
-            if (prop.indexOf('_') !== 0) {
-              data[prop] = $vm[prop];
-            }
-          });
-
-          $vm.buttonAction = result.data;
-          data.buttonAction = result.data;
-
-          eventHub.$emit('field-settings-changed', data);
-          window.buttonProvider = null;
-        });
-      };
 
       component.props._fields = {
         type: Array
@@ -528,7 +476,7 @@ Fliplet.FormBuilder = (function() {
 
       component.props._flexibleWidthComponents = {
         type: Array,
-        default: ['flInput', 'flCheckbox', 'flRadio', 'flEmail', 'flNumber', 'flTelephone', 'flUrl', 'flTextarea', 'flWysiwyg', 'flSelect', 'flDate', 'flTime', 'flDateRange', 'flTimeRange', 'flTimer', 'flStarRating', 'flSignature', 'flImage', 'flFile', 'flSlider', 'flMatrix', 'flTypeahead', 'flGeolocation', 'flPassword', 'flCodeScanner', 'flCustomButton']
+        default: ['flInput', 'flCheckbox', 'flRadio', 'flEmail', 'flNumber', 'flTelephone', 'flUrl', 'flTextarea', 'flWysiwyg', 'flSelect', 'flDate', 'flTime', 'flDateRange', 'flTimeRange', 'flTimer', 'flStarRating', 'flSignature', 'flImage', 'flFile', 'flSlider', 'flMatrix', 'flTypeahead', 'flGeolocation', 'flPassword', 'flCodeScanner']
       };
 
       component.props._idx = {
@@ -574,19 +522,6 @@ Fliplet.FormBuilder = (function() {
           }
 
           return '';
-        }
-
-        if (this.buttonLabel) {
-          var regex = /<([a-z]+)([^<]+)*(?:>(.*)<\/\1>|\s+\/>)/;
-          var isValid = regex.test(this.buttonLabel);
-
-          if (/^[^<]*$/.test(this.buttonLabel)) {
-            return '';
-          }
-
-          if (!isValid) {
-            return 'Invalid HTML error';
-          }
         }
 
         if (!this.label) {
@@ -759,18 +694,11 @@ Fliplet.FormBuilder = (function() {
 
       if (!component.mounted) {
         component.mounted = function() {
-          this._showNameField
-            = componentName === 'flCustomButton'
-              ? this.name !== this.buttonLabel
-              : this.name !== this.label;
+          this._showNameField = this.name !== this.label;
           this.initTooltip();
 
           if (componentName === 'flTypeahead') {
             this.initDataProvider();
-          }
-
-          if (componentName === 'flCustomButton') {
-            this.initButtonProvider();
           }
         };
       }
@@ -803,7 +731,7 @@ Fliplet.FormBuilder = (function() {
 
       component.methods._enableAutomatch = function() {
         this._showNameField = false;
-        this.name = this._componentName === 'flCustomButton' ? this.buttonLabel : this.label;
+        this.name = this.label;
         this.initTooltip();
       };
 
@@ -812,9 +740,7 @@ Fliplet.FormBuilder = (function() {
       }
 
       component.methods._matchFields = function() {
-        if (!this._showNameField) {
-          this.name = this._componentName === 'flCustomButton' ? this.buttonLabel : this.label;
-        }
+        this.name = this._showNameField ? this.name : this.label;
       };
 
       if (!component.methods.matchFields) {

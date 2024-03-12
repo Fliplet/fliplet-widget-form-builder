@@ -1355,9 +1355,3 @@ form hr {
     width: 35px;
   }
 }
-
-/* Custom button*/
-
-.custom-btn {
-  gap: 8px;
-}
