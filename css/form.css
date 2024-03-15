@@ -1,3 +1,7 @@
+body {
+  margin: 0 !important;
+}
+
 .form-group {
   margin-bottom: 0;
 }
