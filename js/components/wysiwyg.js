@@ -171,6 +171,18 @@ Fliplet.FormBuilder.field('wysiwyg', {
 
           $vm.updateValue();
         });
+
+        editor.on('undo', function() {
+          $vm.value = editor.getContent();
+
+          $vm.updateValue();
+        });
+
+        editor.on('redo', function() {
+          $vm.value = editor.getContent();
+
+          $vm.updateValue();
+        });
       }
     };
 
