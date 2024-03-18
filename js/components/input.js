@@ -43,7 +43,7 @@ Fliplet.FormBuilder.field('input', {
       }
     },
     onReset: function(data) {
-      if (!data || data.id !== this.$parent.id) {
+      if (this.readonly || !data || data.id !== this.$parent.id) {
         return;
       }
 
