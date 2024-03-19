@@ -80,7 +80,11 @@ Fliplet.FormBuilder.field('wysiwyg', {
     var config = {
       target: this.$refs.textarea,
       mobile: {
-        toolbar_mode: 'floating'
+        toolbar_mode: 'floating',
+        plugins: [
+          'advlist', 'autolink', 'lists', 'link', 'directionality',
+          'autoresize', 'fullscreen', 'code', 'paste', 'wordcount', 'table'
+        ]
       },
       readonly: this.readonly,
       placeholder: this.placeholder,
@@ -167,6 +171,18 @@ Fliplet.FormBuilder.field('wysiwyg', {
         });
 
         editor.on('change', function() {
+          $vm.value = editor.getContent();
+
+          $vm.updateValue();
+        });
+
+        editor.on('undo', function() {
+          $vm.value = editor.getContent();
+
+          $vm.updateValue();
+        });
+
+        editor.on('redo', function() {
           $vm.value = editor.getContent();
 
           $vm.updateValue();
