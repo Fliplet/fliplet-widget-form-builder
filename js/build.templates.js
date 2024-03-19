@@ -26,10 +26,6 @@ this["Fliplet"]["Widget"]["Templates"]["templates.components.codeScanner"] = Han
     + "\n  </p>\n  <p v-if=\"errorMessage\" class=\"text-danger\">{{errorMessage}}</p>\n</template>";
 },"useData":true});
 
-this["Fliplet"]["Widget"]["Templates"]["templates.components.customButton"] = Handlebars.template({"compiler":[7,">= 4.0.0"],"main":function(container,depth0,helpers,partials,data) {
-    return "<template>\n  <button class=\"custom-btn btn\" :class=\"[buttonStyle, className]\" tabindex=\"0\" v-html=\"buttonLabel || 'Button'\"></button>\n</template>";
-},"useData":true});
-
 this["Fliplet"]["Widget"]["Templates"]["templates.components.date"] = Handlebars.template({"compiler":[7,">= 4.0.0"],"main":function(container,depth0,helpers,partials,data) {
     return "<template v-if=\"autofill === 'always' && defaultSource === 'submission'\">\n  Today\n</template>\n<template v-else>\n  <div class=\"form-group fl-date-picker\" :class=\"{ 'readonly' : readonly }\" ref=\"datePicker\">\n    <i class=\"fa fa-calendar fa-fw\"></i>\n    <input type=\"date\" class=\"form-control\" :name=\"name\" :id=\"name\"/>\n    <input type=\"text\" class=\"form-control\" :tabindex=\"readonly ? -1 : 0\"/>\n    <i class=\"fa fa-times fa-fw\"></i>\n  </div>\n</template>\n<p class=\"text-danger\" v-if=\"$v.value.required === false && $v.value.$dirty\">\n  "
     + container.escapeExpression((helpers.T || (depth0 && depth0.T) || helpers.helperMissing).call(depth0 != null ? depth0 : (container.nullContext || {}),"widgets.form.errors.required",{"name":"T","hash":{},"data":data}))

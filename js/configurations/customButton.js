@@ -1,1 +1,0 @@
-Fliplet.FormBuilder.configuration('customButton');
