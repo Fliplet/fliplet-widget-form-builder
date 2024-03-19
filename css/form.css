@@ -1184,6 +1184,14 @@ form hr {
     max-width: 100%;
   }
 
+  .custom-btn.btn-link,
+  .custom-btn.btn-primary,
+  .custom-btn.btn-secondary {
+    display: flex !important;
+    justify-content: center;
+    align-items: center;
+  }
+
   .form-group.fileUpload .btn-primary {
     display: flex;
   }
@@ -1558,4 +1566,15 @@ form hr {
   .form-group.w-1_4 .fl-time-range .fl-time-picker {
     width: 100%;
   }
+}
+
+/* Custom button*/
+
+.custom-btn {
+  gap: 8px;
+}
+
+.custom-btn svg,
+.custom-btn img {
+  width: 23px;
 }
