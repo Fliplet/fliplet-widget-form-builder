@@ -254,7 +254,30 @@ Fliplet().then(function() {
           }
 
           break;
+        case 'profile':
+          if (!field.defaultValueKey) {
+            throw new Error('A key is required to fetch data from the user\'s profile');
+          }
 
+          result = Fliplet.User.getCachedSession({ force: true })
+            .then(function(session) {
+              if (session && session.entries) {
+                if (session.entries.dataSource) {
+                  return session.entries.dataSource.data[field.defaultValueKey];
+                }
+
+                if (session.entries.saml2) {
+                  return session.entries.saml2.data[field.defaultValueKey];
+                }
+
+                if (session.entries.flipletLogin) {
+                  return session.entries.flipletLogin.data[field.defaultValueKey];
+                }
+              }
+
+              return Fliplet.Profile.get(field.defaultValueKey);
+            });
+          break;
         default:
           break;
       }
@@ -364,8 +387,8 @@ Fliplet().then(function() {
 
                   if (isResetAction) {
                     if ((!field.defaultValueKey && matrixKey)
-                      || (field.defaultValueKey.indexOf(val) !== -1 && matrixKey)
-                      || (field.defaultValueKey.indexOf(fieldKey) !== -1 && matrixKey)) {
+                        || (field.defaultValueKey.indexOf(val) !== -1 && matrixKey)
+                        || (field.defaultValueKey.indexOf(fieldKey) !== -1 && matrixKey)) {
                       option[val] = matrixKey;
                     }
                   } else if (matrixKey) {
@@ -544,6 +567,7 @@ Fliplet().then(function() {
                 break;
 
               case 'query':
+              case 'profile':
                 loadFieldValueFromSource(field);
                 break;
 
@@ -552,17 +576,15 @@ Fliplet().then(function() {
             }
           }
 
-          if (progress && !isEditMode) {
-            var savedValue = progress[field.name];
+          setTimeout(function() {
+            if (progress && !isEditMode) {
+              var savedValue = progress[field.name];
 
-            if (typeof savedValue !== 'undefined') {
-              if (field._type === 'flTypeahead') {
-                setTypeaheadFieldValue(field, savedValue);
-              } else {
+              if (typeof savedValue !== 'undefined') {
                 field.value = savedValue;
               }
             }
-          }
+          }, 500);
 
           return field;
         });
@@ -653,10 +675,18 @@ Fliplet().then(function() {
               return;
             }
 
-            if (field._type === 'flCheckbox' || field._type === 'flTypeahead') {
+            if (field._type === 'flCheckbox') {
               value = fieldSettings.defaultValue || fieldSettings.value;
 
               if (typeof value !== 'undefined' && !Array.isArray(value)) {
+                value = value.split(/\n/);
+              }
+            } else if (field._type === 'flTypeahead') {
+              value = fieldSettings.defaultValue || fieldSettings.value;
+
+              if (value === '') {
+                value = null;
+              } else if (typeof value !== 'undefined' && !Array.isArray(value)) {
                 value = value.split(/\n/);
               }
             } else if (field._type === 'flDate') {
@@ -1309,18 +1339,19 @@ Fliplet().then(function() {
             });
           }
 
-          if (data.autobindProfileEditing || formMode === 'add') {
+          if (formMode === 'add') {
+            return Promise.resolve();
+          }
+
+          if (data.autobindProfileEditing) {
             $vm.isLoading = true;
 
             return Fliplet.Session.get().then(function(session) {
               var isEditMode = false;
 
               if (session.entries && session.entries.dataSource) {
-                if (formMode !== 'add') {
-                  entryId = 'session'; // this works because you can use it as an ID on the backend
-                  isEditMode = true;
-                }
-
+                entryId = 'session'; // this works because you can use it as an ID on the backend
+                isEditMode = true;
                 entry = session.entries.dataSource;
               }
 
@@ -1397,7 +1428,7 @@ Fliplet().then(function() {
 
           // This data is available through "Fliplet.FormBuilder.get()"
           formReady({
-            name: data.name,
+            name: data.displayName,
             // Deprecated property but kept for legacy support
             instance: $form,
             $instance: $form,
@@ -1693,36 +1724,40 @@ Fliplet().then(function() {
 
 Fliplet.FormBuilder.get = function(name) {
   return Fliplet().then(function() {
-    return Promise.all(formBuilderInstances).then(function(forms) {
-      var form;
+    return Fliplet.Widget();
+  }).then(function() {
+    return Promise.all(formBuilderInstances);
+  }).then(function(forms) {
+    var form;
 
-      if (typeof name === 'undefined') {
-        form = forms.length ? forms[0] : undefined;
-      } else {
-        forms.some(function(vueForm) {
-          if (vueForm.name === name) {
-            form = vueForm;
+    if (typeof name === 'undefined') {
+      form = forms.length ? forms[0] : undefined;
+    } else {
+      forms.some(function(vueForm) {
+        if (vueForm.name === name) {
+          form = vueForm;
 
-            return true;
-          }
-        });
-      }
+          return true;
+        }
+      });
+    }
 
-      return form;
-    });
+    return form;
   });
 };
 
 Fliplet.FormBuilder.getAll = function(name) {
   return Fliplet().then(function() {
-    return Promise.all(formBuilderInstances).then(function(forms) {
-      if (typeof name === 'undefined') {
-        return forms;
-      }
+    return Fliplet.Widget();
+  }).then(function() {
+    return Promise.all(formBuilderInstances);
+  }).then(function(forms) {
+    if (typeof name === 'undefined') {
+      return forms;
+    }
 
-      return forms.filter(function(form) {
-        return form.name === name;
-      });
+    return forms.filter(function(form) {
+      return form.name === name;
     });
   });
 };

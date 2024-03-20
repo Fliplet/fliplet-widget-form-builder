@@ -15,6 +15,20 @@ Fliplet.FormBuilder.field('customButton', {
     },
     className: {
       type: String
+    },
+    buttonAction: {
+      type: Object
+    }
+  },
+  methods: {
+    runCustomFunction: function() {
+      try {
+        Fliplet.Navigate.to(this.buttonAction);
+      } catch (err) {
+        var defaultError = T('widgets.form.customButton.defaultError', { label: this.buttonLabel });
+
+        Fliplet.UI.Toast.error(err, defaultError);
+      }
     }
   }
 });

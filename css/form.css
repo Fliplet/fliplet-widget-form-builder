@@ -1095,6 +1095,12 @@ html[dir="rtl"] .radio.radio-icon input[type="radio"] + label > span.check {
   border-radius: 4px;
 }
 
+@media screen and (max-width: 1280px) {
+  .tox-toolbar__primary {
+    justify-content: space-between;
+  }
+}
+
 /* DATE AND TIME PICKER */
 
 .form-group.fl-time-picker.readonly > .fa:first-child,
