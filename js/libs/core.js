@@ -811,11 +811,13 @@ Fliplet.FormBuilder = (function() {
         component.methods.enableAutomatch = component.methods._enableAutomatch;
       }
 
-      component.methods._matchFields = function() {
+      component.methods._matchFields = _.debounce(function() {
         if (!this._showNameField) {
           this.name = this._componentName === 'flCustomButton' ? this.buttonLabel : this.label;
         }
-      };
+
+        return;
+      }, 200);
 
       if (!component.methods.matchFields) {
         component.methods.matchFields = component.methods._matchFields;
