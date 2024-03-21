@@ -1559,3 +1559,30 @@ form hr {
     width: 100%;
   }
 }
+
+.list-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  touch-action: none;
+}
+
+.list-group-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.list-group-item:hover {
+  cursor: grab;
+}
+
+.list-group-item::selection {
+  cursor: grabbing;
+}
+
+.list-icons {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+}
