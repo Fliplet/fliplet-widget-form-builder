@@ -467,15 +467,15 @@ Fliplet.FormBuilder = (function() {
           variables: [
             {
               name: 'form',
-              description: 'This would be the form instance'
+              description: 'The form instance'
             },
             {
               name: 'fields',
-              description: 'This would be a list of fields'
+              description: 'List of form fields'
             },
             {
               name: 'button',
-              description: 'This would be the instance details of the button that was clicked'
+              description: 'The button instance user clicked'
             }
           ]
         }, $vm.buttonAction);
