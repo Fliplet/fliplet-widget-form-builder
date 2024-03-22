@@ -22,13 +22,27 @@ Fliplet.FormBuilder.field('customButton', {
   },
   methods: {
     runCustomFunction: function() {
-      try {
-        Fliplet.Navigate.to(this.buttonAction);
-      } catch (err) {
-        var defaultError = T('widgets.form.customButton.defaultError', { label: this.buttonLabel });
+      var $vm = this;
 
-        Fliplet.UI.Toast.error(err, defaultError);
-      }
+      Fliplet.FormBuilder.get().then(function(form) {
+        var button = _.assign({}, _.find($vm.$parent.fields, { name: $vm.name }), { $el: $vm.$el });
+
+        if ($vm.buttonAction) {
+          $vm.buttonAction.context = {
+            form,
+            button,
+            fields: $vm.$parent.fields
+          };
+        }
+
+        try {
+          return Fliplet.Navigate.to($vm.buttonAction);
+        } catch (err) {
+          var defaultError = T('widgets.form.customButton.defaultError', { label: $vm.buttonLabel });
+
+          Fliplet.UI.Toast.error(err, defaultError);
+        }
+      });
     }
   }
 });
