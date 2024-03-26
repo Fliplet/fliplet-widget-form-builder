@@ -1138,6 +1138,10 @@ Fliplet().then(function() {
                   value = result;
                 }
 
+                if (type === 'flReorderList' && !value) {
+                  value = field.options ? field.options.map((option) => option.id ? option.id : option.label) : [];
+                }
+
                 if (type === 'flDateRange' || type === 'flTimeRange') {
                   if (value) {
                     appendField(`${field.name} [Start]`, value.start);

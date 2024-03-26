@@ -17,9 +17,11 @@ Fliplet.FormBuilder.field('reorderList', {
       default: function() {
         return [
           {
+            id: 'Option 1',
             label: 'Option 1'
           },
           {
+            id: 'Option 2',
             label: 'Option 2'
           }
         ];
@@ -69,15 +71,18 @@ Fliplet.FormBuilder.field('reorderList', {
     }
   },
   watch: {
+    options: {
+      immediate: true,
+      handler(val) {
+        this.orderedOptions = _.cloneDeep(val);
+      }
+    },
     value: function(val) {
       if (val) {
         this.orderedOptions = val.map(value => this.options.find(option => option.id === value));
       }
 
       this.$emit('_input', this.name, val);
-    },
-    options: function(val) {
-      this.orderedOptions = _.cloneDeep(val);
     }
   },
   methods: {
