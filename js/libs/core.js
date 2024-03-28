@@ -853,9 +853,11 @@ Fliplet.FormBuilder = (function() {
         this.columnOptions = null;
         this.options = [
           {
+            id: 'Option 1',
             label: 'Option 1'
           },
           {
+            id: 'Option 2',
             label: 'Option 2'
           }
         ];
