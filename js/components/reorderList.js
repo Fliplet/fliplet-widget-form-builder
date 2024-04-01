@@ -85,11 +85,7 @@ Fliplet.FormBuilder.field('reorderList', {
 
         if (allValuesPresent && val.length === this.orderedOptions.length) {
           // Create a map to store the indexes of options based on their IDs
-          const indexMap = new Map();
-
-          this.orderedOptions.forEach((option, index) => {
-            indexMap.set(option.id, index);
-          });
+          const indexMap = new Map(this.orderedOptions.map((option, index) => [option.id, index]));
 
           // Sort the options based on the order of the values array
           this.orderedOptions = val.map(value => this.orderedOptions[indexMap.get(value)]);
