@@ -1356,6 +1356,17 @@ form hr {
   }
 }
 
+/* Custom button*/
+.custom-btn {
+  gap: 8px;
+}
+
+.custom-btn svg,
+.custom-btn img {
+  width: 18px;
+}
+
+/* Reorder list */
 .list-group {
   display: flex;
   flex-direction: column;
@@ -1375,3 +1386,4 @@ form hr {
   gap: 11px;
   color: #e3e1e2;
 }
+

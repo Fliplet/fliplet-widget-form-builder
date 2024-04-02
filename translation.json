@@ -123,6 +123,9 @@
       "codeScanner": {
         "scanCode": "Scan Code"
       },
+      "customButton": {
+        "defaultError": "Error encountered with '{{label}}' button"
+      },
       "telephone": {
         "instruction": "Phone number can only contain <b>; , . ( ) - + SPACE * #</b> and numbers."
       },
