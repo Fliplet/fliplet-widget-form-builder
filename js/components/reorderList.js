@@ -79,7 +79,20 @@ Fliplet.FormBuilder.field('reorderList', {
     },
     value: function(val) {
       if (val) {
-        this.orderedOptions = val.map(value => this.options.find(option => option.id === value));
+        const allValuesPresent = val.every(value =>
+          this.orderedOptions.some(option => option.id === value)
+        );
+
+        if (allValuesPresent && val.length === this.orderedOptions.length) {
+          // Create a map to store the indexes of options based on their IDs
+          const indexMap = new Map(this.orderedOptions.map((option, index) => [option.id, index]));
+
+          // Sort the options based on the order of the values array
+          this.orderedOptions = val.map(value => this.orderedOptions[indexMap.get(value)]);
+        } else {
+          // If any value is not present in options, keep the original order of options
+          return;
+        }
       }
 
       this.$emit('_input', this.name, val);
