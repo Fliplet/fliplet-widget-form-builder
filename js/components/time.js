@@ -103,7 +103,7 @@ Fliplet.FormBuilder.field('time', {
       this.empty = false;
     }
 
-    if (this.autofill === 'empty') {
+    if (this.autofill === 'empty' && this.defaultSource !== 'load') {
       this.value = '';
 
       return;
