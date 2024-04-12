@@ -1357,7 +1357,6 @@ form hr {
 }
 
 /* Custom button*/
-
 .custom-btn {
   gap: 8px;
 }
@@ -1366,3 +1365,25 @@ form hr {
 .custom-btn img {
   width: 18px;
 }
+
+/* Reorder list */
+.list-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.list-group-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  background-color: #ffffff;
+}
+
+.list-icons {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  color: #e3e1e2;
+}
+
