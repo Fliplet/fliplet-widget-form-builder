@@ -293,7 +293,7 @@ Fliplet().then(function() {
           }
 
           field.value = val;
-        } else if (field._type === 'flTypeahead') {
+        } else if (field._type === 'flTypeahead' || field._type === 'flReorderList') {
           if (!Array.isArray(val)) {
             val = _.compact([val]);
           }
@@ -335,7 +335,7 @@ Fliplet().then(function() {
           Fliplet.App.Storage.remove(field.name);
         }
 
-        if (field._type === 'flTypeahead' && field.optionsType === 'dataSource') {
+        if ((field._type === 'flTypeahead' || field._type === 'flReorderList') && field.optionsType === 'dataSource') {
           getDataSourceColumnValues(field).then(function(result) {
             field.options = result;
           });
@@ -424,6 +424,7 @@ Fliplet().then(function() {
             switch (field._type) {
               case 'flCheckbox':
               case 'flTypeahead':
+              case 'flReorderList':
                 if (!Array.isArray(fieldData)) {
                   fieldData = _.compact([fieldData]);
                 }
@@ -546,6 +547,7 @@ Fliplet().then(function() {
                 break;
                 // There is no validation and value assignment for checkbox and radio options as there is no access to the options. This is implemented in the checkbox and radio components respectively.
               case 'flTypeahead':
+              case 'flReorderList':
                 setTypeaheadFieldValue(field, fieldData);
                 break;
               default:
@@ -682,6 +684,14 @@ Fliplet().then(function() {
                 value = value.split(/\n/);
               }
             } else if (field._type === 'flTypeahead') {
+              value = fieldSettings.defaultValue || fieldSettings.value;
+
+              if (value === '') {
+                value = null;
+              } else if (typeof value !== 'undefined' && !Array.isArray(value)) {
+                value = value.split(/\n/);
+              }
+            } else if (field._type === 'flReorderList') {
               value = fieldSettings.defaultValue || fieldSettings.value;
 
               if (value === '') {
@@ -1126,6 +1136,10 @@ Fliplet().then(function() {
                   });
 
                   value = result;
+                }
+
+                if (type === 'flReorderList' && !value) {
+                  value = field.options ? field.options.map((option) => option.id ? option.id : option.label) : [];
                 }
 
                 if (type === 'flDateRange' || type === 'flTimeRange') {
@@ -1631,14 +1645,14 @@ Fliplet().then(function() {
                           option.id = option.value;
                         }
 
-                        if (field._type === 'flTypeahead' && typeof option.id === 'undefined') {
+                        if ((field._type === 'flTypeahead' || field._type === 'flReorderList') && typeof option.id === 'undefined') {
                           option.id = option.label;
                         }
 
                         return option;
                       }
 
-                      if (field._type === 'flTypeahead') {
+                      if (field._type === 'flTypeahead' || field._type === 'flReorderList') {
                         return { id: option, label: option };
                       }
 
