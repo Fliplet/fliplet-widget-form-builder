@@ -73,7 +73,7 @@ Fliplet.FormBuilder.field('wysiwyg', {
   },
   mounted: function() {
     var $vm = this;
-    var lineHeight = 40;
+    var lineHeight = 55;
 
     this.tinymceId = _.kebabCase(this.name) + '-' + $(this.$refs.textarea).parents('[data-form-builder-id]').data('formBuilderId');
 

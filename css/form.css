@@ -1107,6 +1107,10 @@ html[dir="rtl"] .radio.radio-icon input[type="radio"] + label > span.check {
   padding: 0px !important;
 }
 
+.tox.tox-tinymce {
+  min-height: 130px !important;
+}
+
 @media screen and (max-width: 1280px) {
   .tox-toolbar__primary {
     justify-content: space-between;
