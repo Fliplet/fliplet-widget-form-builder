@@ -104,7 +104,8 @@ Fliplet.FormBuilder.field('typeahead', {
         options: this.options,
         freeInput: this.freeInput,
         maxItems: this.maxItems,
-        placeholder: this.placeholder
+        placeholder: this.placeholder,
+        order: this.optionsType === 'dataSource' ? 'asc' : null
       });
 
       this.typeahead.change(function(value) {
