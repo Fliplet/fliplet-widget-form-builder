@@ -80,7 +80,7 @@ Fliplet.FormBuilder.field('wysiwyg', {
     var config = {
       target: this.$refs.textarea,
       mobile: {
-        toolbar_mode: 'floating',
+        toolbar_mode: 'sliding',
         plugins: [
           'advlist', 'autolink', 'lists', 'link', 'directionality',
           'autoresize', 'fullscreen', 'code', 'paste', 'wordcount', 'table'
