@@ -2,6 +2,10 @@ this["Fliplet"] = this["Fliplet"] || {};
 this["Fliplet"]["Widget"] = this["Fliplet"]["Widget"] || {};
 this["Fliplet"]["Widget"]["Templates"] = this["Fliplet"]["Widget"]["Templates"] || {};
 
+this["Fliplet"]["Widget"]["Templates"]["templates.configurations.address"] = Handlebars.template({"compiler":[7,">= 4.0.0"],"main":function(container,depth0,helpers,partials,data) {
+    return "";
+},"useData":true});
+
 this["Fliplet"]["Widget"]["Templates"]["templates.configurations.buttons"] = Handlebars.template({"compiler":[7,">= 4.0.0"],"main":function(container,depth0,helpers,partials,data) {
     return "<div class=\"form-group clearfix\">\n  <div class=\"checkbox checkbox-icon\">\n    <input type=\"checkbox\" id=\"show_submit\" v-model=\"showSubmit\">\n    <label for=\"show_submit\">\n      <span class=\"check\"><i class=\"fa fa-check\"></i></span> Show submit button\n    </label>\n  </div>\n</div>\n\n<div class=\"form-group\" :class=\"{ 'has-error': _fieldLabelError && !submitValue }\">\n  <label>Submit button label</label>\n  <input class=\"form-control\" type=\"text\" v-model.trim=\"submitValue\" placeholder=\"Submit button label\" />\n  <p class=\"help-block\" v-if=\"_fieldLabelError && !submitValue\" v-html=\"_fieldLabelError\"></p>\n</div>\n\n<div class=\"form-group clearfix\">\n  <div class=\"checkbox checkbox-icon\">\n    <input type=\"checkbox\" id=\"show_clear\" v-model=\"showClear\">\n    <label for=\"show_clear\">\n      <span class=\"check\"><i class=\"fa fa-check\"></i></span> Show clear button\n    </label>\n    <p class=\"help-block\">The clear button will reset all fields to their defaults.</p>\n  </div>\n</div>\n\n<div class=\"form-group\" :class=\"{ 'has-error': _fieldLabelError && !clearValue }\">\n  <label>Clear button label</label>\n  <input class=\"form-control\" type=\"text\" v-model.trim=\"clearValue\" placeholder=\"Clear button label\" />\n  <p class=\"help-block\" v-if=\"_fieldLabelError && !clearValue\" v-html=\"_fieldLabelError\"></p>\n</div>\n";
 },"useData":true});
