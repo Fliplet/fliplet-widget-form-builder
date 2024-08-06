@@ -1606,3 +1606,8 @@ form hr {
   gap: 11px;
 }
 
+/* Address field*/
+
+.form-group.address-typeahead.fl-typeahead {
+  left: 14px !important;
+}

@@ -1387,3 +1387,12 @@ form hr {
   color: #e3e1e2;
 }
 
+/* Address field*/
+
+.form-group.address-typeahead.fl-typeahead.selectize-dropdown {
+  left: 14px !important;
+}
+
+.form-group.fl-typeahead .selectize-input.focus {
+  border-color: #00abd1;
+}

@@ -3,7 +3,7 @@ this["Fliplet"]["Widget"] = this["Fliplet"]["Widget"] || {};
 this["Fliplet"]["Widget"]["Templates"] = this["Fliplet"]["Widget"]["Templates"] || {};
 
 this["Fliplet"]["Widget"]["Templates"]["templates.components.address"] = Handlebars.template({"compiler":[7,">= 4.0.0"],"main":function(container,depth0,helpers,partials,data) {
-    return "<div class=\"form-group fl-address-field\" ref=\"addressField\">\n <input type=\"text\" class=\"form-control\" placeholder=\"Enter your address\">\n</div>\n";
+    return "<div class=\"form-group fl-address-field\" ref=\"addressField\">\n  <input type=\"text\" class=\"form-control\" placeholder=\"Enter your address\">\n</div>\n";
 },"useData":true});
 
 this["Fliplet"]["Widget"]["Templates"]["templates.components.buttons"] = Handlebars.template({"compiler":[7,">= 4.0.0"],"main":function(container,depth0,helpers,partials,data) {
