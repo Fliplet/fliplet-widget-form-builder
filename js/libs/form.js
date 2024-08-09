@@ -1586,11 +1586,13 @@ Fliplet().then(function() {
                       field.value = value;
                     }
 
-                    debouncedUpdate();
 
                     if (hasChanged) {
                       $form.triggerChange(field.name, field.value);
                     }
+
+                    getFields();
+                    debouncedUpdate();
                   });
                 },
                 get: function() {
