@@ -133,6 +133,8 @@ Fliplet.FormBuilder.field('typeahead', {
       if (this.typeahead) {
         this.typeahead.options(val);
       }
+
+      this.typeahead.set(this.value);
     }
   }
 });
