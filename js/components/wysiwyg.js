@@ -83,14 +83,14 @@ Fliplet.FormBuilder.field('wysiwyg', {
         toolbar_mode: 'floating',
         plugins: [
           'advlist', 'autolink', 'lists', 'link', 'directionality',
-          'autoresize', 'fullscreen', 'code', 'paste', 'wordcount', 'table'
+          'autoresize', 'fullscreen', 'code', 'wordcount', 'table'
         ]
       },
       readonly: this.readonly,
       placeholder: this.placeholder,
       plugins: [
         'advlist', 'autolink', 'lists', 'link', 'directionality',
-        'autoresize', 'fullscreen', 'code', 'paste', 'wordcount', 'table'
+        'autoresize', 'fullscreen', 'code', 'wordcount', 'table'
       ],
       toolbar: this.readonly
         ? false
@@ -198,12 +198,6 @@ Fliplet.FormBuilder.field('wysiwyg', {
       }).then(function() {
         var pluginPaths = ['plugins', 'mobile.plugins'];
         var tinymceVersion = tinymce.majorVersion + '.' + tinymce.minorVersion;
-        var deprecatedPlugins = {
-          '6.8.1': ['paste']
-        };
-        var deprecatedProperties = {
-          '6.8.1': ['theme']
-        };
 
         _.forEach(pluginPaths, function(path) {
           var plugins = _.get(config, path);
@@ -212,9 +206,6 @@ Fliplet.FormBuilder.field('wysiwyg', {
             // Use array of plugins (as TinyMCE's preferred format) if string is provided
             plugins = plugins.split(' ');
           }
-
-          // Remove deprecated plugins
-          plugins = _.difference(plugins, deprecatedPlugins[tinymceVersion]);
 
           _.set(config, path, plugins);
         });
