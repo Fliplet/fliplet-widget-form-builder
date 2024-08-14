@@ -197,7 +197,6 @@ Fliplet.FormBuilder.field('wysiwyg', {
         config: config
       }).then(function() {
         var pluginPaths = ['plugins', 'mobile.plugins'];
-        var tinymceVersion = tinymce.majorVersion + '.' + tinymce.minorVersion;
 
         _.forEach(pluginPaths, function(path) {
           var plugins = _.get(config, path);
@@ -208,13 +207,6 @@ Fliplet.FormBuilder.field('wysiwyg', {
           }
 
           _.set(config, path, plugins);
-        });
-
-        // Assess config to remove deprecated properties
-        _.forEach(deprecatedProperties[tinymceVersion], function(property) {
-          if (typeof config[property] !== 'undefined') {
-            delete config[property];
-          }
         });
 
         tinymce.init(config);
