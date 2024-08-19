@@ -83,14 +83,14 @@ Fliplet.FormBuilder.field('wysiwyg', {
         toolbar_mode: 'floating',
         plugins: [
           'advlist', 'autolink', 'lists', 'link', 'directionality',
-          'autoresize', 'fullscreen', 'code', 'paste', 'wordcount', 'table'
+          'autoresize', 'fullscreen', 'code', 'wordcount', 'table'
         ]
       },
       readonly: this.readonly,
       placeholder: this.placeholder,
       plugins: [
         'advlist', 'autolink', 'lists', 'link', 'directionality',
-        'autoresize', 'fullscreen', 'code', 'paste', 'wordcount', 'table'
+        'autoresize', 'fullscreen', 'code', 'wordcount', 'table'
       ],
       toolbar: this.readonly
         ? false
@@ -197,13 +197,6 @@ Fliplet.FormBuilder.field('wysiwyg', {
         config: config
       }).then(function() {
         var pluginPaths = ['plugins', 'mobile.plugins'];
-        var tinymceVersion = tinymce.majorVersion + '.' + tinymce.minorVersion;
-        var deprecatedPlugins = {
-          '6.8.1': ['paste']
-        };
-        var deprecatedProperties = {
-          '6.8.1': ['theme']
-        };
 
         _.forEach(pluginPaths, function(path) {
           var plugins = _.get(config, path);
@@ -213,17 +206,7 @@ Fliplet.FormBuilder.field('wysiwyg', {
             plugins = plugins.split(' ');
           }
 
-          // Remove deprecated plugins
-          plugins = _.difference(plugins, deprecatedPlugins[tinymceVersion]);
-
           _.set(config, path, plugins);
-        });
-
-        // Assess config to remove deprecated properties
-        _.forEach(deprecatedProperties[tinymceVersion], function(property) {
-          if (typeof config[property] !== 'undefined') {
-            delete config[property];
-          }
         });
 
         tinymce.init(config);
