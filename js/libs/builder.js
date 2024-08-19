@@ -820,15 +820,13 @@ Fliplet().then(function() {
 
         tinymce.init({
           target: $vm.$refs.resulthtml,
-          theme: 'modern',
           mobile: {
-            theme: 'mobile',
             plugins: ['autosave', 'lists', 'autolink'],
             toolbar: ['bold', 'italic', 'underline', 'bullist', 'numlist', 'removeformat']
           },
           plugins: [
             'advlist autolink lists link directionality',
-            'autoresize fullscreen code paste'
+            'autoresize fullscreen code'
           ].join(' '),
           toolbar: [
             'bold italic underline',
