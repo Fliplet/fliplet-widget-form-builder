@@ -892,27 +892,40 @@ Fliplet.FormBuilder = (function() {
         var $vm = this;
         var fields = $vm.$parent.fields;
 
-        $vm.fieldOptions = fields.map(function(field) {
-          if (field.name !== 'buttons') {
-            return field.name;
-          }
-        }).filter(function(field) {
-          return field;
+        if ($vm.fieldOptions.length < 1) {
+          $vm.fieldOptions = fields.map(function(field) {
+            if (field._type !== 'flButtons' && field._type !== 'flAddress') {
+              return { label: field.label, disabled: false };
+            }
+          }).filter(function(field) {
+            return field;
+          });
+        }
+      };
+
+      component.methods._updateDisabledOptions = function() {
+        var $vm = this;
+
+        const assignedValues = new Set(
+          Object.values($vm.selectedFieldOptions).filter(value => value)
+        );
+
+        $vm.fieldOptions.forEach(option => {
+          option.disabled = assignedValues.has(option.label);
         });
       };
 
       component.methods._initAddressTypeahead = function() {
         var $vm = this;
-
         var countries;
 
-        fetch('https://freetestapi.com/api/v1/countries').then(function(response) {
+        fetch('https://restcountries.com/v3.1/all').then(function(response) {
           return response.json();
         }).then(function(data) {
           countries = data.map(function(country) {
             return {
-              id: country.id,
-              label: country.name
+              id: country.cca2,
+              label: country.name.common
             };
           });
 
