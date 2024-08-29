@@ -221,7 +221,7 @@ Fliplet.FormBuilder.field('address', {
         if (this.addressComponents.length) {
           this.assignValuesToSeparateFields(this.addressComponents, this.separateFieldsName);
 
-          for (var key in this.selectedFieldOptions) {
+          for (const key in this.selectedFieldOptions) {
             if (this.selectedFieldOptions[key]) {
               var matchedField = this.separateFieldsName.find(field => field.key === key);
               var fieldName = this.selectedFieldOptions[key];
