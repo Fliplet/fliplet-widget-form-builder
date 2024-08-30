@@ -24,27 +24,38 @@ Fliplet.FormBuilder.field('map', {
     placeholder: {
       type: String,
       default: 'Start typing your address..'
+    },
+    addressSuggestions: {
+      type: Array,
+      default: []
+    },
+    suggestionSelected: {
+      type: Boolean,
+      default: false
     }
   },
 
   mounted: function() {
-    var self = this;
+    this.initAutocomplete('', []);
+    this.onChange();
 
-    console.log(this.$refs.mapField, 'pppppppppppppppppppppppppppppp');
+    this.$emit('_input', this.name, this.value, false, true);
+
+    console.log(this.mapAddressField.get(), 'pppppppppppppppppppppppppppppp');
     Fliplet.UI.MapField(this.$refs.mapField, {
       enablePin: true,
       readOnly: false,
       defaultMapType: 'roadmap',
       autocomplete: true,
-      placeholder: 'Enter address or select on the map'
+      placeholder: 'Enter address or select on the map',
+      address: this.value
     });
 
-    Fliplet.UI.AddressField(this.$refs.mapAddressLookUp);
 
     var mapField = Fliplet.UI.MapField.get(this.$refs.mapField);
 
     // Example of setting a value
-    // mapField.set('1600 Amphitheatre Parkway, Mountain View, CA');
+    mapField.set('1600 Amphitheatre Parkway, Mountain View, CA');
 
     // // Example of clearing the value
     // mapField.clear();
@@ -53,5 +64,47 @@ Fliplet.FormBuilder.field('map', {
     // mapField.change(function(value) {
     //   console.log('Map value changed:', value);
     // });
+  },
+  methods: {
+    selectSuggestion: function(option) {
+      this.value = option;
+      this.addressSuggestions = [];
+      this.suggestionSelected = true;
+
+      this.mapAddressField.set(option.label);
+      this.updateValue();
+
+      this.onChange();
+    },
+    initAutocomplete: async function(input, []) {
+      this.mapAddressField = Fliplet.UI.AddressField(this.$refs.mapAddressLookUp);
+
+      const suggestions =  await this.mapAddressField.getAutocompleteSuggestions(input, []);
+
+      if (typeof this.value === 'object') {
+        this.addressSuggestions = [];
+        this.suggestionSelected = true;
+      } else {
+        this.addressSuggestions = suggestions;
+      }
+    },
+    onChange: function() {
+      this.mapAddressField.change((value) => {
+        this.value = value;
+        this.updateValue();
+      });
+    }
+  },
+  watch: {
+    value: function(val) {
+      if (!this.suggestionSelected) {
+        this.initAutocomplete(val, []);
+        this.onChange();
+      }
+
+      this.suggestionSelected = false;
+      this.mapAddressField.set(val);
+      this.$emit('_input', this.name, val);
+    }
   }
 });
