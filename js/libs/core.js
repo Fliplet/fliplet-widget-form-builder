@@ -911,31 +911,20 @@ Fliplet.FormBuilder = (function() {
       };
 
       component.methods._initAddressTypeahead = function() {
-        var countries;
+        const countries = Fliplet.FormBuilderData.countries;
 
-        fetch('https://restcountries.com/v3.1/all').then(function(response) {
-          return response.json();
-        }).then(function(data) {
-          countries = data.map(function(country) {
-            return {
-              id: country.cca2,
-              label: country.name.common
-            };
-          });
+        const addressTypeahead = Fliplet.UI.Typeahead('#restricted-countries', {
+          readonly: false,
+          value: this.countryRestrictions,
+          options: countries,
+          freeInput: false,
+          maxItems: 5,
+          placeholder: 'Select countries',
+          order: 'asc'
+        });
 
-          var addressTypeahead = Fliplet.UI.Typeahead('#restricted-countries', {
-            readonly: false,
-            value: this.countryRestrictions,
-            options: countries,
-            freeInput: false,
-            maxItems: 5,
-            placeholder: 'Select countries',
-            order: 'asc'
-          });
-
-          addressTypeahead.change(function(value) {
-            this.countryRestrictions = value;
-          });
+        addressTypeahead.change(function(value) {
+          this.countryRestrictions = value;
         });
       };
 
