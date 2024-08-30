@@ -32,6 +32,7 @@
       "vendor/vue-sortable.js",
       "js/build.templates.js",
       "js/interface.templates.js",
+      "js/libs/countries.js",
       "js/libs/core.js",
       "js/libs/templates.js",
       "vendor/signature-pad.js",
