@@ -911,11 +911,12 @@ Fliplet.FormBuilder = (function() {
       };
 
       component.methods._initAddressTypeahead = function() {
+        var $vm = this;
         const countries = Fliplet.FormBuilderData.countries;
 
         const addressTypeahead = Fliplet.UI.Typeahead('#restricted-countries', {
           readonly: false,
-          value: this.countryRestrictions,
+          value: $vm.countryRestrictions,
           options: countries,
           freeInput: false,
           maxItems: 5,
@@ -924,7 +925,7 @@ Fliplet.FormBuilder = (function() {
         });
 
         addressTypeahead.change(function(value) {
-          this.countryRestrictions = value;
+          $vm.countryRestrictions = value;
         });
       };
 
