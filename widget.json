@@ -15,6 +15,7 @@
       "rangeslider",
       "fliplet-studio-ui",
       "fliplet-ui-datetime",
+      "fliplet-ui-address",
       "fliplet-ui-rangeslider",
       "fliplet-ui-typeahead",
       "fliplet-datasources",
@@ -66,6 +67,8 @@
       "js/components/starRating.js",
       "js/components/slider.js",
       "js/components/signature.js",
+      "js/components/address.js",
+      "js/components/map.js",
 
       "js/configurations/input.js",
       "js/configurations/email.js",
@@ -98,6 +101,8 @@
       "js/configurations/slider.js",
       "js/configurations/signature.js",
       "js/configurations/wysiwyg.js",
+      "js/configurations/address.js",
+      "js/configurations/map.js",
 
       "js/libs/builder.js",
       "css/builder.css"
@@ -112,6 +117,7 @@
       "rangeslider",
       "fliplet-communicate",
       "fliplet-ui-datetime",
+      "fliplet-ui-address",
       "fliplet-ui-rangeslider",
       "fliplet-ui-typeahead",
       "fliplet-datasources",
@@ -163,6 +169,8 @@
       "js/components/slider.js",
       "js/components/signature.js",
       "js/components/wysiwyg.js",
+      "js/components/address.js",
+      "js/components/map.js",
 
       "js/libs/form.js",
       "css/form.css"
