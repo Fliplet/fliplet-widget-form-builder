@@ -38,32 +38,8 @@ Fliplet.FormBuilder.field('map', {
   mounted: function() {
     this.initAutocomplete('', []);
     this.onChange();
-
     this.$emit('_input', this.name, this.value, false, true);
-
-    console.log(this.mapAddressField.get(), 'pppppppppppppppppppppppppppppp');
-    Fliplet.UI.MapField(this.$refs.mapField, {
-      enablePin: true,
-      readOnly: false,
-      defaultMapType: 'roadmap',
-      autocomplete: true,
-      placeholder: 'Enter address or select on the map',
-      address: this.value
-    });
-
-
-    var mapField = Fliplet.UI.MapField.get(this.$refs.mapField);
-
-    // Example of setting a value
-    mapField.set('1600 Amphitheatre Parkway, Mountain View, CA');
-
-    // // Example of clearing the value
-    // mapField.clear();
-
-    // // Example of adding a change listener
-    // mapField.change(function(value) {
-    //   console.log('Map value changed:', value);
-    // });
+    this.initMap();
   },
   methods: {
     selectSuggestion: function(option) {
@@ -76,10 +52,20 @@ Fliplet.FormBuilder.field('map', {
 
       this.onChange();
     },
-    initAutocomplete: async function(input, []) {
+    initMap: function() {
+      this.mapField = Fliplet.UI.MapField(this.$refs.mapField, this.$refs.mapAddressLookUp, {
+        enablePin: this.enablePin,
+        readOnly: this.readOnly,
+        defaultMapType: this.defaultMapType,
+        autocomplete: this.autocomplete,
+        placeholder: this.placeholder,
+        address: this.value
+      });
+    },
+    initAutocomplete: async function(input, countryRestrictions) {
       this.mapAddressField = Fliplet.UI.AddressField(this.$refs.mapAddressLookUp);
 
-      const suggestions =  await this.mapAddressField.getAutocompleteSuggestions(input, []);
+      const suggestions =  await this.mapAddressField.getAutocompleteSuggestions(input, countryRestrictions);
 
       if (typeof this.value === 'object') {
         this.addressSuggestions = [];
@@ -87,6 +73,9 @@ Fliplet.FormBuilder.field('map', {
       } else {
         this.addressSuggestions = suggestions;
       }
+    },
+    handleLocationPermissions: function() {
+      this.mapField.handleLocationPermissions();
     },
     onChange: function() {
       this.mapAddressField.change((value) => {
@@ -100,6 +89,8 @@ Fliplet.FormBuilder.field('map', {
       if (!this.suggestionSelected) {
         this.initAutocomplete(val, []);
         this.onChange();
+      } else {
+        this.mapField.set(val);
       }
 
       this.suggestionSelected = false;
