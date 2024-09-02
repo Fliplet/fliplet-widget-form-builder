@@ -518,12 +518,12 @@ Fliplet.FormBuilder = (function() {
 
       component.props._componentsWithDescription = {
         type: Array,
-        default: ['flInput', 'flCheckbox', 'flRadio', 'flEmail', 'flNumber', 'flTelephone', 'flUrl', 'flTextarea', 'flWysiwyg', 'flSelect', 'flDate', 'flTime', 'flDateRange', 'flTimeRange', 'flTimer', 'flStarRating', 'flSignature', 'flImage', 'flFile', 'flSlider', 'flMatrix', 'flTypeahead', 'flGeolocation', 'flCodeScanner', 'flReorderList']
+        default: ['flInput', 'flCheckbox', 'flRadio', 'flEmail', 'flNumber', 'flTelephone', 'flUrl', 'flTextarea', 'flWysiwyg', 'flSelect', 'flDate', 'flTime', 'flDateRange', 'flTimeRange', 'flTimer', 'flStarRating', 'flSignature', 'flImage', 'flFile', 'flSlider', 'flMatrix', 'flTypeahead', 'flGeolocation', 'flCodeScanner', 'flReorderList', 'flAddress']
       };
 
       component.props._readOnlyComponents = {
         type: Array,
-        default: ['flInput', 'flCheckbox', 'flRadio', 'flEmail', 'flNumber', 'flTelephone', 'flUrl', 'flTextarea', 'flWysiwyg', 'flSelect', 'flDate', 'flTime', 'flDateRange', 'flTimeRange', 'flTimer', 'flStarRating', 'flSignature', 'flImage', 'flFile', 'flSlider', 'flMatrix', 'flTypeahead', 'flCodeScanner', 'flReorderList']
+        default: ['flInput', 'flCheckbox', 'flRadio', 'flEmail', 'flNumber', 'flTelephone', 'flUrl', 'flTextarea', 'flWysiwyg', 'flSelect', 'flDate', 'flTime', 'flDateRange', 'flTimeRange', 'flTimer', 'flStarRating', 'flSignature', 'flImage', 'flFile', 'flSlider', 'flMatrix', 'flTypeahead', 'flCodeScanner', 'flReorderList', 'flAddress']
       };
 
       component.props._flexibleWidthComponents = {
@@ -772,6 +772,11 @@ Fliplet.FormBuilder = (function() {
           if (componentName === 'flCustomButton') {
             this.initButtonProvider();
           }
+
+          if (componentName === 'flAddress') {
+            this._initAddressTypeahead();
+            this._getFieldOptions();
+          }
         };
       }
 
@@ -882,6 +887,47 @@ Fliplet.FormBuilder = (function() {
       if (!component.methods.openFilePicker) {
         component.methods.openFilePicker = component.methods._openFilePicker;
       }
+
+      component.methods._getFieldOptions = function() {
+        var fields = this.$parent.fields;
+
+        if (!this.fieldOptions.length) {
+          this.fieldOptions = fields.map(function(field) {
+            if (field._type !== 'flButtons' && field._type !== 'flAddress') {
+              return { label: field.label, disabled: false };
+            }
+          }).filter(Boolean);
+        }
+      };
+
+      component.methods._updateDisabledOptions = function() {
+        const assignedValues = new Set(
+          Object.values(this.selectedFieldOptions).filter(value => value)
+        );
+
+        this.fieldOptions.forEach(option => {
+          option.disabled = assignedValues.has(option.label);
+        });
+      };
+
+      component.methods._initAddressTypeahead = function() {
+        var $vm = this;
+        const countries = Fliplet.FormBuilderData.countries;
+
+        const addressTypeahead = Fliplet.UI.Typeahead('#restricted-countries', {
+          readonly: false,
+          value: $vm.countryRestrictions,
+          options: countries,
+          freeInput: false,
+          maxItems: 5,
+          placeholder: 'Select countries',
+          order: 'asc'
+        });
+
+        addressTypeahead.change(function(value) {
+          $vm.countryRestrictions = value;
+        });
+      };
 
       component.methods._initDataProvider = function() {
         var $vm = this;
