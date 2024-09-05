@@ -261,6 +261,17 @@ Fliplet.FormBuilder.field('address', {
       this.updateSelectedFieldsProperty('value', '');
     }
   },
+  validations: function() {
+    var rules = {
+      value: {}
+    };
+
+    if (this.required && !this.readonly) {
+      rules.value.required = window.validators.required;
+    }
+
+    return rules;
+  },
   watch: {
     value: function(val) {
       if (typeof val === 'object') {

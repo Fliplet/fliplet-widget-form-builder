@@ -19,3 +19,6 @@
       </li>
     </ul>
   </div>
+
+  <p class="text-danger" v-if="$v.value.required === false && $v.value.$dirty">{{T "widgets.form.errors.required"}}</p>
+
