@@ -187,7 +187,26 @@ Fliplet.FormBuilder.field('address', {
       });
     },
     updateDisabledOptions: function() {
-      const selectedValues = Object.values(this.selectedFieldOptions);
+      var fields = this.$parent.fields;
+
+      this.fieldOptions = fields.map(function(field) {
+        if (field._type !== 'flButtons' && field._type !== 'flAddress') {
+          return { label: field.label, disabled: false };
+        }
+      }).filter(Boolean);
+
+      Object.keys(this.selectedFieldOptions).forEach(key => {
+        const selectedFieldLabel = this.selectedFieldOptions[key];
+        const isValidOption = this.fieldOptions.find(option => option.label === selectedFieldLabel);
+
+        if (!isValidOption) {
+          this.selectedFieldOptions[key] = '';
+        }
+      });
+
+      const selectedValues = Object.values(this.selectedFieldOptions)
+        .filter(value => value && this.fieldOptions.some(option => option.label === value)) // Check if value exists in fieldOptions
+        .map(value => value);
 
       this.fieldOptions.forEach(option => {
         if (selectedValues.includes(option.label)) {
@@ -276,14 +295,8 @@ Fliplet.FormBuilder.field('address', {
       this.$emit('_input', this.name, val);
     },
     selectedFieldOptions: {
-      handler: function(newVal) {
+      handler: function() {
         this.updateDisabledOptions();
-
-        for (let key in newVal) {
-          if (newVal.hasOwnProperty(key)) {
-            this.resetOptionsOnSelectOne(key);
-          }
-        }
       },
       deep: true
     }

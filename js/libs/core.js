@@ -891,23 +891,29 @@ Fliplet.FormBuilder = (function() {
       component.methods._getFieldOptions = function() {
         var fields = this.$parent.fields;
 
-        if (!this.fieldOptions.length) {
-          this.fieldOptions = fields.map(function(field) {
-            if (field._type !== 'flButtons' && field._type !== 'flAddress') {
-              return { label: field.label, disabled: false };
-            }
-          }).filter(Boolean);
-        }
+        this.fieldOptions = fields.map(function(field) {
+          if (field._type !== 'flButtons' && field._type !== 'flAddress') {
+            return { label: field.label, disabled: false };
+          }
+        }).filter(Boolean);
+        this._updateDisabledOptions();
       };
 
       component.methods._updateDisabledOptions = function() {
-        const assignedValues = new Set(
-          Object.values(this.selectedFieldOptions).filter(value => value)
-        );
+        console.log(this.fieldOptions, 'fieeeeeeeeeeeeldoptions');
+
+        const assignedValues = Object.values(this.selectedFieldOptions)
+          .filter(value => value && this.fieldOptions.some(option => option.label === value)) // Check if value exists in fieldOptions
+          .map(value => value);
+
+        console.log(this.selectedFieldOptions, 'this.selectedFieldOptions');
+
+        console.log(assignedValues, 'assignedValues');
 
         this.fieldOptions.forEach(option => {
-          option.disabled = assignedValues.has(option.label);
+          option.disabled = assignedValues.includes(option.label);
         });
+        console.log(this.fieldOptions, 'f222222222222222222222 ieeeeeeeeeeeeldoptions');
       };
 
       component.methods._initAddressTypeahead = function() {
