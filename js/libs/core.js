@@ -222,7 +222,7 @@ Fliplet.FormBuilder = (function() {
       }
 
       component.computed._isFormField = function() {
-        return (this.showLabel || this.showLabel === undefined) && component.props._componentName.default !== 'flCustomButton';
+        return (this.showLabel || this.showLabel === undefined) && !(component.props._componentName.default === 'flCustomButton' || component.props._componentName.default === 'flTimeStamp');
       };
 
       component.computed._labelName = function() {
@@ -523,7 +523,7 @@ Fliplet.FormBuilder = (function() {
 
       component.props._readOnlyComponents = {
         type: Array,
-        default: ['flInput', 'flCheckbox', 'flRadio', 'flEmail', 'flNumber', 'flTelephone', 'flUrl', 'flTextarea', 'flWysiwyg', 'flSelect', 'flDate', 'flTime', 'flDateRange', 'flTimeRange', 'flTimer', 'flStarRating', 'flSignature', 'flImage', 'flFile', 'flSlider', 'flMatrix', 'flTypeahead', 'flCodeScanner', 'flReorderList']
+        default: ['flInput', 'flCheckbox', 'flRadio', 'flEmail', 'flNumber', 'flTelephone', 'flUrl', 'flTextarea', 'flWysiwyg', 'flSelect', 'flDate', 'flTime', 'flDateRange', 'flTimeRange', 'flTimer', 'flStarRating', 'flSignature', 'flImage', 'flFile', 'flSlider', 'flMatrix', 'flTypeahead', 'flCodeScanner', 'flReorderList', 'flTimeStamp']
       };
 
       component.props._flexibleWidthComponents = {
@@ -747,6 +747,15 @@ Fliplet.FormBuilder = (function() {
 
                   return true;
                 }
+              });
+            }
+
+            break;
+
+          case 'flTimeStamp':
+            if (!this.updatedAt && !this.createdAt) {
+              _.assignIn(this.errors, {
+                timeStampOption: 'Select at least one timestamp saving option to continue'
               });
             }
 

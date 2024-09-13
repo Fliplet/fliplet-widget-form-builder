@@ -1177,6 +1177,8 @@ Fliplet().then(function() {
                 } else if (type === 'flGeolocation') {
                   appendField(field.name, value ? value[0] : null);
                   appendField(`${field.name} (accuracy)`, value ? value[1] : null);
+                } else if (type === 'flTimeStamp') {
+                  return;
                 } else {
                   // Other inputs
                   appendField(field.name, value);

@@ -1,8 +1,11 @@
-<form v-on:submit.prevent="onSubmit" class="form-horizontal">
+ <form v-on:submit.prevent="onSubmit" class="form-horizontal">
   <div class="form-fields-holder">
-    <div v-if="_isFormField || _componentName === 'flCustomButton'">
+    <div v-if="_isFormField || _componentName === 'flCustomButton' || _componentName === 'flTimeStamp'">
+      <div v-if="_componentName === 'flTimeStamp'">
+        This field will save a timestamp when form is submitted or updated.
+      </div>
       <div class="form-group cleafix" :class="{ 'has-error': _fieldLabelError }">
-        <div v-if="_componentName !== 'flCustomButton'" class="col-xs-12">
+        <div v-if="_componentName !== 'flCustomButton' && _componentName !== 'flTimeStamp'" class="col-xs-12">
           <div class="row">
             <div class="col-xs-5">
               <label class="control-label" for="field-label">Field label</label>
@@ -13,7 +16,7 @@
             </div>
           </div>
         </div>
-        <div v-else class="col-xs-12">
+        <div v-else-if="_componentName !== 'flTimeStamp'" class="col-xs-12">
           <div class="row">
             <div class="col-xs-5">
               <label class="control-label" for="button-label">Button label</label>
@@ -26,7 +29,7 @@
         </div>
       </div>
 
-      <div class="form-group cleafix" :class="{ 'has-error': _fieldNameError }">
+      <div v-if="_componentName !== 'flTimeStamp'" class="form-group cleafix" :class="{ 'has-error': _fieldNameError }">
         <div class="col-xs-12">
           <div class="row">
             <div class="col-xs-5" v-if="_showNameField">
@@ -46,7 +49,7 @@
         </div>
       </div>
 
-      <div class="form-group cleafix" v-if="_supportsRequired">
+      <div class="form-group cleafix" v-if="_supportsRequired && _componentName !== 'flTimeStamp'">
         <div class="col-xs-12">
           <label class="control-label">Is this field required?</label>
         </div>
