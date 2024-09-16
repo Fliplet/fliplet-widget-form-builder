@@ -1387,3 +1387,10 @@ form hr {
   color: #e3e1e2;
 }
 
+.timeStamp {
+  font-size: 13px;
+  text-align: center;
+  color: #514f4f;
+  padding: 10px 10px;
+  background-color: #eaeaea;
+}
