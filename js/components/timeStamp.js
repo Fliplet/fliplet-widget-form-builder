@@ -30,21 +30,20 @@ Fliplet.FormBuilder.field('timeStamp', {
     Fliplet.Hooks.off('afterFormSubmit', this.afterFormSubmit);
   },
   methods: {
-    afterFormSubmit: function(data) {
-      let $vm = this;
+    afterFormSubmit: async function(data) {
       let dataSourceId = data.result.dataSourceId;
 
-      Fliplet.DataSources.connect(dataSourceId).then(function(connection) {
-        if (data.result.createdAt !== data.result.updatedAt && $vm.updatedAt) {
-          connection.update(data.result.id, {
-            'Last updated': data.result.updatedAt
-          });
-        } else if ($vm.createdAt) {
-          connection.update(data.result.id, {
-            'Created at': data.result.createdAt
-          });
-        }
-      });
+      const connection = await Fliplet.DataSources.connect(dataSourceId);
+
+      if (data.result.createdAt !== data.result.updatedAt && this.updatedAt) {
+        connection.update(data.result.id, {
+          'Last updated': data.result.updatedAt
+        });
+      } else if (this.createdAt) {
+        connection.update(data.result.id, {
+          'Created at': data.result.createdAt
+        });
+      }
     }
   }
 });
