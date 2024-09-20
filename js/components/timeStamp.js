@@ -40,18 +40,20 @@ Fliplet.FormBuilder.field('timeStamp', {
 
       const dataSourceId = data.result && data.result.dataSourceId;
 
-      if (dataSourceId) {
-        const connection = await Fliplet.DataSources.connect(dataSourceId);
+      if (!dataSourceId) {
+        return;
+      }
 
-        if (data.result.createdAt !== data.result.updatedAt && this.updatedAt) {
-          connection.update(data.result.id, {
-            'Last updated': data.result.updatedAt
-          });
-        } else if (this.createdAt) {
-          connection.update(data.result.id, {
-            'Created at': data.result.createdAt
-          });
-        }
+      const connection = await Fliplet.DataSources.connect(dataSourceId);
+
+      if (data.result.createdAt !== data.result.updatedAt && this.updatedAt) {
+        connection.update(data.result.id, {
+          'Last updated': data.result.updatedAt
+        });
+      } else if (this.createdAt) {
+        connection.update(data.result.id, {
+          'Created at': data.result.createdAt
+        });
       }
     }
   }
