@@ -31,14 +31,14 @@ Fliplet.FormBuilder.field('timeStamp', {
   },
   methods: {
     afterFormSubmit: async function(data, form) {
-      const fields = form.$instance.fields
+      const fields = form.$instance.fields;
       const hasTimeStamp = fields.some(field => field._type === 'flTimeStamp');
 
-      if(!hasTimeStamp) {
+      if (!hasTimeStamp) {
         return;
       }
 
-      const dataSourceId = data.result?.dataSourceId;
+      const dataSourceId = data.result && data.result.dataSourceId;
 
       if (dataSourceId) {
         const connection = await Fliplet.DataSources.connect(dataSourceId);
@@ -53,6 +53,6 @@ Fliplet.FormBuilder.field('timeStamp', {
           });
         }
       }
-    },
+    }
   }
 });
