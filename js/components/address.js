@@ -81,14 +81,14 @@ Fliplet.FormBuilder.field('address', {
     };
   },
   created: function() {
+    Fliplet.Hooks.on('beforeFormSubmit', this.onBeforeSubmit);
+
     this.separateFieldsName.forEach((field) => {
       if (!this.selectedFieldOptions[field.key]) {
         this.$set(this.selectedFieldOptions, field.key, '');
       }
     });
     this.updateDisabledOptions();
-
-    Fliplet.Hooks.on('beforeFormSubmit', this.onBeforeSubmit);
   },
   destroyed: function() {
     Fliplet.Hooks.off('beforeFormSubmit', this.onBeforeSubmit);
@@ -186,21 +186,36 @@ Fliplet.FormBuilder.field('address', {
         }
       });
     },
-    updateDisabledOptions: function() {
-      const selectedValues = Object.values(this.selectedFieldOptions);
+    updateSelectedFieldsOptions: function() {
+      Object.keys(this.selectedFieldOptions).forEach(key => {
+        const selectedFieldLabel = this.selectedFieldOptions[key];
+        const isValidOption = this.fieldOptions.find(option => option.label === selectedFieldLabel);
 
-      this.fieldOptions.forEach(option => {
-        if (selectedValues.includes(option.label)) {
-          option.disabled = true;
-        } else {
-          option.disabled = false;
+        if (!isValidOption) {
+          this.selectedFieldOptions[key] = '';
         }
       });
     },
-    resetOptionsOnSelectOne: function(key) {
-      if (this.selectedFieldOptions[key] === '') {
-        this.updateDisabledOptions();
-      }
+    updateFieldOptions: function() {
+      var fields = this.$parent.fields;
+
+      this.fieldOptions = fields.map(function(field) {
+        if (field._type !== 'flButtons' && field._type !== 'flAddress') {
+          return { label: field.label, disabled: false };
+        }
+      }).filter(Boolean);
+    },
+    updateDisabledOptions: function() {
+      this.updateFieldOptions();
+      this.updateSelectedFieldsOptions();
+
+      const assignedValues = Object.values(this.fieldOptions.selectedFieldOptions)
+        .filter(value => value && this.fieldOptions.some(option => option.label === value))
+        .map(value => value);
+
+      this.fieldOptions.forEach(option => {
+        option.disabled = assignedValues.includes(option.label);
+      });
     },
     initAutocomplete: async function(input, countryRestrictions) {
       this.addressField = Fliplet.UI.AddressField(this.$refs.addressField);
@@ -278,25 +293,13 @@ Fliplet.FormBuilder.field('address', {
         this.lastChosenAutocompleteValue = val.label;
         this.suggestionSelected = true;
         val = val.label;
-      } else {
+      } else if (val.trim() !== this.lastChosenAutocompleteValue) {
         this.initAutocomplete(val, this.countryRestrictions);
         this.onChange();
       }
 
       this.addressField.set(val);
       this.$emit('_input', this.name, val);
-    },
-    selectedFieldOptions: {
-      handler: function(newVal) {
-        this.updateDisabledOptions();
-
-        for (let key in newVal) {
-          if (newVal.hasOwnProperty(key)) {
-            this.resetOptionsOnSelectOne(key);
-          }
-        }
-      },
-      deep: true
     }
   }
 });

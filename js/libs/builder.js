@@ -280,6 +280,27 @@ Fliplet().then(function() {
         Fliplet.Studio.emit('widget-cancel-label-update');
         Fliplet.Widget.toggleCancelButton(false);
         this.$forceUpdate();
+
+        if (this.activeField._type === 'flAddress') {
+          this.getAddressFieldOptions(this.activeField);
+          this.updateAddressFieldOptions(this.activeField);
+        }
+      },
+      getAddressFieldOptions: function(addressField) {
+        addressField.fieldOptions = this.fields.map(function(field) {
+          if (field._type !== 'flButtons' && field._type !== 'flAddress') {
+            return { label: field.label, disabled: false };
+          }
+        }).filter(Boolean);
+      },
+      updateAddressFieldOptions: function(addressField) {
+        const assignedValues = Object.values(addressField.selectedFieldOptions)
+          .filter(value => value && addressField.fieldOptions.some(option => option.label === value)) // Check if value exists in fieldOptions
+          .map(value => value);
+
+        addressField.fieldOptions.forEach(option => {
+          option.disabled = assignedValues.includes(option.label);
+        });
       },
       closeEdit: function() {
         this.activeFieldConfigType = null;

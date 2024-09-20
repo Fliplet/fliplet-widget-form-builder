@@ -775,7 +775,6 @@ Fliplet.FormBuilder = (function() {
 
           if (componentName === 'flAddress') {
             this._initAddressTypeahead();
-            this._getFieldOptions();
           }
         };
       }
@@ -888,25 +887,13 @@ Fliplet.FormBuilder = (function() {
         component.methods.openFilePicker = component.methods._openFilePicker;
       }
 
-      component.methods._getFieldOptions = function() {
-        var fields = this.$parent.fields;
-
-        if (!this.fieldOptions.length) {
-          this.fieldOptions = fields.map(function(field) {
-            if (field._type !== 'flButtons' && field._type !== 'flAddress') {
-              return { label: field.label, disabled: false };
-            }
-          }).filter(Boolean);
-        }
-      };
-
       component.methods._updateDisabledOptions = function() {
-        const assignedValues = new Set(
-          Object.values(this.selectedFieldOptions).filter(value => value)
-        );
+        const assignedValues = Object.values(this.selectedFieldOptions)
+          .filter(value => value && this.fieldOptions.some(option => option.label === value)) // Check if value exists in fieldOptions
+          .map(value => value);
 
         this.fieldOptions.forEach(option => {
-          option.disabled = assignedValues.has(option.label);
+          option.disabled = assignedValues.includes(option.label);
         });
       };
 
