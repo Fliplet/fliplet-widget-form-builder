@@ -23,7 +23,7 @@ Fliplet.FormBuilder.field('map', {
     },
     placeholder: {
       type: String,
-      default: 'Start typing your address..'
+      default: 'Start typing your address...'
     },
     addressSuggestions: {
       type: Array,
@@ -34,7 +34,11 @@ Fliplet.FormBuilder.field('map', {
       default: false
     }
   },
-
+  data: function() {
+    return {
+      lastChosenAutocompleteValue: ''
+    };
+  },
   mounted: function() {
     this.initAutocomplete('', []);
     this.onChange();
@@ -86,10 +90,11 @@ Fliplet.FormBuilder.field('map', {
   },
   watch: {
     value: function(val) {
-      if (!this.suggestionSelected) {
+      if (!this.suggestionSelected &&  this.lastChosenAutocompleteValue !== val.trim()) {
         this.initAutocomplete(val, []);
         this.onChange();
       } else {
+        this.lastChosenAutocompleteValue = val;
         this.mapField.set(val);
       }
 

@@ -114,7 +114,7 @@ this["Fliplet"]["Widget"]["Templates"]["templates.configurations.input"] = Handl
 },"useData":true});
 
 this["Fliplet"]["Widget"]["Templates"]["templates.configurations.map"] = Handlebars.template({"compiler":[7,">= 4.0.0"],"main":function(container,depth0,helpers,partials,data) {
-    return "";
+    return "<div class=\"form-group\"></div>\n  <label>Default map type</label>\n  <select class=\"form-control\">\n    <option value=\"\">Select one</option>\n    <option value=\"\">RoadMap</option>\n    <option value=\"\">Satellite</option>\n    <option value=\"\">Hybrid</option>\n    <option value=\"\">Terrain</option>\n  </select>\n</div>\n\n<div class=\"form-group\"></div>\n  <label>Placeholder</label>\n  <input class=\"form-control\" type=\"text\" v-model=\"placeholder\" placeholder=\"Start typing your address...\" />\n</div>";
 },"useData":true});
 
 this["Fliplet"]["Widget"]["Templates"]["templates.configurations.matrix"] = Handlebars.template({"compiler":[7,">= 4.0.0"],"main":function(container,depth0,helpers,partials,data) {
