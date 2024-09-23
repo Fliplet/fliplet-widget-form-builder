@@ -105,6 +105,16 @@
           "defaultValueKey": {
             "type": "string",
             "title": "The key of the default value to look up in the defined source"
+          },
+          "createdAt": {
+            "type": "boolean",
+            "title": "Save timestamp when form is first submitted",
+            "default": true
+          },
+          "updatedAt": {
+            "type": "boolean",
+            "title": "Save timestamp every time form is updated",
+            "default": true
           }
         },
         "required": [
@@ -469,6 +479,16 @@
             "properties": {
               "_type": {
                 "enum": ["flSignature"]
+              }
+            },
+            "required": ["_type"]
+          },
+          {
+            "title": "A field to add a timeStamp",
+            "description": "This is a special input field that is used to automatically record the exact date and time when a user submits a form.",
+            "properties": {
+              "_type": {
+                "enum": ["flTimeStamp"]
               }
             },
             "required": ["_type"]
