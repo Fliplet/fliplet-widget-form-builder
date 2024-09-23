@@ -30,8 +30,19 @@ Fliplet.FormBuilder.field('timeStamp', {
     Fliplet.Hooks.off('afterFormSubmit', this.afterFormSubmit);
   },
   methods: {
-    afterFormSubmit: async function(data) {
-      let dataSourceId = data.result.dataSourceId;
+    afterFormSubmit: async function(data, form) {
+      const fields = form.$instance.fields;
+      const hasTimeStamp = fields.some(field => field._type === 'flTimeStamp');
+
+      if (!hasTimeStamp) {
+        return;
+      }
+
+      const dataSourceId = data.result && data.result.dataSourceId;
+
+      if (!dataSourceId) {
+        return;
+      }
 
       const connection = await Fliplet.DataSources.connect(dataSourceId);
 
