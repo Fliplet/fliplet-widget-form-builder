@@ -13,7 +13,7 @@ Fliplet.FormBuilder.field('map', {
       type: Boolean,
       default: false
     },
-    defaultMapType: {
+    mapType: {
       type: String,
       default: 'roadmap'
     },
@@ -60,7 +60,7 @@ Fliplet.FormBuilder.field('map', {
       this.mapField = Fliplet.UI.MapField(this.$refs.mapField, this.$refs.mapAddressLookUp, {
         enablePin: this.enablePin,
         readOnly: this.readOnly,
-        defaultMapType: this.defaultMapType,
+        mapType: this.mapType,
         autocomplete: this.autocomplete,
         placeholder: this.placeholder,
         address: this.value

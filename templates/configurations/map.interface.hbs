@@ -1,13 +1,13 @@
-<div class="form-group"></div>
+<template class="form-group"></div>
   <label>Default map type</label>
-  <select class="form-control">
+  <select class="form-control" v-model="mapType">
     <option value="">Select one</option>
-    <option value="">RoadMap</option>
-    <option value="">Satellite</option>
-    <option value="">Hybrid</option>
-    <option value="">Terrain</option>
+    <option value="roadMap">roadMap</option>
+    <option value="satellite">satellite</option>
+    <option value="hybrid">hybrid</option>
+    <option value="terrain">terrain</option>
   </select>
-</div>
+</template>
 
 <div class="form-group"></div>
   <label>Placeholder</label>
