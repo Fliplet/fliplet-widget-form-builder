@@ -1622,3 +1622,10 @@ form hr {
   gap: 11px;
 }
 
+.timeStamp {
+  font-size: 16px;
+  text-align: center;
+  color: #514f4f;
+  padding: 10px 10px;
+  background-color: #eaeaea;
+}

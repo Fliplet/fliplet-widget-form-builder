@@ -246,6 +246,10 @@ this["Fliplet"]["Widget"]["Templates"]["templates.components.timeRange"] = Handl
     + "\n</p>\n";
 },"useData":true});
 
+this["Fliplet"]["Widget"]["Templates"]["templates.components.timeStamp"] = Handlebars.template({"compiler":[7,">= 4.0.0"],"main":function(container,depth0,helpers,partials,data) {
+    return "<div>\n  <div class=\"timeStamp\">timestamp will be recorded upon submission</div>\n</div>";
+},"useData":true});
+
 this["Fliplet"]["Widget"]["Templates"]["templates.components.title"] = Handlebars.template({"compiler":[7,">= 4.0.0"],"main":function(container,depth0,helpers,partials,data) {
     return "<h2>{{ value }}</h2>";
 },"useData":true});

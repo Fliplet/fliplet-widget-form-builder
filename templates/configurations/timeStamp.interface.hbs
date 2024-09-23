@@ -1,0 +1,23 @@
+<div class="form-group clearfix">
+  <label>Created at:</label>
+  <div class="checkbox checkbox-icon">
+    <input type="checkbox" name="created-at" v-model="createdAt" id="created-at">
+    <label for="created-at">
+      <span class="check"><i class="fa fa-check"></i></span>
+      <span class="hide-field">Save timestamp when form is first submitted</span>
+    </label>
+  </div>
+</div>
+
+<div class="form-group clearfix">
+  <label>Updated at:</label>
+  <div class="checkbox checkbox-icon">
+    <input type="checkbox" name="updated-at" v-model="updatedAt" id="updated-at">
+    <label for="updated-at">
+      <span class="check"><i class="fa fa-check"></i></span>
+      <span class="hide-field">Save timestamp every time form is updated</span>
+    </label>
+  </div>
+</div>
+
+  <div class="text-danger" v-if="errors.timeStampOption"> \{{ errors.timeStampOption }} </div>
