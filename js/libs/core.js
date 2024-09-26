@@ -222,7 +222,7 @@ Fliplet.FormBuilder = (function() {
       }
 
       component.computed._isFormField = function() {
-        return (this.showLabel || this.showLabel === undefined) && !(component.props._componentName.default === 'flCustomButton' || component.props._componentName.default === 'flTimeStamp');
+        return (this.showLabel || this.showLabel === undefined) && component.props._componentName.default !== 'flCustomButton';
       };
 
       component.computed._labelName = function() {

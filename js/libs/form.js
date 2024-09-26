@@ -1178,7 +1178,14 @@ Fliplet().then(function() {
                   appendField(field.name, value ? value[0] : null);
                   appendField(`${field.name} (accuracy)`, value ? value[1] : null);
                 } else if (type === 'flTimeStamp') {
-                  return;
+                  if (value.createdAt && !value.updatedAt) {
+                    appendField('Created at', '');
+                  } else if (!value.createdAt && value.updatedAt) {
+                    appendField('Last updated', '');
+                  } else {
+                    appendField('Created at', '');
+                    appendField('Last updated', '');
+                  }
                 } else {
                   // Other inputs
                   appendField(field.name, value);

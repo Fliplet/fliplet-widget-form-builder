@@ -1,8 +1,10 @@
 Fliplet.FormBuilder.field('timeStamp', {
   name: 'Time Stamp',
   category: 'Date & time',
-  submit: false,
   props: {
+    value: {
+      type: Object
+    },
     placeholder: {
       type: String
     },
@@ -29,6 +31,29 @@ Fliplet.FormBuilder.field('timeStamp', {
   destroyed: function() {
     Fliplet.Hooks.off('afterFormSubmit', this.afterFormSubmit);
   },
+  mounted: function() {
+    this.value = {
+      createdAt: this.createdAt,
+      updatedAt: this.updatedAt
+    };
+    this.$emit('_input', this.name, this.value);
+  },
+  watch: {
+    createdAt: function(val) {
+      this.value = {
+        createdAt: val,
+        updatedAt: this.updatedAt
+      };
+      this.$emit('_input', this.name, this.value);
+    },
+    updatedAt: function(val) {
+      this.value = {
+        createdAt: this.createdAt,
+        updatedAt: val
+      };
+      this.$emit('_input', this.name, this.value);
+    }
+  },
   methods: {
     afterFormSubmit: async function(data, form) {
       const fields = form.$instance.fields;
@@ -46,11 +71,16 @@ Fliplet.FormBuilder.field('timeStamp', {
 
       const connection = await Fliplet.DataSources.connect(dataSourceId);
 
-      if (data.result.createdAt !== data.result.updatedAt && this.updatedAt) {
+      if (data.result.createdAt !== data.result.updatedAt && this.updatedAt && this.createdAt) {
+        connection.update(data.result.id, {
+          'Created at': data.result.createdAt,
+          'Last updated': data.result.updatedAt
+        });
+      } else if (data.result.createdAt !== data.result.updatedAt && this.updatedAt) {
         connection.update(data.result.id, {
           'Last updated': data.result.updatedAt
         });
-      } else if (this.createdAt) {
+      } else {
         connection.update(data.result.id, {
           'Created at': data.result.createdAt
         });
