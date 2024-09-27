@@ -80,7 +80,7 @@ Fliplet.FormBuilder.field('timeStamp', {
         connection.update(data.result.id, {
           'Last updated': data.result.updatedAt
         });
-      } else {
+      } else if (this.createdAt) {
         connection.update(data.result.id, {
           'Created at': data.result.createdAt
         });
