@@ -1174,6 +1174,8 @@ Fliplet().then(function() {
                       appendField(`${field.name} [${val}]`, '');
                     });
                   }
+                } else if (type === 'flMap') {
+                  appendField('Address', value);
                 } else if (type === 'flGeolocation') {
                   appendField(field.name, value ? value[0] : null);
                   appendField(`${field.name} (accuracy)`, value ? value[1] : null);

@@ -15,7 +15,7 @@ Fliplet.FormBuilder.field('map', {
     },
     mapType: {
       type: String,
-      default: 'roadmap'
+      default: ''
     },
     autocomplete: {
       type: Boolean,
@@ -42,12 +42,12 @@ Fliplet.FormBuilder.field('map', {
   mounted: function() {
     this.initAutocomplete('', []);
     this.onChange();
-    this.$emit('_input', this.name, this.value, false, true);
+    this.$emit('_input', this.name, this.value.address, false, true);
     this.initMap();
   },
   methods: {
     selectSuggestion: function(option) {
-      this.value = option;
+      this.value.address = option;
       this.addressSuggestions = [];
       this.suggestionSelected = true;
 
@@ -63,7 +63,7 @@ Fliplet.FormBuilder.field('map', {
         mapType: this.mapType,
         autocomplete: this.autocomplete,
         placeholder: this.placeholder,
-        address: this.value
+        address: this.value.address
       });
     },
     initAutocomplete: async function(input, countryRestrictions) {
@@ -71,7 +71,7 @@ Fliplet.FormBuilder.field('map', {
 
       const suggestions =  await this.mapAddressField.getAutocompleteSuggestions(input, countryRestrictions);
 
-      if (typeof this.value === 'object') {
+      if (typeof this.value.address === 'object') {
         this.addressSuggestions = [];
         this.suggestionSelected = true;
       } else {
@@ -83,24 +83,24 @@ Fliplet.FormBuilder.field('map', {
     },
     onChange: function() {
       this.mapAddressField.change((value) => {
-        this.value = value;
+        this.value = { address: value };
         this.updateValue();
       });
     }
   },
   watch: {
     value: function(val) {
-      if (!this.suggestionSelected &&  this.lastChosenAutocompleteValue !== val.trim()) {
-        this.initAutocomplete(val, []);
+      if (!this.suggestionSelected &&  this.lastChosenAutocompleteValue !== val.address.trim()) {
+        this.initAutocomplete(val.address, []);
         this.onChange();
       } else {
-        this.lastChosenAutocompleteValue = val;
-        this.mapField.set(val);
+        this.lastChosenAutocompleteValue = val.address;
+        this.mapField.set(val.address);
       }
 
       this.suggestionSelected = false;
-      this.mapAddressField.set(val);
-      this.$emit('_input', this.name, val);
+      this.mapAddressField.set(val.address);
+      this.$emit('_input', this.name, val.address);
     }
   }
 });
