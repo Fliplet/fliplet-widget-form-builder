@@ -173,7 +173,8 @@ Fliplet().then(function() {
             type: ['select']
           }
         ],
-        newColumns: []
+        newColumns: [],
+        selectedOptions: {}
       };
     },
     computed: {
@@ -242,6 +243,10 @@ Fliplet().then(function() {
             _.assign(data, { 'rowOptions': component.props.rowOptions.default() });
           }
 
+          if (componentName === 'flAddress') {
+            _.assign(data, { 'selectedFieldOptions': component.props.selectedFieldOptions.default() });
+          }
+
           return this.fields.splice(event.newIndex, 0, data);
         }
       },
@@ -281,28 +286,33 @@ Fliplet().then(function() {
         Fliplet.Widget.toggleCancelButton(false);
         this.$forceUpdate();
 
-        if (this.activeField._type === 'flAddress') {
-          this.getAddressFieldOptions(this.activeField);
-          this.updateAddressFieldOptions(this.activeField);
+        if (field._type === 'flAddress') {
+          var options = this.fields.map(function(field) {
+            if (field._type !== 'flButtons' && field._type !== 'flAddress') {
+              return { label: field.label, disabled: false };
+            }
+          }).filter(Boolean);
+
+          this.activeField.fieldOptions = Object.assign([], options);
+
+          this.activeField.selectedFieldOptions = Object.assign({}, field.selectedFieldOptions);
+
+          const assignedValues = Object.values(this.activeField.selectedFieldOptions)
+            .filter(value => value && this.activeField.fieldOptions.some(option => option.label === value)) // Check if value exists in fieldOptions
+            .map(value => value);
+
+          this.activeField.fieldOptions.forEach(option => {
+            option.disabled = assignedValues.includes(option.label);
+          });
         }
       },
-      getAddressFieldOptions: function(addressField) {
-        addressField.fieldOptions = this.fields.map(function(field) {
-          if (field._type !== 'flButtons' && field._type !== 'flAddress') {
-            return { label: field.label, disabled: false };
-          }
-        }).filter(Boolean);
-      },
-      updateAddressFieldOptions: function(addressField) {
-        const assignedValues = Object.values(addressField.selectedFieldOptions)
-          .filter(value => value && addressField.fieldOptions.some(option => option.label === value)) // Check if value exists in fieldOptions
-          .map(value => value);
+      closeEdit: function(isSaved) {
+        isSaved = isSaved || false;
 
-        addressField.fieldOptions.forEach(option => {
-          option.disabled = assignedValues.includes(option.label);
-        });
-      },
-      closeEdit: function() {
+        if (!isSaved) {
+          this.activeField.selectedFieldOptions = this.selectedOptions;
+        }
+
         this.activeFieldConfigType = null;
         this.activeField = {};
         Fliplet.Studio.emit('widget-save-label-reset');
@@ -320,7 +330,7 @@ Fliplet().then(function() {
         Fliplet.Studio.emit('reload-widget-instance', widgetId);
         Fliplet.Widget.setCancelButtonLabel(CANCEL_BUTTON_LABEL);
         Fliplet.Widget.toggleCancelButton(true);
-        this.closeEdit();
+        this.closeEdit(true);
       },
       changeTemplate: function() {
         this.toChangeTemplate = true;
@@ -345,6 +355,8 @@ Fliplet().then(function() {
         }
       },
       save: function(initial) {
+        this.selectedOptions = this.activeField.selectedFieldOptions;
+
         var $vm = this;
 
         if (initial) {
@@ -1190,6 +1202,10 @@ Fliplet().then(function() {
           field.hours = displayValues.hours;
           field.minutes = displayValues.minutes;
           field.seconds = displayValues.seconds;
+        }
+
+        if (field._type === 'flAddress') {
+          $vm.selectedOptions = Object.assign({}, field.selectedFieldOptions);
         }
       });
 
