@@ -1,4 +1,4 @@
-<div class="form-group fl-address-field" ref="mapAddressLookUp" @click="handleLocationPermissions">
+<div class="form-group fl-address-field" ref="mapAddressLookUp">
   <input
     type="text"
     class="form-control focus-outline"
@@ -20,8 +20,4 @@
   </ul>
 </div>
 
-<div class="form-group fl-map-field maps" style="width: 100%; height: 300px;" ref="mapField" @click="handleLocationPermissions">
-  <div class="map-container" style="width: 100%; height: 400px;"></div>
-  <input type="hidden" class="latitude" />
-  <input type="hidden" class="longitude" />
-</div>
+<div class="form-group fl-map-field maps" style="width: 100%; height: 220px;" ref="mapField"></div>

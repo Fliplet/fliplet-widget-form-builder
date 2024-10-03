@@ -44,6 +44,10 @@ Fliplet.FormBuilder.field('map', {
     this.onChange();
     this.$emit('_input', this.name, this.value.address, false, true);
     this.initMap();
+
+    if (!this.value.address) {
+      this.handleLocationPermissions();
+    }
   },
   methods: {
     selectSuggestion: function(option) {
@@ -54,7 +58,7 @@ Fliplet.FormBuilder.field('map', {
       this.mapAddressField.set(option.label);
       this.updateValue();
 
-      this.onChange();
+      // this.onChange();
     },
     initMap: function() {
       this.mapField = Fliplet.UI.MapField(this.$refs.mapField, this.$refs.mapAddressLookUp, {
@@ -71,7 +75,10 @@ Fliplet.FormBuilder.field('map', {
 
       const suggestions =  await this.mapAddressField.getAutocompleteSuggestions(input, countryRestrictions);
 
-      if (typeof this.value.address === 'object') {
+      console.log(this.suggestionSelected, '33333333333333333333333 this.suggestionSelected');
+
+      if (this.suggestionSelected &&  this.lastChosenAutocompleteValue === this.value.address.trim()) {
+        console.log('sssssssssssssssssssssssssssssss44444444444444444444444444');
         this.addressSuggestions = [];
         this.suggestionSelected = true;
       } else {
@@ -83,6 +90,14 @@ Fliplet.FormBuilder.field('map', {
     },
     onChange: function() {
       this.mapAddressField.change((value) => {
+        console.log(value, this.lastChosenAutocompleteValue, '000000zzzzzzzzzzxxxxxxxxxxxxxxx;;;;;;;;;;;;;;;');
+
+        if (value === this.lastChosenAutocompleteValue) {
+          this.suggestionSelected = false;
+
+          return;
+        }
+
         this.value = { address: value };
         this.updateValue();
       });
@@ -90,10 +105,18 @@ Fliplet.FormBuilder.field('map', {
   },
   watch: {
     value: function(val) {
+      console.log('suggestionSelected', this.suggestionSelected);
+      console.log('lastChosenAutocompleteValue', this.lastChosenAutocompleteValue);
+
+      console.log('al.address.trim', val.address.trim());
+
       if (!this.suggestionSelected &&  this.lastChosenAutocompleteValue !== val.address.trim()) {
+        console.log('88888888888888888888888888888888888888888');
         this.initAutocomplete(val.address, []);
         this.onChange();
       } else {
+        console.log('999999999999999999999999999999999999999999');
+
         this.lastChosenAutocompleteValue = val.address;
         this.mapField.set(val.address);
       }

@@ -1396,13 +1396,3 @@ form hr {
 .form-group.fl-typeahead .selectize-input.focus {
   border-color: #00abd1;
 }
-
-.maps {
-  height: 300px;
-  width: 300px;
-}
-
-.getLocationModal {
-  height: 300px;
-  width: 300px;
-}
