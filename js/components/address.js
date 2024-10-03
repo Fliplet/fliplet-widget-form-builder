@@ -56,7 +56,16 @@ Fliplet.FormBuilder.field('address', {
     },
     selectedFieldOptions: {
       type: Object,
-      default: {}
+      default: function() {
+        return {
+          streetNumber: '',
+          streetName: '',
+          city: '',
+          state: '',
+          country: '',
+          postalCode: ''
+        };
+      }
     },
     addressSuggestions: {
       type: Array,
@@ -209,7 +218,7 @@ Fliplet.FormBuilder.field('address', {
       this.updateFieldOptions();
       this.updateSelectedFieldsOptions();
 
-      const assignedValues = Object.values(this.fieldOptions.selectedFieldOptions)
+      const assignedValues = Object.values(this.selectedFieldOptions)
         .filter(value => value && this.fieldOptions.some(option => option.label === value))
         .map(value => value);
 
@@ -242,10 +251,13 @@ Fliplet.FormBuilder.field('address', {
 
             if (!matchedField) continue;
 
-            Fliplet.FormBuilder.get()
-              .then(function(form) {
-                form.field(fieldName).set(matchedField.value);
-              });
+            const fields = this.$parent.fields;
+
+            fields.forEach(field =>{
+              if (field.label === fieldName) {
+                field.value = matchedField.value;
+              }
+            });
           }
         }
 
