@@ -41,7 +41,7 @@ Fliplet.FormBuilder.field('map', {
   },
   mounted: function() {
     this.initAutocomplete('', []);
-    this.onChange();
+    // this.onChange();
     this.$emit('_input', this.name, this.value.address, false, true);
     this.initMap();
 
@@ -73,57 +73,75 @@ Fliplet.FormBuilder.field('map', {
     initAutocomplete: async function(input, countryRestrictions) {
       this.mapAddressField = Fliplet.UI.AddressField(this.$refs.mapAddressLookUp);
 
-      const suggestions =  await this.mapAddressField.getAutocompleteSuggestions(input, countryRestrictions);
+      this.mapAddressField.change(this.onChange);
 
-      console.log(this.suggestionSelected, '33333333333333333333333 this.suggestionSelected');
+      // const suggestions =  await this.mapAddressField.getAutocompleteSuggestions(input, countryRestrictions);
 
-      if (this.suggestionSelected &&  this.lastChosenAutocompleteValue === this.value.address.trim()) {
-        console.log('sssssssssssssssssssssssssssssss44444444444444444444444444');
-        this.addressSuggestions = [];
-        this.suggestionSelected = true;
-      } else {
-        this.addressSuggestions = suggestions;
-      }
+      // if (this.suggestionSelected && this.lastChosenAutocompleteValue === this.value.address.trim()) {
+      //   this.addressSuggestions = [];
+      //   this.suggestionSelected = true;
+      // } else {
+      //   this.addressSuggestions = suggestions;
+      // }
     },
     handleLocationPermissions: function() {
       this.mapField.handleLocationPermissions();
     },
-    onChange: function() {
-      this.mapAddressField.change((value) => {
-        console.log(value, this.lastChosenAutocompleteValue, '000000zzzzzzzzzzxxxxxxxxxxxxxxx;;;;;;;;;;;;;;;');
+    onChange: function(value) {
+      if (this.mapField.getAddressChangedByDrag()) {
+        this.suggestionSelected = true;
+      }
 
-        if (value === this.lastChosenAutocompleteValue) {
-          this.suggestionSelected = false;
+      this.mapAddressField.getAutocompleteSuggestions(value, [])
+        .then((suggestions) => {
+          debugger;
 
-          return;
-        }
+          if (this.suggestionSelected && this.lastChosenAutocompleteValue === value.trim()) {
+            this.addressSuggestions = [];
+            this.suggestionSelected = true;
+          } else {
+            this.addressSuggestions = suggestions;
+          }
 
-        this.value = { address: value };
-        this.updateValue();
-      });
+          if (value === this.lastChosenAutocompleteValue) {
+            this.suggestionSelected = false;
+
+            return;
+          }
+        });
+
+
+      // this.value = { address: value || '' };
+      // this.updateValue();
     }
   },
   watch: {
     value: function(val) {
-      console.log('suggestionSelected', this.suggestionSelected);
-      console.log('lastChosenAutocompleteValue', this.lastChosenAutocompleteValue);
+      if (!val.address) {
+        val = {
+          address: val
+        };
+      } else if (val.address && val.address.label) {
+        val = {
+          address: val.address.label
+        };
+      }
 
-      console.log('al.address.trim', val.address.trim());
 
-      if (!this.suggestionSelected &&  this.lastChosenAutocompleteValue !== val.address.trim()) {
-        console.log('88888888888888888888888888888888888888888');
-        this.initAutocomplete(val.address, []);
-        this.onChange();
-      } else {
-        console.log('999999999999999999999999999999999999999999');
+      // if (!this.suggestionSelected && this.lastChosenAutocompleteValue !==  val.address.trim() && !this.mapField.getAddressChangedByDrag()) {
+      //   this.initAutocomplete(val.address, []);
+      //   // this.onChange();
+      // } else {
 
+
+      if (this.suggestionSelected) {
         this.lastChosenAutocompleteValue = val.address;
         this.mapField.set(val.address);
       }
 
       this.suggestionSelected = false;
       this.mapAddressField.set(val.address);
-      this.$emit('_input', this.name, val.address);
+      this.$emit('_input', this.name, val);
     }
   }
 });

@@ -1650,3 +1650,7 @@ form hr {
 .gmnoprint {
   display: none;
 }
+
+.gm-style-cc {
+  display: none;
+}

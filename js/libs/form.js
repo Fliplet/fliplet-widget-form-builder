@@ -743,6 +743,11 @@ Fliplet().then(function() {
               }
             } else if (field._type === 'flGeolocation') {
               value = null;
+            } else if (field._type === 'flMap') {
+              value = {
+                address: '',
+                latLng: null
+              };
             } else {
               value = fieldSettings.value;
             }
