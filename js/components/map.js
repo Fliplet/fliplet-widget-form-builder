@@ -32,6 +32,10 @@ Fliplet.FormBuilder.field('map', {
     suggestionSelected: {
       type: Boolean,
       default: false
+    },
+    activeSuggestionIndex: {
+      type: Number,
+      default: -1
     }
   },
   data: function() {
@@ -50,12 +54,59 @@ Fliplet.FormBuilder.field('map', {
     }
   },
   methods: {
+    handleKeyDown: function(event) {
+      const suggestionsCount = this.addressSuggestions.length;
+
+      if (!suggestionsCount) {
+        return;
+      }
+
+      switch (event.key) {
+        case 'ArrowDown':
+          event.preventDefault();
+
+          if (this.activeSuggestionIndex < suggestionsCount - 1) {
+            console.log('bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb');
+
+            this.activeSuggestionIndex += 1;
+          }
+
+          break;
+
+        case 'ArrowUp':
+          event.preventDefault();
+
+          if (this.activeSuggestionIndex > 0) {
+            this.activeSuggestionIndex -= 1;
+          }
+
+          break;
+
+        case 'Enter':
+          event.preventDefault();
+
+          if (this.activeSuggestionIndex >= 0) {
+            const selectedSuggestion = this.addressSuggestions[this.activeSuggestionIndex];
+
+            this.lastChosenAutocompleteValue = selectedSuggestion.label;
+            this.selectSuggestion(selectedSuggestion);
+            this.activeSuggestionIndex = -1;
+          }
+
+          break;
+
+        default:
+          break;
+      }
+    },
     selectSuggestion: function(option) {
       this.value.address = option;
       this.addressSuggestions = [];
       this.suggestionSelected = true;
+      this.activeSuggestionIndex = -1;
 
       this.mapAddressField.set(option.label);
+      this.lastChosenAutocompleteValue = option.label;
       this.updateValue();
 
       // this.onChange();
@@ -88,23 +139,30 @@ Fliplet.FormBuilder.field('map', {
       this.mapField.handleLocationPermissions();
     },
     onChange: function(value) {
-      if (this.mapField.getAddressChangedByDrag()) {
-        this.suggestionSelected = true;
-      }
+      // if (this.mapField.getAddressChangedByDrag()) {
+      //   this.suggestionSelected = true;
+      // }
+
+      console.log(this.suggestionSelected, '5555 suggestionSelected');
+      console.log(this.mapField.getAddressChangedByDrag(), 'this.mapField.getAddressChangedByDrag()');
+      console.log(this.lastChosenAutocompleteValue, 'this.lastChosenAutocompleteValue');
+      console.log(value, 'value');
+
 
       this.mapAddressField.getAutocompleteSuggestions(value, [])
         .then((suggestions) => {
-          debugger;
-
           if (this.suggestionSelected && this.lastChosenAutocompleteValue === value.trim()) {
+            console.log('111111111111111111111111111111111111111');
             this.addressSuggestions = [];
             this.suggestionSelected = true;
           } else {
+            console.log('222222222222222222222');
+
             this.addressSuggestions = suggestions;
           }
 
           if (value === this.lastChosenAutocompleteValue) {
-            this.suggestionSelected = false;
+            this.suggestionSelected = true;
 
             return;
           }
@@ -116,32 +174,41 @@ Fliplet.FormBuilder.field('map', {
     }
   },
   watch: {
-    value: function(val) {
-      if (!val.address) {
-        val = {
-          address: val
-        };
-      } else if (val.address && val.address.label) {
-        val = {
-          address: val.address.label
-        };
+    value: {
+      deep: true,
+      handler: function(val) {
+        console.log(val, '3333333333333333 val');
+
+        if (!val.address) {
+          val = {
+            address: val
+          };
+        } else if (val.address && val.address.label) {
+          val = {
+            address: val.address.label
+          };
+        }
+
+
+        // if (!this.suggestionSelected && this.lastChosenAutocompleteValue !==  val.address.trim() && !this.mapField.getAddressChangedByDrag()) {
+        //   this.initAutocomplete(val.address, []);
+        //   // this.onChange();
+        // } else {
+        console.log(this.suggestionSelected, 'val.this.suggestionSelected');
+
+        if (this.suggestionSelected) {
+          this.lastChosenAutocompleteValue = val.address;
+          this.mapField.set(val.address);
+        }
+
+        this.mapAddressField.set(val.address);
+        this.$emit('_input', this.name, val);
       }
-
-
-      // if (!this.suggestionSelected && this.lastChosenAutocompleteValue !==  val.address.trim() && !this.mapField.getAddressChangedByDrag()) {
-      //   this.initAutocomplete(val.address, []);
-      //   // this.onChange();
-      // } else {
-
-
-      if (this.suggestionSelected) {
-        this.lastChosenAutocompleteValue = val.address;
-        this.mapField.set(val.address);
+    },
+    addressSuggestions: function(newSuggestions) {
+      if (newSuggestions.length) {
+        this.activeSuggestionIndex = -1;
       }
-
-      this.suggestionSelected = false;
-      this.mapAddressField.set(val.address);
-      this.$emit('_input', this.name, val);
     }
   }
 });
