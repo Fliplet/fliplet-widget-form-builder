@@ -82,6 +82,10 @@ Fliplet.FormBuilder.field('address', {
     suggestionSelected: {
       type: Boolean,
       default: false
+    },
+    activeSuggestionIndex: {
+      type: Number,
+      default: -1
     }
   },
   data: function() {
@@ -110,6 +114,49 @@ Fliplet.FormBuilder.field('address', {
     this.$emit('_input', this.name, this.value, false, true);
   },
   methods: {
+    handleKeyDown: function(event) {
+      const suggestionsCount = this.addressSuggestions.length;
+
+      if (!suggestionsCount) {
+        return;
+      }
+
+      switch (event.key) {
+        case 'ArrowDown':
+          event.preventDefault();
+
+          if (this.activeSuggestionIndex < suggestionsCount - 1) {
+            this.activeSuggestionIndex += 1;
+          }
+
+          break;
+
+        case 'ArrowUp':
+          event.preventDefault();
+
+          if (this.activeSuggestionIndex > 0) {
+            this.activeSuggestionIndex -= 1;
+          }
+
+          break;
+
+        case 'Enter':
+          event.preventDefault();
+
+          if (this.activeSuggestionIndex >= 0) {
+            const selectedSuggestion = this.addressSuggestions[this.activeSuggestionIndex];
+
+            this.lastChosenAutocompleteValue = selectedSuggestion.label;
+            this.selectSuggestion(selectedSuggestion);
+            this.activeSuggestionIndex = -1;
+          }
+
+          break;
+
+        default:
+          break;
+      }
+    },
     handleClickOutside: function(event) {
       const suggestionsList = this.$el.querySelector('.google-autocomplete');
 
@@ -122,12 +169,14 @@ Fliplet.FormBuilder.field('address', {
       this.value = option;
       this.addressSuggestions = [];
       this.suggestionSelected = true;
+      this.activeSuggestionIndex = -1;
 
       const data = await this.addressField.getAddressComponents(option.id);
 
       this.addressComponents = data;
 
       this.addressField.set(option.label);
+      this.lastChosenAutocompleteValue = option.label;
       this.updateValue();
 
       this.onChange();
@@ -312,6 +361,11 @@ Fliplet.FormBuilder.field('address', {
 
       this.addressField.set(val);
       this.$emit('_input', this.name, val);
+    },
+    addressSuggestions: function(newSuggestions) {
+      if (newSuggestions.length) {
+        this.activeSuggestionIndex = -1;
+      }
     }
   }
 });
