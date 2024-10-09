@@ -9,10 +9,6 @@ Fliplet.FormBuilder.field('map', {
     description: {
       type: String
     },
-    readOnly: {
-      type: Boolean,
-      default: false
-    },
     mapType: {
       type: String,
       default: ''
@@ -47,10 +43,6 @@ Fliplet.FormBuilder.field('map', {
     this.initAutocomplete('', []);
     this.$emit('_input', this.name, this.value.address, false, true);
     this.initMap();
-
-    // if (!this.value.address) {
-    //   this.handleLocationPermissions();
-    // }
   },
   methods: {
     handleKeyDown: function(event) {
@@ -122,7 +114,7 @@ Fliplet.FormBuilder.field('map', {
     initMap: function() {
       this.mapField = Fliplet.UI.MapField(this.$refs.mapField, this.$refs.mapAddressLookUp, {
         enablePin: this.enablePin,
-        readOnly: this.readOnly,
+        readonly: this.readonly,
         mapType: this.mapType,
         autoCollectUserLocation: this.autoCollectUserLocation,
         placeholder: this.placeholder,
