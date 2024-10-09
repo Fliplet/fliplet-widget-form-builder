@@ -9,6 +9,14 @@
   </select>
 </template>
 
+<div class="checkbox checkbox-icon">
+  <input type="checkbox" name="auto-collect-user-location" v-model="autoCollectUserLocation" id="auto-collect-user-location">
+  <label for="auto-collect-user-location">
+    <span class="check"><i class="fa fa-check"></i></span>
+    <span class="hide-field">Automatically collect user location</span>
+  </label>
+</div>
+
 <div class="form-group"></div>
   <label>Placeholder</label>
   <input class="form-control" type="text" v-model="placeholder" placeholder="Start typing your address..." />

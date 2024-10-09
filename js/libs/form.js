@@ -746,7 +746,7 @@ Fliplet().then(function() {
             } else if (field._type === 'flMap') {
               value = {
                 address: '',
-                latLng: null
+                latLong: null
               };
             } else {
               value = fieldSettings.value;
@@ -1180,7 +1180,8 @@ Fliplet().then(function() {
                     });
                   }
                 } else if (type === 'flMap') {
-                  appendField('Address', value);
+                  appendField('Address', value.address);
+                  appendField('Lat/Long', value.latLong);
                 } else if (type === 'flGeolocation') {
                   appendField(field.name, value ? value[0] : null);
                   appendField(`${field.name} (accuracy)`, value ? value[1] : null);

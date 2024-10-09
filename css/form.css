@@ -1627,7 +1627,7 @@ form hr {
 
 .google-autocomplete li {
   display: flex;
-  padding: 8px 12px;
+  padding: 8px 4px;
   cursor: pointer;
   font-size: 12px;
   line-height: 20px;
@@ -1635,6 +1635,15 @@ form hr {
   list-style: none;
   align-items: self-end;
   gap: 4px;
+}
+.google-autocomplete :first-child {
+  padding-left: 3px;
+  font-size: 14px;
+}
+
+.google-autocomplete :first-child svg {
+  width: 28px;
+  height: 18px;
 }
 
 .google-autocomplete li:hover,
