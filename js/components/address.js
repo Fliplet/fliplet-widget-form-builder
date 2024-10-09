@@ -205,6 +205,12 @@ Fliplet.FormBuilder.field('address', {
             case 'locality':
               addressData.city = longName;
               break;
+            case 'postal_town':
+              if (!addressData.city) {
+                addressData.city = longName;
+              }
+
+              break;
             case 'administrative_area_level_1':
               addressData.state = longName;
               break;
