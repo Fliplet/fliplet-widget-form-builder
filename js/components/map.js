@@ -43,6 +43,10 @@ Fliplet.FormBuilder.field('map', {
     this.initAutocomplete('', []);
     this.$emit('_input', this.name, this.value.address, false, true);
     this.initMap();
+    this.value = {
+      address: this.value.address || '',
+      latLong: this.value.latLong || null
+    };
   },
   methods: {
     handleKeyDown: function(event) {
@@ -111,6 +115,19 @@ Fliplet.FormBuilder.field('map', {
       this.mapAddressField.clear();
       this.mapField.clear();
     },
+    displayAddressNotFoundToast: function() {
+      Fliplet.UI.Toast({
+        type: 'minimal',
+        message: "We couldn't find the address. Please double-check and re-enter the correct details.",
+        actions: [{
+          label: 'Dismiss',
+          action: () => {
+            Fliplet.UI.Toast.dismiss();
+          }
+        }],
+        duration: false
+      });
+    },
     initMap: function() {
       this.mapField = Fliplet.UI.MapField(this.$refs.mapField, this.$refs.mapAddressLookUp, {
         enablePin: this.enablePin,
@@ -130,14 +147,14 @@ Fliplet.FormBuilder.field('map', {
       this.mapField.handleLocationPermissions();
     },
     onChange: function(value) {
-      if (value === this.lastChosenAutocompleteValue) {
-        this.suggestionSelected = true;
-      }
-
       this.mapAddressField.getAutocompleteSuggestions(value, [])
         .then((suggestions) => {
           if (suggestions.length && suggestions[0].label !== 'Select location on map') {
             suggestions.unshift({ id: null, label: 'Select location on map' });
+          }
+
+          if (value === this.lastChosenAutocompleteValue) {
+            this.suggestionSelected = true;
           }
 
           if (this.suggestionSelected && this.lastChosenAutocompleteValue === value.trim()) {
@@ -149,9 +166,13 @@ Fliplet.FormBuilder.field('map', {
             this.value = this.mapField.getTotalAddress();
             this.suggestionSelected = false;
           } else {
+            if (suggestions.length === 0) {
+              this.addressSuggestions.unshift({ id: null, label: 'Select location on map' });
+              this.displayAddressNotFoundToast();
+            }
+
             this.addressSuggestions = suggestions;
             this.suggestionSelected = false;
-            this.value = { address: value || '' };
           }
         });
     }

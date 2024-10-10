@@ -1396,3 +1396,12 @@ form hr {
 .form-group.fl-typeahead .selectize-input.focus {
   border-color: #00abd1;
 }
+
+.secondary-info {
+  font-size: 11px;
+  color: #777777;
+  font-weight: 400;
+  line-height: 16px;
+  margin-top: 9px;
+  margin-left: 25px;
+}
