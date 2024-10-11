@@ -1405,3 +1405,8 @@ form hr {
   margin-top: 9px;
   margin-left: 25px;
 }
+
+.select-proxy-display .map-type-icon {
+  background-color: #474a74;
+  color: #fff;
+}

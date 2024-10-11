@@ -32,6 +32,10 @@ Fliplet.FormBuilder.field('map', {
     activeSuggestionIndex: {
       type: Number,
       default: -1
+    },
+    hasSelectOnMapOption: {
+      type: Boolean,
+      default: false
     }
   },
   data: function() {
@@ -93,10 +97,28 @@ Fliplet.FormBuilder.field('map', {
           break;
       }
     },
+    handleFocus: function(e) {
+      if (!e.target.value && !this.readonly) {
+        this.addressSuggestions = [{
+          id: null,
+          label: 'Select location on map'
+        }];
+      }
+    },
+    updateAddressSuggestions: function() {
+      if (this.hasSelectOnMapOption) {
+        this.addressSuggestions = [];
+        this.hasSelectOnMapOption = false;
+        return;
+      }
+
+      this.addressSuggestions = [{ id: null, label: 'Select location on map' }];
+    },
     selectSuggestion: function(option) {
       if (option.label === 'Select location on map') {
         this.getAddressFromMap();
-
+        Fliplet.UI.Toast.dismiss();
+        this.hasSelectOnMapOption = true;
         return;
       }
 
@@ -125,7 +147,8 @@ Fliplet.FormBuilder.field('map', {
             Fliplet.UI.Toast.dismiss();
           }
         }],
-        duration: false
+        duration: false,
+        tapToDismiss: false
       });
     },
     initMap: function() {
@@ -149,7 +172,7 @@ Fliplet.FormBuilder.field('map', {
     onChange: function(value) {
       this.mapAddressField.getAutocompleteSuggestions(value, [])
         .then((suggestions) => {
-          if (suggestions.length && suggestions[0].label !== 'Select location on map') {
+          if (suggestions[0]?.label !== 'Select location on map') {
             suggestions.unshift({ id: null, label: 'Select location on map' });
           }
 
@@ -159,16 +182,18 @@ Fliplet.FormBuilder.field('map', {
 
           if (this.suggestionSelected && this.lastChosenAutocompleteValue === value.trim()) {
             this.value = this.mapField.getTotalAddress();
-            this.addressSuggestions = [];
+            this.updateAddressSuggestions();
           } else if (this.mapField.getAddressChangedByDrag()) {
-            this.addressSuggestions = [];
+            this.updateAddressSuggestions();
             this.mapField.getAddressChangedByDrag(false);
             this.value = this.mapField.getTotalAddress();
             this.suggestionSelected = false;
           } else {
-            if (suggestions.length === 0) {
+            if (suggestions.length === 1 && value.trim() !== '') {
               this.addressSuggestions.unshift({ id: null, label: 'Select location on map' });
               this.displayAddressNotFoundToast();
+            } else {
+              Fliplet.UI.Toast.dismiss();
             }
 
             this.addressSuggestions = suggestions;
