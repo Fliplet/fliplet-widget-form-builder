@@ -673,7 +673,10 @@ Fliplet().then(function() {
             var value;
             var fieldSettings = data.fields[index];
 
-            if (field.isHidden || field.readonly) {
+            const addressField = data.fields.filter(field => field._type === 'flAddress');
+            const addressSelectedFieldOptions = addressField.length ? Object.values(addressField[0].selectedFieldOptions) : [];
+
+            if (field.isHidden || (field.readonly && !addressSelectedFieldOptions.includes(field.name))) {
               return;
             }
 
