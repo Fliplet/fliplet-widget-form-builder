@@ -112,6 +112,10 @@ Fliplet.FormBuilder.field('address', {
     document.addEventListener('click', this.handleClickOutside);
 
     this.$emit('_input', this.name, this.value, false, true);
+
+    if (!this.manualInput) {
+      this.updateSelectedFieldsProperty('readonly', this.manualInput);
+    }
   },
   methods: {
     handleKeyDown: function(event) {
