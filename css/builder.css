@@ -1410,3 +1410,18 @@ form hr {
   background-color: #474a74;
   color: #fff;
 }
+.google-autocomplete {
+  display: none;
+}
+
+.gmnoprint:not(:first-child) {
+  display: none;
+}
+
+.gm-style-cc {
+  display: none;
+}
+
+.maps {
+  height: 220px;
+}

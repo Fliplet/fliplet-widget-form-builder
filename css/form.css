@@ -1657,7 +1657,7 @@ form hr {
   font-weight: bold;
 }
 
-.gmnoprint {
+.gmnoprint:not(:first-child) {
   display: none;
 }
 

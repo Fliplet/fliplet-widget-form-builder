@@ -404,6 +404,13 @@ Fliplet().then(function() {
               case 'flGeolocation':
                 fieldData = [entry.data[`${fieldKey}`], entry.data[`${fieldKey} (accuracy)`]];
                 break;
+              case 'flMap':
+                fieldData = {
+                  address: entry.data['Address'],
+                  latLong: entry.data['Lat/Long']
+                };
+                break;
+
               default:
                 fieldData = entry.data[fieldKey];
 
@@ -578,6 +585,13 @@ Fliplet().then(function() {
             }
           }
 
+          if (field._type === 'flMap') {
+            field.value = progress[field.name] || {
+              address: '',
+              latLong: null
+            };
+          }
+
           setTimeout(function() {
             if (progress && !isEditMode) {
               var savedValue = progress[field.name];
@@ -673,7 +687,7 @@ Fliplet().then(function() {
             var value;
             var fieldSettings = data.fields[index];
 
-            if (field.isHidden || field.readonly) {
+            if (field.isHidden || (field.readonly && field._type !== 'flMap')) {
               return;
             }
 
