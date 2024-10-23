@@ -29,7 +29,7 @@ Fliplet.FormBuilder.field('map', {
       type: Number,
       default: -1
     },
-    hasSelectOnMapOption: {
+    isSelectOnMapClicked: {
       type: Boolean,
       default: false
     }
@@ -135,9 +135,9 @@ Fliplet.FormBuilder.field('map', {
       }
     },
     updateAddressSuggestions: function() {
-      if (this.hasSelectOnMapOption) {
+      if (this.isSelectOnMapClicked) {
         this.addressSuggestions = [];
-        this.hasSelectOnMapOption = false;
+        this.isSelectOnMapClicked = false;
         return;
       }
 
@@ -147,7 +147,7 @@ Fliplet.FormBuilder.field('map', {
       if (option.label === 'Select location on map') {
         this.clearAddressAndMapValues();
         Fliplet.UI.Toast.dismiss();
-        this.hasSelectOnMapOption = true;
+        this.isSelectOnMapClicked = true;
         return;
       }
 
@@ -170,9 +170,6 @@ Fliplet.FormBuilder.field('map', {
         readonly: this.readonly,
         mapType: this.mapType,
         value: this.value,
-        zoomControl: true,
-        disableDefaultUI: true,
-        zoomLevel: 8
       });
     },
     initAutocomplete: async function() {
@@ -264,7 +261,7 @@ Fliplet.FormBuilder.field('map', {
           this.suggestionSelected = true
           this.lastChosenAutocompleteValue = val.address
           this.addressSuggestions = []
-          this.hasSelectOnMapOption = true
+          this.isSelectOnMapClicked = true
           return
         }
 
@@ -276,8 +273,6 @@ Fliplet.FormBuilder.field('map', {
         if (this.suggestionSelected && !this.lastChosenAutocompleteValue && !this.mapField.checkIfAddressChangedByDragging()) {
           this.suggestionSelected = false;
         }
-
-        debugger
 
         this.$emit('_input', this.name, val, false, true);
       }
