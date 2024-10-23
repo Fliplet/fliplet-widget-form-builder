@@ -106,6 +106,21 @@
             "type": "string",
             "title": "The key of the default value to look up in the defined source"
           },
+          "countryRestrictions": {
+            "type": "array",
+            "title": "Restricting the search predictions",
+            "default": []
+          },
+          "manualInput": {
+            "type": "boolean",
+            "title": "Allow users manually add or edit address",
+            "default": true
+          },
+          "storeInSeparateFields": {
+            "type": "boolean",
+            "title": "Enable to store each part of the address data in separate fields",
+            "default": false
+          },
           "createdAt": {
             "type": "boolean",
             "title": "Save timestamp when form is first submitted",
@@ -482,6 +497,34 @@
               }
             },
             "required": ["_type"]
+          },
+          {
+            "title": "A generic input for address",
+            "description": "This is a special input field that is used to enter an address. It provides autocomplete suggestions.",
+            "properties": {
+              "_type": {
+                "enum": ["flAddress"]
+              },
+              "addressSuggestions": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "title": "The options to choose from",
+                  "properties": {
+                    "id": {
+                      "title": "Location ID",
+                      "type": "string"
+                    },
+                    "label": {
+                      "title": "Location Name",
+                      "type": "string"
+                    }
+                  },
+                  "required": ["label", "id"]
+                }
+              }
+            },
+            "required": ["_type", "addressSuggestions"]
           },
           {
             "title": "A field to add a timeStamp",

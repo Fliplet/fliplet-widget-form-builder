@@ -1622,6 +1622,48 @@ form hr {
   gap: 11px;
 }
 
+/* Address field*/
+
+.form-group.address-typeahead.fl-typeahead {
+  left: 14px !important;
+}
+
+.google-autocomplete {
+  position: absolute;
+  background-color: #ffffff;
+  border: 1px solid #dcdcdc;
+  border-radius: 4px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  max-height: 300px;
+  overflow-y: auto;
+  width: 100%;
+  padding-left: 0;
+  z-index: 1000;
+}
+
+.google-autocomplete li {
+  display: inline-block;
+  width: 100%;
+  padding: 8px 12px;
+  cursor: pointer;
+  font-size: 12px;
+  line-height: 20px;
+  border-bottom: 1px solid #dcdcdc;
+  list-style: none;
+  align-items: baseline;
+  gap: 4px;
+}
+
+.google-autocomplete li:hover,
+.google-autocomplete li:focus {
+  background-color: #f0f0f0;
+}
+
+.google-autocomplete li.active {
+  background-color: #e0e0e0;
+  font-weight: bold;
+}
+
 .timeStamp {
   font-size: 16px;
   text-align: center;
