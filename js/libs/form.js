@@ -673,7 +673,10 @@ Fliplet().then(function() {
             var value;
             var fieldSettings = data.fields[index];
 
-            if (field.isHidden || field.readonly) {
+            const addressField = data.fields.filter(field => field._type === 'flAddress');
+            const addressSelectedFieldOptions = addressField.length ? Object.values(addressField[0].selectedFieldOptions) : [];
+
+            if (field.isHidden || (field.readonly && !addressSelectedFieldOptions.includes(field.name))) {
               return;
             }
 
@@ -1177,6 +1180,15 @@ Fliplet().then(function() {
                 } else if (type === 'flGeolocation') {
                   appendField(field.name, value ? value[0] : null);
                   appendField(`${field.name} (accuracy)`, value ? value[1] : null);
+                } else if (type === 'flTimeStamp') {
+                  if (value.createdAt && !value.updatedAt) {
+                    appendField('Created at', new Date().toISOString());
+                  } else if (!value.createdAt && value.updatedAt) {
+                    appendField('Last updated', '');
+                  } else if (value.createdAt && value.updatedAt) {
+                    appendField('Created at', new Date().toISOString());
+                    appendField('Last updated', '');
+                  }
                 } else {
                   // Other inputs
                   appendField(field.name, value);

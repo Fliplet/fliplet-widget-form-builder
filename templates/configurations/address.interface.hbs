@@ -1,0 +1,52 @@
+<template>
+  <div class="form-group">
+    <label>Restrict search to certain countries (max 5)</label>
+    <div class="col-xs-12">
+      <div class="form-group fl-typeahead address-typeahead" id="restricted-countries">
+        <select multiple placeholder="Select countries"></select>
+      </div>
+    </div>
+  </div>
+</template>
+
+<div class="form-group clearfix">
+  <label>Allow users manually add or edit address</label>
+  <div class="checkbox checkbox-icon">
+    <input type="checkbox" name="manual-input" v-model="manualInput" id="manual-input">
+    <label for="manual-input">
+      <span class="check"><i class="fa fa-check"></i></span>
+      <span class="hide-field">Yes, allow manual address input</span>
+    </label>
+  </div>
+</div>
+
+<div class="form-group clearfix">
+  <label>Store each part of the address data in separate fields?</label>
+  <div class="checkbox checkbox-icon">
+    <input type="checkbox" name="store-in-separate-fields" v-model="storeInSeparateFields" id="store-in-separate-fields">
+    <label for="store-in-separate-fields">
+      <span class="check"><i class="fa fa-check"></i></span>
+      <span class="hide-field">Yes</span>
+    </label>
+  </div>
+</div>
+
+<div v-if="storeInSeparateFields">
+  <p class="form-group">
+    Select the form field you want each part of the address data written to. Create the form fields before selecting them.
+  </p>
+  <div class="form-group" v-for="(field) in separateFieldsName" :key="field.key">
+    <label>\{{ field.label }}</label>
+    <select class="form-control" v-model="selectedFieldOptions[field.key]" @change="_updateDisabledOptions">
+      <option value="">-- Select one</option>
+      <option  v-for="option in fieldOptions" :value="option.label" :disabled="option.disabled" :key="option.label">
+        \{{ option.label }}
+      </option>
+    </select>
+  </div>
+</div>
+
+<div class="form-group">
+  <label>Placeholder</label>
+  <input class="form-control" type="text" v-model="placeholder" placeholder="Start typing your address..." />
+</div>

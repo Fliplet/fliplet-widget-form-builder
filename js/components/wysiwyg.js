@@ -73,7 +73,7 @@ Fliplet.FormBuilder.field('wysiwyg', {
   },
   mounted: function() {
     var $vm = this;
-    var lineHeight = 40;
+    var lineHeight = 55;
 
     this.tinymceId = _.kebabCase(this.name) + '-' + $(this.$refs.textarea).parents('[data-form-builder-id]').data('formBuilderId');
 
@@ -97,7 +97,7 @@ Fliplet.FormBuilder.field('wysiwyg', {
         : [
           'undo redo',
           'bold italic underline',
-          'alignleft aligncenter alignright alignjustify | bullist numlist outdent indent',
+          'alignleft aligncenter alignright alignjustify | bullist numlist | outdent indent',
           'ltr rtl | link | removeformat code fullscreen',
           'table tabledelete | tableprops tablerowprops tablecellprops',
           'tableinsertrowbefore tableinsertrowafter tabledeleterow | tableinsertcolbefore tableinsertcolafter tabledeletecol'
