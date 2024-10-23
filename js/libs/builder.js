@@ -960,6 +960,18 @@ Fliplet().then(function() {
 
               break;
 
+            case 'flTimeStamp':
+              if (field.createdAt && !field.updatedAt) {
+                fieldNames.push('Created at');
+              } else if (!field.createdAt && field.updatedAt) {
+                fieldNames.push('Last updated');
+              } else {
+                fieldNames.push('Created at');
+                fieldNames.push('Last updated');
+              }
+
+              break;
+
             case 'flMatrix':
               _.forEach(field.rowOptions, function(row) {
                 var val = row.id ? row.id : row.label;

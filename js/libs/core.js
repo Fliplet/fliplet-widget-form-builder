@@ -752,6 +752,15 @@ Fliplet.FormBuilder = (function() {
 
             break;
 
+          case 'flTimeStamp':
+            if (!this.updatedAt && !this.createdAt) {
+              _.assignIn(this.errors, {
+                timeStampOption: 'Select at least one timestamp saving option to continue'
+              });
+            }
+
+            break;
+
           default:
             // nothing
         }

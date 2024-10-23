@@ -69,6 +69,7 @@
       "js/components/slider.js",
       "js/components/signature.js",
       "js/components/address.js",
+      "js/components/timeStamp.js",
 
       "js/configurations/input.js",
       "js/configurations/email.js",
@@ -102,6 +103,7 @@
       "js/configurations/signature.js",
       "js/configurations/wysiwyg.js",
       "js/configurations/address.js",
+      "js/configurations/timeStamp.js",
 
       "js/libs/builder.js",
       "css/builder.css"
@@ -169,6 +171,7 @@
       "js/components/signature.js",
       "js/components/wysiwyg.js",
       "js/components/address.js",
+      "js/components/timeStamp.js",
 
       "js/libs/form.js",
       "css/form.css"
