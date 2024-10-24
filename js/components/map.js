@@ -47,9 +47,11 @@ Fliplet.FormBuilder.field('map', {
   },
   mounted: function() {
     this.initAutocomplete('', []);
-    if(this.value.latLong) {
+
+    if (this.value.latLong) {
       this.$emit('_input', this.name, this.value, false, true);
     }
+
     this.initMap();
     this.value = {
       address: this.value.address || '',
@@ -70,7 +72,8 @@ Fliplet.FormBuilder.field('map', {
       const value = {
         address: e.target.value,
         latLong: null
-      }
+      };
+
       this.$emit('_input', this.name, value);
       this.mapField.clear();
     },
@@ -130,6 +133,7 @@ Fliplet.FormBuilder.field('map', {
       if (this.isSelectOnMapClicked) {
         this.addressSuggestions = [];
         this.isSelectOnMapClicked = false;
+
         return;
       }
 
@@ -140,6 +144,7 @@ Fliplet.FormBuilder.field('map', {
         this.clearAddressAndMapValues();
         Fliplet.UI.Toast.dismiss();
         this.isSelectOnMapClicked = true;
+
         return;
       }
 
@@ -160,13 +165,13 @@ Fliplet.FormBuilder.field('map', {
       this.value = {
         address: '',
         latLong: null
-      }
+      };
     },
     initMap: function() {
       this.mapField = Fliplet.UI.MapField(this.$refs.mapField, this.$refs.mapAddressLookUp, {
         readonly: this.readonly,
         mapType: this.mapType,
-        value: this.value,
+        value: this.value
       });
     },
     initAutocomplete: async function() {
@@ -175,25 +180,27 @@ Fliplet.FormBuilder.field('map', {
       this.mapAddressField.change(this.onChange);
     },
     onChange: function(value) {
-      if(this.readonly){
-        return
+      if (this.readonly) {
+        return;
       }
 
-      if(!value) {
-        this.mapField.clear()
-        return
+      if (!value) {
+        this.mapField.clear();
+
+        return;
       }
 
       this.mapAddressField.getAutocompleteSuggestions(value, [])
         .then((suggestions) => {
-
-          if (suggestions[0]?.label !== 'Select location on map') {
+          if (suggestions.length && suggestions[0].label !== 'Select location on map') {
+            suggestions.unshift({ id: null, label: 'Select location on map' });
+          } else if (!suggestions.length) {
             suggestions.unshift({ id: null, label: 'Select location on map' });
           }
 
           if (value.length > 1 && value === this.lastChosenAutocompleteValue) {
             this.suggestionSelected = true;
-          }else {
+          } else {
             this.suggestionSelected = false;
           }
 
@@ -207,21 +214,23 @@ Fliplet.FormBuilder.field('map', {
             this.suggestionSelected = false;
           } else {
             if (suggestions.length === 1 && value.trim() !== '') {
-              if(this.addressSuggestions.length && this.addressSuggestions[0].label === 'Select location on map') {
+              if (this.addressSuggestions.length && this.addressSuggestions[0].label === 'Select location on map') {
                 this.addressSuggestions.unshift({ id: null, label: 'Select location on map' });
               }
+
               this.mapField.displayToastMessage("We couldn't find the address. Please double-check and re-enter the correct details.");
-          } else {
-            Fliplet.UI.Toast.dismiss();
+            } else {
+              Fliplet.UI.Toast.dismiss();
+            }
+
+            this.addressSuggestions = suggestions;
+            this.suggestionSelected = false;
           }
-          this.addressSuggestions = suggestions;
-          this.suggestionSelected = false;
-        };
-      });
+        });
     },
     onReset: function() {
       this.clearAddressAndMapValues();
-    },
+    }
   },
   validations: function() {
     var $vm = this;
@@ -241,8 +250,8 @@ Fliplet.FormBuilder.field('map', {
     value: {
       deep: true,
       handler: function(val) {
-        if(!val) {
-          return
+        if (!val) {
+          return;
         }
 
         if (val.address && val.address.label) {
@@ -251,23 +260,26 @@ Fliplet.FormBuilder.field('map', {
           };
         }
 
-        if(val.address && !this.suggestionSelected && !this.lastChosenAutocompleteValue && !this.readonly) {
-          if(val.latLong) {
-            this.mapAddressField.set(val.address)
-            this.mapField.set(val.address)
-          }else {
-            this.mapAddressField.set(val.address)
+        if (val.address && !this.suggestionSelected && !this.lastChosenAutocompleteValue && !this.readonly) {
+          if (val.latLong) {
+            this.mapAddressField.set(val.address);
+            this.mapField.set(val.address);
+          } else {
+            this.mapAddressField.set(val.address);
           }
-          this.suggestionSelected = true
-          this.lastChosenAutocompleteValue = val.address
-          this.addressSuggestions = []
-          this.isSelectOnMapClicked = true
-          return
+
+          this.suggestionSelected = true;
+          this.lastChosenAutocompleteValue = val.address;
+          this.addressSuggestions = [];
+          this.isSelectOnMapClicked = true;
+
+          return;
         }
 
-        if(val.address === '' && !this.readonly && !this.autoCollectUserLocation){
-          this.mapAddressField.clear()
+        if (val.address === '' && !this.readonly && !this.autoCollectUserLocation) {
+          this.mapAddressField.clear();
           this.mapField.clear();
+          this.addressSuggestions = [];
         }
 
         if (this.suggestionSelected && !this.lastChosenAutocompleteValue && !this.mapField.checkIfAddressChangedByDragging()) {
