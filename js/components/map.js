@@ -126,14 +126,6 @@ Fliplet.FormBuilder.field('map', {
           break;
       }
     },
-    handleFocus: function(e) {
-      if (!e.target.value && !this.readonly) {
-        this.addressSuggestions = [{
-          id: null,
-          label: 'Select location on map'
-        }];
-      }
-    },
     updateAddressSuggestions: function() {
       if (this.isSelectOnMapClicked) {
         this.addressSuggestions = [];
@@ -159,11 +151,16 @@ Fliplet.FormBuilder.field('map', {
       this.mapAddressField.set(option.label);
       this.lastChosenAutocompleteValue = option.label;
       this.mapField.set(option.label);
+      this.updateValue();
     },
     clearAddressAndMapValues: function() {
       this.addressSuggestions = [];
       this.mapAddressField.clear();
       this.mapField.clear();
+      this.value = {
+        address: '',
+        latLong: null
+      }
     },
     initMap: function() {
       this.mapField = Fliplet.UI.MapField(this.$refs.mapField, this.$refs.mapAddressLookUp, {
@@ -178,6 +175,10 @@ Fliplet.FormBuilder.field('map', {
       this.mapAddressField.change(this.onChange);
     },
     onChange: function(value) {
+      if(this.readonly){
+        return
+      }
+
       if(!value) {
         this.mapField.clear()
         return
@@ -219,8 +220,7 @@ Fliplet.FormBuilder.field('map', {
       });
     },
     onReset: function() {
-      this.mapField.clear();
-      this.mapAddressField.clear();
+      this.clearAddressAndMapValues();
     },
   },
   validations: function() {
