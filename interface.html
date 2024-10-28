@@ -386,7 +386,7 @@
                   <h2 class="modal-title"><small>\{{ activeFieldName }}</small></h2>
                 </div>
                 <div class="modal-body">
-                  <a href="#" class="btn btn-default close-btn" data-dismiss="modal" aria-label="Close" v-on:click.prevent="closeEdit(false)">Cancel</a>
+                  <a href="#" class="btn btn-default close-btn" data-dismiss="modal" aria-label="Close" v-on:click.prevent="closeEdit">Cancel</a>
                   <component :is="activeFieldConfigType" v-bind="activeField" :_fields="fields" :_idx="activeFieldIdx"></component>
                 </div>
               </div>
