@@ -6,7 +6,10 @@
   display: flex;
   flex-direction: column;
   margin: 0;
-  align-self: self-end;
+}
+
+[_type="flCustomButton"] {
+  justify-content: flex-end;
 }
 
 [data-form-field] .col-xs-12 {
