@@ -404,6 +404,13 @@ Fliplet().then(function() {
               case 'flGeolocation':
                 fieldData = [entry.data[`${fieldKey}`], entry.data[`${fieldKey} (accuracy)`]];
                 break;
+              case 'flMap':
+                fieldData = {
+                  address: entry.data['Address'],
+                  latLong: entry.data['Lat/Long']
+                };
+                break;
+
               default:
                 fieldData = entry.data[fieldKey];
 
@@ -578,6 +585,13 @@ Fliplet().then(function() {
             }
           }
 
+          if (field._type === 'flMap') {
+            field.value = progress[field.name] || {
+              address: '',
+              latLong: null
+            };
+          }
+
           setTimeout(function() {
             if (progress && !isEditMode) {
               var savedValue = progress[field.name];
@@ -676,7 +690,7 @@ Fliplet().then(function() {
             const addressField = data.fields.filter(field => field._type === 'flAddress');
             const addressSelectedFieldOptions = addressField.length ? Object.values(addressField[0].selectedFieldOptions) : [];
 
-            if (field.isHidden || (field.readonly && !addressSelectedFieldOptions.includes(field.name))) {
+            if (field.isHidden || (field.readonly && !addressSelectedFieldOptions.includes(field.name) || field._type !== 'flMap')) {
               return;
             }
 
@@ -746,6 +760,11 @@ Fliplet().then(function() {
               }
             } else if (field._type === 'flGeolocation') {
               value = null;
+            } else if (field._type === 'flMap') {
+              value = {
+                address: '',
+                latLong: null
+              };
             } else {
               value = fieldSettings.value;
             }
@@ -1177,6 +1196,9 @@ Fliplet().then(function() {
                       appendField(`${field.name} [${val}]`, '');
                     });
                   }
+                } else if (type === 'flMap') {
+                  appendField('Address', value.address);
+                  appendField('Lat/Long', value.latLong);
                 } else if (type === 'flGeolocation') {
                   appendField(field.name, value ? value[0] : null);
                   appendField(`${field.name} (accuracy)`, value ? value[1] : null);
