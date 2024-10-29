@@ -1400,32 +1400,3 @@ form hr {
   padding: 10px 10px;
   background-color: #eaeaea;
 }
-
-.secondary-info {
-  font-size: 11px;
-  color: #777777;
-  font-weight: 400;
-  line-height: 16px;
-  margin-top: 9px;
-  margin-left: 25px;
-}
-
-.select-proxy-display .map-type-icon {
-  background-color: #474a74;
-  color: #fff;
-}
-.google-autocomplete {
-  display: none;
-}
-
-.gmnoprint:not(:first-child) {
-  display: none;
-}
-
-.gm-style-cc {
-  display: none;
-}
-
-.maps {
-  height: 220px;
-}
