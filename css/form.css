@@ -8,6 +8,10 @@
   margin: 0;
 }
 
+[_type="flCustomButton"] {
+  justify-content: flex-end;
+}
+
 [data-form-field] .col-xs-12 {
   padding: 0;
 }
@@ -260,6 +264,7 @@ form.placeholder button {
 .btn-link,
 a {
   text-decoration: underline;
+  padding: 0;
 }
 
 /* FORM STYLES */
