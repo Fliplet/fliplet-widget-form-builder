@@ -8,6 +8,10 @@
   margin: 0;
 }
 
+[_type="flCustomButton"] {
+  justify-content: flex-end;
+}
+
 [data-form-field] .col-xs-12 {
   padding: 0;
 }
