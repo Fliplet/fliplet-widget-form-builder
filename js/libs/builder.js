@@ -983,7 +983,7 @@ Fliplet().then(function() {
 
             case 'flMap':
               fieldNames.push('Lat/Long');
-              fieldNames.push('Address');
+              fieldNames.push('Map Address');
 
               break;
 
