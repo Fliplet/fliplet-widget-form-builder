@@ -1020,11 +1020,15 @@ Fliplet().then(function() {
           Fliplet.Studio.emit('widget-mode', 'normal');
         }
       },
-      'section': function() {
+      'section': function(value) {
         var $vm = this;
 
-        $vm.setupCodeEditor();
-        changeSelectText();
+        if (value === 'settings') {
+          $vm.setupCodeEditor();
+          changeSelectText();
+        } else {
+          tinymce.remove();
+        }
       },
       'settings.dataStore': function(value) {
         this.showExtraAdd = value.indexOf('dataSource') > -1;
