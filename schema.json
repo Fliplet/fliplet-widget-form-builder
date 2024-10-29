@@ -130,15 +130,6 @@
             "type": "boolean",
             "title": "Save timestamp every time form is updated",
             "default": true
-          },
-          "mapType": {
-            "type": "string",
-            "title": "Allow users to change map type"
-          },
-          "autoCollectUserLocation": {
-            "type": "boolean",
-            "title": "Automatically collect the user's location when permission is granted.",
-            "default": false
           }
         },
         "required": [
@@ -544,48 +535,6 @@
               }
             },
             "required": ["_type"]
-          },
-          {
-            "title": "A generic input for address and map",
-            "description": "This is a specialized field designed for entering addresses, either by typing into the input to get autocomplete suggestions or by pinning a location directly on the map.",
-            "properties": {
-              "_type": {
-                "enum": ["flMap"]
-              },
-              "addressSuggestions": {
-                "type": "array",
-                "items": {
-                  "type": "object",
-                  "title": "The options to choose from",
-                  "properties": {
-                    "id": {
-                      "title": "Location ID",
-                      "type": "string"
-                    },
-                    "label": {
-                      "title": "Location Name",
-                      "type": "string"
-                    }
-                  },
-                  "required": ["label", "id"]
-                }
-              },
-              "value": {
-                "title": "The value to save the address along with its latitude and longitude.",
-                "type": "object",
-                "properties": {
-                  "address": {
-                    "title": "The text to display",
-                    "type": "string"
-                  },
-                  "Lat/Long": {
-                    "title": "The text to display",
-                    "type": "string"
-                  }
-                }
-              }
-            },
-            "required": ["_type", "addressSuggestions"]
           }
         ]
       }
