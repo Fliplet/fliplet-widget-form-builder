@@ -260,6 +260,7 @@ form.placeholder button {
 .btn-link,
 a {
   text-decoration: underline;
+  padding: 0;
 }
 
 /* FORM STYLES */
