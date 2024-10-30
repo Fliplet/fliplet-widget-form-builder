@@ -406,8 +406,8 @@ Fliplet().then(function() {
                 break;
               case 'flMap':
                 fieldData = {
-                  address: entry.data['Map Address'],
-                  latLong: entry.data['Lat/Long']
+                  address: entry.data[`${field.name} Address`],
+                  latLong: entry.data[`${field.name} Lat/Long`]
                 };
                 break;
 
@@ -1197,8 +1197,8 @@ Fliplet().then(function() {
                     });
                   }
                 } else if (type === 'flMap') {
-                  appendField('Map Address', value.address);
-                  appendField('Lat/Long', value.latLong);
+                  appendField(`${field.name} Address`, value.address);
+                  appendField(`${field.name} Lat/Long`, value.latLong);
                 } else if (type === 'flGeolocation') {
                   appendField(field.name, value ? value[0] : null);
                   appendField(`${field.name} (accuracy)`, value ? value[1] : null);

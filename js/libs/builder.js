@@ -982,8 +982,8 @@ Fliplet().then(function() {
 
 
             case 'flMap':
-              fieldNames.push('Lat/Long');
-              fieldNames.push('Map Address');
+              fieldNames.push(`${field.name} Lat/Long`);
+              fieldNames.push(`${field.name} Address`);
 
               break;
 
