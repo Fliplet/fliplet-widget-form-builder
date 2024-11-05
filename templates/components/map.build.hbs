@@ -8,7 +8,7 @@
     @keydown="handleKeyDown"
     @input="handleInput"
   />
-  <ul v-if="!readonly" class="google-autocomplete">
+  <ul v-if="!readonly && addressSuggestions.length > 1" class="google-autocomplete google-autocomplete-map">
     <li  v-for="(option, index) in addressSuggestions" :key="index" @click="selectSuggestion(option)" :class="{ 'active': index === activeSuggestionIndex }">
        <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" width="17" height="17" viewBox="0 0 256 256" xml:space="preserve">
         <defs>

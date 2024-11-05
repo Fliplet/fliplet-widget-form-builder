@@ -166,6 +166,7 @@ Fliplet.FormBuilder.field('map', {
         address: '',
         latLong: null
       };
+      this.$emit('_input', this.name, this.value, false, true);
     },
     initMap: function() {
       this.mapField = Fliplet.UI.MapField(this.$refs.mapField, this.$refs.mapAddressLookUp, {
@@ -210,7 +211,10 @@ Fliplet.FormBuilder.field('map', {
           } else if (this.mapField.checkIfAddressChangedByDragging()) {
             this.updateAddressSuggestions();
             this.mapField.checkIfAddressChangedByDragging(false);
-            this.value = this.mapField.getTotalAddress();
+            this.value = {
+              address: value,
+              latLong: `${this.mapField.get().lat}/${this.mapField.get().lng}`
+            };
             this.suggestionSelected = false;
           } else {
             if (suggestions.length === 1 && value.trim() !== '') {
@@ -226,6 +230,8 @@ Fliplet.FormBuilder.field('map', {
             this.addressSuggestions = suggestions;
             this.suggestionSelected = false;
           }
+
+          this.$emit('_input', this.name, this.value, false, true);
         });
     },
     onReset: function() {
@@ -286,7 +292,7 @@ Fliplet.FormBuilder.field('map', {
           this.suggestionSelected = false;
         }
 
-        this.$emit('_input', this.name, val, false, true);
+        this.$emit('_input', this.name, this.value, false, true);
       }
     },
     addressSuggestions: function(newSuggestions) {
