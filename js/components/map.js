@@ -233,14 +233,13 @@ Fliplet.FormBuilder.field('map', {
     }
   },
   validations: function() {
-    var $vm = this;
     var rules = {
       value: {}
     };
 
     if (this.required && !this.readonly) {
       rules.value.required = function() {
-        return $vm.value.address;
+        return  this.value && this.value.address ? true : false;
       };
     }
 
