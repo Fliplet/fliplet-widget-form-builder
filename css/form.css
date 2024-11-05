@@ -1658,12 +1658,12 @@ form hr {
   align-items: baseline;
   gap: 4px;
 }
-.google-autocomplete :first-child {
+.google-autocomplete-map :first-child {
   padding-left: 3px;
   font-size: 14px;
 }
 
-.google-autocomplete :first-child svg {
+.google-autocomplete-map :first-child svg {
   width: 28px;
   height: 18px;
 }
