@@ -245,7 +245,7 @@ Fliplet.FormBuilder.field('map', {
 
     if (this.required && !this.readonly) {
       rules.value.required = function() {
-        return  this.value && this.value.address ? true : false;
+        return  !!(this.value?.address);
       };
     }
 
