@@ -2,6 +2,11 @@
 var widgetId = parseInt(Fliplet.Widget.getDefaultId(), 10);
 var widgetUuid = Fliplet.Widget.getUUID(widgetId);
 var data = Fliplet.Widget.getData(widgetId) || {};
+var isFormInSlider = false;
+
+Fliplet.Widget.findParents({ instanceId: widgetId }).then(function(parents) {
+  isFormInSlider = parents[0].name === 'Slide';
+});
 
 // Cleanup
 if (data.fields) {
@@ -103,7 +108,8 @@ function generateFormDefaults(data) {
     createdBy: {
       id: Fliplet.User.get('id'),
       fullName: Fliplet.User.get('fullName')
-    }
+    },
+    isPartOfMultiStepForm: data.isPartOfMultiStepForm
   }, data);
 }
 
@@ -174,7 +180,9 @@ Fliplet().then(function() {
           }
         ],
         newColumns: [],
-        selectedOptions: {}
+        selectedOptions: {},
+        isPartOfMultiStepForm: formSettings.isPartOfMultiStepForm,
+        isInSlider: formSettings.isInSlider
       };
     },
     computed: {

@@ -151,6 +151,19 @@
               </div>
             </div>
 
+            <div v-if="isFormInSlider" class="form-group">
+              <div class="control-label">
+                <label>Is this form a part of a multi-step form?</label>
+                <p>If this opt is selected the form will not submit until the final form in the chain is submitted</p>
+              </div>
+              <div class="checkbox checkbox-icon">
+                <input type="checkbox" id="isPartOfMultiStepForm" v-model="settings.isPartOfMultiStepForm" :value="true">
+                <label for="isPartOfMultiStepForm">
+                  <span class="check"><i class="fa fa-check"></i></span> Yes
+                </label>
+              </div>
+            </div>
+
             <h3>Submission</h3>
             <div  v-if="!settings.dataStore.length" class="form-group">
               <div class="control-label">

@@ -123,6 +123,8 @@ function setTypeaheadFieldValue(field, value) {
 // Wait for form fields to be ready, as they get defined after translations are initialized
 Fliplet().then(function() {
   Fliplet.Widget.instance('form-builder', function(data) {
+    console.log('Form Builder widget is running', data);
+
     var saveDelay = 1000; // save progress after 1s from last input
     var selector = '[data-form-builder-id="' + data.id + '"]';
     var progressKey = 'form-builder-progress-' + (data.uuid || data.id);
