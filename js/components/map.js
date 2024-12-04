@@ -283,8 +283,6 @@ Fliplet.FormBuilder.field('map', {
             this.lastChosenAutocompleteValue = val.address;
             this.addressSuggestions = [];
             this.isSelectOnMapClicked = true;
-
-            return;
           }, 1000);
         }
 
