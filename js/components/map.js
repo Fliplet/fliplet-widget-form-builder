@@ -205,8 +205,10 @@ Fliplet.FormBuilder.field('map', {
             const timeout = this.mapField.getGeocoder() ? 0 : 3000;
 
             setTimeout(() => {
-              if (this.mapField.getTotalAddress()) {
-                this.value = this.mapField.getTotalAddress();
+              const address = this.mapField.getTotalAddress();
+
+              if (address) {
+                this.value = address;
               }
 
               this.updateAddressSuggestions();
