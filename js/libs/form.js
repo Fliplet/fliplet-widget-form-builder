@@ -585,13 +585,6 @@ Fliplet().then(function() {
             }
           }
 
-          if (field._type === 'flMap') {
-            field.value = progress[field.name] || {
-              address: '',
-              latLong: null
-            };
-          }
-
           setTimeout(function() {
             if (progress && !isEditMode) {
               var savedValue = progress[field.name];
