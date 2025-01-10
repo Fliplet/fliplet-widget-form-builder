@@ -32,6 +32,10 @@ Fliplet.FormBuilder.field('map', {
     isSelectOnMapClicked: {
       type: Boolean,
       default: false
+    },
+    isTyping: {
+      type: Boolean,
+      default: false
     }
   },
   data: function() {
@@ -74,6 +78,7 @@ Fliplet.FormBuilder.field('map', {
         latLong: null
       };
 
+      this.isTyping = true;
       this.$emit('_input', this.name, value);
       this.mapField.clear();
     },
@@ -272,7 +277,7 @@ Fliplet.FormBuilder.field('map', {
           };
         }
 
-        if (val.address && !this.suggestionSelected && !this.lastChosenAutocompleteValue) {
+        if (val.address && !this.suggestionSelected && !this.lastChosenAutocompleteValue && !this.isTyping) {
           setTimeout(() => {
             if (val.latLong) {
               this.mapAddressField.set(val.address);
@@ -287,6 +292,8 @@ Fliplet.FormBuilder.field('map', {
             this.isSelectOnMapClicked = true;
           }, 1000);
         }
+
+        this.isTyping = false;
 
         if (val.address === '' && !this.readonly && !this.autoCollectUserLocation) {
           this.mapAddressField.clear();
