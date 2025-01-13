@@ -1027,15 +1027,11 @@ Fliplet().then(function() {
           Fliplet.Studio.emit('widget-mode', 'normal');
         }
       },
-      'section': function(value) {
+      'section': function() {
         var $vm = this;
 
-        if (value === 'settings') {
-          $vm.setupCodeEditor();
-          changeSelectText();
-        } else {
-          tinymce.remove();
-        }
+        $vm.setupCodeEditor();
+        changeSelectText();
       },
       'settings.dataStore': function(value) {
         this.showExtraAdd = value.indexOf('dataSource') > -1;
