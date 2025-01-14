@@ -988,6 +988,13 @@ Fliplet().then(function() {
               });
               break;
 
+
+            case 'flMap':
+              fieldNames.push(`${field.name} Lat/Long`);
+              fieldNames.push(`${field.name} Address`);
+
+              break;
+
             default:
               fieldNames.push(field.name);
           }
