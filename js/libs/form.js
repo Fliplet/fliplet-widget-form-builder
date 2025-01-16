@@ -122,12 +122,27 @@ function setTypeaheadFieldValue(field, value) {
 
 // Wait for form fields to be ready, as they get defined after translations are initialized
 Fliplet().then(function() {
-  Fliplet.Widget.instance('form-builder', function(data) {
-    var saveDelay = 1000; // save progress after 1s from last input
-    var selector = '[data-form-builder-id="' + data.id + '"]';
+  Fliplet.Widget.instance('form-builder', async function(data, vm) {
+    const saveDelay = 1000; // save progress after 1s from last input
+
+    if (vm && vm.entry) {
+      data.entryId = vm.entry.id;
+      data.dataSourceId = vm.entry.dataSourceId;
+    }
+
+    const selector = `[data-form-builder-id="${data.id}"]`;
+
+    const getRootElement = () => {
+      if (vm && vm.entry) {
+        return vm.element.querySelector(selector);
+      }
+
+      return document.querySelector(selector);
+    };
+
     var progressKey = 'form-builder-progress-' + (data.uuid || data.id);
 
-    var entryId = !Fliplet.Env.get('interact') && data.dataSourceId && Fliplet.Navigate.query.dataSourceEntryId;
+    const entryId = !Fliplet.Env.get('interact') && data.dataSourceId && (data.entryId || Fliplet.Navigate.query.dataSourceEntryId);
     var formMode = Fliplet.Navigate.query.mode;
     var entry;
     var isResetAction = false;
@@ -603,7 +618,7 @@ Fliplet().then(function() {
 
     var $form = new Vue({
       i18n: Fliplet.Locale.plugins.vue(),
-      el: $(selector)[0],
+      el: getRootElement(),
       data: function() {
         return {
           isFormValid: false,
@@ -1402,7 +1417,7 @@ Fliplet().then(function() {
 
         this.saveProgressed = debounce(this.saveProgress, saveDelay);
 
-        $(selector).removeClass('hidden');
+        $(getRootElement()).removeClass('hidden');
 
         if (!data.offline) {
           Fliplet.Navigator.onOnline(function() {
