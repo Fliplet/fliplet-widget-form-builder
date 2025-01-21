@@ -25,7 +25,8 @@
         },
         "confirmMessage": "How do you want to choose your image?",
         "confirmLabel": "Choose Image",
-        "required": "Please fill in required fields."
+        "required": "Please fill in required fields.",
+        "imageSizeExceeded": "Image dimensions are too large. Please upload an image {{maxImageSize}}px or smaller."
       },
       "interface": {
         "hidden": "Hidden"

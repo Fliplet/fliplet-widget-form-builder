@@ -105,7 +105,7 @@ this["Fliplet"]["Widget"]["Templates"]["templates.components.image"] = Handlebar
     + alias3((helpers.T || (depth0 && depth0.T) || alias2).call(alias1,"widgets.form.image.instruction",{"name":"T","hash":{},"data":data}))
     + "</span>\n    <input\n      multiple\n      type=\"file\"\n      ref=\"imageInput\"\n      :id=\"name\"\n      :name=\"name\"\n      class=\"input-file selectfile\"\n      accept=\"image/gif, image/jpg, image/jpeg, image/tiff, image/png\"\n      :data-folder-id=\"mediaFolderId\"\n      v-on:click=\"onFileClick\"\n      v-on:change=\"onFileChange($event)\"\n      tabindex=\"-1\"\n    />\n  </label>\n  <p class=\"text-danger\" v-if=\"hasCorruptedImage\">"
     + alias3((helpers.T || (depth0 && depth0.T) || alias2).call(alias1,"widgets.form.image.invalid",{"name":"T","hash":{},"data":data}))
-    + "</p>\n  <p class=\"text-danger\" v-if=\"$v.value.required === false && $v.value.$dirty\">"
+    + "</p>\n  <p class=\"text-danger\" v-if=\"isImageSizeExceeded\">{{$t(\"widgets.form.image.imageSizeExceeded\", { maxImageSize: customWidth + 'x' + customHeight })}}</p>\n  <p class=\"text-danger\" v-if=\"$v.value.required === false && $v.value.$dirty\">"
     + alias3((helpers.T || (depth0 && depth0.T) || alias2).call(alias1,"widgets.form.errors.required",{"name":"T","hash":{},"data":data}))
     + "</p>\n</div>\n";
 },"useData":true});

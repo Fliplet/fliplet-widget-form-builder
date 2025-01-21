@@ -29,6 +29,7 @@
     />
   </label>
   <p class="text-danger" v-if="hasCorruptedImage">{{T "widgets.form.image.invalid"}}</p>
+  <p class="text-danger" v-if="isImageSizeExceeded">\{{$t("widgets.form.image.imageSizeExceeded", { maxImageSize: customWidth + 'x' + customHeight })}}</p>
   <p class="text-danger" v-if="$v.value.required === false && $v.value.$dirty">{{T
       "widgets.form.errors.required"
     }}</p>
