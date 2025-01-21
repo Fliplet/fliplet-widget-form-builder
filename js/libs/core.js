@@ -211,8 +211,8 @@ Fliplet.FormBuilder = (function() {
       };
 
       // Define method to trigger the form reset from a children
-      if (!component.methods.resetForm) {
-        component.methods.resetForm = function() {
+      if (!component.methods.reset) {
+        component.methods.reset = function() {
           this.$emit('_reset');
         };
       }
