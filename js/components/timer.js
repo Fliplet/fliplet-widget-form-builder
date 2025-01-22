@@ -86,7 +86,7 @@ Fliplet.FormBuilder.field('timer', {
     },
     start: function() {
       if (this.status === 'running') {
-        return;
+        this.stopInterval();
       }
 
       this.status = 'running';
@@ -195,27 +195,28 @@ Fliplet.FormBuilder.field('timer', {
     }
   },
   mounted: async function() {
-    var $vm = this;
-
     this.value = 0;
+    this.status = 'stopped';
+
+    this.stopInterval();
 
     if (this.defaultValueSource !== 'default') {
-      this.setValueFromDefaultSettings({ source: this.defaultValueSource, key: this.defaultValueKey });
+      await this.setValueFromDefaultSettings({ source: this.defaultValueSource, key: this.defaultValueKey });
     }
 
-    Fliplet.App.Storage.get(this.name).then(function(value) {
-      if (value) {
-        $vm.startTimestamp = value;
-        $vm.status = 'running';
-        $vm.setInterval();
-      }
-    });
+    const progressValue = await Fliplet.App.Storage.get(this.name);
 
-    this.stringValue = this.formatSeconds(this.initialTimerValue);
-
-    if (this.autostart) {
+    if (progressValue) {
+      this.startTimestamp = progressValue;
+      this.status = 'running';
+      this.setInterval();
+    } else if (this.autostart && !this.timerInterval) {
+      this.startTimestamp = moment().valueOf() / 1000;
+      this.status = 'running';
       this.start();
     }
+
+    this.stringValue = this.formatSeconds(this.initialTimerValue);
 
     this.$emit('_input', this.name, this.value);
     this.$v.$reset();
