@@ -1,6 +1,8 @@
 var formBuilderInstances = [];
 var dataSourceColumnPromises = {};
 var allFormsInSlide = [];
+var currentFormUId;
+var currentMultiStepForm;
 
 function drawImageOnCanvas(img, canvas) {
   var imgWidth = img.width;
@@ -124,13 +126,15 @@ function setTypeaheadFieldValue(field, value) {
 async function getCurrentMultiStepForm(allFormsInSlide, currentForm) {
   let currentMultiStepForm = [];
   let isCurrentForm = false;
-  let currenformDsId = currentForm.dataSourceId;
+  let currenFormDsId = currentForm.dataSourceId;
 
   for (let form of allFormsInSlide) {
     const formDsId = form.dataSourceId;
 
-    if (currenformDsId !== formDsId) break;
+
     if (currentForm.id === form.id) isCurrentForm = true;
+
+    if (currenFormDsId !== formDsId && isCurrentForm) break;
 
     let hasFlButton = false;
     // let hasNavButton = false;
@@ -143,7 +147,7 @@ async function getCurrentMultiStepForm(allFormsInSlide, currentForm) {
       // if (field._type === 'flCustomButton' && (field.buttonAction.action === 'previous-slide' || field.buttonAction.action === 'next-slide')) hasNavButton = true;
     }
 
-    if (!hasFlButton) {
+    if (!hasFlButton && currenFormDsId.id === formDsId.id) {
       currentMultiStepForm.push(form);
     } else if (isCurrentForm && hasFlButton) {
       currentMultiStepForm.push(form);
@@ -925,9 +929,16 @@ Fliplet().then(function() {
         },
         onInput: async function(fieldName, value, fromPasswordConfirmation, skipOnChange) {
           var $vm = this;
-          const currentMultiStepForm = await getCurrentMultiStepForm(allFormsInSlide, data);
 
-          $vm.synchronizeMatchingFields(currentMultiStepForm, data, 'onInput');
+          if (currentFormUId && currentFormUId._uid === this._uid) {
+            $vm.synchronizeMatchingFields(currentMultiStepForm, data, 'onInput');
+          } else {
+            currentFormUId = this;
+
+            currentMultiStepForm = await getCurrentMultiStepForm(allFormsInSlide, data);
+            $vm.synchronizeMatchingFields(currentMultiStepForm, data, 'onInput');
+          }
+
           this.fields.some(function(field) {
             if (field.name === fieldName) {
               if (field._type === 'flPassword' && fromPasswordConfirmation) {
@@ -1571,21 +1582,23 @@ Fliplet().then(function() {
               }
             }
 
-            currentMultiStepForm.forEach((form) => {
-              if (form.$instance.id === currentForm.id) return;
+            if (currentMultiStepForm) {
+              currentMultiStepForm.forEach((form) => {
+                if (form.$instance.id === currentForm.id) return;
 
-              form.$instance.fields.forEach((field) => {
-                const matchingField = currentFormInstance.$instance.fields.find(
-                  (currentFormField) => currentFormField.name === field.name
-                );
+                form.$instance.fields.forEach((field) => {
+                  const matchingField = currentFormInstance.$instance.fields.find(
+                    (currentFormField) => currentFormField.name === field.name
+                  );
 
-                if (matchingField) {
-                  const targetForm = forms.find(targetForm => targetForm.$instance.id === form.$instance.id);
+                  if (matchingField) {
+                    const targetForm = forms.find(targetForm => targetForm.$instance.id === form.$instance.id);
 
-                  targetForm.field(matchingField.name).set(matchingField.value);
-                }
+                    targetForm.field(matchingField.name).set(matchingField.value);
+                  }
+                });
               });
-            });
+            }
           });
         },
         attachCustomButtonListener: function() {
