@@ -74,8 +74,10 @@ Fliplet.FormBuilder.field('date', {
   },
   watch: {
     value: function(val) {
-      if (val === '' &&  ['default', 'always'].indexOf(this.autofill) > -1 && (this.required || this.autofill === 'always')) {
-        this.value = this.today;
+      if (val === '' &&  ['default', 'always'].indexOf(this.autofill) > -1) {
+        if (!this.empty && (this.required || this.autofill === 'always')) {
+          this.value = this.today;
+        }
 
         return;
       }
@@ -113,12 +115,18 @@ Fliplet.FormBuilder.field('date', {
       });
 
       this.datePicker.change(function(value) {
+        $vm.empty = false;
         $vm.value = value;
         $vm.updateValue();
       });
     },
     onBeforeSubmit: function(data) {
-      // Empty date fields are validated to null before this hook is called
+      if (this.autofill === 'default' && !this.empty && this.value) {
+        data[this.name] = this.value;
+
+        return;
+      }
+
       if (this.autofill === 'always' && data[this.name] === null) {
         data[this.name] = this.defaultSource === 'submission' ? moment().locale('en').format('YYYY-MM-DD') : this.today;
       }
