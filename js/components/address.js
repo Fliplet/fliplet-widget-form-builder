@@ -113,6 +113,10 @@ Fliplet.FormBuilder.field('address', {
 
     this.$emit('_input', this.name, this.value, false, true);
 
+    if (this.value) {
+      this.addressField.set(this.value);
+    }
+
     if (!this.manualInput) {
       this.updateSelectedFieldsProperty('readonly', this.manualInput);
     }
