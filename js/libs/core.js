@@ -296,14 +296,8 @@ Fliplet.FormBuilder = (function() {
 
       var fieldContext = $('html').hasClass('context-build') ? 'field' : 'interface';
 
-      const queryParams = Object.fromEntries(new URLSearchParams(location.search));
-      const beta = queryParams.beta === 'true';
-
       componentName = name(componentName);
-
-      if (!(componentName === 'flMap' && !beta)) {
-        components[componentName] = component;
-      }
+      components[componentName] = component;
 
       // All fields have these properties
       component.props = _.assign({
