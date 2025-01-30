@@ -297,11 +297,11 @@ Fliplet.FormBuilder = (function() {
       var fieldContext = $('html').hasClass('context-build') ? 'field' : 'interface';
 
       const queryParams = Object.fromEntries(new URLSearchParams(location.search));
-      const beta = queryParams.beta === 'true';
+      const isAdmin = queryParams.beta === 'true';
 
       componentName = name(componentName);
 
-      if (!(componentName === 'flMap' && !beta)) {
+      if (!(componentName === 'flMap' && !isAdmin)) {
         components[componentName] = component;
       }
 
