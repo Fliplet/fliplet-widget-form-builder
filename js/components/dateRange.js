@@ -91,14 +91,16 @@ Fliplet.FormBuilder.field('dateRange', {
       case 'custom':
         this.value = {
           start: this.startValue,
-          end: this.endValue
+          end: this.endValue,
+          selectedRange: this.selectedRange
         };
         break;
       case 'default':
       case 'always':
         this.value = {
           start: this.today,
-          end: this.today
+          end: this.today,
+          selectedRange: this.selectedRange
         };
         this.empty = false;
         break;
@@ -134,10 +136,13 @@ Fliplet.FormBuilder.field('dateRange', {
   },
   watch: {
     value: function(val) {
+      this.selectedRange = val.selectedRange;
+
       if (!val && ['default', 'always'].indexOf(this.autofill) > -1 && (this.required || this.autofill === 'always')) {
         this.value = {
           start: this.today,
-          end: this.today
+          end: this.today,
+          selectedRange: this.selectedRange
         };
       }
 
@@ -153,6 +158,8 @@ Fliplet.FormBuilder.field('dateRange', {
     },
     selectedRange: function(range) {
       var newDate = range ? this.getDate(range.value) : this.getDate();
+
+      newDate.selectedRange = this.selectedRange;
 
       this.value = newDate;
     }
