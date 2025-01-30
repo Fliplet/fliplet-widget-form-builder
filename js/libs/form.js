@@ -645,7 +645,7 @@ Fliplet().then(function() {
           });
         },
         isAdmin: function() {
-          return !data.isAdmin;
+          return data.isAdmin;
         }
       },
       methods: {
