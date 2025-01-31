@@ -643,9 +643,6 @@ Fliplet().then(function() {
           return this.fields.some(function(el) {
             return el.required && !el.readonly;
           });
-        },
-        isAdmin: function() {
-          return data.isAdmin;
         }
       },
       methods: {
