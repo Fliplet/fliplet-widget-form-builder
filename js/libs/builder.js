@@ -85,9 +85,6 @@ Vue.directive('sortable', {
 });
 
 function generateFormDefaults(data) {
-  const queryParams = Object.fromEntries(new URLSearchParams(location.search));
-  const isAdmin = queryParams.beta === 'true';
-
   return _.assign({
     name: '',
     dataSourceId: '',
@@ -106,8 +103,7 @@ function generateFormDefaults(data) {
     createdBy: {
       id: Fliplet.User.get('id'),
       fullName: Fliplet.User.get('fullName')
-    },
-    isAdmin: isAdmin
+    }
   }, data);
 }
 
@@ -200,12 +196,6 @@ Fliplet().then(function() {
         }
 
         return '';
-      },
-      isAdmin: function() {
-        const queryParams = Object.fromEntries(new URLSearchParams(location.search));
-        const isAdmin = queryParams.beta === 'true';
-
-        return isAdmin;
       }
     },
     methods: {
@@ -992,10 +982,8 @@ Fliplet().then(function() {
 
 
             case 'flMap':
-              if (data.isAdmin) {
-                fieldNames.push(`${field.name} Lat/Long`);
-                fieldNames.push(`${field.name} Address`);
-              }
+              fieldNames.push(`${field.name} Lat/Long`);
+              fieldNames.push(`${field.name} Address`);
 
               break;
 
