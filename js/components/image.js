@@ -51,6 +51,10 @@ Fliplet.FormBuilder.field('image', {
     },
     description: {
       type: String
+    },
+    isImageSizeExceeded: {
+      type: Boolean,
+      default: false
     }
   },
   data: {
@@ -228,7 +232,14 @@ Fliplet.FormBuilder.field('image', {
             return;
           }
 
+          if (img.width > $vm.customWidth || img.height > $vm.customHeight) {
+            $vm.isImageSizeExceeded = true;
+
+            return;
+          }
+
           $vm.hasCorruptedImage = false;
+          $vm.isImageSizeExceeded = false;
 
           var scaledImage = loadImage.scale(img, options);
           var imgBase64Url = scaledImage.toDataURL(mimeType, $vm.jpegQuality);
