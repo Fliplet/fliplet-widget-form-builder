@@ -316,7 +316,10 @@ Fliplet().then(function() {
     function getFields(isEditMode) {
       var fields = _.compact(JSON.parse(JSON.stringify(data.fields || [])));
 
-      if (!data.isAdmin) {
+      const queryParams = Object.fromEntries(new URLSearchParams(location.search));
+      const isAdmin = queryParams.beta === 'true';
+
+      if (!isAdmin) {
         fields = fields.filter((field) => field._type !== 'flMap');
       }
 
@@ -643,9 +646,6 @@ Fliplet().then(function() {
           return this.fields.some(function(el) {
             return el.required && !el.readonly;
           });
-        },
-        isAdmin: function() {
-          return data.isAdmin;
         }
       },
       methods: {

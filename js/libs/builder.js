@@ -3,6 +3,9 @@ var widgetId = parseInt(Fliplet.Widget.getDefaultId(), 10);
 var widgetUuid = Fliplet.Widget.getUUID(widgetId);
 var data = Fliplet.Widget.getData(widgetId) || {};
 
+const queryParams = Object.fromEntries(new URLSearchParams(location.search));
+const isAdmin = queryParams.beta === 'true';
+
 // Cleanup
 if (data.fields) {
   data.fields = _.compact(data.fields);
@@ -85,9 +88,6 @@ Vue.directive('sortable', {
 });
 
 function generateFormDefaults(data) {
-  const queryParams = Object.fromEntries(new URLSearchParams(location.search));
-  const isAdmin = queryParams.beta === 'true';
-
   return _.assign({
     name: '',
     dataSourceId: '',
@@ -200,12 +200,6 @@ Fliplet().then(function() {
         }
 
         return '';
-      },
-      isAdmin: function() {
-        const queryParams = Object.fromEntries(new URLSearchParams(location.search));
-        const isAdmin = queryParams.beta === 'true';
-
-        return isAdmin;
       }
     },
     methods: {
@@ -992,7 +986,7 @@ Fliplet().then(function() {
 
 
             case 'flMap':
-              if (data.isAdmin) {
+              if (isAdmin) {
                 fieldNames.push(`${field.name} Lat/Long`);
                 fieldNames.push(`${field.name} Address`);
               }
