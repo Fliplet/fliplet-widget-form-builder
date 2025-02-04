@@ -7,7 +7,7 @@ Fliplet.FormBuilder.field('file', {
   props: {
     accept: {
       type: String,
-      default: ''
+      default: '.mp3, .docx, .pdf, .xlsx, .bmp, .gif, .jpg, .png, .svg, .tiff, .webp, .txt, .mp4, .csv, .xml, .json, .pptx, .doc, .rtf, .mpg, .mov, .flv'
     },
     selectedFileName: {
       type: String,
