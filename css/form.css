@@ -1658,6 +1658,15 @@ form hr {
   align-items: baseline;
   gap: 4px;
 }
+.google-autocomplete-map :first-child {
+  padding-left: 3px;
+  font-size: 14px;
+}
+
+.google-autocomplete-map :first-child svg {
+  width: 28px;
+  height: 18px;
+}
 
 .google-autocomplete li:hover,
 .google-autocomplete li:focus {
@@ -1675,4 +1684,12 @@ form hr {
   color: #514f4f;
   padding: 10px 10px;
   background-color: #eaeaea;
+}
+
+.gmnoprint:not(:first-child) {
+  display: none;
+}
+
+.gm-style-cc {
+  display: none;
 }

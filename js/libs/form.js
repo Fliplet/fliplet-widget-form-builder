@@ -316,6 +316,13 @@ Fliplet().then(function() {
     function getFields(isEditMode) {
       var fields = _.compact(JSON.parse(JSON.stringify(data.fields || [])));
 
+      const queryParams = Object.fromEntries(new URLSearchParams(location.search));
+      const isAdmin = queryParams.beta === 'true';
+
+      if (!isAdmin) {
+        fields = fields.filter((field) => field._type !== 'flMap');
+      }
+
       var progress = getProgress();
 
       fields.forEach(function(field) {
@@ -404,6 +411,13 @@ Fliplet().then(function() {
               case 'flGeolocation':
                 fieldData = [entry.data[`${fieldKey}`], entry.data[`${fieldKey} (accuracy)`]];
                 break;
+              case 'flMap':
+                fieldData = {
+                  address: entry.data[`${field.name} Address`],
+                  latLong: entry.data[`${field.name} Lat/Long`]
+                };
+                break;
+
               default:
                 fieldData = entry.data[fieldKey];
 
@@ -676,7 +690,7 @@ Fliplet().then(function() {
             const addressField = data.fields.filter(field => field._type === 'flAddress');
             const addressSelectedFieldOptions = addressField.length ? Object.values(addressField[0].selectedFieldOptions) : [];
 
-            if (field.isHidden || (field.readonly && !addressSelectedFieldOptions.includes(field.name))) {
+            if (field.isHidden || (field.readonly && (!addressSelectedFieldOptions.includes(field.name) || !field._type === 'flMap'))) {
               return;
             }
 
@@ -746,6 +760,11 @@ Fliplet().then(function() {
               }
             } else if (field._type === 'flGeolocation') {
               value = null;
+            } else if (field._type === 'flMap') {
+              value = {
+                address: '',
+                latLong: null
+              };
             } else {
               value = fieldSettings.value;
             }
@@ -1177,6 +1196,9 @@ Fliplet().then(function() {
                       appendField(`${field.name} [${val}]`, '');
                     });
                   }
+                } else if (type === 'flMap') {
+                  appendField(`${field.name} Address`, value.address);
+                  appendField(`${field.name} Lat/Long`, value.latLong);
                 } else if (type === 'flGeolocation') {
                   appendField(field.name, value ? value[0] : null);
                   appendField(`${field.name} (accuracy)`, value ? value[1] : null);
