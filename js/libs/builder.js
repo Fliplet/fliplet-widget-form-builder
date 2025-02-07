@@ -434,20 +434,22 @@ Fliplet().then(function() {
             var payload = JSON.parse(JSON.stringify($vm.emailTemplateAdd));
 
             operation = Fliplet.DataSources.getById($vm.settings.dataSourceId).then(function(dataSource) {
-              // Find hooks to update
-              var hooks = _.filter(dataSource.hooks, {
-                type: 'email',
-                runOn: ['insert'],
-                widgetInstanceId: widgetId
+              // First check if any email hook exists
+              var emailHookExists = dataSource.hooks.some(function(hook) {
+                return hook.type === 'email';
               });
 
-              if (hooks.length) {
-                // Update hooks
-                hooks.forEach(function(hook) {
-                  hook.payload = payload;
+              if (emailHookExists) {
+                // Update existing email hooks
+                dataSource.hooks.forEach(function(hook) {
+                  if (hook.type === 'email') {
+                    hook.payload = payload;
+                    hook.widgetInstanceId = widgetId;
+                    hook.triggers = [widgetUuid];
+                  }
                 });
               } else {
-                // Add new hook
+                // Add new hook only if no email hook exists
                 dataSource.hooks.push({
                   type: 'email',
                   runOn: ['insert'],
@@ -505,20 +507,22 @@ Fliplet().then(function() {
             var payload = JSON.parse(JSON.stringify($vm.emailTemplateEdit));
 
             operation = Fliplet.DataSources.getById($vm.settings.dataSourceId).then(function(dataSource) {
-              // Find hooks to update
-              var hooks = _.filter(dataSource.hooks, {
-                type: 'email',
-                runOn: ['update'],
-                widgetInstanceId: widgetId
+              // First check if any email hook exists
+              var emailHookExists = dataSource.hooks.some(function(hook) {
+                return hook.type === 'email';
               });
 
-              if (hooks.length) {
-                // Update hooks
-                hooks.forEach(function(hook) {
-                  hook.payload = payload;
+              if (emailHookExists) {
+                // Update existing email hooks
+                dataSource.hooks.forEach(function(hook) {
+                  if (hook.type === 'email') {
+                    hook.payload = payload;
+                    hook.widgetInstanceId = widgetId;
+                    hook.triggers = [widgetUuid];
+                  }
                 });
               } else {
-                // Add new hook
+                // Add new hook only if no email hook exists
                 dataSource.hooks.push({
                   type: 'email',
                   runOn: ['update'],
