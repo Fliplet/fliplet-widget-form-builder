@@ -150,6 +150,10 @@ async function getCurrentMultiStepForm(allFormsInSlide, currentForm) {
     if (!hasFlButton && currenFormDsId.id === formDsId.id) {
       currentMultiStepForm.push(form);
     } else if (isCurrentForm && hasFlButton) {
+      if (currentMultiStepForm.length && currentMultiStepForm[currentMultiStepForm.length - 1].dataSourceId !== currenFormDsId) {
+        currentMultiStepForm.pop();
+      }
+
       currentMultiStepForm.push(form);
       break;
     } else {
