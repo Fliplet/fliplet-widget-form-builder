@@ -136,7 +136,7 @@ Fliplet.FormBuilder.field('dateRange', {
   },
   watch: {
     value: function(val) {
-      this.selectedRange = val.selectedRange;
+      this.selectedRange = val ? val.selectedRange : null;
 
       if (!val && ['default', 'always'].indexOf(this.autofill) > -1 && (this.required || this.autofill === 'always')) {
         this.value = {
