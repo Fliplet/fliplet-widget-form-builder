@@ -73,6 +73,14 @@ Fliplet.FormBuilder.field('typeahead', {
     return rules;
   },
   created: function() {
+    if (!!this.defaultValue && this.optionsType === 'manual') {
+      this.value = this.defaultValue.split(/\n/);
+      this.updateValue(this.name, this.value);
+    } else if (!Array.isArray(this.value) && this.optionsType === 'manual') {
+      this.value = [];
+      this.updateValue(this.name, this.value);
+    }
+
     Fliplet.Hooks.on('beforeFormSubmit', this.onBeforeSubmit);
   },
   destroyed: function() {
