@@ -232,7 +232,7 @@ Fliplet.FormBuilder.field('image', {
             return;
           }
 
-          if (img.width > $vm.customWidth || img.height > $vm.customHeight) {
+          if (($vm.customWidth && img.width > $vm.customWidth) || ($vm.customHeight && img.height > $vm.customHeight)) {
             $vm.isImageSizeExceeded = true;
 
             return;
