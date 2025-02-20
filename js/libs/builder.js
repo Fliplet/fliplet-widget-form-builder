@@ -3,6 +3,9 @@ var widgetId = parseInt(Fliplet.Widget.getDefaultId(), 10);
 var widgetUuid = Fliplet.Widget.getUUID(widgetId);
 var data = Fliplet.Widget.getData(widgetId) || {};
 
+const queryParams = Object.fromEntries(new URLSearchParams(location.search));
+const isAdmin = queryParams.beta === 'true';
+
 // Cleanup
 if (data.fields) {
   data.fields = _.compact(data.fields);
@@ -103,7 +106,8 @@ function generateFormDefaults(data) {
     createdBy: {
       id: Fliplet.User.get('id'),
       fullName: Fliplet.User.get('fullName')
-    }
+    },
+    isAdmin: isAdmin
   }, data);
 }
 
@@ -982,6 +986,15 @@ Fliplet().then(function() {
 
                 fieldNames.push(`${field.name} [${val}]`);
               });
+              break;
+
+
+            case 'flMap':
+              if (isAdmin) {
+                fieldNames.push(`${field.name} Lat/Long`);
+                fieldNames.push(`${field.name} Address`);
+              }
+
               break;
 
             default:
