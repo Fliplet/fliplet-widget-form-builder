@@ -764,12 +764,13 @@ Fliplet().then(function() {
       },
       initDataSourceProvider: function() {
         var $vm = this;
+        var displayName = encodeURIComponent($vm.settings.displayName);
         var dataSourceData = {
           dataSourceTitle: 'Form data source',
           dataSourceId: $vm.settings.dataSourceId,
           appId: Fliplet.Env.get('appId'),
           default: {
-            name: 'Form data for ' + $vm.settings.displayName,
+            name: 'Form data for ' + displayName,
             entries: [],
             columns: []
           },
