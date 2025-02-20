@@ -2,7 +2,7 @@
   <input
     type="text"
     class="form-control focus-outline"
-    :placeholder="placeholder"
+    :placeholder="placeholder || 'Start typing your address...'"
     :readonly="readonly"
     tabindex="0"
     @keydown="handleKeyDown"
@@ -23,5 +23,12 @@
 </div>
 <p class="text-danger" v-if="$v.value.required === false && $v.value.$dirty">{{T "widgets.form.errors.required"}}</p>
 
-
-<div class="form-group fl-map-field maps" ref="mapField"></div>
+<div class="maps">
+  <div class="form-group fl-map-field maps" ref="mapField">
+    <div class="sending-form">
+      <div class="spinner-holder animated">
+        <div class="spinner-overlay"></div>
+      </div>
+    </div>
+  </div>
+</div>

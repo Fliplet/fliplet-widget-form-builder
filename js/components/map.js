@@ -7,7 +7,7 @@ Fliplet.FormBuilder.field('map', {
     },
     mapType: {
       type: String,
-      default: ''
+      default: 'roadmap'
     },
     autoCollectUserLocation: {
       type: Boolean,
