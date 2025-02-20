@@ -15,7 +15,7 @@ Fliplet.FormBuilder.field('map', {
     },
     placeholder: {
       type: String,
-      default: 'Start typing your address...'
+      default: ''
     },
     addressSuggestions: {
       type: Array,
