@@ -142,7 +142,7 @@ Fliplet().then(function() {
 
     var progressKey = 'form-builder-progress-' + (data.uuid || data.id);
 
-    const entryId = !Fliplet.Env.get('interact') && data.dataSourceId && (data.entryId || Fliplet.Navigate.query.dataSourceEntryId);
+    let entryId = !Fliplet.Env.get('interact') && data.dataSourceId && (data.entryId || Fliplet.Navigate.query.dataSourceEntryId);
     var formMode = Fliplet.Navigate.query.mode;
     var entry;
     var isResetAction = false;
