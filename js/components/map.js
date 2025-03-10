@@ -36,6 +36,10 @@ Fliplet.FormBuilder.field('map', {
     isTyping: {
       type: Boolean,
       default: false
+    },
+    mapStatusError: {
+      type: String,
+      default: null
     }
   },
   data: function() {
@@ -61,6 +65,13 @@ Fliplet.FormBuilder.field('map', {
       address: this.value.address || '',
       latLong: this.value.latLong || null
     };
+
+    const mapComputedStyle = window.getComputedStyle(this.$refs.mapField);
+
+    if (mapComputedStyle.height ===  'auto' || mapComputedStyle.height === '0px' || mapComputedStyle.height === '') {
+      this.$refs.mapField.style.height = '220px';
+    }
+
     document.addEventListener('click', this.handleClickOutside);
 
     setTimeout(() => {
@@ -73,6 +84,8 @@ Fliplet.FormBuilder.field('map', {
   },
   methods: {
     handleInput: function(e) {
+      this.mapStatusError = null;
+
       const value = {
         address: e.target.value,
         latLong: null
@@ -207,7 +220,7 @@ Fliplet.FormBuilder.field('map', {
           }
 
           if (this.suggestionSelected && this.lastChosenAutocompleteValue === value.trim()) {
-            const timeout = this.mapField.getGeocoder() ? 0 : 3000;
+            const timeout = this.mapField.getGeocoder() ? 500 : 3000;
 
             setTimeout(() => {
               const address = this.mapField.getTotalAddress();
@@ -251,7 +264,11 @@ Fliplet.FormBuilder.field('map', {
   },
   validations: function() {
     var rules = {
-      value: {}
+      value: {
+        checkStatus: function() {
+          return !this.mapStatusError;
+        }
+      }
     };
 
     if (this.required && !this.readonly) {
@@ -311,6 +328,11 @@ Fliplet.FormBuilder.field('map', {
     addressSuggestions: function(newSuggestions) {
       if (newSuggestions.length) {
         this.activeSuggestionIndex = -1;
+      }
+    },
+    mapStatusError: function(newVal) {
+      if (newVal) {
+        this.clearAddressAndMapValues();
       }
     }
   }

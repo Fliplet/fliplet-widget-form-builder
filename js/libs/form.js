@@ -142,7 +142,7 @@ Fliplet().then(function() {
 
     var progressKey = 'form-builder-progress-' + (data.uuid || data.id);
 
-    const entryId = !Fliplet.Env.get('interact') && data.dataSourceId && (data.entryId || Fliplet.Navigate.query.dataSourceEntryId);
+    let entryId = !Fliplet.Env.get('interact') && data.dataSourceId && (data.entryId || Fliplet.Navigate.query.dataSourceEntryId);
     var formMode = Fliplet.Navigate.query.mode;
     var entry;
     var isResetAction = false;
@@ -943,7 +943,54 @@ Fliplet().then(function() {
         triggerBlurEventOnInputs: function() {
           $(this.$el).find('input').blur();
         },
-        onSubmit: function() {
+        checkMapFieldStatus: async function() {
+          const mapField = this.fields.find(field => field._type === 'flMap' && field.value && field.value.address && field.value.address.id);
+
+          if (!mapField) {
+            return;
+          }
+
+          try {
+            await new Promise((resolve, reject) => {
+              this.isSending = true;
+              this.isSendingMessage = T('widgets.form.savingData');
+
+              let elapsedTime = 0;
+              const timeoutDuration = 10000;
+              const intervalDuration = 4000;
+
+
+              const checkInterval = setInterval(() => {
+                const currentValue = mapField.value;
+
+                if (currentValue && currentValue.address && currentValue.latLong) {
+                  clearInterval(checkInterval);
+                  resolve();
+
+                  return;
+                }
+
+                elapsedTime += intervalDuration;
+
+                if (elapsedTime >= timeoutDuration) {
+                  clearInterval(checkInterval);
+                  this.isSending = false;
+                  reject(new Error(T('widgets.form.errors.locationError')));
+                }
+              }, intervalDuration);
+            });
+          } catch (error) {
+            this.$children.forEach(function(inputField) {
+              if (inputField.$options._componentTag === 'flMap') {
+                inputField.mapStatusError = error.message;
+              }
+            });
+            this.isSending = false;
+          }
+        },
+        onSubmit: async function() {
+          await this.checkMapFieldStatus();
+
           var $vm = this;
           var formData = {};
 
