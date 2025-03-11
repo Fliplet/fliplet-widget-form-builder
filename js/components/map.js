@@ -157,7 +157,7 @@ Fliplet.FormBuilder.field('map', {
 
       this.addressSuggestions = [{ id: null, label: 'Select location on map' }];
     },
-    selectSuggestion: function(option) {
+    selectSuggestion: async function(option) {
       if (option.label === 'Select location on map') {
         this.clearAddressAndMapValues();
         Fliplet.UI.Toast.dismiss();
@@ -172,8 +172,14 @@ Fliplet.FormBuilder.field('map', {
       this.activeSuggestionIndex = -1;
 
       this.mapAddressField.set(option.label);
+
+      let addressComponents = await  this.mapAddressField.getAddressComponents(option.id);
+
+      addressComponents = this.mapField.extractAddressComponents(addressComponents);
+
+
       this.lastChosenAutocompleteValue = option.label;
-      this.mapField.set(option.label);
+      this.mapField.set(option.label, false, addressComponents);
       this.updateValue();
     },
     clearAddressAndMapValues: function() {
@@ -235,10 +241,7 @@ Fliplet.FormBuilder.field('map', {
           } else if (this.mapField.checkIfAddressChangedByDragging()) {
             this.updateAddressSuggestions();
             this.mapField.checkIfAddressChangedByDragging(false);
-            this.value = {
-              address: value,
-              latLong: `${this.mapField.get().lat}/${this.mapField.get().lng}`
-            };
+            this.value = this.mapField.getTotalAddress();
             this.suggestionSelected = false;
             this.$emit('_input', this.name, this.value, false, true);
           } else {

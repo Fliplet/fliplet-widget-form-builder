@@ -1261,6 +1261,12 @@ Fliplet().then(function() {
                 } else if (type === 'flMap') {
                   appendField(`${field.name} Address`, value.address);
                   appendField(`${field.name} Lat/Long`, value.latLong);
+                  appendField(`${field.name} Country`, value.addressComponents.country);
+                  appendField(`${field.name} City`, value.addressComponents.city);
+                  appendField(`${field.name} Postal Code`, value.addressComponents.postalCode);
+                  appendField(`${field.name} State`, value.addressComponents.state);
+                  appendField(`${field.name} Street Name`, value.addressComponents.streetName);
+                  appendField(`${field.name} Street Number`, value.addressComponents.streetNumber);
                 } else if (type === 'flGeolocation') {
                   appendField(field.name, value ? value[0] : null);
                   appendField(`${field.name} (accuracy)`, value ? value[1] : null);
