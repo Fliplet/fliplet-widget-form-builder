@@ -365,7 +365,7 @@ Fliplet().then(function() {
       });
 
       if (fields.length && (data.saveProgress && typeof progress === 'object') || entry) {
-        fields.forEach(function(field) {
+        fields.forEach(async function(field) {
           if (entry && entry.data && field.populateOnUpdate !== false) {
             var fieldKey = isResetAction
               ? field.defaultValueKey
@@ -606,6 +606,17 @@ Fliplet().then(function() {
                 break;
             }
           }
+
+          if (field._type === 'flMap' && !field.autoCollectUserLocation && !field.value.address) {
+            const connection = await Fliplet.DataSources.connect(data.dataSourceId);
+            const formData = await connection.find({});
+
+            field.value = {
+              address: formData[0].data[field.name + ' Address'],
+              latLong: formData[0].data[field.name + ' Lat/Long']
+            };
+          }
+
 
           setTimeout(function() {
             if (progress && !isEditMode) {
@@ -856,6 +867,10 @@ Fliplet().then(function() {
           var $vm = this;
 
           this.fields.some(function(field) {
+            if (field._type === 'flMap' && field.value.address && field.mapStatusError) {
+              field.mapStatusError = '';
+            }
+
             if (field.name === fieldName) {
               if (field._type === 'flPassword' && fromPasswordConfirmation) {
                 field.passwordConfirmation = value;
@@ -944,52 +959,63 @@ Fliplet().then(function() {
           $(this.$el).find('input').blur();
         },
         checkMapFieldStatus: async function() {
-          const mapField = this.fields.find(field => field._type === 'flMap' && field.value && field.value.address && field.value.address.id);
+          const mapField = this.fields.find(field =>
+            field._type === 'flMap' && field.value && field.value.address && field.value.address.id
+          );
 
           if (!mapField) {
             return;
           }
 
-          try {
-            await new Promise((resolve, reject) => {
-              this.isSending = true;
-              this.isSendingMessage = T('widgets.form.savingData');
+          this.isSending = true;
+          this.isSendingMessage = T('widgets.form.savingData');
 
-              let elapsedTime = 0;
-              const timeoutDuration = 10000;
-              const intervalDuration = 4000;
+          return new Promise((resolve, reject) => {
+            let elapsedTime = 0;
+            const timeoutDuration = 10000;
+            const intervalDuration = 4000;
 
 
-              const checkInterval = setInterval(() => {
-                const currentValue = mapField.value;
+            const checkInterval = setInterval(() => {
+              const currentValue = mapField.value;
 
-                if (currentValue && currentValue.address && currentValue.latLong) {
-                  clearInterval(checkInterval);
-                  resolve();
+              if (currentValue && currentValue.address && currentValue.latLong) {
+                clearInterval(checkInterval);
+                resolve();
 
-                  return;
-                }
-
-                elapsedTime += intervalDuration;
-
-                if (elapsedTime >= timeoutDuration) {
-                  clearInterval(checkInterval);
-                  this.isSending = false;
-                  reject(new Error(T('widgets.form.errors.locationError')));
-                }
-              }, intervalDuration);
-            });
-          } catch (error) {
-            this.$children.forEach(function(inputField) {
-              if (inputField.$options._componentTag === 'flMap') {
-                inputField.mapStatusError = error.message;
+                return;
               }
-            });
-            this.isSending = false;
-          }
+
+              elapsedTime += intervalDuration;
+
+              if (elapsedTime >= timeoutDuration) {
+                clearInterval(checkInterval);
+                this.isSending = false;
+                reject({
+                  message: T('widgets.form.errors.locationError'),
+                  currentFieldName: mapField.name
+                });
+              }
+            }, intervalDuration);
+          });
         },
         onSubmit: async function() {
-          await this.checkMapFieldStatus();
+          try {
+            await this.checkMapFieldStatus();
+          } catch (error) {
+            this.isSending = false;
+
+            this.fields.forEach(function(field) {
+              if (field._type === 'flMap' && field.name === error.currentFieldName) {
+                field.mapStatusError = error.message;
+                field.value.address = '';
+              }
+            });
+
+            showValidationMessage(error.message);
+
+            return;
+          }
 
           var $vm = this;
           var formData = {};
@@ -1261,12 +1287,15 @@ Fliplet().then(function() {
                 } else if (type === 'flMap') {
                   appendField(`${field.name} Address`, value.address);
                   appendField(`${field.name} Lat/Long`, value.latLong);
-                  appendField(`${field.name} Country`, value.addressComponents.country);
-                  appendField(`${field.name} City`, value.addressComponents.city);
-                  appendField(`${field.name} Postal Code`, value.addressComponents.postalCode);
-                  appendField(`${field.name} State`, value.addressComponents.state);
-                  appendField(`${field.name} Street Name`, value.addressComponents.streetName);
-                  appendField(`${field.name} Street Number`, value.addressComponents.streetNumber);
+
+                  if (value.addressComponents) {
+                    appendField(`${field.name} Country`, value.addressComponents.country);
+                    appendField(`${field.name} City`, value.addressComponents.city);
+                    appendField(`${field.name} Postal Code`, value.addressComponents.postalCode);
+                    appendField(`${field.name} State`, value.addressComponents.state);
+                    appendField(`${field.name} Street Name`, value.addressComponents.streetName);
+                    appendField(`${field.name} Street Number`, value.addressComponents.streetNumber);
+                  }
                 } else if (type === 'flGeolocation') {
                   appendField(field.name, value ? value[0] : null);
                   appendField(`${field.name} (accuracy)`, value ? value[1] : null);

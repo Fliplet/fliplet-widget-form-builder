@@ -39,7 +39,7 @@ Fliplet.FormBuilder.field('map', {
     },
     mapStatusError: {
       type: String,
-      default: null
+      default: ''
     }
   },
   data: function() {
@@ -84,8 +84,6 @@ Fliplet.FormBuilder.field('map', {
   },
   methods: {
     handleInput: function(e) {
-      this.mapStatusError = null;
-
       const value = {
         address: e.target.value,
         latLong: null
@@ -212,7 +210,7 @@ Fliplet.FormBuilder.field('map', {
       }
 
       this.mapAddressField.getAutocompleteSuggestions(value, [])
-        .then((suggestions) => {
+        .then(async(suggestions) => {
           if (suggestions.length && suggestions[0].label !== 'Select location on map') {
             suggestions.unshift({ id: null, label: 'Select location on map' });
           } else if (!suggestions.length) {
@@ -241,7 +239,14 @@ Fliplet.FormBuilder.field('map', {
           } else if (this.mapField.checkIfAddressChangedByDragging()) {
             this.updateAddressSuggestions();
             this.mapField.checkIfAddressChangedByDragging(false);
-            this.value = this.mapField.getTotalAddress();
+
+            const addressComponents = await this.mapField.getAddressComponents(value);
+
+            this.value = {
+              address: value,
+              latLong: `${this.mapField.get().lat}/${this.mapField.get().lng}`,
+              addressComponents: addressComponents
+            };
             this.suggestionSelected = false;
             this.$emit('_input', this.name, this.value, false, true);
           } else {
@@ -267,11 +272,7 @@ Fliplet.FormBuilder.field('map', {
   },
   validations: function() {
     var rules = {
-      value: {
-        checkStatus: function() {
-          return !this.mapStatusError;
-        }
-      }
+      value: {}
     };
 
     if (this.required && !this.readonly) {
@@ -331,11 +332,6 @@ Fliplet.FormBuilder.field('map', {
     addressSuggestions: function(newSuggestions) {
       if (newSuggestions.length) {
         this.activeSuggestionIndex = -1;
-      }
-    },
-    mapStatusError: function(newVal) {
-      if (newVal) {
-        this.clearAddressAndMapValues();
       }
     }
   }
