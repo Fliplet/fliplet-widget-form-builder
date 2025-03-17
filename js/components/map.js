@@ -40,6 +40,10 @@ Fliplet.FormBuilder.field('map', {
     mapStatusError: {
       type: String,
       default: ''
+    },
+    selectedSuggestion: {
+      type: Object,
+      default: null
     }
   },
   data: function() {
@@ -171,6 +175,7 @@ Fliplet.FormBuilder.field('map', {
 
       this.mapAddressField.set(option.label);
       this.lastChosenAutocompleteValue = option.label;
+      this.selectedSuggestion = option;
       this.mapField.set(option.label, false, option.id);
       this.updateValue();
     },
@@ -228,7 +233,7 @@ Fliplet.FormBuilder.field('map', {
               }
 
               this.updateAddressSuggestions();
-              this.$emit('_input', this.name, this.value, false, true);
+              this.$emit('_input', this.name, this.value);
             }, timeout);
           } else if (this.mapField.checkIfAddressChangedByDragging()) {
             this.updateAddressSuggestions();
@@ -310,7 +315,7 @@ Fliplet.FormBuilder.field('map', {
 
         this.isTyping = false;
 
-        if (val.address === '' && !this.readonly && !this.autoCollectUserLocation) {
+        if (val.address === '' && !this.readonly && (!this.autoCollectUserLocation || this.mapStatusError)) {
           this.mapAddressField.clear();
           this.mapField.clear();
           this.addressSuggestions = [];
@@ -320,7 +325,7 @@ Fliplet.FormBuilder.field('map', {
           this.suggestionSelected = false;
         }
 
-        this.$emit('_input', this.name, this.value, false, true);
+        this.$emit('_input', this.name, this.value, false, false);
       }
     },
     addressSuggestions: function(newSuggestions) {

@@ -867,13 +867,20 @@ Fliplet().then(function() {
           var $vm = this;
 
           this.fields.some(function(field) {
-            if (field._type === 'flMap' && field.value.address && field.mapStatusError) {
-              field.mapStatusError = '';
-            }
-
             if (field.name === fieldName) {
               if (field._type === 'flPassword' && fromPasswordConfirmation) {
                 field.passwordConfirmation = value;
+              } else if (field._type === 'flMap' && field.mapStatusError) {
+                if (field.value.address.id) {
+                  value = {
+                    address: '',
+                    latLong: null
+                  };
+                } else if (value.address) {
+                  field.mapStatusError = '';
+                }
+
+                field.value = value;
               } else {
                 field.value = value;
               }
@@ -972,8 +979,8 @@ Fliplet().then(function() {
 
           return new Promise((resolve, reject) => {
             let elapsedTime = 0;
-            const timeoutDuration = 10000;
-            const intervalDuration = 4000;
+            const timeoutDuration = 9000;
+            const intervalDuration = 3000;
 
 
             const checkInterval = setInterval(() => {
@@ -1000,23 +1007,6 @@ Fliplet().then(function() {
           });
         },
         onSubmit: async function() {
-          try {
-            await this.checkMapFieldStatus();
-          } catch (error) {
-            this.isSending = false;
-
-            this.fields.forEach(function(field) {
-              if (field._type === 'flMap' && field.name === error.currentFieldName) {
-                field.mapStatusError = error.message;
-                field.value.address = '';
-              }
-            });
-
-            showValidationMessage(error.message);
-
-            return;
-          }
-
           var $vm = this;
           var formData = {};
 
@@ -1112,7 +1102,25 @@ Fliplet().then(function() {
             return Promise.resolve();
           }
 
-          return onFormSubmission().then(function() {
+          return onFormSubmission().then(async function() {
+            try {
+              await $vm.checkMapFieldStatus();
+            } catch (error) {
+              $vm.isSending = false;
+
+              $vm.fields.forEach(function(field) {
+                if (field._type === 'flMap' && field.name === error.currentFieldName) {
+                  field.mapStatusError = error.message;
+
+                  return;
+                }
+              });
+
+              showValidationMessage(error.message);
+
+              throw new Error(error.message);
+            }
+
             $vm.isSending = true;
 
             function appendField(name, value) {
