@@ -607,17 +607,6 @@ Fliplet().then(function() {
             }
           }
 
-          if (field._type === 'flMap' && !field.autoCollectUserLocation && !field.value.address) {
-            const connection = await Fliplet.DataSources.connect(data.dataSourceId);
-            const formData = await connection.find({});
-
-            field.value = {
-              address: formData[0].data[field.name + ' Address'],
-              latLong: formData[0].data[field.name + ' Lat/Long']
-            };
-          }
-
-
           setTimeout(function() {
             if (progress && !isEditMode) {
               var savedValue = progress[field.name];

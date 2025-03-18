@@ -57,7 +57,7 @@ Fliplet.FormBuilder.field('map', {
   destroyed: function() {
     Fliplet.FormBuilder.off('reset', this.onReset);
   },
-  mounted: function() {
+  mounted: async function() {
     this.initAutocomplete('', []);
 
     if (this.value.latLong) {
@@ -83,6 +83,17 @@ Fliplet.FormBuilder.field('map', {
         this.mapField.handleLocationPermissions();
       }
     }, 3000);
+
+    if (!this.value.address && !(this.autoCollectUserLocation || this.readonly)) {
+      const dataSourceId = this.$parent.getWidgetInstanceData().dataSourceId;
+      const connection = await Fliplet.DataSources.connect(dataSourceId);
+      const formData = await connection.find({});
+
+      this.value = {
+        address: formData[0].data[this.name + ' Address'],
+        latLong: formData[0].data[this.name + ' Lat/Long']
+      };
+    }
 
     this.updateValue();
   },
