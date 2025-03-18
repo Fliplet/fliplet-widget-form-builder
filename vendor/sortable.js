@@ -207,9 +207,9 @@
       dragoverBubble: false,
       dataIdAttr: 'data-id',
       delay: 0,
-      forceFallback: false,
+      forceFallback: true,
       fallbackClass: 'sortable-fallback',
-      fallbackOnBody: false
+      fallbackOnBody: true
     };
 
 
