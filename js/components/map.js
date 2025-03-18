@@ -89,10 +89,12 @@ Fliplet.FormBuilder.field('map', {
       const connection = await Fliplet.DataSources.connect(dataSourceId);
       const formData = await connection.find({});
 
-      this.value = {
-        address: formData[0].data[this.name + ' Address'],
-        latLong: formData[0].data[this.name + ' Lat/Long']
-      };
+      if (formData && formData[0]) {
+        this.value = {
+          address: formData[0].data[this.name + ' Address'],
+          latLong: formData[0].data[this.name + ' Lat/Long']
+        };
+      }
     }
 
     this.updateValue();
