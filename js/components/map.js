@@ -238,11 +238,17 @@ Fliplet.FormBuilder.field('map', {
           if (this.suggestionSelected && this.lastChosenAutocompleteValue === value.trim()) {
             const timeout = this.mapField.getGeocoder() ? 500 : 3000;
 
-            setTimeout(() => {
+            setTimeout(async() => {
               const address = this.mapField.getTotalAddress();
 
               if (address) {
                 this.value = address;
+              }
+
+              if (!this.value.addressComponents) {
+                const addressComponents = await this.mapField.getAddressComponents(value);
+
+                this.value.addressComponents = addressComponents;
               }
 
               this.updateAddressSuggestions();
