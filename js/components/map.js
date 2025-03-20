@@ -82,7 +82,7 @@ Fliplet.FormBuilder.field('map', {
       if (!this.value.address && (this.autoCollectUserLocation || this.readonly)) {
         this.mapField.handleLocationPermissions();
       }
-    }, 3000);
+    }, 4000);
 
     if (!this.value.address && !(this.autoCollectUserLocation || this.readonly)) {
       const dataSourceId = this.$parent.getWidgetInstanceData().dataSourceId;
