@@ -994,12 +994,6 @@ Fliplet().then(function() {
               if (isAdmin) {
                 fieldNames.push(`${field.name} Lat/Long`);
                 fieldNames.push(`${field.name} Address`);
-                fieldNames.push(`${field.name} Country`);
-                fieldNames.push(`${field.name} City`);
-                fieldNames.push(`${field.name} Postal Code`);
-                fieldNames.push(`${field.name} State`);
-                fieldNames.push(`${field.name} Street Name`);
-                fieldNames.push(`${field.name} Street Number`);
               }
 
               break;
