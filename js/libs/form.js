@@ -1118,20 +1118,6 @@ Fliplet().then(function() {
           const activeElement = document.activeElement;
 
           async function onFormSubmission() {
-            if (data.isFormInSlide) {
-              const currentMultiStepForm = await getCurrentMultiStepForm(allFormsInSlide, data);
-
-              for (let i = 0; i < currentMultiStepForm.length; i++) {
-                let form  = currentMultiStepForm[i];
-
-                if (form.$instance.id === data.id) break;
-
-                if (form.$instance.slideId === data.slideId) {
-                  form.$instance.onSubmit();
-                }
-              }
-            }
-
             if (!$vm.isFormValid) {
               if (data.isFormInSlide) {
                 data.canSwipeSlide = false;
@@ -1564,34 +1550,60 @@ Fliplet().then(function() {
 
           return Promise.resolve();
         },
-        synchronizeMatchingFields: function(currentMultiStepForm, currentForm, event) {
+        synchronizeMatchingFields: function(currentMultiStepForm, currentForm, event, arrowButton) {
           Fliplet.FormBuilder.getAll().then(async function(forms) {
-            const currentFormInstance = forms.find(form => form.$instance.id === currentForm.id);
+            try {
+              const currentFormInstance = forms.find(form => form.$instance.id === currentForm.id);
+              const formsInCurrentSlide = currentMultiStepForm && currentMultiStepForm.filter(form => form.$instance.slideId === data.slideId);
 
-            if (event !== 'onInput') {
-              await currentFormInstance.$instance.onSubmit();
+              if (event !== 'onInput') {
+                for (let i = 0; i <= formsInCurrentSlide.length; i++) {
+                  let form = formsInCurrentSlide[i];
 
-              if (!currentForm.canSwipeSlide) {
-                return;
+                  if (form && form.$instance.slideId === data.slideId) {
+                    try {
+                      await form.$instance.onSubmit();
+                    } catch (error) {
+                      console.warn('Form validation failed:', error);
+                    }
+                  }
+                }
+
+                await currentFormInstance.$instance.onSubmit();
+
+
+                if (!currentForm.canSwipeSlide) {
+                  return;
+                }
+
+                if (arrowButton) {
+                  arrowButton.click();
+                }
               }
-            }
 
-            if (currentMultiStepForm) {
-              currentMultiStepForm.forEach((form) => {
-                if (form.$instance.id === currentForm.id) return;
+              if (currentMultiStepForm) {
+                currentMultiStepForm.forEach((form) => {
+                  if (form.$instance.id === currentForm.id) return;
 
-                form.$instance.fields.forEach((field) => {
-                  const matchingField = currentFormInstance.$instance.fields.find(
-                    (currentFormField) => currentFormField.name === field.name
-                  );
+                  try {
+                    form.$instance.fields.forEach((field) => {
+                      const matchingField = currentFormInstance.$instance.fields.find(
+                        (currentFormField) => currentFormField.name === field.name
+                      );
 
-                  if (matchingField) {
-                    const targetForm = forms.find(targetForm => targetForm.$instance.id === form.$instance.id);
+                      if (matchingField) {
+                        const targetForm = forms.find(targetForm => targetForm.$instance.id === form.$instance.id);
 
-                    targetForm.field(matchingField.name).set(matchingField.value);
+                        targetForm.field(matchingField.name).set(matchingField.value);
+                      }
+                    });
+                  } catch (error) {
+                    console.warn('Error synchronizing fields for form:', form.$instance.id, error);
                   }
                 });
-              });
+              }
+            } catch (error) {
+              console.error('Error in synchronizeMatchingFields:', error);
             }
           });
         },
@@ -1636,15 +1648,29 @@ Fliplet().then(function() {
               }
             });
 
-            const buttons = formElement.querySelectorAll('[data-button-action="previous-slide"], [data-button-action="next-slide"]');
+            const nextButtons = formElement.querySelectorAll('[data-button-action="next-slide"]');
+            const prevButtons = formElement.querySelectorAll('[data-button-action="previous-slide"]');
 
-            buttons.forEach(button => {
+            nextButtons.forEach(button => {
               button.addEventListener('click', async function(e) {
                 e.preventDefault();
 
+                const nextButton = swiperContainer.querySelector('.swiper-button-next');
+
                 const currentMultiStepForm = await getCurrentMultiStepForm(allFormsInSlide, data);
 
-                await $vm.synchronizeMatchingFields(currentMultiStepForm, data);
+                await $vm.synchronizeMatchingFields(currentMultiStepForm, data, undefined, nextButton);
+              });
+            });
+
+            prevButtons.forEach(button => {
+              button.addEventListener('click', async function(e) {
+                e.preventDefault();
+
+                const prevButton = swiperContainer.querySelector('.swiper-button-prev');
+                const currentMultiStepForm = await getCurrentMultiStepForm(allFormsInSlide, data);
+
+                await $vm.synchronizeMatchingFields(currentMultiStepForm, data, undefined, prevButton);
               });
             });
           }
