@@ -209,7 +209,8 @@
       delay: 0,
       forceFallback: true,
       fallbackClass: 'sortable-fallback',
-      fallbackOnBody: true
+      fallbackOnBody: false,
+      fallbackTolerance: 3
     };
 
 
