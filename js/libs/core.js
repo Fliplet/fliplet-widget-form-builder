@@ -462,7 +462,11 @@ Fliplet.FormBuilder = (function() {
         component.methods.onSubmit = component.methods._onSubmit;
       }
 
-      component.methods.initButtonProvider = function() {
+      component.methods.initButtonProvider = async function() {
+        var widgetId = parseInt(Fliplet.Widget.getDefaultId(), 10);
+        var formParents = await Fliplet.Widget.findParents({ instanceId: widgetId });
+        var isFormInSlide = formParents.length && formParents[0].name === 'Slide';
+
         var $vm = this;
         var page = Fliplet.Widget.getPage();
         var omitPages = page ? [page.id] : [];
@@ -470,6 +474,7 @@ Fliplet.FormBuilder = (function() {
         var action = $.extend(true, {
           omitPages: omitPages,
           functionStr: '',
+          isFormInSlide: isFormInSlide,
           variables: [
             {
               name: 'form',
