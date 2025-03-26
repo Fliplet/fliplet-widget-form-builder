@@ -85,7 +85,7 @@ Fliplet.FormBuilder.field('map', {
     }, 4000);
 
     if (!this.value.address && !(this.autoCollectUserLocation || this.readonly)) {
-      const dataSourceId = this.$parent.getWidgetInstanceData().dataSourceId;
+      const dataSourceId = this.$parent.getWidgetInstanceData && this.$parent.getWidgetInstanceData().dataSourceId;
       const connection = await Fliplet.DataSources.connect(dataSourceId);
       const formData = await connection.find({});
 
