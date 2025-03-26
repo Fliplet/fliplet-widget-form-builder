@@ -36,14 +36,6 @@ Fliplet.FormBuilder.field('map', {
     isTyping: {
       type: Boolean,
       default: false
-    },
-    mapStatusError: {
-      type: String,
-      default: ''
-    },
-    selectedSuggestion: {
-      type: Object,
-      default: null
     }
   },
   data: function() {
@@ -57,7 +49,7 @@ Fliplet.FormBuilder.field('map', {
   destroyed: function() {
     Fliplet.FormBuilder.off('reset', this.onReset);
   },
-  mounted: async function() {
+  mounted: function() {
     this.initAutocomplete('', []);
 
     if (this.value.latLong) {
@@ -69,33 +61,13 @@ Fliplet.FormBuilder.field('map', {
       address: this.value.address || '',
       latLong: this.value.latLong || null
     };
-
-    const mapComputedStyle = window.getComputedStyle(this.$refs.mapField);
-
-    if (mapComputedStyle.height ===  'auto' || mapComputedStyle.height === '0px' || mapComputedStyle.height === '') {
-      this.$refs.mapField.style.height = '220px';
-    }
-
     document.addEventListener('click', this.handleClickOutside);
 
     setTimeout(() => {
       if (!this.value.address && (this.autoCollectUserLocation || this.readonly)) {
         this.mapField.handleLocationPermissions();
       }
-    }, 4000);
-
-    if (!this.value.address && !(this.autoCollectUserLocation || this.readonly)) {
-      const dataSourceId = this.$parent.getWidgetInstanceData().dataSourceId;
-      const connection = await Fliplet.DataSources.connect(dataSourceId);
-      const formData = await connection.find({});
-
-      if (formData && formData[0]) {
-        this.value = {
-          address: formData[0].data[this.name + ' Address'],
-          latLong: formData[0].data[this.name + ' Lat/Long']
-        };
-      }
-    }
+    }, 3000);
 
     this.updateValue();
   },
@@ -188,8 +160,7 @@ Fliplet.FormBuilder.field('map', {
 
       this.mapAddressField.set(option.label);
       this.lastChosenAutocompleteValue = option.label;
-      this.selectedSuggestion = option;
-      this.mapField.set(option.label, false, option.id);
+      this.mapField.set(option.label);
       this.updateValue();
     },
     clearAddressAndMapValues: function() {
@@ -222,7 +193,7 @@ Fliplet.FormBuilder.field('map', {
       }
 
       this.mapAddressField.getAutocompleteSuggestions(value, [])
-        .then(async(suggestions) => {
+        .then((suggestions) => {
           if (suggestions.length && suggestions[0].label !== 'Select location on map') {
             suggestions.unshift({ id: null, label: 'Select location on map' });
           } else if (!suggestions.length) {
@@ -236,34 +207,24 @@ Fliplet.FormBuilder.field('map', {
           }
 
           if (this.suggestionSelected && this.lastChosenAutocompleteValue === value.trim()) {
-            const timeout = this.mapField.getGeocoder() ? 500 : 3000;
+            const timeout = this.mapField.getGeocoder() ? 0 : 3000;
 
-            setTimeout(async() => {
+            setTimeout(() => {
               const address = this.mapField.getTotalAddress();
 
               if (address) {
                 this.value = address;
               }
 
-              if (!this.value.addressComponents) {
-                const addressComponents = await this.mapField.getAddressComponents(value);
-
-                this.value.addressComponents = addressComponents;
-              }
-
               this.updateAddressSuggestions();
-              this.$emit('_input', this.name, this.value);
+              this.$emit('_input', this.name, this.value, false, true);
             }, timeout);
           } else if (this.mapField.checkIfAddressChangedByDragging()) {
             this.updateAddressSuggestions();
             this.mapField.checkIfAddressChangedByDragging(false);
-
-            const addressComponents = await this.mapField.getAddressComponents(value);
-
             this.value = {
               address: value,
-              latLong: `${this.mapField.get().lat}/${this.mapField.get().lng}`,
-              addressComponents: addressComponents
+              latLong: `${this.mapField.get().lat}/${this.mapField.get().lng}`
             };
             this.suggestionSelected = false;
             this.$emit('_input', this.name, this.value, false, true);
@@ -334,7 +295,7 @@ Fliplet.FormBuilder.field('map', {
 
         this.isTyping = false;
 
-        if (val.address === '' && !this.readonly && (!this.autoCollectUserLocation || this.mapStatusError)) {
+        if (val.address === '' && !this.readonly && !this.autoCollectUserLocation) {
           this.mapAddressField.clear();
           this.mapField.clear();
           this.addressSuggestions = [];
@@ -344,7 +305,7 @@ Fliplet.FormBuilder.field('map', {
           this.suggestionSelected = false;
         }
 
-        this.$emit('_input', this.name, this.value, false, false);
+        this.$emit('_input', this.name, this.value, false, true);
       }
     },
     addressSuggestions: function(newSuggestions) {
