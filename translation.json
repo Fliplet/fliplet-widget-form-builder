@@ -141,7 +141,8 @@
         "fieldsNotFilled": "Please complete all required fields.",
         "unableToLoadEntry": "Unable to load entry",
         "offlineDataError": "The data can only be updated when connected to the internet.",
-        "offlineFormError": "This form can only be submitted when connected to the internet."
+        "offlineFormError": "This form can only be submitted when connected to the internet.",
+        "locationError": "Address processing failed. Check your connection and try again."
       }
     }
   }
