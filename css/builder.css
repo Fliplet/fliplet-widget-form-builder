@@ -1427,6 +1427,5 @@ form hr {
 }
 
 .maps {
-  margin-top: 10px;
-  height: 220px;
+  display: none;
 }
