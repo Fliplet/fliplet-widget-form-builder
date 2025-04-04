@@ -909,6 +909,17 @@ Fliplet().then(function() {
           Fliplet.FormBuilder.emit('reset', { id: data.id });
           this.$emit('reset');
         },
+        resetMultiStepForm: async function() {
+          const currentMultiStepForm = await getCurrentMultiStepForm(allFormsInSlide, data);
+
+          Fliplet.FormBuilder.getAll().then(function(forms) {
+            currentMultiStepForm.forEach((form) => {
+              const relatedForm = forms.find(currentForm => currentForm.$instance.id === form.$instance.id);
+
+              relatedForm.instance.resetForm();
+            });
+          });
+        },
         onError: function(fieldName, error) {
           if (!error) {
             if (this.errors[fieldName]) {
@@ -1402,6 +1413,10 @@ Fliplet().then(function() {
             }).then(function() {
               if (data.saveProgress) {
                 localStorage.removeItem(progressKey);
+              }
+
+              if (data.isFormInSlide) {
+                $vm.resetMultiStepForm();
               }
 
               var operation = Promise.resolve();
