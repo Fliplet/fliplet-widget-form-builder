@@ -1550,7 +1550,7 @@ Fliplet().then(function() {
 
           return Promise.resolve();
         },
-        synchronizeMatchingFields: function(currentMultiStepForm, currentForm, event, arrowButton) {
+        synchronizeMatchingFields: function(currentMultiStepForm, currentForm, event) {
           Fliplet.FormBuilder.getAll().then(async function(forms) {
             try {
               const currentFormInstance = forms.find(form => form.$instance.id === currentForm.id);
@@ -1574,10 +1574,6 @@ Fliplet().then(function() {
 
                 if (!currentForm.canSwipeSlide) {
                   return;
-                }
-
-                if (arrowButton) {
-                  arrowButton.click();
                 }
               }
 
@@ -1655,11 +1651,9 @@ Fliplet().then(function() {
               button.addEventListener('click', async function(e) {
                 e.preventDefault();
 
-                const nextButton = swiperContainer.querySelector('.swiper-button-next');
-
                 const currentMultiStepForm = await getCurrentMultiStepForm(allFormsInSlide, data);
 
-                await $vm.synchronizeMatchingFields(currentMultiStepForm, data, undefined, nextButton);
+                await $vm.synchronizeMatchingFields(currentMultiStepForm, data);
               });
             });
 
@@ -1667,10 +1661,9 @@ Fliplet().then(function() {
               button.addEventListener('click', async function(e) {
                 e.preventDefault();
 
-                const prevButton = swiperContainer.querySelector('.swiper-button-prev');
                 const currentMultiStepForm = await getCurrentMultiStepForm(allFormsInSlide, data);
 
-                await $vm.synchronizeMatchingFields(currentMultiStepForm, data, undefined, prevButton);
+                await $vm.synchronizeMatchingFields(currentMultiStepForm, data);
               });
             });
           }
