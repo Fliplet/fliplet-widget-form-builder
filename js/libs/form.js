@@ -1039,6 +1039,17 @@ Fliplet().then(function() {
           $(this.$el).find('input').blur();
         },
         onSubmit: function() {
+          const activeElement = document.activeElement;
+          const isPrevButton = activeElement.getAttribute('data-button-action') === 'previous-slide';
+          const isPrevArrow = activeElement.classList.contains('swiper-button-prev');
+
+          if (isPrevArrow || isPrevButton) {
+            data.canSwipeSlide = true;
+            activeElement.setAttribute('data-can-swipe', true);
+
+            return;
+          }
+
           var $vm = this;
           var formData = {};
 
@@ -1126,7 +1137,6 @@ Fliplet().then(function() {
             });
           }
 
-          const activeElement = document.activeElement;
 
           async function onFormSubmission() {
             if (!$vm.isFormValid) {
