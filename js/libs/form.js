@@ -331,13 +331,6 @@ Fliplet().then(function() {
     function getFields(isEditMode) {
       var fields = _.compact(JSON.parse(JSON.stringify(data.fields || [])));
 
-      const queryParams = Object.fromEntries(new URLSearchParams(location.search));
-      const isAdmin = queryParams.beta === 'true';
-
-      if (!isAdmin) {
-        fields = fields.filter((field) => field._type !== 'flMap');
-      }
-
       var progress = getProgress();
 
       fields.forEach(function(field) {
