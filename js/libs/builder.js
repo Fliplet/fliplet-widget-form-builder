@@ -3,9 +3,6 @@ var widgetId = parseInt(Fliplet.Widget.getDefaultId(), 10);
 var widgetUuid = Fliplet.Widget.getUUID(widgetId);
 var data = Fliplet.Widget.getData(widgetId) || {};
 
-const queryParams = Object.fromEntries(new URLSearchParams(location.search));
-const isAdmin = queryParams.beta === 'true';
-
 // Cleanup
 if (data.fields) {
   data.fields = _.compact(data.fields);
@@ -106,8 +103,7 @@ function generateFormDefaults(data) {
     createdBy: {
       id: Fliplet.User.get('id'),
       fullName: Fliplet.User.get('fullName')
-    },
-    isAdmin: isAdmin
+    }
   }, data);
 }
 
@@ -991,16 +987,14 @@ Fliplet().then(function() {
 
 
             case 'flMap':
-              if (isAdmin) {
-                fieldNames.push(`${field.name} Lat/Long`);
-                fieldNames.push(`${field.name} Address`);
-                fieldNames.push(`${field.name} Country`);
-                fieldNames.push(`${field.name} City`);
-                fieldNames.push(`${field.name} Postal Code`);
-                fieldNames.push(`${field.name} State`);
-                fieldNames.push(`${field.name} Street Name`);
-                fieldNames.push(`${field.name} Street Number`);
-              }
+              fieldNames.push(`${field.name} Lat/Long`);
+              fieldNames.push(`${field.name} Address`);
+              fieldNames.push(`${field.name} Country`);
+              fieldNames.push(`${field.name} City`);
+              fieldNames.push(`${field.name} Postal Code`);
+              fieldNames.push(`${field.name} State`);
+              fieldNames.push(`${field.name} Street Name`);
+              fieldNames.push(`${field.name} Street Number`);
 
               break;
 
