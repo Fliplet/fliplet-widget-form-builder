@@ -238,7 +238,7 @@ Fliplet.App.get().then(app => {
   const components = Fliplet.FormBuilder.components();
 
   if (components.flFile && components.flFile.props && components.flFile.props.useBroadPicker) {
-  components.flFile.props.useBroadPicker.default = useBroadPicker;
+    components.flFile.props.useBroadPicker.default = useBroadPicker;
   }
 
   return;
