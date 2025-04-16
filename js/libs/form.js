@@ -141,7 +141,7 @@ async function getCurrentMultiStepForm(allFormsInSlide, currentForm) {
     for (let i = form.fields.length - 1; i >= 0; i--) {
       const field = form.fields[i];
 
-      if (field._type === 'flButtons' && currenFormDsId === formDsId) { hasFlButton = true; break; }
+      if (field._type === 'flButtons' && field.showSubmit && currenFormDsId === formDsId) { hasFlButton = true; break; }
     }
 
     if (!hasFlButton && currenFormDsId.id === formDsId.id) {
