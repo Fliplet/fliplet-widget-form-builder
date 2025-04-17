@@ -2,6 +2,11 @@
 var widgetId = parseInt(Fliplet.Widget.getDefaultId(), 10);
 var widgetUuid = Fliplet.Widget.getUUID(widgetId);
 var data = Fliplet.Widget.getData(widgetId) || {};
+var isFormInSlider = false;
+
+Fliplet.Widget.findParents({ instanceId: widgetId }).then(function(parents) {
+  isFormInSlider = parents[0].name === 'Slide';
+});
 
 const queryParams = Object.fromEntries(new URLSearchParams(location.search));
 const isAdmin = queryParams.beta === 'true';

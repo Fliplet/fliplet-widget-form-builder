@@ -716,7 +716,8 @@ Fliplet().then(function() {
           today: moment().locale('en').format('YYYY-MM-DD'),
           now: moment().locale('en').format('HH:mm'),
           id: data.id,
-          entryId: entryId
+          entryId: entryId,
+          redirect: data.redirect
         };
       },
       computed: {
@@ -752,7 +753,7 @@ Fliplet().then(function() {
 
           const $vm = this;
 
-          if (data.isFormInSlide) {
+          if (data.isFormInSlide && this.redirect === false) {
             const currentMultiStepForm = await getCurrentMultiStepForm(allFormsInSlide, data);
 
             if (currentMultiStepForm.length > 1) {
@@ -1471,7 +1472,7 @@ Fliplet().then(function() {
                 operation = Fliplet.Communicate.composeEmail(_.extend({}, data.generateEmailTemplate), formData);
               }
 
-              if (data.linkAction && data.redirect) {
+              if (data.linkAction && data.redirect === true) {
                 return operation.then(function() {
                   return trackEventOp.then(function() {
                     Fliplet.Navigate.to(data.linkAction);
@@ -1502,6 +1503,10 @@ Fliplet().then(function() {
               $vm.$forceUpdate();
 
               $vm.loadEntryForUpdate();
+
+              if (data.redirect === 'nextSlide' && data.isFormInSlide) {
+                $vm.start();
+              }
             }, function(err) {
               /* eslint-disable-next-line */
               console.error(err);

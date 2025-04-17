@@ -274,11 +274,17 @@
                   <label for="redirect_yes">
                     <span class="check"><i class="fa fa-circle"></i></span> Take the user to another screen
                   </label>
-                  <div class="hidden-settings" v-show="settings.redirect">
+                  <div class="hidden-settings" v-show="settings.redirect === true">
                     <div class="form-group">
                       <div id="linkAction"></div>
                     </div>
                   </div>
+                </div>
+                <div v-if="isFormInSlider" class="radio radio-icon">
+                  <input type="radio" id="redirect_next_slide" name="redirectOptions" v-model="settings.redirect" :value="'nextSlide'">
+                  <label for="redirect_next_slide">
+                    <span class="check"><i class="fa fa-circle"></i></span> Take user to the next slide
+                  </label>
                 </div>
                 <div class="radio radio-icon">
                   <input type="radio" id="redirect_no" name="redirectOptions" v-model="settings.redirect" :value="false">
