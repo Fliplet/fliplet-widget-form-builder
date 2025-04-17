@@ -743,14 +743,39 @@ Fliplet().then(function() {
 
           storage.setItem(progressKey, JSON.stringify(progress));
         },
-        start: function(event) {
+        start: async function(event) {
           if (event) {
             event.preventDefault();
           }
 
           this.isSent = false;
 
-          this.$nextTick(function() {
+          const $vm = this;
+
+          if (data.isFormInSlide) {
+            const currentMultiStepForm = await getCurrentMultiStepForm(allFormsInSlide, data);
+
+            if (currentMultiStepForm.length > 1) {
+              const targetSlideId = currentMultiStepForm[0].$instance.slideId;
+              const targetSlide = document.querySelector(`.swiper-slide[data-id="${targetSlideId}"]`);
+
+
+              if (targetSlide) {
+                const swiperContainer = targetSlide.closest('.swiper-container');
+
+                if (swiperContainer && swiperContainer.swiper) {
+                  const swiper = swiperContainer.swiper;
+                  const targetSlideIndex = swiper.slides.indexOf(targetSlide);
+
+                  if (targetSlideIndex !== -1) {
+                    swiper.slideTo(targetSlideIndex);
+                  }
+                }
+              }
+            }
+          }
+
+          $vm.$nextTick(function() {
             this.attachCustomButtonListener();
           });
         },
