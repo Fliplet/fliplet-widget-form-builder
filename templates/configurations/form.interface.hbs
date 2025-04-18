@@ -48,7 +48,7 @@
           </div>
         </div>
       </div>
-      <div>
+      <div v-if="hasFieldDuplicatesInMultiStepForm">
         <p class="alert alert-warning"><b>Warning:</b> Using the same field name across multiple form steps will overwrite previous entries. To review or prevent changes, set the field as "read-only". <a href="#">Learn more</a>  about using shared field names.</p>
       </div>
       <div class="form-group cleafix" v-if="_supportsRequired && _componentName !== 'flTimeStamp'">

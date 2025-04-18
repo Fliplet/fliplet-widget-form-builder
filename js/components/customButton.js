@@ -1,6 +1,7 @@
 Fliplet.FormBuilder.field('customButton', {
   name: 'Button',
   category: 'Buttons',
+  submit: false,
   props: {
     description: {
       type: String

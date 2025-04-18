@@ -385,6 +385,9 @@ Fliplet.FormBuilder = (function() {
         component = {};
       }
 
+      let currentMultiStepForm = [];
+      let currentFormData;
+
       var template = templates['templates.configurations.' + componentName];
 
       Handlebars.registerPartial('defaultValuePartial', templates['templates.configurations.defaultValue']());
@@ -560,6 +563,11 @@ Fliplet.FormBuilder = (function() {
       component.props.errors = {
         type: Object,
         default: {}
+      };
+
+      component.props.hasFieldDuplicatesInMultiStepForm = {
+        type: Boolean,
+        default: false
       };
 
       component.computed._fieldNameError = function() {
@@ -778,7 +786,13 @@ Fliplet.FormBuilder = (function() {
       };
 
       if (!component.mounted) {
-        component.mounted = function() {
+        component.mounted = async function() {
+          const allFormsInSlide = await this._getFormsInSlides();
+
+          if (allFormsInSlide.length) {
+            currentMultiStepForm = await this._getCurrentMultiStepForm(allFormsInSlide, currentFormData);
+          }
+
           this._showNameField
             = componentName === 'flCustomButton'
               ? this.name !== this.buttonLabel
@@ -839,6 +853,11 @@ Fliplet.FormBuilder = (function() {
         if (!this._showNameField) {
           this.name = this._componentName === 'flCustomButton' ? this.buttonLabel : this.label;
         }
+
+        if (currentMultiStepForm.length) {
+          this.hasFieldDuplicatesInMultiStepForm = this._checkDuplicateFieldsInMultiStepForm();
+        }
+
 
         return;
       }, 200);
@@ -1014,6 +1033,90 @@ Fliplet.FormBuilder = (function() {
               folder: $vm.mediaFolderData,
               navStack: $vm.mediaFolderNavStack
             }
+          }
+        });
+      };
+
+      component.methods._getFormsInSlides = async function() {
+        try {
+          const formWidgets = await Fliplet.Widget.find((w) => w.package === 'com.fliplet.form-builder');
+          const formsInSlides = [];
+
+          for (const widget of formWidgets) {
+            const widgetId = widget.id;
+            const currentWidgetId =  parseInt(await Fliplet.Widget.getDefaultId(), 10);
+
+            if (currentWidgetId === widgetId) {
+              currentFormData = widget;
+            }
+
+            const parents = await Fliplet.Widget.findParents({ instanceId: widgetId });
+            const slideParent = parents.find(parent => parent.name === 'Slide');
+
+            widget.slideId = slideParent.id;
+            widget.isFormInSlide = true;
+
+            formsInSlides.push(widget);
+          }
+
+          return formsInSlides;
+        } catch (error) {
+          console.error('Error getting forms in slides:', error);
+
+          return [];
+        }
+      };
+
+      component.methods._getCurrentMultiStepForm = async function(allFormsInSlide, currentForm) {
+        let currentMultiStepForm = [];
+        let isCurrentForm = false;
+        let currentFormDsId = currentForm.dataSourceId;
+
+        for (let form of allFormsInSlide) {
+          const formDsId = form.dataSourceId;
+
+
+          if (currentForm.id === form.id) isCurrentForm = true;
+
+          if (currentFormDsId !== formDsId) continue;
+
+          let hasFlButton = false;
+
+          for (let i = form.fields.length - 1; i >= 0; i--) {
+            const field = form.fields[i];
+
+            if (field._type === 'flButtons' && field.showSubmit && currentFormDsId === formDsId) { hasFlButton = true; break; }
+          }
+
+          if (!hasFlButton && currentFormDsId.id === formDsId.id) {
+            currentMultiStepForm.push(form);
+          } else if (isCurrentForm && hasFlButton) {
+            if (currentMultiStepForm.length && currentMultiStepForm[currentMultiStepForm.length - 1].dataSourceId !== currentFormDsId) {
+              currentMultiStepForm.pop();
+            }
+
+            currentMultiStepForm.push(form);
+            break;
+          } else {
+            currentMultiStepForm = [];
+          }
+        }
+
+        return currentMultiStepForm;
+      };
+
+      component.methods._checkDuplicateFieldsInMultiStepForm = function() {
+        return currentMultiStepForm.some((form) => {
+          if (form.id === currentFormData.id) return false;
+
+          try {
+            return form.fields.some((field) => {
+              return this.label === field.label;
+            });
+          } catch (error) {
+            console.warn('Error checking fields for form:', form.id, error);
+
+            return false;
           }
         });
       };
