@@ -769,9 +769,11 @@ Fliplet().then(function() {
                   const targetSlideIndex = swiper.slides.indexOf(targetSlide);
 
                   if (targetSlideIndex !== -1) {
+                    const allowSlidePrev = swiper.allowSlidePrev;
+
                     swiper.allowSlidePrev = true;
                     swiper.slideTo(targetSlideIndex);
-                    swiper.allowSlidePrev = false;
+                    swiper.allowSlidePrev = allowSlidePrev;
                   }
                 }
               }
