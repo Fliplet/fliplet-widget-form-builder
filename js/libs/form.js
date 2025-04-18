@@ -141,7 +141,7 @@ async function getCurrentMultiStepForm(allFormsInSlide, currentForm) {
     for (let i = form.fields.length - 1; i >= 0; i--) {
       const field = form.fields[i];
 
-      if (field._type === 'flButtons' && field.showSubmit && currenFormDsId === formDsId) { hasFlButton = true; break; }
+      if (field._type === 'flButtons' && field.showSubmit !== false && currenFormDsId === formDsId) { hasFlButton = true; break; }
     }
 
     if (!hasFlButton && currenFormDsId.id === formDsId.id) {
@@ -1165,6 +1165,36 @@ Fliplet().then(function() {
 
 
           async function onFormSubmission() {
+            if (data.isFormInSlide && $vm.isFormValid) {
+              const multiStepForm = await getCurrentMultiStepForm(allFormsInSlide, data);
+
+              if (data.id !== multiStepForm[multiStepForm.length - 1].$instance.id) return;
+
+              for (const form of multiStepForm) {
+                if (form.$instance && form.$instance._data.id === data.id) {
+                  continue;
+                }
+
+                const formInstance = form.$instance;
+
+                if (formInstance && formInstance.$children) {
+                  formInstance.$children.forEach(function(inputField) {
+                    if (inputField.$v) {
+                      inputField.$v.$touch();
+
+                      if (inputField.$v.$invalid) {
+                        $vm.isFormValid = false;
+                      }
+                    }
+                  });
+                }
+
+                if (!$vm.isFormValid) {
+                  break;
+                }
+              }
+            }
+
             if (!$vm.isFormValid) {
               if (data.isFormInSlide) {
                 data.canSwipeSlide = false;
@@ -1183,7 +1213,7 @@ Fliplet().then(function() {
             currentMultiStepForm.forEach((form) => {
               if (form.$instance) {
                 form.$instance.fields.forEach((field) => {
-                  if (field._type !== 'flButtons') {
+                  if (!(field._type === 'flButtons' || field._type === 'flCustomButton')) {
                     formData[field.name] = field.value;
                   }
                 });
@@ -1192,7 +1222,11 @@ Fliplet().then(function() {
           }
 
           return onFormSubmission().then(function() {
-            if (data.isFormInSlide && activeElement && (activeElement.getAttribute('data-button-action') || activeElement.getAttribute('data-can-swipe'))) {
+            const hasButtonAction = activeElement.getAttribute('data-button-action');
+            const canSwipe = activeElement.getAttribute('data-can-swipe');
+            const isNavigationButton = (activeElement.type === 'submit' && hasButtonAction) || (activeElement.type !== 'submit' && canSwipe);
+
+            if (data.isFormInSlide && activeElement && isNavigationButton && (hasButtonAction || canSwipe)) {
               $vm.isSending = false;
               data.canSwipeSlide = true;
               activeElement.setAttribute('data-can-swipe', true);
