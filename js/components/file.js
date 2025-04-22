@@ -43,10 +43,6 @@ Fliplet.FormBuilder.field('file', {
     },
     description: {
       type: String
-    },
-    useBroadPicker: {
-      type: Boolean,
-      default: false
     }
   },
   computed: {
@@ -230,16 +226,4 @@ Fliplet.FormBuilder.field('file', {
       this.$refs.fileInput.click();
     }
   }
-});
-
-Fliplet.App.get().then(app => {
-  const useBroadPicker = Boolean(app && app.settings && app.settings.useBroadPicker);
-
-  const components = Fliplet.FormBuilder.components();
-
-  if (components.flFile && components.flFile.props && components.flFile.props.useBroadPicker) {
-    components.flFile.props.useBroadPicker.default = useBroadPicker;
-  }
-
-  return;
 });
