@@ -141,7 +141,7 @@ async function getCurrentMultiStepForm(allFormsInSlide, currentForm) {
     for (let i = form.fields.length - 1; i >= 0; i--) {
       const field = form.fields[i];
 
-      if (field._type === 'flButtons' && currenFormDsId === formDsId) { hasFlButton = true; break; }
+      if (field._type === 'flButtons' && field.showSubmit !== false && currenFormDsId === formDsId) { hasFlButton = true; break; }
     }
 
     if (!hasFlButton && currenFormDsId.id === formDsId.id) {
@@ -716,7 +716,8 @@ Fliplet().then(function() {
           today: moment().locale('en').format('YYYY-MM-DD'),
           now: moment().locale('en').format('HH:mm'),
           id: data.id,
-          entryId: entryId
+          entryId: entryId,
+          redirect: data.redirect
         };
       },
       computed: {
@@ -743,14 +744,43 @@ Fliplet().then(function() {
 
           storage.setItem(progressKey, JSON.stringify(progress));
         },
-        start: function(event) {
+        start: async function(event) {
           if (event) {
             event.preventDefault();
           }
 
           this.isSent = false;
 
-          this.$nextTick(function() {
+          const $vm = this;
+
+          if (data.isFormInSlide && this.redirect === false) {
+            const currentMultiStepForm = await getCurrentMultiStepForm(allFormsInSlide, data);
+
+            if (currentMultiStepForm.length > 1) {
+              const targetSlideId = currentMultiStepForm[0].$instance.slideId;
+              const targetSlide = document.querySelector(`.swiper-slide[data-id="${targetSlideId}"]`);
+
+
+              if (targetSlide) {
+                const swiperContainer = targetSlide.closest('.swiper-container');
+
+                if (swiperContainer && swiperContainer.swiper) {
+                  const swiper = swiperContainer.swiper;
+                  const targetSlideIndex = swiper.slides.indexOf(targetSlide);
+
+                  if (targetSlideIndex !== -1) {
+                    const allowSlidePrev = swiper.allowSlidePrev;
+
+                    swiper.allowSlidePrev = true;
+                    swiper.slideTo(targetSlideIndex);
+                    swiper.allowSlidePrev = allowSlidePrev;
+                  }
+                }
+              }
+            }
+          }
+
+          $vm.$nextTick(function() {
             this.attachCustomButtonListener();
           });
         },
@@ -1139,6 +1169,36 @@ Fliplet().then(function() {
 
 
           async function onFormSubmission() {
+            if (data.isFormInSlide && $vm.isFormValid) {
+              const multiStepForm = await getCurrentMultiStepForm(allFormsInSlide, data);
+
+              if (data.id !== multiStepForm[multiStepForm.length - 1].$instance.id) return;
+
+              for (const form of multiStepForm) {
+                if (form.$instance && form.$instance._data.id === data.id) {
+                  continue;
+                }
+
+                const formInstance = form.$instance;
+
+                if (formInstance && formInstance.$children) {
+                  formInstance.$children.forEach(function(inputField) {
+                    if (inputField.$v) {
+                      inputField.$v.$touch();
+
+                      if (inputField.$v.$invalid) {
+                        $vm.isFormValid = false;
+                      }
+                    }
+                  });
+                }
+
+                if (!$vm.isFormValid) {
+                  break;
+                }
+              }
+            }
+
             if (!$vm.isFormValid) {
               if (data.isFormInSlide) {
                 data.canSwipeSlide = false;
@@ -1157,7 +1217,7 @@ Fliplet().then(function() {
             currentMultiStepForm.forEach((form) => {
               if (form.$instance) {
                 form.$instance.fields.forEach((field) => {
-                  if (field._type !== 'flButtons') {
+                  if (!(field._type === 'flButtons' || field._type === 'flCustomButton')) {
                     formData[field.name] = field.value;
                   }
                 });
@@ -1166,7 +1226,11 @@ Fliplet().then(function() {
           }
 
           return onFormSubmission().then(function() {
-            if (data.isFormInSlide && activeElement && (activeElement.getAttribute('data-button-action') || activeElement.getAttribute('data-can-swipe'))) {
+            const hasButtonAction = activeElement.getAttribute('data-button-action');
+            const canSwipe = activeElement.getAttribute('data-can-swipe');
+            const isNavigationButton = (activeElement.type === 'submit' && hasButtonAction) || (activeElement.type !== 'submit' && canSwipe);
+
+            if (data.isFormInSlide && activeElement && isNavigationButton && (hasButtonAction || canSwipe)) {
               $vm.isSending = false;
               data.canSwipeSlide = true;
               activeElement.setAttribute('data-can-swipe', true);
@@ -1446,7 +1510,7 @@ Fliplet().then(function() {
                 operation = Fliplet.Communicate.composeEmail(_.extend({}, data.generateEmailTemplate), formData);
               }
 
-              if (data.linkAction && data.redirect) {
+              if (data.linkAction && data.redirect === true) {
                 return operation.then(function() {
                   return trackEventOp.then(function() {
                     Fliplet.Navigate.to(data.linkAction);
@@ -1477,6 +1541,10 @@ Fliplet().then(function() {
               $vm.$forceUpdate();
 
               $vm.loadEntryForUpdate();
+
+              if (data.redirect === 'nextSlide' && data.isFormInSlide) {
+                $vm.start();
+              }
             }, function(err) {
               /* eslint-disable-next-line */
               console.error(err);
