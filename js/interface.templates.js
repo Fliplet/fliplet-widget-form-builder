@@ -126,7 +126,7 @@ this["Fliplet"]["Widget"]["Templates"]["templates.configurations.number"] = Hand
 },"useData":true});
 
 this["Fliplet"]["Widget"]["Templates"]["templates.configurations.paragraph"] = Handlebars.template({"compiler":[7,">= 4.0.0"],"main":function(container,depth0,helpers,partials,data) {
-    return "<div class=\"form-group\">\n  <label>Text</label>\n  <textarea class=\"form-control\" v-model.trim=\"value\" placeholder=\"Type some text\" rows=\"6\"></textarea>\n</div>";
+    return "<div class='form-group'>\n  <label>Text</label>\n  <div class='fl-paragraph-editor'>\n    <textarea\n      id='tinymce-paragraph'\n      ref='textarea'\n      placeholder='Type some text'\n      class=\"form-control\"\n    >\n    </textarea>\n  </div>\n</div>";
 },"useData":true});
 
 this["Fliplet"]["Widget"]["Templates"]["templates.configurations.password"] = Handlebars.template({"compiler":[7,">= 4.0.0"],"main":function(container,depth0,helpers,partials,data) {
