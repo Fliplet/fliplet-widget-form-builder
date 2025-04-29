@@ -72,6 +72,7 @@ Fliplet.FormBuilder.field('number', {
           if (!decimal.test(value)) {
             return false;
           }
+
           value = parseFloat(value);
 
           if (_.isNaN(value)) {
