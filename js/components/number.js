@@ -63,7 +63,7 @@ Fliplet.FormBuilder.field('number', {
           value: maxNumbersAfterPoint
         },
         function(value) {
-          var decimal = /^(-?\d+((\.|\,)\d{1,10})?)$/;
+          var decimal = /^(-?\d+((\.)\d{1,10})?)$/;
 
           if (!value) {
             return true;
@@ -72,8 +72,6 @@ Fliplet.FormBuilder.field('number', {
           if (!decimal.test(value)) {
             return false;
           }
-
-          value = value.replace(',', '.');
           value = parseFloat(value);
 
           if (_.isNaN(value)) {
