@@ -13,15 +13,14 @@ Fliplet.FormBuilder.field('checkbox', {
     description: {
       type: String
     },
-    options: {
+    optionsWithDescription: {
       type: Array,
       default: function() {
         return [
           {
-            label: 'Option 1'
-          },
-          {
-            label: 'Option 2'
+            label: 'Option 1',
+            description: '',
+            _iteration_key: Fliplet.guid()
           }
         ];
       }
@@ -53,7 +52,7 @@ Fliplet.FormBuilder.field('checkbox', {
         });
 
         // Get all options label in array format
-        var allOptions = _.map(this.options, function(option) {
+        var allOptions = _.map(this.optionsWithDescription, function(option) {
           return option.id || option.label;
         });
 
@@ -72,10 +71,10 @@ Fliplet.FormBuilder.field('checkbox', {
         if (val) {
           this.value = [];
 
-          this.options.forEach(function(option) {
+          this.optionsWithDescription.forEach(function(option) {
             $vm.value.push(option.id || option.label);
           });
-        } else if (this.value.length === this.options.length) {
+        } else if (this.value.length === this.optionsWithDescription.length) {
           this.value = [];
         }
 

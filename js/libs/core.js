@@ -11,6 +11,23 @@ Fliplet.FormBuilder = (function() {
     return 'fl' + component.charAt(0).toUpperCase() + component.slice(1);
   }
 
+  function attachObservers() {
+    var $accordion = $('#fieldDescriptionsAccordion');
+
+    $accordion.on('show.bs.collapse', '.panel-collapse', function() {
+      const obj = $(this);
+
+      obj.children('.panel-body').fadeIn(250);
+      obj.children('.panel-body').animate({
+        scrollTop: 0
+      }, 250);
+    });
+
+    $accordion.on('hide.bs.collapse', '.panel-collapse', function() {
+      $(this).children('.panel-body').fadeOut(250);
+    });
+  }
+
   return {
     on: function(eventName, fn) {
       eventHub.$on(eventName, fn);
@@ -243,6 +260,10 @@ Fliplet.FormBuilder = (function() {
 
       component.computed._supportsColumnOptions = function() {
         return this._isFormField && component.props._componentName.default === 'flMatrix';
+      };
+
+      component.computed._supportsOptionsWithDescription = function() {
+        return this._isFormField && (component.props._componentName.default === 'flCheckbox' || component.props._componentName.default === 'flRadio');
       };
 
       component.computed._showField = function() {
@@ -611,6 +632,18 @@ Fliplet.FormBuilder = (function() {
         return !_.isEmpty(this.errors);
       };
 
+      component.methods._hasEmptyOptions = function(options) {
+        var invalidOptions = _.filter(options, function(option) {
+          var hasId = _.isString(option.id) && option.id.trim() !== '';
+          var hasLabel = _.isString(option.label) && option.label.trim() !== '';
+
+          return !hasId && !hasLabel;
+        });
+
+        return !!invalidOptions.length;
+      };
+
+
       component.methods._hasDuplicateOptions  = function(options) {
         var finalOptions = _.map(options, function(option) {
           return {
@@ -640,11 +673,11 @@ Fliplet.FormBuilder = (function() {
 
         switch (this._componentName) {
           case 'flCheckbox':
-            if (this.options.length === 0) {
+            if (this.optionsWithDescription.length === 0) {
               _.assignIn(this.errors, {
                 checkboxOptions: 'Please enter options for the checkbox field'
               });
-            } else if (this._hasDuplicateOptions(this.options)) {
+            } else if (this._hasDuplicateOptions(this.optionsWithDescription)) {
               _.assignIn(this.errors, {
                 checkboxDuplicateOptions: 'Please enter unique options for the checkbox field'
               });
@@ -653,13 +686,17 @@ Fliplet.FormBuilder = (function() {
             break;
 
           case 'flRadio':
-            if (this.options.length === 0) {
+            if (this.optionsWithDescription.length === 0) {
               _.assignIn(this.errors, {
                 radioOptions: 'Please enter options for the radio field'
               });
-            } else if (this._hasDuplicateOptions(this.options)) {
+            } else if (this._hasDuplicateOptions(this.optionsWithDescription)) {
               _.assignIn(this.errors, {
                 radioDuplicateOptions: 'Please enter unique options for the radio field'
+              });
+            } else if (this._hasEmptyOptions(this.optionsWithDescription)) {
+              _.assignIn(this.errors, {
+                radioOptions: 'Please enter options for all the entries'
               });
             }
 
@@ -786,8 +823,40 @@ Fliplet.FormBuilder = (function() {
           if (componentName === 'flAddress') {
             this._initAddressTypeahead();
           }
+
+          if (componentName === 'flRadio' || componentName === 'flCheckbox') {
+            this.$nextTick(() => {
+              attachObservers();
+            });
+          }
         };
       }
+
+      component.methods._addOption = function() {
+        const newOption = {
+          _iteration_key: Fliplet.guid(),
+          label: `Option ${this.optionsWithDescription.length + 1}`,
+          description: ''
+        };
+
+        this.optionsWithDescription = this.optionsWithDescription.concat(newOption);
+
+        this.$nextTick(() => {
+          attachObservers();
+        });
+      };
+
+      component.methods._removeOption = function(index) {
+        this.optionsWithDescription = this.optionsWithDescription.filter((_, i) => i !== index);
+      };
+
+      component.methods._onSort = function(event) {
+        const newList = [...this.optionsWithDescription];
+        const movedItem = newList.splice(event.oldIndex, 1)[0];
+
+        newList.splice(event.newIndex, 0, movedItem);
+        this.optionsWithDescription = newList;
+      };
 
       component.methods._hideField = function() {
         this.required = false;

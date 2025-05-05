@@ -140,6 +140,10 @@ nav > .btn {
   color: #14505e;
 }
 
+.controls {
+  text-align: center;
+}
+
 /* TEMPLATES GALLERY */
 
 .templates-sub-title {
@@ -1428,4 +1432,75 @@ form hr {
 
 .maps {
   display: none;
+}
+
+/*Options Accordion Panels */
+
+.accordion .panel-options {
+  margin-bottom: 0;
+  border: none;
+  background-color: #f4f1f2;
+}
+
+.panel-default > .panel-heading + .panel-collapse.in > .panel-body {
+  display: block;
+}
+
+.accordion + .controls {
+  margin-top: 20px;
+}
+
+.accordion .panel-options .panel-body {
+  padding: 15px;
+}
+
+.accordion .panel-heading.screen-reorder-handle + .panel-collapse {
+  overflow: hidden;
+}
+
+.accordion .panel.focus .icon-delete {
+  opacity: 0 !important;
+  -webkit-transition: opacity 50ms linear;
+}
+
+.accordion .panel-default > .panel-heading.panel-heading.screen-reorder-handle {
+  color: #605d5d;
+  background-color: #dcdae0;
+  border-color: rgba(51, 51, 51, 0.1);
+  border-radius: 0;
+}
+
+.accordion .panel-heading.screen-reorder-handle:hover {
+  cursor: -webkit-grab;
+  cursor: -moz-grab;
+}
+
+.panel-heading.screen-reorder-handle .chevron-icon {
+  top: 2px;
+}
+
+.accordion .panel-heading .icon-delete {
+  position: absolute;
+  top: 0;
+  right: 20px;
+  opacity: 0;
+  color: #e60000;
+  width: 38px;
+  height: 38px;
+  line-height: 38px;
+  text-align: center;
+}
+
+.accordion .panel-heading:hover .icon-delete {
+  opacity: 1;
+}
+
+.accordion .panel-heading.screen-reorder-handle .screen-reorder-handle {
+  display: block;
+  width: 2.4rem;
+  float: left;
+  margin-right: 6px;
+  text-align: center;
+  opacity: 0.7;
+  line-height: 18px;
 }
