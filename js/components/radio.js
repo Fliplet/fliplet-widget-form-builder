@@ -5,15 +5,14 @@ Fliplet.FormBuilder.field('radio', {
     description: {
       type: String
     },
-    options: {
+    optionsWithDescription: {
       type: Array,
       default: function() {
         return [
           {
-            label: 'Option 1'
-          },
-          {
-            label: 'Option 2'
+            label: 'Option 1',
+            description: '',
+            _iteration_key: Fliplet.guid()
           }
         ];
       }
@@ -38,14 +37,14 @@ Fliplet.FormBuilder.field('radio', {
     focusHandler: function(index) {
       var newIndex = index;
 
-      if (index > this.options.length - 1) {
+      if (index > this.optionsWithDescription.length - 1) {
         newIndex = 0;
       } else if (index < 0) {
-        newIndex = this.options.length - 1;
+        newIndex = this.optionsWithDescription.length - 1;
       }
 
       this.$refs.radioButton[newIndex].focus();
-      this.clickHandler(this.options[newIndex]);
+      this.clickHandler(this.optionsWithDescription[newIndex]);
     }
   },
   created: function() {
