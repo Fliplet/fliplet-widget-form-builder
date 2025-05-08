@@ -1860,7 +1860,10 @@ Fliplet().then(function() {
 
                   setTimeout(() => {
                     const canSwipe = (() => {
-                      const formsInActiveSlide = currentMultiStepForm.filter(form => form.$instance.slideId == activeSlideId);
+                      console.log(currentMultiStepForm, 'activeSlideId');
+
+
+                      const formsInActiveSlide = currentMultiStepForm.filter(form => form.$instance.slideId === activeSlideId);
 
                       return !formsInActiveSlide.some(form => form.$instance.isFormValid === false);
                     })();
