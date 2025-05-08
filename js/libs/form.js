@@ -1224,8 +1224,6 @@ Fliplet().then(function() {
                     formData[`${field.name} Address`] = value.address;
                     formData[`${field.name} Lat/Long`] = value.latLong;
                   } else if (type === 'flTimeStamp') {
-                    console.log(value);
-
                     if (value.createdAt && !value.updatedAt) {
                       formData['Created at'] =  new Date().toISOString();
                     } else if (!value.createdAt && value.updatedAt) {
