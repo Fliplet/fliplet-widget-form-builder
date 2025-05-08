@@ -116,6 +116,14 @@ function setTypeaheadFieldValue(field, value) {
       field.value = value;
     });
   } else {
+    value.forEach((val) => {
+      const exists = field.options.some(option => option.id === val);
+
+      if (!exists) {
+        field.options.push({ id: val, label: val });
+      }
+    });
+
     field.value = value;
   }
 }
