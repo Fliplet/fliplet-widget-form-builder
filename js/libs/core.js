@@ -1125,8 +1125,6 @@ Fliplet.FormBuilder = (function() {
           }
         }
 
-        console.log(currentMultiStepForm, '2222222222222222222currentMultiStepForm');
-
         return currentMultiStepForm;
       };
 
