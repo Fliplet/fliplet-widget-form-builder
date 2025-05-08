@@ -1217,7 +1217,56 @@ Fliplet().then(function() {
             currentMultiStepForm.forEach((form) => {
               if (form.$instance) {
                 form.$instance.fields.forEach((field) => {
-                  if (!(field._type === 'flButtons' || field._type === 'flCustomButton')) {
+                  let value = field.value;
+                  let type = field._type;
+
+                  if (type === 'flMap') {
+                    formData[`${field.name} Address`] = value.address;
+                    formData[`${field.name} Lat/Long`] = value.latLong;
+                  } else if (type === 'flTimeStamp') {
+                    console.log(value);
+
+                    if (value.createdAt && !value.updatedAt) {
+                      formData['Created at'] =  new Date().toISOString();
+                    } else if (!value.createdAt && value.updatedAt) {
+                      formData['Last updated'] =  '';
+                    } else if (value.createdAt && value.updatedAt) {
+                      formData['Created at'] =  new Date().toISOString();
+                      formData['Last updated'] = '';
+                    }
+                  } else    if (type === 'flDateRange' || type === 'flTimeRange') {
+                    if (value) {
+                      formData[`${field.name} [Start]`] = value.start;
+                      formData[`${field.name} [End]`] = value.end;
+                    }
+                  } else if (type === 'flMatrix') {
+                    if (!_.isEmpty(value)) {
+                      _.forEach(field.rowOptions, function(rowOpt) {
+                        var val = rowOpt.id || rowOpt.label;
+                        var rowFound = _.some(value, function(col, row) {
+                          if (!row || !col) {
+                            return;
+                          }
+
+                          if (val === row) {
+                            formData[`${field.name} [${val}]`] = col;
+
+                            return true;
+                          }
+                        });
+
+                        if (!rowFound) {
+                          formData[`${field.name} [${val}]`] = '';
+                        }
+                      });
+                    } else {
+                      _.forEach(field.rowOptions, function(row) {
+                        var val = row.id ? row.id : row.label;
+
+                        formData[`${field.name} [${val}]`] = '';
+                      });
+                    }
+                  } else   if (!(field._type === 'flButtons' || field._type === 'flCustomButton')) {
                     formData[field.name] = field.value;
                   }
                 });
@@ -1741,24 +1790,92 @@ Fliplet().then(function() {
             const prevButtons = formElement.querySelectorAll('[data-button-action="previous-slide"]');
 
             nextButtons.forEach(button => {
-              button.addEventListener('click', async function(e) {
+              if (button._nextClickHandler) {
+                button.removeEventListener('click', button._nextClickHandler);
+              }
+
+              button._nextClickHandler = async function(e) {
                 e.preventDefault();
 
                 const currentMultiStepForm = await getCurrentMultiStepForm(allFormsInSlide, data);
 
                 await $vm.synchronizeMatchingFields(currentMultiStepForm, data);
-              });
+
+                setTimeout(() => {
+                  if (data.canSwipeSlide) {
+                    swiperContainer.swiper.slideNext();
+                  }
+                }, 0);
+              };
+
+              button.addEventListener('click', button._nextClickHandler);
             });
 
             prevButtons.forEach(button => {
-              button.addEventListener('click', async function(e) {
+              if (button._prevClickHandler) {
+                button.removeEventListener('click', button._prevClickHandler);
+              }
+
+              button._prevClickHandler = async function(e) {
                 e.preventDefault();
 
                 const currentMultiStepForm = await getCurrentMultiStepForm(allFormsInSlide, data);
 
                 await $vm.synchronizeMatchingFields(currentMultiStepForm, data);
-              });
+
+                setTimeout(() => {
+                  if (data.canSwipeSlide) {
+                    swiperContainer.swiper.slidePrev();
+                  }
+                }, 0);
+              };
+
+              button.addEventListener('click', button._prevClickHandler);
             });
+
+
+            setTimeout(() => {
+              let isTouchMoveTriggered = false;
+
+              const swiper = swiperContainer && swiperContainer.swiper;
+
+              swiper.on('touchStart', function() {
+                isTouchMoveTriggered = false;
+                swiper.allowSlideNext = true;
+              });
+
+              swiper.on('touchMove', async function() {
+                if (!isTouchMoveTriggered) {
+                  const activeSlide = swiperContainer.querySelector('.swiper-slide-active');
+                  const activeSlideId = activeSlide.getAttribute('data-id');
+                  const currentMultiStepFormSlideId = data.slideId;
+
+                  isTouchMoveTriggered = true;
+
+                  if (activeSlideId !== currentMultiStepFormSlideId) {
+                    return;
+                  }
+
+                  const currentMultiStepForm = await getCurrentMultiStepForm(allFormsInSlide, data);
+
+                  $vm.synchronizeMatchingFields(currentMultiStepForm, data);
+
+                  setTimeout(() => {
+                    const canSwipe = (() => {
+                      const formsInActiveSlide = currentMultiStepForm.filter(form => form.$instance.slideId == activeSlideId);
+
+                      return !formsInActiveSlide.some(form => form.$instance.isFormValid === false);
+                    })();
+
+                    if (!canSwipe) {
+                      swiper.allowSlideNext = false;
+                    } else {
+                      swiper.allowSlideNext = true;
+                    }
+                  }, 0);
+                }
+              });
+            }, 0);
           }
         }
       },
