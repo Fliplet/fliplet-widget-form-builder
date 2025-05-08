@@ -1232,7 +1232,7 @@ Fliplet().then(function() {
                       formData['Created at'] =  new Date().toISOString();
                       formData['Last updated'] = '';
                     }
-                  } else    if (type === 'flDateRange' || type === 'flTimeRange') {
+                  } else if (type === 'flDateRange' || type === 'flTimeRange') {
                     if (value) {
                       formData[`${field.name} [Start]`] = value.start;
                       formData[`${field.name} [End]`] = value.end;
@@ -1264,7 +1264,7 @@ Fliplet().then(function() {
                         formData[`${field.name} [${val}]`] = '';
                       });
                     }
-                  } else   if (!(field._type === 'flButtons' || field._type === 'flCustomButton')) {
+                  } else if (!(field._type === 'flButtons' || field._type === 'flCustomButton')) {
                     formData[field.name] = field.value;
                   }
                 });
@@ -1704,7 +1704,7 @@ Fliplet().then(function() {
                     try {
                       await form.$instance.onSubmit();
                     } catch (error) {
-                      console.warn('Form validation failed:', error);
+                      console.warn('Form validation failed');
                     }
                   }
                 }
@@ -1739,7 +1739,7 @@ Fliplet().then(function() {
                 });
               }
             } catch (error) {
-              console.error('Error in synchronizeMatchingFields:', error);
+              console.error('Error in synchronizeMatchingFields');
             }
           });
         },

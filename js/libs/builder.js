@@ -1098,11 +1098,17 @@ Fliplet().then(function() {
         for (let form of allFormsInSlide) {
           const formDsId = form.dataSourceId;
 
-          if (form.sliderContainerId !== currentForm.sliderContainerId) continue;
+          if (form.sliderContainerId !== currentForm.sliderContainerId) {
+            continue;
+          }
 
-          if (currentForm.id === form.id) isCurrentForm = true;
+          if (currentForm.id === form.id) {
+            isCurrentForm = true;
+          }
 
-          if (currentFormDsId !== formDsId) continue;
+          if (currentFormDsId !== formDsId) {
+            continue;
+          }
 
           let hasFlButton = false;
 
