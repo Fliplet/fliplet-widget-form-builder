@@ -1038,11 +1038,22 @@ Fliplet.FormBuilder = (function() {
       };
 
       component.methods._getFormsInSlides = async function() {
-        try {
-          const formWidgets = await Fliplet.Widget.find((w) => w.package === 'com.fliplet.form-builder');
-          const formsInSlides = [];
+        const appId = Fliplet.Env.get('appId');
+        const pageId = Fliplet.Widget.getPage().id;
 
-          for (const widget of formWidgets) {
+        const currentPage = await Fliplet.API.request({
+          method: 'GET',
+          url: 'v1/apps/' + appId + '/pages/' + pageId + '?richLayout'
+        });
+
+        const formsIdsInDomOrder = Array.from(currentPage.page.richLayout.matchAll(/<fl-form cid="(\d+)"/g), m => m[1]);
+
+        const formWidgets = await Fliplet.Widget.find((w) =>{
+          return w.isFormInSlider !== undefined;
+        });
+
+        const formPromises = formWidgets.map(async(widget) => {
+          try {
             const widgetId = widget.id;
             const currentWidgetId =  parseInt(await Fliplet.Widget.getDefaultId(), 10);
 
@@ -1050,21 +1061,33 @@ Fliplet.FormBuilder = (function() {
               currentFormData = widget;
             }
 
-            const parents = await Fliplet.Widget.findParents({ instanceId: widgetId });
-            const slideParent = parents.find(parent => parent.name === 'Slide');
+            const parents = await Fliplet.Widget.findParents({ instanceId: widget.id });
 
-            widget.slideId = slideParent.id;
-            widget.isFormInSlide = true;
+            widget.isFormInSlider = parents.length > 1 && parents[1].sliderId;
+            widget.sliderContainerId = parents.length > 1 && parents[1].sliderId;
+            widget.slideId = widget.sldieId;
 
-            formsInSlides.push(widget);
+            return widget;
+          } catch (error) {
+            console.error('Error processing widget:', widget.id, error);
+
+            return widget;
           }
+        });
 
-          return formsInSlides;
-        } catch (error) {
-          console.error('Error getting forms in slides:', error);
+        const allFormsInSlide = await Promise.all(formPromises);
+        const sortedFormsByDomOrder = [...allFormsInSlide].sort((formA, formB) => {
+          const formAId = String(formA.id);
+          const formBId = String(formB.id);
 
-          return [];
-        }
+          const formAPosition = formsIdsInDomOrder.indexOf(formAId);
+          const formBPosition = formsIdsInDomOrder.indexOf(formBId);
+
+          return formAPosition - formBPosition;
+        });
+
+
+        return sortedFormsByDomOrder;
       };
 
       component.methods._getCurrentMultiStepForm = async function(allFormsInSlide, currentForm) {
@@ -1111,7 +1134,7 @@ Fliplet.FormBuilder = (function() {
 
           try {
             return form.fields.some((field) => {
-              return this.label === field.label;
+              return this.label === field.label && field._type !== 'flCustomButton';
             });
           } catch (error) {
             console.warn('Error checking fields for form:', form.id, error);
