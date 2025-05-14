@@ -37,9 +37,9 @@
   </p>
   <div class="form-group" v-for="(field) in separateFieldsName" :key="field.key">
     <label>\{{ field.label }}</label>
-    <select class="form-control" v-model="selectedFieldOptions[field.key]" @change="_updateDisabledOptions">
+    <select class="form-control" v-model="localSelectedFieldOptions[field.key]" @change="_updateDisabledOptions">
       <option value="">-- Select one</option>
-      <option  v-for="option in fieldOptions" :value="option.label" :disabled="option.disabled" :key="option.label">
+      <option  v-for="option in localFieldOptions" :value="option.label" :disabled="option.disabled" :key="option.label">
         \{{ option.label }}
       </option>
     </select>
