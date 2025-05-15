@@ -1,6 +1,6 @@
 Fliplet.FormBuilder.field('geolocation', {
   name: 'Geolocation',
-  category: 'Advanced',
+  category: 'Location & Map',
   props: {
     value: {
       type: Array,
