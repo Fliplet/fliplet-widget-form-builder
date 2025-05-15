@@ -116,6 +116,14 @@ function setTypeaheadFieldValue(field, value) {
       field.value = value;
     });
   } else {
+    value.forEach((val) => {
+      const exists = field.options.some(option => option.id === val);
+
+      if (!exists) {
+        field.options.push({ id: val, label: val });
+      }
+    });
+
     field.value = value;
   }
 }
@@ -1380,6 +1388,7 @@ Fliplet().then(function() {
                 return operation.then(function() {
                   return trackEventOp.then(function() {
                     Fliplet.Navigate.to(data.linkAction);
+                    $vm.resetFormLoad(true);
                   });
                 }).catch(function(err) {
                   Fliplet.Modal.alert({
@@ -1395,9 +1404,7 @@ Fliplet().then(function() {
                   field.passwordConfirmation = '';
                 }
               });
-              $vm.isSending = false;
-              $vm.isResetAction = false;
-              $vm.resetForm(false);
+              $vm.resetFormLoad();
               /**
                * When we try to submit a form in Edge or IE11 and use components date picker and rich text
                * (only in this sequence) we could saw that rich text textarea become empty but there was no
@@ -1422,6 +1429,11 @@ Fliplet().then(function() {
             //   }));
             // });
           });
+        },
+        resetFormLoad: function(action = false) {
+          this.isSending = false;
+          this.isResetAction = true;
+          this.resetForm(action);
         },
         loadEntryForUpdate: function(fn) {
           var $vm = this;
