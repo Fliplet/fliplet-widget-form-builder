@@ -1429,3 +1429,15 @@ form hr {
 .maps {
   display: none;
 }
+
+.fl-paragraph-editor .tox .tox-toolbar__group > .tox-tbtn--select:first-child .tox-tbtn__select-label {
+  background: transparent;
+  font-weight: 700;
+}
+
+/* Prevent hover styles from appearing on the label */
+.fl-paragraph-editor .tox .tox-toolbar__group > .tox-tbtn--select:first-child:hover,
+.fl-paragraph-editor .tox .tox-toolbar__group > .tox-tbtn--select:first-child:focus {
+  background: transparent;
+  box-shadow: none;
+}

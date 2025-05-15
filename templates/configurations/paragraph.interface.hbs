@@ -1,4 +1,12 @@
-<div class="form-group">
+<div class='form-group'>
   <label>Text</label>
-  <textarea class="form-control" v-model.trim="value" placeholder="Type some text" rows="6"></textarea>
+  <div class='fl-paragraph-editor'>
+    <textarea
+      id='tinymce-paragraph'
+      ref='textarea'
+      placeholder='Type some text'
+      class="form-control"
+    >
+    </textarea>
+  </div>
 </div>
