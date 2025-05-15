@@ -1054,7 +1054,7 @@ Fliplet.FormBuilder = (function() {
           branding: false,
           plugins: 'lists',
           toolbar: 'bold italic underline | fontsize_label fontsize',
-          font_size_formats: '12pt 16pt 20pt',
+          font_size_formats: '8px 10px 12px 14px 18px 24px 36px',
           setup: function(editor) {
             $vm._editor = editor;
 
