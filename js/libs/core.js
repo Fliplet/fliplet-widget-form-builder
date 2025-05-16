@@ -444,6 +444,11 @@ Fliplet.FormBuilder = (function() {
           }
         }
 
+        if (this._componentName === 'flAddress') {
+          data.fieldOptions = this.localFieldOptions;
+          data.selectedFieldOptions = this.localSelectedFieldOptions;
+        }
+
         if (this._componentName === 'flCustomButton') {
           window.buttonProvider.forwardSaveRequest();
 
@@ -551,6 +556,15 @@ Fliplet.FormBuilder = (function() {
         type: Object,
         default: {}
       };
+
+      if (!component.data) {
+        component.data = function() {
+          return {
+            localSelectedFieldOptions: {},
+            localFieldOptions: []
+          };
+        };
+      }
 
       component.computed._fieldNameError = function() {
         if (!this.name) {
@@ -785,6 +799,8 @@ Fliplet.FormBuilder = (function() {
 
           if (componentName === 'flAddress') {
             this._initAddressTypeahead();
+            this.localSelectedFieldOptions = _.cloneDeep(this.selectedFieldOptions);
+            this.localFieldOptions = _.cloneDeep(this.fieldOptions);
           }
         };
       }
@@ -898,11 +914,11 @@ Fliplet.FormBuilder = (function() {
       }
 
       component.methods._updateDisabledOptions = function() {
-        const assignedValues = Object.values(this.selectedFieldOptions)
+        const assignedValues = Object.values(this.localSelectedFieldOptions)
           .filter(value => value && this.fieldOptions.some(option => option.label === value)) // Check if value exists in fieldOptions
           .map(value => value);
 
-        this.fieldOptions.forEach(option => {
+        this.localFieldOptions.forEach(option => {
           option.disabled = assignedValues.includes(option.label);
         });
       };
