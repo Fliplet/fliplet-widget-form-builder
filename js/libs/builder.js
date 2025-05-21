@@ -5,9 +5,17 @@ var data = Fliplet.Widget.getData(widgetId) || {};
 var isFormInSlider = false;
 
 Fliplet.Widget.findParents({ instanceId: widgetId }).then(function(parents) {
-  data.slideId = parents.length && parents[0].slideId;
-  data.sliderContainerId = parents.length > 1 && parents[1].sliderId;
-  isFormInSlider = parents.length > 1 && parents[1].sliderId;
+  const formSlideParent = parents.find(parent =>
+    parent.package === 'com.fliplet.slide' || parent.name === 'Slide'
+  );
+
+  const formSliderParent = parents.find(parent =>
+    parent.package === 'com.fliplet.slider-container' || parent.name === 'Slider container'
+  );
+
+  data.slideId = formSlideParent.length && formSlideParent.slideId;
+  data.sliderContainerId = formSliderParent.length && formSliderParent.sliderId;
+  isFormInSlider = !!(formSlideParent && formSlideParent.slideId);
 });
 
 const queryParams = Object.fromEntries(new URLSearchParams(location.search));
@@ -1065,8 +1073,12 @@ Fliplet().then(function() {
           try {
             const parents = await Fliplet.Widget.findParents({ instanceId: widget.id });
 
-            widget.isFormInSlider = parents.length > 1 && parents[1].sliderId;
-            widget.sliderContainerId = parents.length > 1 && parents[1].sliderId;
+            const formSliderParent = parents.find(parent =>
+              parent.package === 'com.fliplet.slider-container' || parent.name === 'Slider container'
+            );
+
+            widget.isFormInSlider = !!(formSliderParent && formSliderParent.slideId);
+            widget.sliderContainerId = formSliderParent.length && formSliderParent.sliderId;
 
             return widget;
           } catch (error) {

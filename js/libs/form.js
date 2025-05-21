@@ -173,15 +173,19 @@ async function getCurrentMultiStepForm(allFormsInSlide, currentForm) {
 
 
 // Wait for form fields to be ready, as they get defined after translations are initialized
-Fliplet().then(function() {
+Fliplet().then(async function() {
   Fliplet.Widget.instance('form-builder', async function(data, vm) {
-    const formElement = document.querySelector(`[data-id="${data.id}"]`);
-    const isFormInSlide = formElement && formElement.offsetParent && formElement.offsetParent.getAttribute('name') === 'slide';
+    const formParents = await Fliplet.Widget.findParents({ instanceId: data.id });
+    const formSlideParent = formParents.find(parent =>
+      parent.package === 'com.fliplet.slide' || parent.name === 'Slide'
+    );
+
+    const isFormInSlide = !!(formSlideParent && formSlideParent.slideId);
 
     data.isFormInSlide = isFormInSlide;
 
     if (isFormInSlide) {
-      data.slideId = formElement.offsetParent.getAttribute('data-slide-id');
+      data.slideId = formSlideParent.slideId + '';
       allFormsInSlide.push(data);
     }
 
@@ -1068,7 +1072,7 @@ Fliplet().then(function() {
         triggerBlurEventOnInputs: function() {
           $(this.$el).find('input').blur();
         },
-        onSubmit: function() {
+        onSubmit: function(eventType) {
           const activeElement = document.activeElement;
           const isPrevButton = activeElement.getAttribute('data-button-action') === 'previous-slide';
           const isPrevArrow = activeElement.classList.contains('swiper-button-prev');
@@ -1202,7 +1206,10 @@ Fliplet().then(function() {
             if (!$vm.isFormValid) {
               if (data.isFormInSlide) {
                 data.canSwipeSlide = false;
-                activeElement.setAttribute('data-can-swipe', false);
+
+                if (activeElement.type === 'submit') {
+                  activeElement.setAttribute('data-can-swipe', false);
+                }
               }
 
               return onFormInvalid();
@@ -1277,10 +1284,13 @@ Fliplet().then(function() {
             const canSwipe = activeElement.getAttribute('data-can-swipe');
             const isNavigationButton = (activeElement.type === 'submit' && hasButtonAction) || (activeElement.type !== 'submit' && canSwipe);
 
-            if (data.isFormInSlide && activeElement && isNavigationButton && (hasButtonAction || canSwipe)) {
+            if (eventType === 'touchmove' || (data.isFormInSlide && activeElement && isNavigationButton && (hasButtonAction || canSwipe))) {
               $vm.isSending = false;
               data.canSwipeSlide = true;
-              activeElement.setAttribute('data-can-swipe', true);
+
+              if (activeElement.type === 'submit') {
+                activeElement.setAttribute('data-can-swipe', true);
+              }
 
               return;
             }
@@ -1702,14 +1712,14 @@ Fliplet().then(function() {
 
                   if (form && form.$instance.slideId === data.slideId) {
                     try {
-                      await form.$instance.onSubmit();
+                      await form.$instance.onSubmit('touchmove');
                     } catch (error) {
                       console.warn('Form validation failed');
                     }
                   }
                 }
 
-                await currentFormInstance.$instance.onSubmit();
+                await currentFormInstance.$instance.onSubmit('touchmove');
 
 
                 if (!currentForm.canSwipeSlide) {
@@ -1831,51 +1841,59 @@ Fliplet().then(function() {
               button.addEventListener('click', button._prevClickHandler);
             });
 
+            let isTouchMoveTriggered = false;
 
-            setTimeout(() => {
-              let isTouchMoveTriggered = false;
+            function handleTouchStart(swiper) {
+              isTouchMoveTriggered = false;
+              swiper.allowSlideNext = true;
+            }
 
+            async function handleTouchMove(swiper, swiperContainer, data, allFormsInSlide, $vm) {
+              if (isTouchMoveTriggered) return;
+
+              const activeSlide = swiperContainer.querySelector('.swiper-slide-active');
+              const activeSlideId = activeSlide.getAttribute('data-id');
+              const currentMultiStepFormSlideId = data.slideId;
+
+              isTouchMoveTriggered = true;
+
+              if (activeSlideId !== currentMultiStepFormSlideId) {
+                return;
+              }
+
+              const currentMultiStepForm = await getCurrentMultiStepForm(allFormsInSlide, data);
+
+              $vm.synchronizeMatchingFields(currentMultiStepForm, data, 'touchmove');
+
+              setTimeout(() => {
+                const formsInActiveSlide = currentMultiStepForm.filter(form => form.$instance.slideId === activeSlideId);
+                const canSwipe = !formsInActiveSlide.some(form => form.$instance.isFormValid === false);
+
+                swiper.allowSlideNext = canSwipe;
+              }, 0);
+            }
+
+            // DOM events
+            swiperContainer.addEventListener('touchstart', () => {
               const swiper = swiperContainer && swiperContainer.swiper;
 
-              swiper.on('touchStart', function() {
-                isTouchMoveTriggered = false;
-                swiper.allowSlideNext = true;
-              });
+              if (swiper) handleTouchStart(swiper);
+            });
 
-              swiper.on('touchMove', async function() {
-                if (!isTouchMoveTriggered) {
-                  const activeSlide = swiperContainer.querySelector('.swiper-slide-active');
-                  const activeSlideId = activeSlide.getAttribute('data-id');
-                  const currentMultiStepFormSlideId = data.slideId;
+            swiperContainer.addEventListener('touchmove', () => {
+              const swiper = swiperContainer && swiperContainer.swiper;
 
-                  isTouchMoveTriggered = true;
+              if (swiper) handleTouchMove(swiper, swiperContainer, data, allFormsInSlide, $vm);
+            });
 
-                  if (activeSlideId !== currentMultiStepFormSlideId) {
-                    return;
-                  }
+            // Swiper events
+            setTimeout(() => {
+              const swiper = swiperContainer && swiperContainer.swiper;
 
-                  const currentMultiStepForm = await getCurrentMultiStepForm(allFormsInSlide, data);
+              if (!swiper) return;
 
-                  $vm.synchronizeMatchingFields(currentMultiStepForm, data);
-
-                  setTimeout(() => {
-                    const canSwipe = (() => {
-                      console.log(currentMultiStepForm, 'activeSlideId');
-
-
-                      const formsInActiveSlide = currentMultiStepForm.filter(form => form.$instance.slideId === activeSlideId);
-
-                      return !formsInActiveSlide.some(form => form.$instance.isFormValid === false);
-                    })();
-
-                    if (!canSwipe) {
-                      swiper.allowSlideNext = false;
-                    } else {
-                      swiper.allowSlideNext = true;
-                    }
-                  }, 0);
-                }
-              });
+              swiper.on('touchStart', () => handleTouchStart(swiper));
+              swiper.on('touchMove', () => handleTouchMove(swiper, swiperContainer, data, allFormsInSlide, $vm));
             }, 0);
           }
         }

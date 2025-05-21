@@ -468,7 +468,12 @@ Fliplet.FormBuilder = (function() {
       component.methods.initButtonProvider = async function() {
         var widgetId = parseInt(Fliplet.Widget.getDefaultId(), 10);
         var formParents = await Fliplet.Widget.findParents({ instanceId: widgetId });
-        var isFormInSlide = formParents.length && formParents[0].name === 'Slide';
+
+        const formSlideParent = formParents.find(parent =>
+          parent.package === 'com.fliplet.slide' || parent.name === 'Slide'
+        );
+
+        var isFormInSlide = !!(formSlideParent && formSlideParent.slideId);
 
         var $vm = this;
         var page = Fliplet.Widget.getPage();
@@ -1063,8 +1068,14 @@ Fliplet.FormBuilder = (function() {
 
             const parents = await Fliplet.Widget.findParents({ instanceId: widget.id });
 
-            widget.isFormInSlider = parents.length > 1 && parents[1].sliderId;
-            widget.sliderContainerId = parents.length > 1 && parents[1].sliderId;
+
+            const formSliderParent = parents.find(parent =>
+              parent.package === 'com.fliplet.slider-container' || parent.name === 'Slider container'
+            );
+
+            widget.isFormInSlider = !!(formSliderParent && formSliderParent.slideId);
+
+            widget.sliderContainerId = formSliderParent.length && formSliderParent.sliderId;
             widget.slideId = widget.sldieId;
 
             return widget;
