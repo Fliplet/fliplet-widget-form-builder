@@ -119,7 +119,6 @@ function generateFormDefaults(data) {
       id: Fliplet.User.get('id'),
       fullName: Fliplet.User.get('fullName')
     },
-    isAdmin: isAdmin,
     isFormInSlider: isFormInSlider
   }, data);
 }
