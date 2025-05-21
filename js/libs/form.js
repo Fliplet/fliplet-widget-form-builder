@@ -1338,7 +1338,7 @@ Fliplet().then(async function() {
             });
           }
 
-          return onFormSubmission().then(function() {
+          return onFormSubmission().then( async function() {
             try {
               await $vm.checkMapFieldStatus();
             } catch (error) {
