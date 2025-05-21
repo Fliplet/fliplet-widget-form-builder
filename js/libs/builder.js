@@ -18,9 +18,6 @@ Fliplet.Widget.findParents({ instanceId: widgetId }).then(function(parents) {
   isFormInSlider = !!(formSlideParent && formSlideParent.slideId);
 });
 
-const queryParams = Object.fromEntries(new URLSearchParams(location.search));
-const isAdmin = queryParams.beta === 'true';
-
 // Cleanup
 if (data.fields) {
   data.fields = _.compact(data.fields);
@@ -1034,10 +1031,14 @@ Fliplet().then(function() {
 
 
             case 'flMap':
-              if (isAdmin) {
-                fieldNames.push(`${field.name} Lat/Long`);
-                fieldNames.push(`${field.name} Address`);
-              }
+              fieldNames.push(`${field.name} Lat/Long`);
+              fieldNames.push(`${field.name} Address`);
+              fieldNames.push(`${field.name} Country`);
+              fieldNames.push(`${field.name} City`);
+              fieldNames.push(`${field.name} Postal Code`);
+              fieldNames.push(`${field.name} State`);
+              fieldNames.push(`${field.name} Street Name`);
+              fieldNames.push(`${field.name} Street Number`);
 
               break;
 

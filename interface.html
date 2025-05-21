@@ -309,7 +309,7 @@
             <h2><small>Your form</small> <span class="required-info-label" v-bind:class="{'isRequired': hasRequiredFields}">* Required fields</span></h2>
             <form class="form-html" v-sortable="{ group: { name: 'fields', pull: false }, scrollSensitivity: 116, scrollSpeed: 10, onAdd: onAdd, onUpdate: onSort }">
               <template v-if="fields.length">
-                <div v-if="!(field._type === 'flMap' && !isAdmin)" class="component" :key="field.name" v-for="(field, index) in fields" v-on:click="onFieldClick(field)" v-bind:class="{ editing: activeField && field.name === activeField.name }">
+                <div class="component" :key="field.name" v-for="(field, index) in fields" v-on:click="onFieldClick(field)" v-bind:class="{ editing: activeField && field.name === activeField.name }">
                   <div class="delete-field" href="#" v-on:click.prevent.stop="deleteField(field.label, index)"><i class="fa fa-trash"></i></div>
                   <div class="overlay-screen">
                     <div class="edit-label">

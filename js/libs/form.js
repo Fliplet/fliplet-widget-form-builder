@@ -119,6 +119,14 @@ function setTypeaheadFieldValue(field, value) {
       field.value = value;
     });
   } else {
+    value.forEach((val) => {
+      const exists = field.options.some(option => option.id === val);
+
+      if (!exists) {
+        field.options.push({ id: val, label: val });
+      }
+    });
+
     field.value = value;
   }
 }
@@ -432,7 +440,7 @@ Fliplet().then(async function() {
       });
 
       if (fields.length && (data.saveProgress && typeof progress === 'object') || entry) {
-        fields.forEach(function(field) {
+        fields.forEach(async function(field) {
           if (entry && entry.data && field.populateOnUpdate !== false) {
             var fieldKey = isResetAction
               ? field.defaultValueKey
@@ -988,6 +996,17 @@ Fliplet().then(async function() {
             if (field.name === fieldName) {
               if (field._type === 'flPassword' && fromPasswordConfirmation) {
                 field.passwordConfirmation = value;
+              } else if (field._type === 'flMap' && field.mapStatusError) {
+                if (field.value.address.id) {
+                  value = {
+                    address: '',
+                    latLong: null
+                  };
+                } else if (value.address) {
+                  field.mapStatusError = '';
+                }
+
+                field.value = value;
               } else {
                 field.value = value;
               }
@@ -1072,7 +1091,48 @@ Fliplet().then(async function() {
         triggerBlurEventOnInputs: function() {
           $(this.$el).find('input').blur();
         },
-        onSubmit: function(eventType) {
+        checkMapFieldStatus: async function() {
+          const mapField = this.fields.find(field =>
+            field._type === 'flMap' && field.value && field.value.address && field.value.address.id
+          );
+
+          if (!mapField) {
+            return;
+          }
+
+          this.isSending = true;
+          this.isSendingMessage = T('widgets.form.savingData');
+
+          return new Promise((resolve, reject) => {
+            let elapsedTime = 0;
+            const timeoutDuration = 9000;
+            const intervalDuration = 3000;
+
+
+            const checkInterval = setInterval(() => {
+              const currentValue = mapField.value;
+
+              if (currentValue && currentValue.address && currentValue.latLong) {
+                clearInterval(checkInterval);
+                resolve();
+
+                return;
+              }
+
+              elapsedTime += intervalDuration;
+
+              if (elapsedTime >= timeoutDuration) {
+                clearInterval(checkInterval);
+                this.isSending = false;
+                reject({
+                  message: T('widgets.form.errors.locationError'),
+                  currentFieldName: mapField.name
+                });
+              }
+            }, intervalDuration);
+          });
+        },
+        onSubmit: async function() {
           const activeElement = document.activeElement;
           const isPrevButton = activeElement.getAttribute('data-button-action') === 'previous-slide';
           const isPrevArrow = activeElement.classList.contains('swiper-button-prev');
@@ -1083,7 +1143,6 @@ Fliplet().then(async function() {
 
             return;
           }
-
           var $vm = this;
           var formData = {};
 
@@ -1280,6 +1339,24 @@ Fliplet().then(async function() {
           }
 
           return onFormSubmission().then(function() {
+            try {
+              await $vm.checkMapFieldStatus();
+            } catch (error) {
+              $vm.isSending = false;
+
+              $vm.fields.forEach(function(field) {
+                if (field._type === 'flMap' && field.name === error.currentFieldName) {
+                  field.mapStatusError = error.message;
+
+                  return;
+                }
+              });
+
+              showValidationMessage(error.message);
+
+              throw new Error(error.message);
+            }
+            
             const hasButtonAction = activeElement.getAttribute('data-button-action');
             const canSwipe = activeElement.getAttribute('data-can-swipe');
             const isNavigationButton = (activeElement.type === 'submit' && hasButtonAction) || (activeElement.type !== 'submit' && canSwipe);
@@ -1293,7 +1370,8 @@ Fliplet().then(async function() {
               }
 
               return;
-            }
+          return onFormSubmission().then(async function() {
+
 
             $vm.isSending = true;
 
@@ -1469,6 +1547,15 @@ Fliplet().then(async function() {
                 } else if (type === 'flMap') {
                   appendField(`${field.name} Address`, value.address);
                   appendField(`${field.name} Lat/Long`, value.latLong);
+
+                  if (value.addressComponents) {
+                    appendField(`${field.name} Country`, value.addressComponents.country);
+                    appendField(`${field.name} City`, value.addressComponents.city);
+                    appendField(`${field.name} Postal Code`, value.addressComponents.postalCode);
+                    appendField(`${field.name} State`, value.addressComponents.state);
+                    appendField(`${field.name} Street Name`, value.addressComponents.streetName);
+                    appendField(`${field.name} Street Number`, value.addressComponents.streetNumber);
+                  }
                 } else if (type === 'flGeolocation') {
                   appendField(field.name, value ? value[0] : null);
                   appendField(`${field.name} (accuracy)`, value ? value[1] : null);
@@ -1571,6 +1658,7 @@ Fliplet().then(async function() {
                 return operation.then(function() {
                   return trackEventOp.then(function() {
                     Fliplet.Navigate.to(data.linkAction);
+                    $vm.resetFormLoad(true);
                   });
                 }).catch(function(err) {
                   Fliplet.Modal.alert({
@@ -1586,9 +1674,7 @@ Fliplet().then(async function() {
                   field.passwordConfirmation = '';
                 }
               });
-              $vm.isSending = false;
-              $vm.isResetAction = false;
-              $vm.resetForm(false);
+              $vm.resetFormLoad();
               /**
                * When we try to submit a form in Edge or IE11 and use components date picker and rich text
                * (only in this sequence) we could saw that rich text textarea become empty but there was no
@@ -1617,6 +1703,11 @@ Fliplet().then(async function() {
             //   }));
             // });
           });
+        },
+        resetFormLoad: function(action = false) {
+          this.isSending = false;
+          this.isResetAction = true;
+          this.resetForm(action);
         },
         loadEntryForUpdate: function(fn) {
           var $vm = this;
