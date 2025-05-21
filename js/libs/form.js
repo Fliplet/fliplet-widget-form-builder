@@ -1132,7 +1132,7 @@ Fliplet().then(async function() {
             }, intervalDuration);
           });
         },
-        onSubmit: async function() {
+        onSubmit: async function(eventType) {
           const activeElement = document.activeElement;
           const isPrevButton = activeElement.getAttribute('data-button-action') === 'previous-slide';
           const isPrevArrow = activeElement.classList.contains('swiper-button-prev');
@@ -1143,6 +1143,7 @@ Fliplet().then(async function() {
 
             return;
           }
+
           var $vm = this;
           var formData = {};
 
@@ -1338,7 +1339,7 @@ Fliplet().then(async function() {
             });
           }
 
-          return onFormSubmission().then( async function() {
+          return onFormSubmission().then(async function() {
             try {
               await $vm.checkMapFieldStatus();
             } catch (error) {
@@ -1356,7 +1357,7 @@ Fliplet().then(async function() {
 
               throw new Error(error.message);
             }
-            
+
             const hasButtonAction = activeElement.getAttribute('data-button-action');
             const canSwipe = activeElement.getAttribute('data-can-swipe');
             const isNavigationButton = (activeElement.type === 'submit' && hasButtonAction) || (activeElement.type !== 'submit' && canSwipe);
@@ -1370,8 +1371,7 @@ Fliplet().then(async function() {
               }
 
               return;
-          return onFormSubmission().then(async function() {
-
+            }
 
             $vm.isSending = true;
 
