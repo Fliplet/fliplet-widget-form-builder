@@ -575,7 +575,7 @@ Fliplet.FormBuilder = (function() {
         type: Boolean,
         default: false
       };
-      
+
       if (!component.data) {
         component.data = function() {
           return {
