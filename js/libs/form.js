@@ -1757,6 +1757,37 @@ Fliplet().then(async function() {
           const $vm = this;
           const formElement = document.querySelector(`[data-id="${data.id}"]`);
           const currentSlide = formElement.closest('.swiper-slide');
+          let isTouchMoveTriggered = false;
+
+          function handleTouchStart(swiper) {
+            isTouchMoveTriggered = false;
+            swiper.allowSlideNext = true;
+          }
+
+          async function handleTouchMove(swiper, swiperContainer, data, allFormsInSlide, $vm) {
+            if (isTouchMoveTriggered) return;
+
+            const activeSlide = swiperContainer.querySelector('.swiper-slide-active');
+            const activeSlideId = activeSlide.getAttribute('data-id');
+            const currentMultiStepFormSlideId = data.slideId;
+
+            isTouchMoveTriggered = true;
+
+            if (activeSlideId !== currentMultiStepFormSlideId) {
+              return;
+            }
+
+            const currentMultiStepForm = await getCurrentMultiStepForm(allFormsInSlide, data);
+
+            $vm.synchronizeMatchingFields(currentMultiStepForm, data, 'touchmove');
+
+            setTimeout(() => {
+              const formsInActiveSlide = currentMultiStepForm.filter(form => form.$instance.slideId === activeSlideId);
+              const canSwipe = !formsInActiveSlide.some(form => form.$instance.isFormValid === false);
+
+              swiper.allowSlideNext = canSwipe;
+            }, 0);
+          }
 
           if (currentSlide) {
             const swiperContainer = currentSlide.closest('.swiper-container');
@@ -1840,38 +1871,6 @@ Fliplet().then(async function() {
 
               button.addEventListener('click', button._prevClickHandler);
             });
-
-            let isTouchMoveTriggered = false;
-
-            function handleTouchStart(swiper) {
-              isTouchMoveTriggered = false;
-              swiper.allowSlideNext = true;
-            }
-
-            async function handleTouchMove(swiper, swiperContainer, data, allFormsInSlide, $vm) {
-              if (isTouchMoveTriggered) return;
-
-              const activeSlide = swiperContainer.querySelector('.swiper-slide-active');
-              const activeSlideId = activeSlide.getAttribute('data-id');
-              const currentMultiStepFormSlideId = data.slideId;
-
-              isTouchMoveTriggered = true;
-
-              if (activeSlideId !== currentMultiStepFormSlideId) {
-                return;
-              }
-
-              const currentMultiStepForm = await getCurrentMultiStepForm(allFormsInSlide, data);
-
-              $vm.synchronizeMatchingFields(currentMultiStepForm, data, 'touchmove');
-
-              setTimeout(() => {
-                const formsInActiveSlide = currentMultiStepForm.filter(form => form.$instance.slideId === activeSlideId);
-                const canSwipe = !formsInActiveSlide.some(form => form.$instance.isFormValid === false);
-
-                swiper.allowSlideNext = canSwipe;
-              }, 0);
-            }
 
             // DOM events
             swiperContainer.addEventListener('touchstart', () => {
