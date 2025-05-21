@@ -1765,7 +1765,9 @@ Fliplet().then(async function() {
           }
 
           async function handleTouchMove(swiper, swiperContainer, data, allFormsInSlide, $vm) {
-            if (isTouchMoveTriggered) return;
+            if (isTouchMoveTriggered) {
+              return;
+            }
 
             const activeSlide = swiperContainer.querySelector('.swiper-slide-active');
             const activeSlideId = activeSlide.getAttribute('data-id');
@@ -1876,20 +1878,26 @@ Fliplet().then(async function() {
             swiperContainer.addEventListener('touchstart', () => {
               const swiper = swiperContainer && swiperContainer.swiper;
 
-              if (swiper) handleTouchStart(swiper);
+              if (swiper) {
+                handleTouchStart(swiper);
+              }
             });
 
             swiperContainer.addEventListener('touchmove', () => {
               const swiper = swiperContainer && swiperContainer.swiper;
 
-              if (swiper) handleTouchMove(swiper, swiperContainer, data, allFormsInSlide, $vm);
+              if (swiper) {
+                handleTouchMove(swiper, swiperContainer, data, allFormsInSlide, $vm);
+              }
             });
 
             // Swiper events
             setTimeout(() => {
               const swiper = swiperContainer && swiperContainer.swiper;
 
-              if (!swiper) return;
+              if (!swiper) {
+                return;
+              }
 
               swiper.on('touchStart', () => handleTouchStart(swiper));
               swiper.on('touchMove', () => handleTouchMove(swiper, swiperContainer, data, allFormsInSlide, $vm));
