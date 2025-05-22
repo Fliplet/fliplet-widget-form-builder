@@ -27,7 +27,7 @@
       </div>
     </div>
     <transition name="fade">
-      <div v-if="isSent">{{{ resultHtml }}}</div>
+      <div v-if="isSent && !redirect">{{{ resultHtml }}}</div>
     </transition>
   </form>
   <div v-else-if="!isConfigured && isPlaceholder">
