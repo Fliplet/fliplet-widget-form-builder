@@ -213,7 +213,6 @@ Fliplet.FormBuilder.field('image', {
     },
     processImage: function(file, addThumbnail) {
       var $vm = this;
-      var mimeType = file.type || 'image/png';
 
       this.validateValue();
 
@@ -241,14 +240,14 @@ Fliplet.FormBuilder.field('image', {
           $vm.hasCorruptedImage = false;
           $vm.isImageSizeExceeded = false;
 
-          var scaledImage = loadImage.scale(img, options);
-          var imgBase64Url = scaledImage.toDataURL(mimeType, $vm.jpegQuality);
-          var flipletBase64Url = imgBase64Url + ';filename:' + file.name;
-
-          $vm.value.push(flipletBase64Url);
+          $vm.value.push(file);
 
           if (addThumbnail) {
-            addThumbnailToCanvas(flipletBase64Url, $vm.value.length - 1, $vm);
+            var scaledImage = loadImage.scale(img, options);
+            var mimeType = file.type || 'image/png';
+            var imgBase64Url = scaledImage.toDataURL(mimeType, $vm.jpegQuality);
+
+            addThumbnailToCanvas(imgBase64Url, $vm.value.length - 1, $vm);
           }
 
           $vm.$emit('_input', $vm.name, $vm.value);
@@ -290,12 +289,19 @@ Fliplet.FormBuilder.field('image', {
         imgBase64Url = (imgBase64Url.indexOf('base64') > -1)
           ? imgBase64Url
           : 'data:image/jpeg;base64,' + imgBase64Url;
-        $vm.value.push(imgBase64Url);
-        addThumbnailToCanvas(imgBase64Url, $vm.value.length - 1, $vm);
-        $vm.$emit('_input', $vm.name, $vm.value);
-      }).catch(function(error) {
-        /* eslint-disable-next-line */
-        console.error(error);
+
+        fetch(imgBase64Url)
+          .then(res => res.blob())
+          .then(blob => {
+            var file = new File([blob], 'camera-image-' + Date.now() + '.jpg', {
+              type: 'image/jpeg',
+              lastModified: Date.now()
+            });
+
+            $vm.value.push(file);
+            addThumbnailToCanvas(imgBase64Url, $vm.value.length - 1, $vm);
+            $vm.$emit('_input', $vm.name, $vm.value);
+          });
       });
     },
     onFileChange: function(e) {
@@ -308,16 +314,33 @@ Fliplet.FormBuilder.field('image', {
       e.target.value = '';
     },
     onImageClick: function(index) {
-      var imagesData = {
-        images: _.map(this.value, function(imgURL) {
-          return { url: imgURL };
-        }),
-        options: {
-          index: index
-        }
-      };
+      var image = this.value[index];
 
-      Fliplet.Navigate.previewImages(imagesData);
+      if (image instanceof File || image instanceof Blob) {
+        var reader = new FileReader();
+
+        reader.onload = function(e) {
+          var imagesData = {
+            images: [{ url: e.target.result }],
+            options: {
+              index: 0
+            }
+          };
+
+          Fliplet.Navigate.previewImages(imagesData);
+        };
+
+        reader.readAsDataURL(image);
+      } else {
+        var imagesData = {
+          images: [{ url: image }],
+          options: {
+            index: index
+          }
+        };
+
+        Fliplet.Navigate.previewImages(imagesData);
+      }
     },
     drawImagesAfterInit: function() {
       if (this.readonly) {
@@ -327,8 +350,17 @@ Fliplet.FormBuilder.field('image', {
       var $vm = this;
 
       $vm.value.forEach(function(image, index) {
-        addThumbnailToCanvas(image, index,
-          $vm);
+        if (image instanceof File || image instanceof Blob) {
+          var reader = new FileReader();
+
+          reader.onload = function(e) {
+            addThumbnailToCanvas(e.target.result, index, $vm);
+          };
+
+          reader.readAsDataURL(image);
+        } else {
+          addThumbnailToCanvas(image, index, $vm);
+        }
       });
     },
     openFileDialog: function() {
