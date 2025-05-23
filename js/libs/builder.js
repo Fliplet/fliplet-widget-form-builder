@@ -2,6 +2,21 @@
 var widgetId = parseInt(Fliplet.Widget.getDefaultId(), 10);
 var widgetUuid = Fliplet.Widget.getUUID(widgetId);
 var data = Fliplet.Widget.getData(widgetId) || {};
+var isFormInSlider = false;
+
+Fliplet.Widget.findParents({ instanceId: widgetId }).then(function(parents) {
+  const formSlideParent = parents.find(parent =>
+    parent.package === 'com.fliplet.slide' || parent.name === 'Slide'
+  );
+
+  const formSliderParent = parents.find(parent =>
+    parent.package === 'com.fliplet.slider-container' || parent.name === 'Slider container'
+  );
+
+  data.slideId = formSlideParent.length && formSlideParent.slideId;
+  data.sliderContainerId = formSliderParent.length && formSliderParent.sliderId;
+  isFormInSlider = !!(formSlideParent && formSlideParent.slideId);
+});
 
 // Cleanup
 if (data.fields) {
@@ -103,7 +118,8 @@ function generateFormDefaults(data) {
     createdBy: {
       id: Fliplet.User.get('id'),
       fullName: Fliplet.User.get('fullName')
-    }
+    },
+    isFormInSlider: isFormInSlider
   }, data);
 }
 
@@ -174,7 +190,8 @@ Fliplet().then(function() {
           }
         ],
         newColumns: [],
-        selectedOptions: {}
+        selectedOptions: {},
+        currentMultiStepFormFields: []
       };
     },
     computed: {
@@ -403,8 +420,19 @@ Fliplet().then(function() {
 
         return defaultEmailTemplate;
       },
-      configureEmailTemplateAdd: function() {
+      configureEmailTemplateAdd: async function() {
         var $vm = this;
+
+        this.currentMultiStepFormFields = await this.getCurrentMultiStepFormFields();
+
+        if (data.sliderContainerId !== undefined) {
+          if ($vm.settings.emailTemplateAdd) {
+            $vm.settings.emailTemplateAdd.html = this.createDefaultBodyTemplate(this.currentMultiStepFormFields);
+          } else {
+            $vm.defaultEmailSettings.html = this.createDefaultBodyTemplate(this.currentMultiStepFormFields);
+          }
+        }
+
         var emailProviderData = ($vm.settings && $vm.settings.emailTemplateAdd) || $vm.defaultEmailSettings;
 
         emailProviderData.options = {
@@ -549,8 +577,19 @@ Fliplet().then(function() {
           });
         });
       },
-      configureEmailTemplateForCompose: function() {
+      configureEmailTemplateForCompose: async function() {
         var $vm = this;
+
+        this.currentMultiStepFormFields = await this.getCurrentMultiStepFormFields();
+
+        if (data.sliderContainerId !== undefined) {
+          if ($vm.settings.generateEmailTemplate) {
+            $vm.settings.generateEmailTemplate.html = this.createDefaultBodyTemplate(this.currentMultiStepFormFields);
+          } else {
+            $vm.defaultEmailSettingsForCompose.html = this.createDefaultBodyTemplate(this.currentMultiStepFormFields);
+          }
+        }
+
         var emailProviderData = ($vm.settings && $vm.settings.generateEmailTemplate) || $vm.defaultEmailSettingsForCompose;
 
         emailProviderData.options = {
@@ -579,21 +618,25 @@ Fliplet().then(function() {
           Fliplet.Widget.setSaveButtonLabel(SAVE_BUTTON_LABELS.SAVE_AND_CLOSE);
         });
       },
-      checkEmailTemplate: function() {
+      checkEmailTemplate: async function() {
+        this.currentMultiStepFormFields = await this.getCurrentMultiStepFormFields();
+
         if (!this.settings.emailTemplateAdd) {
           this.defaultEmailSettings.subject = 'Form entries from "' + this.settings.name + '" form';
-          this.defaultEmailSettings.html = this.createDefaultBodyTemplate(this.fields);
+          this.defaultEmailSettings.html = this.createDefaultBodyTemplate(data.sliderContainerId ? this.currentMultiStepFormFields : this.fields);
         }
 
         if (!this.settings.emailTemplateEdit) {
           this.defaultEmailSettings.subject = 'Form entries from "' + this.settings.name + '" form';
-          this.defaultEmailSettings.html = this.createDefaultBodyTemplate(this.fields);
+          this.defaultEmailSettings.html = this.createDefaultBodyTemplate(data.sliderContainerId ? this.currentMultiStepFormFields : this.fields);
         }
       },
-      checkGenerateEmailTemplate: function() {
+      checkGenerateEmailTemplate: async function() {
+        this.currentMultiStepFormFields = await this.getCurrentMultiStepFormFields();
+
         if (!this.settings.generateEmailTemplate) {
           this.defaultEmailSettingsForCompose.subject = 'Form entries from "' + this.settings.name + '" form';
-          this.defaultEmailSettingsForCompose.html = this.createDefaultBodyTemplate(this.fields);
+          this.defaultEmailSettingsForCompose.html = this.createDefaultBodyTemplate(data.sliderContainerId ? this.currentMultiStepFormFields : this.fields);
         }
       },
       getDataSourceColumns: function() {
@@ -1010,6 +1053,111 @@ Fliplet().then(function() {
         this.newColumns = _.filter(fieldNames, function(item) {
           return !_.includes(columns, item);
         });
+      },
+      getAllFormsInSlide: async function() {
+        const appId = Fliplet.Env.get('appId');
+        const pageId = Fliplet.Widget.getPage().id;
+
+        const currentPage = await Fliplet.API.request({
+          method: 'GET',
+          url: 'v1/apps/' + appId + '/pages/' + pageId + '?richLayout'
+        });
+
+        const formsIdsInDomOrder = Array.from(currentPage.page.richLayout.matchAll(/<fl-form cid="(\d+)"/g), m => m[1]);
+
+        const formWidgets = await Fliplet.Widget.find((w) =>{
+          return w.isFormInSlider !== undefined;
+        });
+
+        const formPromises = formWidgets.map(async(widget) => {
+          try {
+            const parents = await Fliplet.Widget.findParents({ instanceId: widget.id });
+
+            const formSliderParent = parents.find(parent =>
+              parent.package === 'com.fliplet.slider-container' || parent.name === 'Slider container'
+            );
+
+            widget.isFormInSlider = !!(formSliderParent && formSliderParent.slideId);
+            widget.sliderContainerId = formSliderParent.length && formSliderParent.sliderId;
+
+            return widget;
+          } catch (error) {
+            console.error('Error processing widget:', widget.id, error);
+
+            return widget;
+          }
+        });
+
+        const allFormsInSlide = await Promise.all(formPromises);
+        const sortedFormsByDomOrder = [...allFormsInSlide].sort((formA, formB) => {
+          const formAId = String(formA.id);
+          const formBId = String(formB.id);
+
+          const formAPosition = formsIdsInDomOrder.indexOf(formAId);
+          const formBPosition = formsIdsInDomOrder.indexOf(formBId);
+
+          return formAPosition - formBPosition;
+        });
+
+
+        return sortedFormsByDomOrder;
+      },
+      getCurrentMultiStepForm: async function(allFormsInSlide, currentForm) {
+        let currentMultiStepForm = [];
+        let isCurrentForm = false;
+        let currentFormDsId = currentForm.dataSourceId;
+
+        for (let form of allFormsInSlide) {
+          const formDsId = form.dataSourceId;
+
+          if (form.sliderContainerId !== currentForm.sliderContainerId) {
+            continue;
+          }
+
+          if (currentForm.id === form.id) {
+            isCurrentForm = true;
+          }
+
+          if (currentFormDsId !== formDsId) {
+            continue;
+          }
+
+          let hasFlButton = false;
+
+          for (let i = form.fields.length - 1; i >= 0; i--) {
+            const field = form.fields[i];
+
+            if (field._type === 'flButtons' && field.showSubmit !== false && currentFormDsId === formDsId) { hasFlButton = true; break; }
+          }
+
+          if (!hasFlButton && currentFormDsId.id === formDsId.id) {
+            currentMultiStepForm.push(form);
+          } else if (isCurrentForm && hasFlButton) {
+            if (currentMultiStepForm.length && currentMultiStepForm[currentMultiStepForm.length - 1].dataSourceId !== currentFormDsId) {
+              currentMultiStepForm.pop();
+            }
+
+            currentMultiStepForm.push(form);
+            break;
+          } else {
+            currentMultiStepForm = [];
+          }
+        }
+
+        return currentMultiStepForm;
+      },
+      getCurrentMultiStepFormFields: async function() {
+        const forms = [];
+        const allFormsInSlide = await this.getAllFormsInSlide();
+        const currentMultiStepForm = await this.getCurrentMultiStepForm(allFormsInSlide, data);
+
+        currentMultiStepForm.forEach(form => {
+          form.fields.forEach(field => {
+            forms.push(field);
+          });
+        });
+
+        return forms;
       }
     },
     watch: {
