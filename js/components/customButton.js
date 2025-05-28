@@ -1,6 +1,7 @@
 Fliplet.FormBuilder.field('customButton', {
   name: 'Button',
   category: 'Buttons',
+  submit: false,
   props: {
     description: {
       type: String
@@ -35,12 +36,14 @@ Fliplet.FormBuilder.field('customButton', {
           };
         }
 
-        try {
-          return Fliplet.Navigate.to($vm.buttonAction);
-        } catch (err) {
-          var defaultError = T('widgets.form.customButton.defaultError', { label: $vm.buttonLabel });
+        if (!($vm.buttonAction.action === 'next-slide' || $vm.buttonAction.action === 'previous-slide')) {
+          try {
+            return Fliplet.Navigate.to($vm.buttonAction);
+          } catch (err) {
+            var defaultError = T('widgets.form.customButton.defaultError', { label: $vm.buttonLabel });
 
-          Fliplet.UI.Toast.error(err, defaultError);
+            Fliplet.UI.Toast.error(err, defaultError);
+          }
         }
       });
     }
