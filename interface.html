@@ -131,6 +131,9 @@
               <p>\{{ missingColumns }}</p>
               <button type="button" class="btn btn-primary btn-block btn-generate-columns" @click="generateColumns">\{{ newColumns.length > 1 ? 'Add columns to data source' : 'Add column to data source' }}</button>
             </div>
+            <div v-if="isFormInSlider">
+              <p class="alert alert-warning"><b>Warning:</b> Using the same field name across multiple form steps will overwrite previous entries. To review or prevent changes, set the field as "read-only". <a href="#">Learn more</a>  about using shared field names.</p>
+            </div>
             <div class="form-group">
               <div class="control-label">
                 <label>Save users' progress on the form</label>
@@ -271,11 +274,17 @@
                   <label for="redirect_yes">
                     <span class="check"><i class="fa fa-circle"></i></span> Take the user to another screen
                   </label>
-                  <div class="hidden-settings" v-show="settings.redirect">
+                  <div class="hidden-settings" v-show="settings.redirect === true">
                     <div class="form-group">
                       <div id="linkAction"></div>
                     </div>
                   </div>
+                </div>
+                <div v-if="isFormInSlider" class="radio radio-icon">
+                  <input type="radio" id="redirect_next_slide" name="redirectOptions" v-model="settings.redirect" :value="'nextSlide'">
+                  <label for="redirect_next_slide">
+                    <span class="check"><i class="fa fa-circle"></i></span> Take user to the next slide
+                  </label>
                 </div>
                 <div class="radio radio-icon">
                   <input type="radio" id="redirect_no" name="redirectOptions" v-model="settings.redirect" :value="false">
@@ -295,6 +304,7 @@
 
         <div v-show="section === 'form'" class="section-holder clearfix">
           <section class="form-preview" v-bind:class="{ 'col-sm-6': isAddingFields, 'col-sm-12': !isAddingFields }">
+            <div class="alert alert-info">Break up long forms into simple, user-friendly steps to boost form completion rates. <a href="#">Learn more</a></div>
             <a href="#" v-if="!isAddingFields" v-on:click.prevent="isAddingFields = true" class="btn btn-primary btn-xs add-field pull-right">Add fields <i class="fa fa-plus"></i></a>
             <h2><small>Your form</small> <span class="required-info-label" v-bind:class="{'isRequired': hasRequiredFields}">* Required fields</span></h2>
             <form class="form-html" v-sortable="{ group: { name: 'fields', pull: false }, scrollSensitivity: 116, scrollSpeed: 10, onAdd: onAdd, onUpdate: onSort }">

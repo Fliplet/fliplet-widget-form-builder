@@ -1,5 +1,8 @@
 var formBuilderInstances = [];
 var dataSourceColumnPromises = {};
+var allFormsInSlide = [];
+var currentFormUId;
+var currentMultiStepForm;
 
 function drawImageOnCanvas(img, canvas) {
   var imgWidth = img.width;
@@ -128,9 +131,72 @@ function setTypeaheadFieldValue(field, value) {
   }
 }
 
+async function getCurrentMultiStepForm(allFormsInSlide, currentForm) {
+  let currentMultiStepForm = [];
+  let isCurrentForm = false;
+  let currenFormDsId = currentForm.dataSourceId;
+
+  for (let form of allFormsInSlide) {
+    const formDsId = form.dataSourceId;
+
+
+    if (currentForm.id === form.id) isCurrentForm = true;
+
+    if (currenFormDsId !== formDsId) continue;
+
+    let hasFlButton = false;
+
+    for (let i = form.fields.length - 1; i >= 0; i--) {
+      const field = form.fields[i];
+
+      if (field._type === 'flButtons' && field.showSubmit !== false && currenFormDsId === formDsId) { hasFlButton = true; break; }
+    }
+
+    if (!hasFlButton && currenFormDsId.id === formDsId.id) {
+      currentMultiStepForm.push(form);
+    } else if (isCurrentForm && hasFlButton) {
+      if (currentMultiStepForm.length && currentMultiStepForm[currentMultiStepForm.length - 1].dataSourceId !== currenFormDsId) {
+        currentMultiStepForm.pop();
+      }
+
+      currentMultiStepForm.push(form);
+      break;
+    } else {
+      currentMultiStepForm = [];
+    }
+  }
+
+  const forms = await Fliplet.FormBuilder.getAll();
+
+  currentMultiStepForm.forEach((form, i) => {
+    const relatedForm = forms.find(currentForm => currentForm.$instance.id === form.id);
+
+    relatedForm.$instance.uuid = form.uuid;
+    relatedForm.$instance.slideId = form.slideId;
+    currentMultiStepForm[i] = relatedForm;
+  });
+
+  return currentMultiStepForm;
+}
+
+
 // Wait for form fields to be ready, as they get defined after translations are initialized
-Fliplet().then(function() {
+Fliplet().then(async function() {
   Fliplet.Widget.instance('form-builder', async function(data, vm) {
+    const formParents = await Fliplet.Widget.findParents({ instanceId: data.id });
+    const formSlideParent = formParents.find(parent =>
+      parent.package === 'com.fliplet.slide' || parent.name === 'Slide'
+    );
+
+    const isFormInSlide = !!(formSlideParent && formSlideParent.slideId);
+
+    data.isFormInSlide = isFormInSlide;
+
+    if (isFormInSlide) {
+      data.slideId = formSlideParent.slideId + '';
+      allFormsInSlide.push(data);
+    }
+
     const saveDelay = 1000; // save progress after 1s from last input
 
     if (vm && vm.entry) {
@@ -164,8 +230,9 @@ Fliplet().then(function() {
       entryId = parseInt(entryId, 10) || undefined;
     }
 
-    function getProgress() {
-      var progress = localStorage.getItem(progressKey);
+    function getProgress(progressKey) {
+      const storage = isFormInSlide ? sessionStorage : localStorage;
+      const progress = storage.getItem(progressKey);
 
       if (!progress) {
         return;
@@ -339,7 +406,14 @@ Fliplet().then(function() {
     function getFields(isEditMode) {
       var fields = _.compact(JSON.parse(JSON.stringify(data.fields || [])));
 
-      var progress = getProgress();
+      const queryParams = Object.fromEntries(new URLSearchParams(location.search));
+      const isAdmin = queryParams.beta === 'true';
+
+      if (!isAdmin) {
+        fields = fields.filter((field) => field._type !== 'flMap');
+      }
+
+      var progress = getProgress(progressKey);
 
       fields.forEach(function(field) {
         field.enabled = true;
@@ -654,7 +728,8 @@ Fliplet().then(function() {
           today: moment().locale('en').format('YYYY-MM-DD'),
           now: moment().locale('en').format('HH:mm'),
           id: data.id,
-          entryId: entryId
+          entryId: entryId,
+          redirect: data.redirect
         };
       },
       computed: {
@@ -676,13 +751,50 @@ Fliplet().then(function() {
           });
 
           localStorage.setItem(progressKey, JSON.stringify(progress));
+
+          const storage = isFormInSlide ? sessionStorage : localStorage;
+
+          storage.setItem(progressKey, JSON.stringify(progress));
         },
-        start: function(event) {
+        start: async function(event) {
           if (event) {
             event.preventDefault();
           }
 
           this.isSent = false;
+
+          const $vm = this;
+
+          if (data.isFormInSlide && this.redirect === false) {
+            const currentMultiStepForm = await getCurrentMultiStepForm(allFormsInSlide, data);
+
+            if (currentMultiStepForm.length > 1) {
+              const targetSlideId = currentMultiStepForm[0].$instance.slideId;
+              const targetSlide = document.querySelector(`.swiper-slide[data-id="${targetSlideId}"]`);
+
+
+              if (targetSlide) {
+                const swiperContainer = targetSlide.closest('.swiper-container');
+
+                if (swiperContainer && swiperContainer.swiper) {
+                  const swiper = swiperContainer.swiper;
+                  const targetSlideIndex = swiper.slides.indexOf(targetSlide);
+
+                  if (targetSlideIndex !== -1) {
+                    const allowSlidePrev = swiper.allowSlidePrev;
+
+                    swiper.allowSlidePrev = true;
+                    swiper.slideTo(targetSlideIndex);
+                    swiper.allowSlidePrev = allowSlidePrev;
+                  }
+                }
+              }
+            }
+          }
+
+          $vm.$nextTick(function() {
+            this.attachCustomButtonListener();
+          });
         },
         reset: function() {
           isResetAction = true;
@@ -831,9 +943,24 @@ Fliplet().then(function() {
 
           localStorage.removeItem(progressKey);
 
+          const storage = isFormInSlide ? sessionStorage : localStorage;
+
+          storage.removeItem(progressKey);
+
           $vm.$forceUpdate();
           Fliplet.FormBuilder.emit('reset', { id: data.id });
           this.$emit('reset');
+        },
+        resetMultiStepForm: async function() {
+          const currentMultiStepForm = await getCurrentMultiStepForm(allFormsInSlide, data);
+
+          Fliplet.FormBuilder.getAll().then(function(forms) {
+            currentMultiStepForm.forEach((form) => {
+              const relatedForm = forms.find(currentForm => currentForm.$instance.id === form.$instance.id);
+
+              relatedForm.instance.resetForm();
+            });
+          });
         },
         onError: function(fieldName, error) {
           if (!error) {
@@ -853,8 +980,17 @@ Fliplet().then(function() {
             });
           }
         },
-        onInput: function(fieldName, value, fromPasswordConfirmation, skipOnChange) {
+        onInput: async function(fieldName, value, fromPasswordConfirmation, skipOnChange) {
           var $vm = this;
+
+          if (currentFormUId && currentFormUId._uid === this._uid) {
+            $vm.synchronizeMatchingFields(currentMultiStepForm, data, 'onInput');
+          } else {
+            currentFormUId = this;
+
+            currentMultiStepForm = await getCurrentMultiStepForm(allFormsInSlide, data);
+            $vm.synchronizeMatchingFields(currentMultiStepForm, data, 'onInput');
+          }
 
           this.fields.some(function(field) {
             if (field.name === fieldName) {
@@ -996,7 +1132,18 @@ Fliplet().then(function() {
             }, intervalDuration);
           });
         },
-        onSubmit: async function() {
+        onSubmit: async function(eventType) {
+          const activeElement = document.activeElement;
+          const isPrevButton = activeElement.getAttribute('data-button-action') === 'previous-slide';
+          const isPrevArrow = activeElement.classList.contains('swiper-button-prev');
+
+          if (isPrevArrow || isPrevButton) {
+            data.canSwipeSlide = true;
+            activeElement.setAttribute('data-can-swipe', true);
+
+            return;
+          }
+
           var $vm = this;
           var formData = {};
 
@@ -1084,12 +1231,112 @@ Fliplet().then(function() {
             });
           }
 
-          function onFormSubmission() {
+
+          async function onFormSubmission() {
+            if (data.isFormInSlide && $vm.isFormValid) {
+              const multiStepForm = await getCurrentMultiStepForm(allFormsInSlide, data);
+
+              if (data.id !== multiStepForm[multiStepForm.length - 1].$instance.id) return;
+
+              for (const form of multiStepForm) {
+                if (form.$instance && form.$instance._data.id === data.id) {
+                  continue;
+                }
+
+                const formInstance = form.$instance;
+
+                if (formInstance && formInstance.$children) {
+                  formInstance.$children.forEach(function(inputField) {
+                    if (inputField.$v) {
+                      inputField.$v.$touch();
+
+                      if (inputField.$v.$invalid) {
+                        $vm.isFormValid = false;
+                      }
+                    }
+                  });
+                }
+
+                if (!$vm.isFormValid) {
+                  break;
+                }
+              }
+            }
+
             if (!$vm.isFormValid) {
+              if (data.isFormInSlide) {
+                data.canSwipeSlide = false;
+
+                if (activeElement.type === 'submit') {
+                  activeElement.setAttribute('data-can-swipe', false);
+                }
+              }
+
               return onFormInvalid();
             }
 
             return Promise.resolve();
+          }
+
+          async function submitMultiStepForm(formData) {
+            const currentMultiStepForm = await getCurrentMultiStepForm(allFormsInSlide, data);
+
+            currentMultiStepForm.forEach((form) => {
+              if (form.$instance) {
+                form.$instance.fields.forEach((field) => {
+                  let value = field.value;
+                  let type = field._type;
+
+                  if (type === 'flMap') {
+                    formData[`${field.name} Address`] = value.address;
+                    formData[`${field.name} Lat/Long`] = value.latLong;
+                  } else if (type === 'flTimeStamp') {
+                    if (value.createdAt && !value.updatedAt) {
+                      formData['Created at'] =  new Date().toISOString();
+                    } else if (!value.createdAt && value.updatedAt) {
+                      formData['Last updated'] =  '';
+                    } else if (value.createdAt && value.updatedAt) {
+                      formData['Created at'] =  new Date().toISOString();
+                      formData['Last updated'] = '';
+                    }
+                  } else if (type === 'flDateRange' || type === 'flTimeRange') {
+                    if (value) {
+                      formData[`${field.name} [Start]`] = value.start;
+                      formData[`${field.name} [End]`] = value.end;
+                    }
+                  } else if (type === 'flMatrix') {
+                    if (!_.isEmpty(value)) {
+                      _.forEach(field.rowOptions, function(rowOpt) {
+                        var val = rowOpt.id || rowOpt.label;
+                        var rowFound = _.some(value, function(col, row) {
+                          if (!row || !col) {
+                            return;
+                          }
+
+                          if (val === row) {
+                            formData[`${field.name} [${val}]`] = col;
+
+                            return true;
+                          }
+                        });
+
+                        if (!rowFound) {
+                          formData[`${field.name} [${val}]`] = '';
+                        }
+                      });
+                    } else {
+                      _.forEach(field.rowOptions, function(row) {
+                        var val = row.id ? row.id : row.label;
+
+                        formData[`${field.name} [${val}]`] = '';
+                      });
+                    }
+                  } else if (!(field._type === 'flButtons' || field._type === 'flCustomButton')) {
+                    formData[field.name] = field.value;
+                  }
+                });
+              }
+            });
           }
 
           return onFormSubmission().then(async function() {
@@ -1109,6 +1356,21 @@ Fliplet().then(function() {
               showValidationMessage(error.message);
 
               throw new Error(error.message);
+            }
+
+            const hasButtonAction = activeElement.getAttribute('data-button-action');
+            const canSwipe = activeElement.getAttribute('data-can-swipe');
+            const isNavigationButton = (activeElement.type === 'submit' && hasButtonAction) || (activeElement.type !== 'submit' && canSwipe);
+
+            if (eventType === 'touchmove' || (data.isFormInSlide && activeElement && isNavigationButton && (hasButtonAction || canSwipe))) {
+              $vm.isSending = false;
+              data.canSwipeSlide = true;
+
+              if (activeElement.type === 'submit') {
+                activeElement.setAttribute('data-can-swipe', true);
+              }
+
+              return;
             }
 
             $vm.isSending = true;
@@ -1315,7 +1577,11 @@ Fliplet().then(function() {
 
             formPromise.then(function(form) {
               return Fliplet.Hooks.run('beforeFormSubmit', formData, form);
-            }).then(function() {
+            }).then(async function() {
+              if (data.isFormInSlide) {
+                await  submitMultiStepForm(formData);
+              }
+
               if (data.dataSourceId) {
                 return Fliplet.DataSources.connect(data.dataSourceId);
               }
@@ -1367,6 +1633,10 @@ Fliplet().then(function() {
                 localStorage.removeItem(progressKey);
               }
 
+              if (data.isFormInSlide) {
+                $vm.resetMultiStepForm();
+              }
+
               var operation = Promise.resolve();
 
               // Emails are only sent by the client when data source hooks aren't set
@@ -1384,7 +1654,7 @@ Fliplet().then(function() {
                 operation = Fliplet.Communicate.composeEmail(_.extend({}, data.generateEmailTemplate), formData);
               }
 
-              if (data.linkAction && data.redirect) {
+              if (data.linkAction && data.redirect === true) {
                 return operation.then(function() {
                   return trackEventOp.then(function() {
                     Fliplet.Navigate.to(data.linkAction);
@@ -1414,6 +1684,10 @@ Fliplet().then(function() {
               $vm.$forceUpdate();
 
               $vm.loadEntryForUpdate();
+
+              if (data.redirect === 'nextSlide' && data.isFormInSlide) {
+                $vm.start();
+              }
             }, function(err) {
               /* eslint-disable-next-line */
               console.error(err);
@@ -1516,6 +1790,210 @@ Fliplet().then(function() {
           }
 
           return Promise.resolve();
+        },
+        synchronizeMatchingFields: function(currentMultiStepForm, currentForm, event) {
+          Fliplet.FormBuilder.getAll().then(async function(forms) {
+            try {
+              const currentFormInstance = forms.find(form => form.$instance.id === currentForm.id);
+              const formsInCurrentSlide = currentMultiStepForm && currentMultiStepForm.filter(form => form.$instance.slideId === data.slideId);
+
+              if (event !== 'onInput') {
+                for (let i = 0; i <= formsInCurrentSlide.length; i++) {
+                  let form = formsInCurrentSlide[i];
+
+                  if (form && form.$instance.slideId === data.slideId) {
+                    try {
+                      await form.$instance.onSubmit('touchmove');
+                    } catch (error) {
+                      console.warn('Form validation failed');
+                    }
+                  }
+                }
+
+                await currentFormInstance.$instance.onSubmit('touchmove');
+
+
+                if (!currentForm.canSwipeSlide) {
+                  return;
+                }
+              }
+
+              if (currentMultiStepForm) {
+                currentMultiStepForm.forEach((form) => {
+                  if (form.$instance.id === currentForm.id) return;
+
+                  try {
+                    form.$instance.fields.forEach((field) => {
+                      const matchingField = currentFormInstance.$instance.fields.find(
+                        (currentFormField) => currentFormField.name === field.name
+                      );
+
+                      if (matchingField) {
+                        const targetForm = forms.find(targetForm => targetForm.$instance.id === form.$instance.id);
+
+                        targetForm.field(matchingField.name).set(matchingField.value);
+                      }
+                    });
+                  } catch (error) {
+                    console.warn('Error synchronizing fields for form:', form.$instance.id, error);
+                  }
+                });
+              }
+            } catch (error) {
+              console.error('Error in synchronizeMatchingFields');
+            }
+          });
+        },
+        attachCustomButtonListener: function() {
+          const $vm = this;
+          const formElement = document.querySelector(`[data-id="${data.id}"]`);
+          const currentSlide = formElement.closest('.swiper-slide');
+          let isTouchMoveTriggered = false;
+
+          function handleTouchStart(swiper) {
+            isTouchMoveTriggered = false;
+            swiper.allowSlideNext = true;
+          }
+
+          async function handleTouchMove(swiper, swiperContainer, data, allFormsInSlide, $vm) {
+            if (isTouchMoveTriggered) {
+              return;
+            }
+
+            const activeSlide = swiperContainer.querySelector('.swiper-slide-active');
+            const activeSlideId = activeSlide.getAttribute('data-id');
+            const currentMultiStepFormSlideId = data.slideId;
+
+            isTouchMoveTriggered = true;
+
+            if (activeSlideId !== currentMultiStepFormSlideId) {
+              return;
+            }
+
+            const currentMultiStepForm = await getCurrentMultiStepForm(allFormsInSlide, data);
+
+            $vm.synchronizeMatchingFields(currentMultiStepForm, data, 'touchmove');
+
+            setTimeout(() => {
+              const formsInActiveSlide = currentMultiStepForm.filter(form => form.$instance.slideId === activeSlideId);
+              const canSwipe = !formsInActiveSlide.some(form => form.$instance.isFormValid === false);
+
+              swiper.allowSlideNext = canSwipe;
+            }, 0);
+          }
+
+          if (currentSlide) {
+            const swiperContainer = currentSlide.closest('.swiper-container');
+
+            swiperContainer.removeEventListener('click', this.handleArrowClick);
+
+            swiperContainer.addEventListener('click', this.handleArrowClick = async function(e) {
+              const arrowClicked = e.target.closest('.swiper-button-next, .swiper-button-prev');
+
+              if (arrowClicked) {
+                e.preventDefault();
+                e.stopPropagation();
+
+                const allSlides = Array.from(swiperContainer.querySelectorAll('.swiper-slide'));
+                const activeSlide = swiperContainer.querySelector('.swiper-slide-active');
+                const currentIndex = allSlides.indexOf(activeSlide);
+
+                let targetSlide;
+
+                if (arrowClicked.classList.contains('swiper-button-next')) {
+                  targetSlide = allSlides[currentIndex - 1];
+                } else if (arrowClicked.classList.contains('swiper-button-prev')) {
+                  targetSlide = allSlides[currentIndex + 2];
+                }
+
+                if (targetSlide) {
+                  const targetForm = targetSlide.querySelector(`[data-id="${data.id}"]`);
+
+                  if (targetForm) {
+                    const currentMultiStepForm = await getCurrentMultiStepForm(allFormsInSlide, data, targetSlide);
+
+                    await $vm.synchronizeMatchingFields(currentMultiStepForm, data);
+                  }
+                }
+              }
+            });
+
+            const nextButtons = formElement.querySelectorAll('[data-button-action="next-slide"]');
+            const prevButtons = formElement.querySelectorAll('[data-button-action="previous-slide"]');
+
+            nextButtons.forEach(button => {
+              if (button._nextClickHandler) {
+                button.removeEventListener('click', button._nextClickHandler);
+              }
+
+              button._nextClickHandler = async function(e) {
+                e.preventDefault();
+
+                const currentMultiStepForm = await getCurrentMultiStepForm(allFormsInSlide, data);
+
+                await $vm.synchronizeMatchingFields(currentMultiStepForm, data);
+
+                setTimeout(() => {
+                  if (data.canSwipeSlide) {
+                    swiperContainer.swiper.slideNext();
+                  }
+                }, 0);
+              };
+
+              button.addEventListener('click', button._nextClickHandler);
+            });
+
+            prevButtons.forEach(button => {
+              if (button._prevClickHandler) {
+                button.removeEventListener('click', button._prevClickHandler);
+              }
+
+              button._prevClickHandler = async function(e) {
+                e.preventDefault();
+
+                const currentMultiStepForm = await getCurrentMultiStepForm(allFormsInSlide, data);
+
+                await $vm.synchronizeMatchingFields(currentMultiStepForm, data);
+
+                setTimeout(() => {
+                  if (data.canSwipeSlide) {
+                    swiperContainer.swiper.slidePrev();
+                  }
+                }, 0);
+              };
+
+              button.addEventListener('click', button._prevClickHandler);
+            });
+
+            // DOM events
+            swiperContainer.addEventListener('touchstart', () => {
+              const swiper = swiperContainer && swiperContainer.swiper;
+
+              if (swiper) {
+                handleTouchStart(swiper);
+              }
+            });
+
+            swiperContainer.addEventListener('touchmove', () => {
+              const swiper = swiperContainer && swiperContainer.swiper;
+
+              if (swiper) {
+                handleTouchMove(swiper, swiperContainer, data, allFormsInSlide, $vm);
+              }
+            });
+
+            // Swiper events
+            setTimeout(() => {
+              const swiper = swiperContainer && swiperContainer.swiper;
+
+              if (!swiper) {
+                return;
+              }
+
+              swiper.on('touchStart', () => handleTouchStart(swiper));
+              swiper.on('touchMove', () => handleTouchMove(swiper, swiperContainer, data, allFormsInSlide, $vm));
+            }, 0);
+          }
         }
       },
       mounted: function() {
@@ -1864,6 +2342,7 @@ Fliplet().then(function() {
             }
           });
         });
+        this.attachCustomButtonListener();
       }
     });
 
