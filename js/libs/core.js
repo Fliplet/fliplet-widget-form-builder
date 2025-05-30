@@ -570,6 +570,10 @@ Fliplet.FormBuilder = (function() {
         default: {}
       };
 
+      component.props._editor = {
+        type: Object,
+        default: null
+      };
 
       component.props.hasFieldDuplicatesInMultiStepForm = {
         type: Boolean,
@@ -826,6 +830,18 @@ Fliplet.FormBuilder = (function() {
             this._initAddressTypeahead();
             this.localSelectedFieldOptions = _.cloneDeep(this.selectedFieldOptions);
             this.localFieldOptions = _.cloneDeep(this.fieldOptions);
+          }
+
+          if (componentName === 'flParagraph') {
+            this._initEdtior();
+          }
+        };
+      }
+
+      if (!component.destroyed) {
+        component.destroyed = function() {
+          if (componentName === 'flParagraph') {
+            this._destroyEditor();
           }
         };
       }
@@ -1170,6 +1186,47 @@ Fliplet.FormBuilder = (function() {
       if (!component.methods.openFileManager) {
         component.methods.openFileManager = component.methods._openFileManager;
       }
+
+      component.methods._initEdtior = function() {
+        const $vm = this;
+
+        tinymce.init({
+          target: this.$refs.textarea,
+          menubar: false,
+          branding: false,
+          plugins: 'lists',
+          toolbar: 'bold italic underline | fontsize_label fontsize',
+          font_size_formats: '8px 10px 12px 14px 18px 24px 36px',
+          setup: function(editor) {
+            $vm._editor = editor;
+
+            editor.ui.registry.addButton('fontsize_label', {
+              text: 'Font Size:',
+              type: 'button',
+              disabled: true,
+              readonly: true,
+              onAction: function() {}
+            });
+
+            editor.on('init', function() {
+              if ($vm.value) {
+                editor.setContent($vm.value);
+              }
+            });
+
+            editor.on('change keyup', function() {
+              $vm.value = editor.getContent();
+            });
+          }
+        });
+      };
+
+      component.methods._destroyEditor = function() {
+        if (this._editor) {
+          this._editor.destroy();
+          this._editor = null;
+        }
+      };
 
       var hasOptions = component.props.options && Array.isArray(component.props.options.type());
       var hasSelectAll = component.props.addSelectAll && typeof component.props.addSelectAll.default === 'boolean';
