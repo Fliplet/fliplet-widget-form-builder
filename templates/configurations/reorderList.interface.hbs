@@ -26,5 +26,8 @@
 </div>
 <div v-if="optionsType === 'manual'" class="form-group clearfix">
   <label class="control-label">Options (one per line)</label>
-  <textarea v-on:input="_setOptions($event.target.value, 'options')" class="form-control">\{{ _options }}</textarea>
+  <textarea v-on:input="_setOptions($event.target.value, 'options')" class="form-control resize-vertical" rows="5">\{{ _options }}</textarea>
+  <div class="options-help-text">
+    If you want to save a different value to the data source, wrap the value in <span class="options-help-highlight">&lt; &gt;</span>. <a href="https://help.fliplet.com/form-component/" target="_blank">Learn more</a>
+  </div>
 </div>
