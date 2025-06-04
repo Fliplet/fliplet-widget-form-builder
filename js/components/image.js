@@ -231,26 +231,29 @@ Fliplet.FormBuilder.field('image', {
             return;
           }
 
-          if (($vm.customWidth && img.width > $vm.customWidth) || ($vm.customHeight && img.height > $vm.customHeight)) {
-            $vm.isImageSizeExceeded = true;
-
-            return;
-          }
-
           $vm.hasCorruptedImage = false;
           $vm.isImageSizeExceeded = false;
 
-          $vm.value.push(file);
+          var scaledImage = loadImage.scale(img, options);
+          var mimeType = file.type || 'image/png';
+          var imgBase64Url = scaledImage.toDataURL(mimeType, $vm.jpegQuality);
 
-          if (addThumbnail) {
-            var scaledImage = loadImage.scale(img, options);
-            var mimeType = file.type || 'image/png';
-            var imgBase64Url = scaledImage.toDataURL(mimeType, $vm.jpegQuality);
+          fetch(imgBase64Url)
+            .then(function(res) { return res.blob(); })
+            .then(function(blob) {
+              var resizedFile = new File([blob], file.name || ('image-' + Date.now()), {
+                type: mimeType,
+                lastModified: Date.now()
+              });
 
-            addThumbnailToCanvas(imgBase64Url, $vm.value.length - 1, $vm);
-          }
+              $vm.value.push(resizedFile);
 
-          $vm.$emit('_input', $vm.name, $vm.value);
+              if (addThumbnail) {
+                addThumbnailToCanvas(imgBase64Url, $vm.value.length - 1, $vm);
+              }
+
+              $vm.$emit('_input', $vm.name, $vm.value);
+            });
         });
       });
     },
