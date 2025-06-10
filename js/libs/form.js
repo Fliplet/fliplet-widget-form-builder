@@ -2389,5 +2389,3 @@ Fliplet.FormBuilder.getAll = function(name) {
     });
   });
 };
-
-
