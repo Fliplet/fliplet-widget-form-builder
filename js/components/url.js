@@ -1,3 +1,5 @@
+/* Purpose: Vue component for 'url' field in Fliplet apps. See AGENTS.md. */
+
 Fliplet.FormBuilder.field('url', {
   name: 'URL input',
   category: 'Text inputs',

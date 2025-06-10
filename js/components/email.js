@@ -1,3 +1,5 @@
+/* Purpose: Vue component for 'email' field in Fliplet apps. See AGENTS.md. */
+
 Fliplet.FormBuilder.field('email', {
   name: 'Email input',
   category: 'Text inputs',

@@ -1,3 +1,5 @@
+/* Purpose: Vue component for 'telephone' field in Fliplet apps. See AGENTS.md. */
+
 Fliplet.FormBuilder.field('telephone', {
   name: 'Telephone input',
   category: 'Text inputs',

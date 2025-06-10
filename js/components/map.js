@@ -1,3 +1,5 @@
+/* Purpose: Vue component for 'map' field in Fliplet apps. See AGENTS.md. */
+
 Fliplet.FormBuilder.field('map', {
   name: 'Map',
   category: 'Location & Map',

@@ -1,3 +1,5 @@
+/* Purpose: Vue component for 'starRating' field in Fliplet apps. See AGENTS.md. */
+
 Fliplet.FormBuilder.field('starRating', {
   name: 'Star rating',
   category: 'Advanced',

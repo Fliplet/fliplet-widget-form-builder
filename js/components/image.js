@@ -1,3 +1,5 @@
+/* Purpose: Vue component for 'image' field in Fliplet apps. See AGENTS.md. */
+
 /* global Camera, addThumbnailToCanvas, loadImage */
 
 Fliplet.FormBuilder.field('image', {

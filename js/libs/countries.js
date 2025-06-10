@@ -1,3 +1,5 @@
+/* Purpose: Library 'countries' used by the Fliplet Form Builder. See AGENTS.md. */
+
 this.Fliplet = this.Fliplet || {};
 
 this.Fliplet.FormBuilderData = this.Fliplet.FormBuilderData || {};

@@ -1,3 +1,5 @@
+/* Purpose: Library 'form' used by the Fliplet Form Builder. See AGENTS.md. */
+
 var formBuilderInstances = [];
 var dataSourceColumnPromises = {};
 var allFormsInSlide = [];

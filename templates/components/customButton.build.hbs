@@ -1,3 +1,5 @@
+{{! Purpose: Template for component customButton.build.hbs. See AGENTS.md }}
+
 <template>
 <button class="custom-btn btn" :class="[buttonStyle, className]" :data-button-action="buttonAction && buttonAction.action || ''" data-can-swipe="false"
  tabindex="0" v-html="buttonLabel || 'Button'" @click.prevent="runCustomFunction"></button>
