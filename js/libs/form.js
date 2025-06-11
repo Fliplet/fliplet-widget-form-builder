@@ -983,13 +983,15 @@ Fliplet().then(async function() {
         onInput: async function(fieldName, value, fromPasswordConfirmation, skipOnChange) {
           var $vm = this;
 
-          if (currentFormUId && currentFormUId._uid === this._uid) {
-            $vm.synchronizeMatchingFields(currentMultiStepForm, data, 'onInput');
-          } else {
-            currentFormUId = this;
+          if (data.isFormInSlide) {
+            if (currentFormUId && currentFormUId._uid === this._uid) {
+              $vm.synchronizeMatchingFields(currentMultiStepForm, data, 'onInput');
+            } else {
+              currentFormUId = this;
 
-            currentMultiStepForm = await getCurrentMultiStepForm(allFormsInSlide, data);
-            $vm.synchronizeMatchingFields(currentMultiStepForm, data, 'onInput');
+              currentMultiStepForm = await getCurrentMultiStepForm(allFormsInSlide, data);
+              $vm.synchronizeMatchingFields(currentMultiStepForm, data, 'onInput');
+            }
           }
 
           this.fields.some(function(field) {
@@ -1964,7 +1966,6 @@ Fliplet().then(async function() {
 
               button.addEventListener('click', button._prevClickHandler);
             });
-
             // DOM events
             swiperContainer.addEventListener('touchstart', () => {
               const swiper = swiperContainer && swiperContainer.swiper;
@@ -2038,7 +2039,6 @@ Fliplet().then(async function() {
                   return opt[valueProp] === elem;
                 });
               });
-
               value = _.uniq(value);
 
               value = _.sortBy(value, function(val) {
