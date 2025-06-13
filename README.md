@@ -2,6 +2,8 @@
 
 Documentation is available at https://developers.fliplet.com/API/components/form-builder.html
 
+Additional notes about the JavaScript files can be found in [docs/js-documentation.md](docs/js-documentation.md).
+
 ---
 
 ## Adding a new field type
