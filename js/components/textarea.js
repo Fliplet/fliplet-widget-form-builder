@@ -1,3 +1,5 @@
+/* Purpose: Vue component for 'textarea' field in Fliplet apps. See AGENTS.md. */
+
 Fliplet.FormBuilder.field('textarea', {
   name: 'Multiple line input',
   category: 'Text inputs',

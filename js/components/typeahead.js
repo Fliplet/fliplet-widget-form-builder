@@ -1,3 +1,5 @@
+/* Purpose: Vue component for 'typeahead' field in Fliplet apps. See AGENTS.md. */
+
 Fliplet.FormBuilder.field('typeahead', {
   name: 'Typeahead (multi-select)',
   category: 'Multiple options',

@@ -1,3 +1,5 @@
+/* Purpose: Library 'builder' used by the Fliplet Form Builder. See AGENTS.md. */
+
 /* eslint-disable eqeqeq */
 var widgetId = parseInt(Fliplet.Widget.getDefaultId(), 10);
 var widgetUuid = Fliplet.Widget.getUUID(widgetId);

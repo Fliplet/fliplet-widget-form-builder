@@ -1,3 +1,5 @@
+/* Purpose: Vue component for 'select' field in Fliplet apps. See AGENTS.md. */
+
 Fliplet.FormBuilder.field('select', {
   name: 'Dropdown (single-select)',
   category: 'Multiple options',

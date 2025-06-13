@@ -1,3 +1,5 @@
+{{! Purpose: Template for component image.build.hbs. See AGENTS.md }}
+
 <div class="form-group fileUpload" :class="{ 'fileUpload-disabled' : readonly, 'fileUpload-padding-top': value.length }">
   <div class="row" v-if="value.length">
     <div v-for="(image, index) in value">

@@ -1,3 +1,5 @@
+/* Purpose: Vue component for 'timeStamp' field in Fliplet apps. See AGENTS.md. */
+
 Fliplet.FormBuilder.field('timeStamp', {
   name: 'Time Stamp',
   category: 'Date & time',

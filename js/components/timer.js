@@ -1,3 +1,5 @@
+/* Purpose: Vue component for 'timer' field in Fliplet apps. See AGENTS.md. */
+
 Fliplet.FormBuilder.field('timer', {
   name: 'Timer',
   category: 'Date & time',

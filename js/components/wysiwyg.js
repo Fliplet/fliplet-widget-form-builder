@@ -1,3 +1,5 @@
+/* Purpose: Vue component for 'wysiwyg' field in Fliplet apps. See AGENTS.md. */
+
 Fliplet.FormBuilder.field('wysiwyg', {
   name: 'Rich text',
   category: 'Text inputs',

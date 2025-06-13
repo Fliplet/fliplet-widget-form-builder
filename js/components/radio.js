@@ -1,3 +1,5 @@
+/* Purpose: Vue component for 'radio' field in Fliplet apps. See AGENTS.md. */
+
 Fliplet.FormBuilder.field('radio', {
   name: 'Radios (single-select)',
   category: 'Multiple options',

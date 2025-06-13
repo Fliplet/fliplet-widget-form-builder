@@ -1,3 +1,5 @@
+/* Purpose: Vue component for 'reorderList' field in Fliplet apps. See AGENTS.md. */
+
 Fliplet.FormBuilder.field('reorderList', {
   name: 'Reorder list',
   category: 'Multiple options',
