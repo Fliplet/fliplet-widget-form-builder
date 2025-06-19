@@ -202,8 +202,8 @@ Fliplet.FormBuilder.field('image', {
           quality: $vm.jpegQuality,
           destinationType: Camera.DestinationType.DATA_URL,
           sourceType: $vm.cameraSource,
-          targetWidth: $vm.customWidth,
-          targetHeight: $vm.customHeight,
+          targetWidth: $vm.customWidth || 0, // Setting default value as 0 so that camera plugin API does not fail
+          targetHeight: $vm.customHeight || 0,
           popoverOptions: popoverOptions,
           encodingType: Camera.EncodingType.JPEG,
           mediaType: Camera.MediaType.PICTURE,
