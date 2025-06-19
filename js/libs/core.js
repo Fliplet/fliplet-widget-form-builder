@@ -1,3 +1,5 @@
+/* Purpose: Library 'core' used by the Fliplet Form Builder. See AGENTS.md. */
+
 /* eslint-disable eqeqeq */
 Fliplet.FormBuilder = (function() {
   var components = {};

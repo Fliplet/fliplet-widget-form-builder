@@ -1,3 +1,5 @@
+/* Purpose: Vue component for 'dateRange' field in Fliplet apps. See AGENTS.md. */
+
 Fliplet.FormBuilder.field('dateRange', {
   name: 'Date range',
   category: 'Date & time',

@@ -1,3 +1,5 @@
+/* Purpose: Vue component for 'paragraph' field in Fliplet apps. See AGENTS.md. */
+
 Fliplet.FormBuilder.field('paragraph', {
   name: 'Format Paragraph',
   category: 'Formatting',

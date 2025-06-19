@@ -1,3 +1,5 @@
+/* Purpose: Vue component for 'signature' field in Fliplet apps. See AGENTS.md. */
+
 /* global SignaturePad */
 Fliplet.FormBuilder.field('signature', {
   name: 'Signature',

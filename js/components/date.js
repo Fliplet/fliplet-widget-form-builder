@@ -1,3 +1,5 @@
+/* Purpose: Vue component for 'date' field in Fliplet apps. See AGENTS.md. */
+
 Fliplet.FormBuilder.field('date', {
   name: 'Date picker',
   category: 'Date & time',

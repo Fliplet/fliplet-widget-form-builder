@@ -1,3 +1,5 @@
+/* Purpose: Vue component for 'timeRange' field in Fliplet apps. See AGENTS.md. */
+
 Fliplet.FormBuilder.field('timeRange', {
   name: 'Time range',
   category: 'Date & time',

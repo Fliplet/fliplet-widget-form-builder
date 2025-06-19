@@ -1,3 +1,5 @@
+/* Purpose: Vue component for 'title' field in Fliplet apps. See AGENTS.md. */
+
 Fliplet.FormBuilder.field('title', {
   name: 'Format Title',
   category: 'Formatting',

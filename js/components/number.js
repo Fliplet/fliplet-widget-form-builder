@@ -1,3 +1,5 @@
+/* Purpose: Vue component for 'number' field in Fliplet apps. See AGENTS.md. */
+
 Fliplet.FormBuilder.field('number', {
   i18n: window.VueI18Next,
   name: 'Number input',

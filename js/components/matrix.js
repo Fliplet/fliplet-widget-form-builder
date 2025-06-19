@@ -1,3 +1,5 @@
+/* Purpose: Vue component for 'matrix' field in Fliplet apps. See AGENTS.md. */
+
 Fliplet.FormBuilder.field('matrix', {
   name: 'Matrix',
   category: 'Multiple options',

@@ -1,3 +1,5 @@
+/* Purpose: Vue component for 'geolocation' field in Fliplet apps. See AGENTS.md. */
+
 Fliplet.FormBuilder.field('geolocation', {
   name: 'Geolocation',
   category: 'Location & Map',
