@@ -291,12 +291,12 @@ Fliplet.FormBuilder.field('image', {
           ? imgBase64Url
           : 'data:image/jpeg;base64,' + imgBase64Url;
 
-          $vm.value.push(imgBase64Url);
-          addThumbnailToCanvas(imgBase64Url, $vm.value.length - 1, $vm);
-          $vm.$emit('_input', $vm.name, $vm.value);
-        }).catch(function(error) {
-          /* eslint-disable-next-line */
-          console.error(error);
+        $vm.value.push(imgBase64Url);
+        addThumbnailToCanvas(imgBase64Url, $vm.value.length - 1, $vm);
+        $vm.$emit('_input', $vm.name, $vm.value);
+      }).catch(function(error) {
+      /* eslint-disable-next-line */
+        console.error(error);
       });
     },
     onFileChange: function(e) {
