@@ -183,6 +183,7 @@
   "references": [
     "linkAction.page:page",
     "fields.$.mediaFolderId:mediaFolder",
+    "fields.$.dataSourceId:dataSource",
     "dataSourceId:dataSource"
   ]
 }

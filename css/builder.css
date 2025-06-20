@@ -140,6 +140,22 @@ nav > .btn {
   color: #14505e;
 }
 
+.options-help-text {
+  padding-top: 8px;
+  color: #737373;
+}
+
+.options-help-highlight {
+  white-space: nowrap;
+  color: #C51616;
+  background-color: #E5E5E5;
+}
+
+.form-control.resize-vertical {
+  resize: vertical;
+  height: calc(1.5em * 5.75);
+}
+
 /* TEMPLATES GALLERY */
 
 .templates-sub-title {
@@ -1428,4 +1444,16 @@ form hr {
 
 .maps {
   display: none;
+}
+
+.fl-paragraph-editor .tox .tox-toolbar__group > .tox-tbtn--select:first-child .tox-tbtn__select-label {
+  background: transparent;
+  font-weight: 700;
+}
+
+/* Prevent hover styles from appearing on the label */
+.fl-paragraph-editor .tox .tox-toolbar__group > .tox-tbtn--select:first-child:hover,
+.fl-paragraph-editor .tox .tox-toolbar__group > .tox-tbtn--select:first-child:focus {
+  background: transparent;
+  box-shadow: none;
 }
