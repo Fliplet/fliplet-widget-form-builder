@@ -1,3 +1,5 @@
+/* Purpose: Vue component for 'customButton' field in Fliplet apps. See AGENTS.md. */
+
 Fliplet.FormBuilder.field('customButton', {
   name: 'Button',
   category: 'Buttons',

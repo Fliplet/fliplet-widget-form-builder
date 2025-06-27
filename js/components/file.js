@@ -1,3 +1,5 @@
+/* Purpose: Vue component for 'file' field in Fliplet apps. See AGENTS.md. */
+
 /* global loadImage, addThumbnailToCanvas */
 
 Fliplet.FormBuilder.field('file', {

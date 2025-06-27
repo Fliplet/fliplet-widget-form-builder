@@ -1,3 +1,5 @@
+/* Purpose: Vue component for 'slider' field in Fliplet apps. See AGENTS.md. */
+
 Fliplet.FormBuilder.field('slider', {
   name: 'Slider',
   category: 'Advanced',

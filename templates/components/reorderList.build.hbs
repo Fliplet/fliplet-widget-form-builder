@@ -1,3 +1,5 @@
+{{! Purpose: Template for component reorderList.build.hbs. See AGENTS.md }}
+
 <template>
   <div class="list-group col" v-sortable="sortableOptions">
     <div class="list-group-item" v-for="option in orderedOptions" :key="option.id || option.label" :data-id="option.id || option.label" :class="{ 'readonly' : readonly }">

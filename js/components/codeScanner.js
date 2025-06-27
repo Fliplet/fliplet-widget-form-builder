@@ -1,3 +1,5 @@
+/* Purpose: Vue component for 'codeScanner' field in Fliplet apps. See AGENTS.md. */
+
 Fliplet.FormBuilder.field('codeScanner', {
   name: 'Code scanner',
   category: 'Advanced',

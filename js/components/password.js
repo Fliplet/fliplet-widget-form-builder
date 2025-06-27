@@ -1,3 +1,5 @@
+/* Purpose: Vue component for 'password' field in Fliplet apps. See AGENTS.md. */
+
 Fliplet.FormBuilder.field('password', {
   name: 'Password input',
   category: 'Text inputs',

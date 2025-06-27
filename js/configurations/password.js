@@ -1,3 +1,5 @@
+/* Purpose: Configuration UI for 'password' field in Fliplet Studio. See AGENTS.md. */
+
 Fliplet.FormBuilder.configuration('password', {
   methods: {
     validatePasswordLength: function() {

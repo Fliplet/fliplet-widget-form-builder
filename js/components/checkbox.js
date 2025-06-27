@@ -1,3 +1,5 @@
+/* Purpose: Vue component for 'checkbox' field in Fliplet apps. See AGENTS.md. */
+
 Fliplet.FormBuilder.field('checkbox', {
   name: 'Checkboxes (multi-select)',
   category: 'Multiple options',

@@ -1,3 +1,5 @@
+/* Purpose: Library 'templates' used by the Fliplet Form Builder. See AGENTS.md. */
+
 var systemTemplates = [{
   id: 1,
   settings: {
