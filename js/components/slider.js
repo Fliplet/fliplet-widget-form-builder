@@ -1,3 +1,7 @@
+/**
+ * Slider field component – renders a range slider input for numeric selection in forms.
+ * Supports min/max values, step increments, and real-time value display.
+ */
 Fliplet.FormBuilder.field('slider', {
   name: 'Slider',
   category: 'Advanced',

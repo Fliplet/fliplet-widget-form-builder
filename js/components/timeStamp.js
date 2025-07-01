@@ -1,3 +1,7 @@
+/**
+ * Timestamp field component – automatically captures current date and time in forms.
+ * Records form submission timestamps with customizable display formats.
+ */
 Fliplet.FormBuilder.field('timeStamp', {
   name: 'Time Stamp',
   category: 'Date & time',

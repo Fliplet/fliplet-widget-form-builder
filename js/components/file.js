@@ -1,5 +1,9 @@
 /* global loadImage, addThumbnailToCanvas */
 
+/**
+ * File field component – renders a file upload input with progress tracking.
+ * Supports multiple file types, image resizing, and media folder integration.
+ */
 Fliplet.FormBuilder.field('file', {
   i18n: window.VueI18Next,
   name: 'Attach a file',

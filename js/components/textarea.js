@@ -1,3 +1,7 @@
+/**
+ * Textarea field component – renders a multi-line text input field in forms.
+ * Supports configurable rows, character limits, and text validation.
+ */
 Fliplet.FormBuilder.field('textarea', {
   name: 'Multiple line input',
   category: 'Text inputs',

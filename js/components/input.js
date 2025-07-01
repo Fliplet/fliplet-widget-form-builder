@@ -1,3 +1,7 @@
+/**
+ * Input field component – renders a text input field in forms.
+ * Supports validation, placeholder text, and GUID generation.
+ */
 Fliplet.FormBuilder.field('input', {
   name: 'Text input',
   category: 'Text inputs',

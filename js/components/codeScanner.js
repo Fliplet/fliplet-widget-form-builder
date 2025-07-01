@@ -1,3 +1,7 @@
+/**
+ * Code scanner field component – renders a barcode/QR code scanner in forms.
+ * Captures and validates barcode data using device camera functionality.
+ */
 Fliplet.FormBuilder.field('codeScanner', {
   name: 'Code scanner',
   category: 'Advanced',

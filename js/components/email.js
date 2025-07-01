@@ -1,3 +1,7 @@
+/**
+ * Email field component – renders an email input field with validation in forms.
+ * Provides automatic email format validation and invalid character filtering.
+ */
 Fliplet.FormBuilder.field('email', {
   name: 'Email input',
   category: 'Text inputs',
