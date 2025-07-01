@@ -1,3 +1,7 @@
+/**
+ * Star rating field component – renders interactive star rating selection in forms.
+ * Allows users to select ratings by clicking on star icons with customizable scales.
+ */
 Fliplet.FormBuilder.field('starRating', {
   name: 'Star rating',
   category: 'Advanced',

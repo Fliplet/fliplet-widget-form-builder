@@ -1,3 +1,7 @@
+/**
+ * Date range field component – renders a dual date picker for selecting date ranges.
+ * Allows selection of start and end dates with validation for proper ranges.
+ */
 Fliplet.FormBuilder.field('dateRange', {
   name: 'Date range',
   category: 'Date & time',

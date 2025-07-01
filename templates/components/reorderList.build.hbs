@@ -1,3 +1,4 @@
+{{! Reorderable list field with drag-and-drop sorting functionality }}
 <template>
   <div class="list-group col" v-sortable="sortableOptions">
     <div class="list-group-item" v-for="option in orderedOptions" :key="option.id || option.label" :data-id="option.id || option.label" :class="{ 'readonly' : readonly }">

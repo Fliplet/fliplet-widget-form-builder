@@ -1,3 +1,7 @@
+/**
+ * Radio field component – renders radio button options for single selection in forms.
+ * Supports custom options and data source integration for dynamic choices.
+ */
 Fliplet.FormBuilder.field('radio', {
   name: 'Radios (single-select)',
   category: 'Multiple options',

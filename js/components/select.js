@@ -1,3 +1,7 @@
+/**
+ * Select field component – renders a dropdown selection input in forms.
+ * Supports custom options, data source integration, and multiple selection modes.
+ */
 Fliplet.FormBuilder.field('select', {
   name: 'Dropdown (single-select)',
   category: 'Multiple options',

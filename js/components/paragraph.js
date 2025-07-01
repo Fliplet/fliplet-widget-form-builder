@@ -1,3 +1,7 @@
+/**
+ * Paragraph field component – renders static text content in forms.
+ * Supports HTML formatting and serves as informational text blocks.
+ */
 Fliplet.FormBuilder.field('paragraph', {
   name: 'Format Paragraph',
   category: 'Formatting',

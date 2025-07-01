@@ -1,3 +1,7 @@
+/**
+ * Buttons field component – renders form action buttons (Submit/Clear).
+ * Configurable button labels and visibility options.
+ */
 Fliplet.FormBuilder.field('buttons', {
   name: 'Form buttons',
   category: 'Buttons',

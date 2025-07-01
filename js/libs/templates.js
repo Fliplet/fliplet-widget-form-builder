@@ -1,3 +1,11 @@
+/**
+ * templates.js – Fliplet Form Builder: Template helpers.
+ *
+ * Provides utility functions for working with Handlebars templates.
+ *
+ * All exported functions and major logic blocks are documented with JSDoc.
+ */
+
 var systemTemplates = [{
   id: 1,
   settings: {
@@ -59,3 +67,22 @@ Fliplet.FormBuilder.templates = function() {
     });
   });
 };
+
+/**
+ * Compile a Handlebars template by name.
+ * @param {string} name - The template name.
+ * @returns {Function} Compiled template function.
+ */
+function compileTemplate(name) {
+  return Handlebars.compile(Fliplet.Widget.Templates[name]);
+}
+
+/**
+ * Render a Handlebars template by name with context.
+ * @param {string} name - The template name.
+ * @param {Object} context - Data to pass to the template.
+ * @returns {string} Rendered HTML.
+ */
+function renderTemplate(name, context) {
+  return compileTemplate(name)(context);
+}

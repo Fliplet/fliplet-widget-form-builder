@@ -1,3 +1,7 @@
+/**
+ * Geolocation field component – captures and stores user's GPS coordinates in forms.
+ * Automatically detects location using device GPS with user permission.
+ */
 Fliplet.FormBuilder.field('geolocation', {
   name: 'Geolocation',
   category: 'Location & Map',

@@ -1,3 +1,11 @@
+/**
+ * form.js – Fliplet Form Builder: Runtime form logic and helpers.
+ *
+ * Handles form rendering, validation, submission, and data integration.
+ *
+ * All exported functions and major logic blocks are documented with JSDoc.
+ */
+
 var formBuilderInstances = [];
 var dataSourceColumnPromises = {};
 var allFormsInSlide = [];

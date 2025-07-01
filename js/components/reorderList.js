@@ -1,3 +1,7 @@
+/**
+ * Reorder list field component – renders a draggable list for item prioritization in forms.
+ * Allows users to drag and drop items to establish custom ordering.
+ */
 Fliplet.FormBuilder.field('reorderList', {
   name: 'Reorder list',
   category: 'Multiple options',
