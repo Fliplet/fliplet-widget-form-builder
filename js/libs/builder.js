@@ -40,7 +40,7 @@ if (data.fields) {
   /**
    * Remove falsy fields from the data.fields array.
    */
-  data.fields = _.compact(data.fields);
+  data.fields = data.fields.filter(Boolean);
 }
 
 if (Array.isArray(data.onSubmit) && data.onSubmit.length) {
@@ -120,7 +120,7 @@ Vue.directive('sortable', {
 });
 
 function generateFormDefaults(data) {
-  return _.assign({
+  return Object.assign({
     name: '',
     dataSourceId: '',
     templateId: '',
@@ -262,7 +262,7 @@ Fliplet().then(function() {
 
           $(event.item).remove();
 
-          var fieldsWithSameName = _.filter(this.fields, function(item) {
+          var fieldsWithSameName = this.fields.filter(function(item) {
             return item.name.match(component.name.replace('(', '\\(').replace(')', '\\)'));
           });
 
@@ -277,11 +277,11 @@ Fliplet().then(function() {
           };
 
           if (componentName === 'flMatrix') {
-            _.assign(data, { 'rowOptions': component.props.rowOptions.default() });
+            Object.assign(data, { 'rowOptions': component.props.rowOptions.default() });
           }
 
           if (componentName === 'flAddress') {
-            _.assign(data, { 'selectedFieldOptions': component.props.selectedFieldOptions.default() });
+            Object.assign(data, { 'selectedFieldOptions': component.props.selectedFieldOptions.default() });
           }
 
           return this.fields.splice(event.newIndex, 0, data);
@@ -313,8 +313,8 @@ Fliplet().then(function() {
       onFieldClick: function(field) {
         this.activeFieldConfigType = field._type.toString() + 'Config';
         this.activeFieldName = Fliplet.FormBuilder.components()[field._type].name;
-        this.activeFieldIdx = _.findIndex(this.fields, {
-          name: field.name
+        this.activeFieldIdx = this.fields.findIndex(function(f) {
+          return f.name === field.name;
         });
         this.activeField = field;
         changeSelectText();
@@ -419,7 +419,7 @@ Fliplet().then(function() {
         $vm.settings.name = $vm.settings.displayName;
 
         // Cleanup
-        this.settings.fields = _.compact(this.fields);
+        this.settings.fields = this.fields.filter(Boolean);
 
         return Fliplet.Widget.save(this.settings).then(function onSettingsUpdated() {
           return $vm.updateDataSourceHooks();
@@ -669,16 +669,21 @@ Fliplet().then(function() {
       },
       updateDataSourceHooks: function() {
         var dataSourceId = this.settings.dataSourceId;
-        var newColumns = _.chain(this.fields)
+        var newColumns = this.fields
           .filter(function(field) {
             return field._submit !== false;
           })
-          .map('name')
-          .value();
+          .map(function(field) {
+            return field.name;
+          });
 
-        var fieldsToHash = _.map(_.filter(this.fields, function(field) {
-          return !!field.hash;
-        }), 'name');
+        var fieldsToHash = this.fields
+          .filter(function(field) {
+            return !!field.hash;
+          })
+          .map(function(field) {
+            return field.name;
+          });
 
         if (!dataSourceId) {
           return Promise.resolve();
@@ -688,17 +693,17 @@ Fliplet().then(function() {
           ds.columns = ds.columns || [];
 
           var hooksDeleted;
-          var columns = _.uniq(newColumns.concat(ds.columns));
+          var columns = [...new Set(newColumns.concat(ds.columns))];
 
           // remove existing hooks for the operations from the same widget instance
-          ds.hooks = _.reject(ds.hooks || [], function(hook) {
+          ds.hooks = (ds.hooks || []).filter(function(hook) {
             var remove = hook.widgetInstanceId == widgetId && hook.type == 'operations';
 
             if (remove) {
               hooksDeleted = true;
             }
 
-            return remove;
+            return !remove;
           });
 
           // add fields that need to be hashed to data source hooks
@@ -716,7 +721,7 @@ Fliplet().then(function() {
               payload: payload
             });
           } else if (!hooksDeleted) {
-            if (_.isEqual(columns.sort(), ds.columns.sort())) {
+            if (JSON.stringify(columns.sort()) === JSON.stringify(ds.columns.sort())) {
               return; // no need to update
             }
           }
@@ -785,7 +790,7 @@ Fliplet().then(function() {
         });
       },
       updateFormSettings: function(templateId, preview) {
-        var formTemplate = _.find(this.templates, function(template) {
+        var formTemplate = this.templates.find(function(template) {
           return template.id === templateId;
         });
 
@@ -969,11 +974,14 @@ Fliplet().then(function() {
         var $html = $('<div/>').append(html);
         var $allElements = $html.find('*');
 
-        _.each($allElements, function(el) {
+        for (var i = 0; i < $allElements.length; i++) {
+          var el = $allElements[i];
           var $el = $(el);
 
-          _.each(el.attributes, function(attr) {
-            if (_.startsWith(attr.name, '@')) {
+          for (var j = 0; j < el.attributes.length; j++) {
+            var attr = el.attributes[j];
+
+            if (attr.name.startsWith('@')) {
               var event = attr.name.split('.');
               var newAttrName = event[0].replace('@', 'v-on:');
               var newAttrValue = attr.value === 'start()' ? 'start($event)' : attr.value;
@@ -981,8 +989,8 @@ Fliplet().then(function() {
               $el.attr(newAttrName, newAttrValue);
               $el.removeAttr(attr.name);
             }
-          });
-        });
+          }
+        }
 
         return $html.html();
       },
@@ -1004,7 +1012,7 @@ Fliplet().then(function() {
             $vm.settings.isPlaceholder = false;
             $vm.useTemplate(blankTemplateId);
           } else {
-            Fliplet.Widget.save(_.assign(data, { isPlaceholder: true })).then(function() {
+            Fliplet.Widget.save(Object.assign(data, { isPlaceholder: true })).then(function() {
               $(selector).removeClass('is-loading');
               Fliplet.Studio.emit('reload-widget-instance', Fliplet.Widget.getDefaultId());
             });
@@ -1013,11 +1021,10 @@ Fliplet().then(function() {
       },
       setNewColumns: function(columns) {
         var fieldNames = [];
-        var fields = _.chain(this.fields)
+        var fields = this.fields
           .filter(function(field) {
             return field._submit !== false;
-          })
-          .value();
+          });
 
         fields.forEach(function(field) {
           switch (field._type) {
@@ -1041,7 +1048,7 @@ Fliplet().then(function() {
               break;
 
             case 'flMatrix':
-              _.forEach(field.rowOptions, function(row) {
+              field.rowOptions.forEach(function(row) {
                 var val = row.id ? row.id : row.label;
 
                 fieldNames.push(`${field.name} [${val}]`);
@@ -1070,8 +1077,8 @@ Fliplet().then(function() {
           this.newColumns = fieldNames;
         }
 
-        this.newColumns = _.filter(fieldNames, function(item) {
-          return !_.includes(columns, item);
+        this.newColumns = fieldNames.filter(function(item) {
+          return !columns.includes(item);
         });
       },
       getAllFormsInSlide: async function() {
@@ -1244,7 +1251,7 @@ Fliplet().then(function() {
               dataSource.hooks = dataSource.hooks || [];
 
               if (dataSource.hooks.length) {
-                var index = _.findIndex(dataSource.hooks, function(o) {
+                var index = dataSource.hooks.findIndex(function(o) {
                   return o.widgetInstanceId == widgetId && o.runOn.indexOf('insert') > -1;
                 });
 
@@ -1272,7 +1279,7 @@ Fliplet().then(function() {
               dataSource.hooks = dataSource.hooks || [];
 
               if (dataSource.hooks.length) {
-                var index = _.findIndex(dataSource.hooks, function(o) {
+                var index = dataSource.hooks.findIndex(function(o) {
                   return o.widgetInstanceId == widgetId && o.runOn.indexOf('update') > -1;
                 });
 
@@ -1483,7 +1490,7 @@ Fliplet().then(function() {
           'generateEmailProvider'
         ];
 
-        _.each(emailProviderNames, function(providerName) {
+        emailProviderNames.forEach(function(providerName) {
           if (window[providerName]) {
             window[providerName].close();
             window[providerName] = null;

@@ -314,7 +314,7 @@ Fliplet.FormBuilder.field('image', {
     },
     onImageClick: function(index) {
       var imagesData = {
-        images: _.map(this.value, function(imgURL) {
+        images: this.value.map(function(imgURL) {
           return { url: imgURL };
         }),
         options: {
