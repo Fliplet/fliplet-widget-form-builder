@@ -50,18 +50,18 @@ Fliplet.FormBuilder.field('checkbox', {
         var $vm = this;
 
         // Sort selected options by their index as a checkbox input option
-        var ordered = _.sortBy(this.value, function(val) {
-          return _.findIndex($vm.options, function(option) {
+        var ordered = this.sortBy(this.value, function(val) {
+          return $vm.options.findIndex(function(option) {
             return (option.id || option.label) === val;
           });
         });
 
         // Get all options label in array format
-        var allOptions = _.map(this.options, function(option) {
+        var allOptions = this.options.map(function(option) {
           return option.id || option.label;
         });
 
-        this.selectedAll = _.isEqual(ordered, allOptions);
+        this.selectedAll = this.isEqual(ordered, allOptions);
       }
     },
     selectedAll: {
@@ -83,7 +83,7 @@ Fliplet.FormBuilder.field('checkbox', {
           this.value = [];
         }
 
-        if (!_.isEqual(oldValue, this.value)) {
+        if (!this.isEqual(oldValue, this.value)) {
           this.updateValue();
         }
       }
@@ -101,12 +101,89 @@ Fliplet.FormBuilder.field('checkbox', {
     return rules;
   },
   methods: {
+    /**
+     * Sorts an array based on iteratee function results
+     * @param {Array} array - array to sort
+     * @param {Function} iteratee - function to determine sort value
+     * @returns {Array} sorted array
+     */
+    sortBy: function(array, iteratee) {
+      return array.slice().sort(function(a, b) {
+        var valueA = iteratee(a);
+        var valueB = iteratee(b);
+
+        if (valueA < valueB) return -1;
+        if (valueA > valueB) return 1;
+
+        return 0;
+      });
+    },
+
+    /**
+     * Performs deep equality comparison
+     * @param {*} a - first value
+     * @param {*} b - second value
+     * @returns {Boolean} true if equal
+     */
+    isEqual: function(a, b) {
+      if (a === b) return true;
+      if (a === null || b === null) return false;
+
+      if (Array.isArray(a) && Array.isArray(b)) {
+        if (a.length !== b.length) return false;
+
+        for (var i = 0; i < a.length; i++) {
+          if (!this.isEqual(a[i], b[i])) return false;
+        }
+
+        return true;
+      }
+
+      if (typeof a === 'object' && typeof b === 'object') {
+        var keysA = Object.keys(a);
+        var keysB = Object.keys(b);
+
+        if (keysA.length !== keysB.length) return false;
+
+        for (var key of keysA) {
+          if (!Object.prototype.hasOwnProperty.call(b, key) || !this.isEqual(a[key], b[key])) return false;
+        }
+
+        return true;
+      }
+
+      return false;
+    },
+
+    /**
+     * Creates unique array using comparator function
+     * @param {Array} array - array to make unique
+     * @param {Function} comparator - function to compare elements
+     * @returns {Array} unique array
+     */
+    uniqueWith: function(array, comparator) {
+      var result = [];
+      var $vm = this;
+
+      array.forEach(function(item) {
+        var isDuplicate = result.some(function(existing) {
+          return comparator.call($vm, item, existing);
+        });
+
+        if (!isDuplicate) {
+          result.push(item);
+        }
+      });
+
+      return result;
+    },
+
     updateValue: function() {
       var $vm = this;
 
       // Sort selected options by their index as a checkbox input option
-      var ordered = _.sortBy(this.value, function(val) {
-        return _.findIndex($vm.options, function(option) {
+      var ordered = this.sortBy(this.value, function(val) {
+        return $vm.options.findIndex(function(option) {
           return (option.label || option.id) === val;
         });
       });
@@ -148,8 +225,8 @@ Fliplet.FormBuilder.field('checkbox', {
       var selectedOptions = [];
 
       this.value.forEach(function(value) {
-        var selectedOption = _.find($vm.options, function(option) {
-          return (_.has(option, 'label') && _.has(option, 'id')) ? option.id === value : option.label === value;
+        var selectedOption = $vm.options.find(function(option) {
+          return (Object.prototype.hasOwnProperty.call(option, 'label') && Object.prototype.hasOwnProperty.call(option, 'id')) ? option.id === value : option.label === value;
         });
 
         if (selectedOption) {
@@ -157,7 +234,7 @@ Fliplet.FormBuilder.field('checkbox', {
         }
       });
 
-      this.value = selectedOptions.length ? _.uniqWith(this.value, _.isEqual) : [];
+      this.value = selectedOptions.length ? this.uniqueWith(this.value, this.isEqual) : [];
     }
 
     if (!!this.defaultValue) {

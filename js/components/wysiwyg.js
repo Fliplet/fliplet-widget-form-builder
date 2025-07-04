@@ -39,7 +39,7 @@ Fliplet.FormBuilder.field('wysiwyg', {
   watch: {
     value: function(val) {
       // This happens when the value is updated programmatically via the FormBuilder field().val() method
-      val = _.isNumber(val) ? _.toString(val) : val;
+      val = typeof val === 'number' ? val.toString() : val;
 
       if (this.editor && val !== this.editor.getContent()) {
         return this.editor.setContent(val || '', { format: 'raw' });
@@ -51,6 +51,49 @@ Fliplet.FormBuilder.field('wysiwyg', {
     }
   },
   methods: {
+    /**
+     * Converts a string to kebab-case
+     * @param {String} str - string to convert
+     * @returns {String} kebab-case string
+     */
+    toKebabCase: function(str) {
+      return str
+        .replace(/([a-z])([A-Z])/g, '$1-$2')
+        .replace(/[\s_]+/g, '-')
+        .toLowerCase();
+    },
+
+    /**
+     * Gets a nested property from an object using dot notation
+     * @param {Object} obj - object to get property from
+     * @param {String} path - dot-separated path
+     * @returns {*} property value
+     */
+    getNestedProperty: function(obj, path) {
+      return path.split('.').reduce(function(current, key) {
+        return current && current[key];
+      }, obj);
+    },
+
+    /**
+     * Sets a nested property on an object using dot notation
+     * @param {Object} obj - object to set property on
+     * @param {String} path - dot-separated path
+     * @param {*} value - value to set
+     * @returns {void}
+     */
+    setNestedProperty: function(obj, path, value) {
+      var keys = path.split('.');
+      var lastKey = keys.pop();
+      var target = keys.reduce(function(current, key) {
+        current[key] = current[key] || {};
+
+        return current[key];
+      }, obj);
+
+      target[lastKey] = value;
+    },
+
     onReset: function() {
       if (this.editor) {
         try {
@@ -79,7 +122,7 @@ Fliplet.FormBuilder.field('wysiwyg', {
     var $vm = this;
     var lineHeight = 55;
 
-    this.tinymceId = _.kebabCase(this.name) + '-' + $(this.$refs.textarea).parents('[data-form-builder-id]').data('formBuilderId');
+    this.tinymceId = this.toKebabCase(this.name) + '-' + $(this.$refs.textarea).parents('[data-form-builder-id]').data('formBuilderId');
 
     var config = {
       target: this.$refs.textarea,
@@ -202,15 +245,15 @@ Fliplet.FormBuilder.field('wysiwyg', {
       }).then(function() {
         var pluginPaths = ['plugins', 'mobile.plugins'];
 
-        _.forEach(pluginPaths, function(path) {
-          var plugins = _.get(config, path);
+        pluginPaths.forEach(function(path) {
+          var plugins = $vm.getNestedProperty(config, path);
 
           if (typeof plugins === 'string') {
             // Use array of plugins (as TinyMCE's preferred format) if string is provided
             plugins = plugins.split(' ');
           }
 
-          _.set(config, path, plugins);
+          $vm.setNestedProperty(config, path, plugins);
         });
 
         tinymce.init(config);

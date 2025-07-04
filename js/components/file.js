@@ -51,10 +51,10 @@ Fliplet.FormBuilder.field('file', {
   },
   computed: {
     selectedFileName: function() {
-      return _.map(this.value, 'name').join(', ');
+      return this.value.map(function(file) { return file.name; }).join(', ');
     },
     isValueUrlLink: function() {
-      return _.some(this.value, function(value) {
+      return this.value.some(function(value) {
         return typeof value === 'string' && Fliplet.Media.isRemoteUrl(value);
       });
     }
@@ -86,10 +86,28 @@ Fliplet.FormBuilder.field('file', {
     this.selectedFiles.length = 0;
   },
   methods: {
+    /**
+     * Sorts an array based on iteratee function results
+     * @param {Array} array - array to sort
+     * @param {Function} iteratee - function to determine sort value
+     * @returns {Array} sorted array
+     */
+    sortBy: function(array, iteratee) {
+      return array.slice().sort(function(a, b) {
+        var valueA = iteratee(a);
+        var valueB = iteratee(b);
+
+        if (valueA < valueB) return -1;
+        if (valueA > valueB) return 1;
+
+        return 0;
+      });
+    },
+
     loadFileData: function() {
       var $vm = this;
       var isFileDataLoaded = false;
-      var fileIDs = _.map(this.value, function(fileURL) {
+      var fileIDs = this.value.map(function(fileURL) {
         if (typeof fileURL === 'string' && /v1\/media\/files\/([0-9]+)/.test(fileURL)) {
           return +fileURL.match(/v1\/media\/files\/([0-9]+)/)[1];
         }
@@ -107,13 +125,13 @@ Fliplet.FormBuilder.field('file', {
         files: fileIDs,
         fields: ['name', 'url', 'metadata', 'createdAt']
       }).then(function(files) {
-        var newFiles = _.map(files, function(file) {
+        var newFiles = files.map(function(file) {
           file.size = file.metadata.size;
 
           return file;
         });
 
-        $vm.value = _.sortBy(newFiles, ['name']);
+        $vm.value = $vm.sortBy(newFiles, function(file) { return file.name; });
       }).catch(function() {});
     },
     showLocalDateFormat: function(date) {

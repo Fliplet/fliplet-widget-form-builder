@@ -30,7 +30,8 @@ Fliplet.FormBuilder.field('customButton', {
       var $vm = this;
 
       Fliplet.FormBuilder.get().then(function(form) {
-        var button = _.assign({}, _.find($vm.$parent.fields, { name: $vm.name }), { $el: $vm.$el });
+        var foundField = $vm.$parent.fields.find(function(field) { return field.name === $vm.name; });
+        var button = Object.assign({}, foundField, { $el: $vm.$el });
 
         if ($vm.buttonAction) {
           $vm.buttonAction.context = {
