@@ -18,52 +18,86 @@
     </header>
     <section v-if="chooseTemplate" class="col-sm-12 choose-template" ref="templateGallery">
       <p class="templates-sub-title">Choose a form template to get started.</p>
-      <template v-if="organizationTemplates.length">
-        <div class="gallery-heading">Templates by \{{ organizationName }}</div>
-        <div class="templates-holder">
-          <div class="template-wrapper" v-for="template in organizationTemplates">
-            <div class="template-info">
-              <h4 class="template-title">\{{ template.settings.displayName }} <span type="button" class="template-created-info" data-toggle="tooltip" data-placement="left" :title="template.createdDescription"><i class="fa fa-info" aria-hidden="true"></i></span></h4>
-              <div v-if="readMore.indexOf(template.id) > -1" class="template-desc">
-                <span v-html="template.settings.description"></span>
-                <a href="#" class="readless" v-on:click.prevent="toggleReadMore(false, template.id)">Close</a>
-              </div>
-              <div v-else class="template-desc">
-                <span v-html="truncate(template.settings.description, 100)"></span>
-                <a v-if="template.settings.description.length > 100" href="#" class="readmore" v-on:click.prevent="toggleReadMore(true, template.id)">Read more <i class="fa fa-angle-down"></i></a>
-              </div>
-              <div class="template-controls">
-                <div class="btn btn-secondary" v-on:click.prevent="previewTemplate(template.id)">
-                  <template v-if="settings.previewingTemplate === template.id">Previewing</template>
-                  <template v-else>Preview</template>
+
+      <!-- System Templates Section -->
+      <div class="template-section">
+        <h3 class="template-section-title">System Templates</h3>
+        <div class="row">
+          <div class="col-xs-6 col-sm-4" v-for="template in systemTemplates">
+            <div class="template-item" :data-template-id="template.id">
+              <div class="template-header">
+                <h5>{{ template.settings.displayName }}</h5>
+                <div class="template-actions">
+                  <button type="button" class="btn btn-link text-primary" v-on:click.prevent="updateFormSettings(template.id, true)">
+                    <i class="fa fa-eye fa-fw"></i> Preview
+                  </button>
+                  <button type="button" class="btn btn-primary" v-on:click.prevent="useTemplate(template.id)">Use this</button>
                 </div>
-                <div class="btn btn-primary" v-on:click.prevent="useTemplate(template.id)">Use</div>
+              </div>
+              <div class="template-body">
+                <p>{{ template.settings.description }}</p>
               </div>
             </div>
           </div>
         </div>
-      </template>
-      <div class="gallery-heading">Fliplet templates</div>
-      <div class="templates-holder">
-        <div class="template-wrapper" v-for="template in systemTemplates">
-          <div class="template-info">
-            <h4 class="template-title">\{{ template.settings.displayName }} <span type="button" class="template-created-info" data-toggle="tooltip" data-placement="left" title="Created by Fliplet"><i class="fa fa-info" aria-hidden="true"></i></span></h4>
-            <div v-if="readMore.indexOf(template.id) > -1" class="template-desc">
-              <span v-html="template.settings.description"></span>
-              <a href="#" class="readless" v-on:click.prevent="toggleReadMore(false, template.id)">Close</a>
-            </div>
-            <div v-else class="template-desc">
-              <span v-html="truncate(template.settings.description, 100)"></span>
-              <a v-if="template.settings.description.length > 100" href="#" class="readmore" v-on:click.prevent="toggleReadMore(true, template.id)">Read more <i class="fa fa-angle-down"></i></a>
-            </div>
-            <div class="template-controls">
-              <div class="btn btn-secondary" v-on:click.prevent="previewTemplate(template.id)">
-                <template v-if="settings.previewingTemplate === template.id">Previewing</template>
-                <template v-else>Preview</template>
+      </div>
+
+      <!-- Organization Templates Section -->
+      <div class="template-section">
+        <h3 class="template-section-title">
+          Organization Templates
+          <span v-if="templatesLoading" class="loading-indicator">
+            <i class="fa fa-spinner fa-spin"></i> Loading...
+          </span>
+        </h3>
+        
+        <!-- Show loading placeholder while templates load -->
+        <div v-if="templatesLoading && !organizationTemplates.length" class="loading-templates">
+          <div class="row">
+            <div class="col-xs-6 col-sm-4" v-for="n in 3">
+              <div class="template-item template-skeleton">
+                <div class="skeleton-header"></div>
+                <div class="skeleton-body">
+                  <div class="skeleton-line"></div>
+                  <div class="skeleton-line short"></div>
+                </div>
+                <div class="skeleton-actions">
+                  <div class="skeleton-button"></div>
+                  <div class="skeleton-button"></div>
+                </div>
               </div>
-              <div class="btn btn-primary" v-on:click.prevent="useTemplate(template.id)">Use</div>
             </div>
           </div>
+        </div>
+
+        <!-- Show actual organization templates -->
+        <div v-else-if="organizationTemplates.length" class="row">
+          <div class="col-xs-6 col-sm-4" v-for="template in organizationTemplates">
+            <div class="template-item" :data-template-id="template.id" data-toggle="tooltip" data-placement="bottom" :title="template.createdDescription">
+              <div class="template-header">
+                <h5>{{ template.settings.displayName }}</h5>
+                <div class="template-actions">
+                  <button type="button" class="btn btn-link text-primary" v-on:click.prevent="updateFormSettings(template.id, true)">
+                    <i class="fa fa-eye fa-fw"></i> Preview
+                  </button>
+                  <button type="button" class="btn btn-primary" v-on:click.prevent="useTemplate(template.id)">Use this</button>
+                </div>
+              </div>
+              <div class="template-body">
+                <p v-if="readMore.indexOf(template.id) === -1">{{ truncate(template.settings.description, 100) }}</p>
+                <p v-else>{{ template.settings.description }}</p>
+                <button v-if="template.settings.description && template.settings.description.length > 100" type="button" class="btn btn-link btn-sm read-more" v-on:click.prevent="toggleReadMore(readMore.indexOf(template.id) === -1, template.id)">
+                  <span v-if="readMore.indexOf(template.id) === -1">Read more</span>
+                  <span v-else>Read less</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Show message when no organization templates -->
+        <div v-else-if="!templatesLoading" class="no-templates">
+          <p class="text-muted">No organization templates available. You can create templates by saving forms with the "Set as template" option.</p>
         </div>
       </div>
     </section>
@@ -180,7 +214,7 @@
                 </div>
                 <div v-if="settings.autobindProfileEditing">
                   <p class="help-block">
-                    <small>If the form loads data from user’s profile, it can only be used to update the user’s profile.</small>
+                    <small>If the form loads data from user's profile, it can only be used to update the user's profile.</small>
                   </p>
                 </div>
 

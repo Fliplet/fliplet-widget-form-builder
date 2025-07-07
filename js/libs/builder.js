@@ -211,7 +211,8 @@ Fliplet().then(function() {
         ],
         newColumns: [],
         selectedOptions: {},
-        currentMultiStepFormFields: []
+        currentMultiStepFormFields: [],
+        templatesLoading: false
       };
     },
     computed: {
@@ -422,6 +423,11 @@ Fliplet().then(function() {
         this.settings.fields = _.compact(this.fields);
 
         return Fliplet.Widget.save(this.settings).then(function onSettingsUpdated() {
+          // Clear template cache if this form is being saved as a template
+          if ($vm.settings.template) {
+            Fliplet.FormBuilder.clearTemplateCache();
+          }
+          
           return $vm.updateDataSourceHooks();
         });
       },
@@ -993,22 +999,49 @@ Fliplet().then(function() {
 
         var $vm = this;
 
-        return Fliplet.FormBuilder.templates().then(function(templates) {
-          $vm.templates = templates.system.concat(templates.organization);
-          $vm.systemTemplates = templates.system;
-          $vm.organizationTemplates = templates.organization;
+        // First, load system templates immediately to show UI quickly
+        return Fliplet.FormBuilder.templates(true).then(function(initialTemplates) {
+          $vm.templates = initialTemplates.system.concat(initialTemplates.organization);
+          $vm.systemTemplates = initialTemplates.system;
+          $vm.organizationTemplates = initialTemplates.organization;
+          $vm.templatesLoading = initialTemplates.loading;
 
-          if (!$vm.organizationTemplates.length) {
-            var blankTemplateId = $vm.systemTemplates[0].id;
+          // Show UI immediately with system templates
+          $(selector).removeClass('is-loading');
 
-            $vm.settings.isPlaceholder = false;
-            $vm.useTemplate(blankTemplateId);
-          } else {
-            Fliplet.Widget.save(_.assign(data, { isPlaceholder: true })).then(function() {
-              $(selector).removeClass('is-loading');
-              Fliplet.Studio.emit('reload-widget-instance', Fliplet.Widget.getDefaultId());
+          // Always use blank template initially to show interface
+          var blankTemplateId = $vm.systemTemplates[0].id;
+          $vm.settings.isPlaceholder = false;
+          $vm.useTemplate(blankTemplateId);
+
+          // Load organization templates in background
+          if (initialTemplates.loading) {
+            Fliplet.FormBuilder.loadOrganizationTemplates().then(function(organizationTemplates) {
+              $vm.organizationTemplates = organizationTemplates;
+              $vm.templates = $vm.systemTemplates.concat(organizationTemplates);
+              $vm.templatesLoading = false;
+
+              // If we now have organization templates, show the template chooser
+              if (organizationTemplates.length > 0) {
+                $vm.chooseTemplate = true;
+                $vm.settings.isPlaceholder = true;
+                
+                // Re-save with placeholder state
+                Fliplet.Widget.save(_.assign(data, { isPlaceholder: true })).then(function() {
+                  Fliplet.Studio.emit('reload-widget-instance', Fliplet.Widget.getDefaultId());
+                });
+              }
+            }).catch(function(error) {
+              console.warn('Failed to load organization templates:', error);
+              // Continue with just system templates
+              $vm.templatesLoading = false;
             });
           }
+        }).catch(function(error) {
+          console.error('Failed to load templates:', error);
+          // Fallback: show interface anyway with minimal setup
+          $(selector).removeClass('is-loading');
+          $vm.settings.isPlaceholder = false;
         });
       },
       setNewColumns: function(columns) {

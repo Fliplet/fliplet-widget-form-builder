@@ -1457,3 +1457,144 @@ form hr {
   background: transparent;
   box-shadow: none;
 }
+
+/* Template Gallery Improvements */
+.template-section {
+  margin-bottom: 2rem;
+}
+
+.template-section-title {
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  color: #333;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.loading-indicator {
+  font-size: 0.9rem;
+  font-weight: normal;
+  color: #666;
+}
+
+.template-item {
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+  transition: all 0.2s ease;
+  background: white;
+}
+
+.template-item:hover {
+  border-color: #007bff;
+  box-shadow: 0 2px 8px rgba(0, 123, 255, 0.1);
+}
+
+.template-header {
+  padding: 1rem;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.template-header h5 {
+  margin: 0 0 0.5rem 0;
+  font-weight: 600;
+  color: #333;
+}
+
+.template-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.template-actions .btn {
+  font-size: 0.85rem;
+  padding: 0.25rem 0.5rem;
+}
+
+.template-body {
+  padding: 1rem;
+}
+
+.template-body p {
+  margin: 0;
+  color: #666;
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+
+.read-more {
+  margin-top: 0.5rem;
+  padding: 0;
+  font-size: 0.8rem;
+}
+
+.no-templates {
+  text-align: center;
+  padding: 2rem;
+  background: #f8f9fa;
+  border-radius: 8px;
+  border: 1px dashed #dee2e6;
+}
+
+/* Skeleton Loading Styles */
+.template-skeleton {
+  pointer-events: none;
+  background: #f8f9fa;
+  border-color: #e9ecef;
+}
+
+.skeleton-header,
+.skeleton-line,
+.skeleton-button {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: skeleton-loading 1.5s infinite;
+  border-radius: 4px;
+}
+
+.skeleton-header {
+  height: 1.2rem;
+  margin-bottom: 0.5rem;
+  width: 70%;
+}
+
+.skeleton-body {
+  padding: 1rem;
+}
+
+.skeleton-line {
+  height: 0.8rem;
+  margin-bottom: 0.5rem;
+}
+
+.skeleton-line.short {
+  width: 60%;
+}
+
+.skeleton-actions {
+  padding: 1rem;
+  border-top: 1px solid #f0f0f0;
+  display: flex;
+  gap: 0.5rem;
+}
+
+.skeleton-button {
+  height: 1.8rem;
+  width: 4rem;
+}
+
+@keyframes skeleton-loading {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+/* Loading Templates Message */
+.loading-templates {
+  opacity: 0.7;
+}
