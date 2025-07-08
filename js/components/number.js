@@ -4,7 +4,7 @@
  * @component number
  * @category Text inputs
  * @description Renders a numeric input with built-in validators for
- * integers, decimal precision and and also has positive-only mode.
+ * integers, decimal precision and also has positive-only mode.
  * @prop {String}  placeholder   Placeholder text
  * @prop {Boolean} positiveOnly  Restrict input to ≥ 0
  * @prop {Number}  decimals      Allowed decimal places
