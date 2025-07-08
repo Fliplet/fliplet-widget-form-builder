@@ -10,7 +10,6 @@
     "dependencies": [
       "fliplet-core",
       "handlebars",
-      "lodash",
       "vue.js",
       "rangeslider",
       "fliplet-studio-ui",
@@ -33,6 +32,7 @@
       "js/build.templates.js",
       "js/interface.templates.js",
       "js/libs/countries.js",
+      "js/libs/utils.js",
       "js/libs/core.js",
       "js/libs/templates.js",
       "vendor/signature-pad.js",
@@ -136,6 +136,7 @@
       "vendor/validators.min.js",
       "vendor/load-image.all.min.js",
       "js/build.templates.js",
+      "js/libs/utils.js",
       "js/libs/core.js",
       "vendor/signature-pad.js",
       "vendor/sortable.js",

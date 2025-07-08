@@ -79,7 +79,7 @@ Fliplet.FormBuilder.field('number', {
 
           value = parseFloat(value);
 
-          if (_.isNaN(value)) {
+          if (isNaN(value)) {
             return false;
           }
 
