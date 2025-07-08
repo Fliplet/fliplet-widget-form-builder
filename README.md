@@ -34,7 +34,6 @@ Fliplet separates code that runs **inside Fliplet Studio** (“builder”) from 
 
 ---
 
-
 ## Adding a new field type
 
 1. Add a Vue component file under `js/components/`
@@ -46,4 +45,3 @@ Fliplet separates code that runs **inside Fliplet Studio** (“builder”) from 
 - Add the assets 3 and 4 to the **interface** section only of `widget.json`.
 
 Once components are added, they will be automatically show up in the list based on the order the assets are declared on the interface assets.
-
