@@ -23,7 +23,7 @@ function cloneDeep(obj) {
     return new Date(obj.getTime());
   }
 
-  if (obj instanceof Array) {
+  if (Array.isArray(obj)) {
     return obj.map(item => cloneDeep(item));
   }
 
@@ -31,7 +31,7 @@ function cloneDeep(obj) {
     const cloned = {};
 
     for (const key in obj) {
-      if (obj.hasOwnProperty(key)) {
+      if (Object.prototype.hasOwnProperty.call(obj, key)) {
         cloned[key] = cloneDeep(obj[key]);
       }
     }
