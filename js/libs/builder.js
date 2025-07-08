@@ -1,10 +1,17 @@
 /**
- * builder.js – Fliplet Form Builder: Studio-side logic for configuring forms.
- *
- * Handles widget initialization, parent lookup, field migration, UI observers,
- * and Vue instance for the builder interface.
- *
- * All exported functions and major logic blocks are documented with JSDoc.
+ * @fileoverview Form Builder Widget - Main Builder Interface
+ * 
+ * It provides a comprehensive interface for creating, configuring, and managing form widgets
+ * within the Fliplet Studio environment.
+ * 
+ * @description
+ * The Form Builder widget allows users to:
+ * - Create and configure form fields with various input types
+ * - Set up data sources for form submissions
+ * - Configure email notifications and templates
+ * - Manage form templates and layouts
+ * - Handle multi-step forms within slider containers
+ * - Configure access rules and security settings
  */
 
 /* eslint-disable eqeqeq */
