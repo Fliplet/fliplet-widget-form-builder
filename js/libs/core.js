@@ -25,6 +25,13 @@ Fliplet.FormBuilder = (function() {
    * @param {any} data - Data to emit with the event.
    * @returns {void}
    */
+  /**
+   * Utility to emit an event on the event hub.
+   * @param {string} eventName - The event name.
+   * @param {any} data - Data to emit with the event.
+   * @returns {void}
+   */
+  // NOTE: Function disabled - replaced by direct eventHub.$emit calls
   // function emitEvent(eventName, data) {
   //   eventHub.$emit(eventName, data);
   // }
