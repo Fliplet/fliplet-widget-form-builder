@@ -9,7 +9,7 @@
  * @param {*} obj - Object to clone
  * @returns {*} Cloned object
  */
-function cloneDeep(obj) {
+function cloneDeep(obj, cache = new WeakMap()) {
   if (typeof structuredClone !== 'undefined') {
     return structuredClone(obj);
   }
@@ -19,20 +19,36 @@ function cloneDeep(obj) {
     return obj;
   }
 
+  // Handle circular references
+  if (cache.has(obj)) {
+    return cache.get(obj);
+  }
+
   if (obj instanceof Date) {
     return new Date(obj.getTime());
   }
 
+  if (obj instanceof RegExp) {
+    return new RegExp(obj);
+  }
+
   if (Array.isArray(obj)) {
-    return obj.map(item => cloneDeep(item));
+    const result = obj.map(item => cloneDeep(item, cache));
+    cache.set(obj, result);
+    return result;
   }
 
   if (typeof obj === 'object') {
-    const cloned = {};
+    const cloned = obj instanceof Map
+      ? new Map()
+      : obj instanceof Set
+        ? new Set()
+        : {};
+    cache.set(obj, cloned);
 
     for (const key in obj) {
       if (Object.prototype.hasOwnProperty.call(obj, key)) {
-        cloned[key] = cloneDeep(obj[key]);
+        cloned[key] = cloneDeep(obj[key], cache);
       }
     }
 
