@@ -113,23 +113,25 @@ function compact(array) {
  * @returns {Object} Merged object
  */
 function assignIn(target, ...sources) {
-  if (!target || typeof target !== 'object') {
-    target = {};
+  let result = target;
+
+  if (!result || typeof result !== 'object') {
+    result = {};
   }
 
   sources.forEach(source => {
     if (source && typeof source === 'object') {
       Object.keys(source).forEach(key => {
         if (source[key] && typeof source[key] === 'object' && !Array.isArray(source[key])) {
-          target[key] = assignIn(target[key] || {}, source[key]);
+          result[key] = assignIn(result[key] || {}, source[key]);
         } else {
-          target[key] = source[key];
+          result[key] = source[key];
         }
       });
     }
   });
 
-  return target;
+  return result;
 }
 
 /**
