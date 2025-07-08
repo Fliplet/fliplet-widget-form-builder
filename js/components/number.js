@@ -1,6 +1,16 @@
 /**
- * Number field component – renders a numeric input field with validation in forms.
- * Supports decimal precision, min/max constraints, and numeric formatting.
+ * Number field component.
+ *
+ * @component number
+ * @category Text inputs
+ * @description Renders a numeric input with built-in validators for
+ * integers, decimal precision and positive-only mode.
+ * @prop {String}  placeholder   Placeholder text
+ * @prop {Boolean} positiveOnly  Restrict input to ≥ 0
+ * @prop {Number}  decimals      Allowed decimal places
+ * @prop {String}  description   Additional helper text
+ * @example
+ * <number-field :decimals="2" :positiveOnly="true" />
  */
 Fliplet.FormBuilder.field('number', {
   i18n: window.VueI18Next,
