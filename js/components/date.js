@@ -1,6 +1,6 @@
 /**
  * Date field component – renders a date picker input in forms.
- * Supports date validation, format customization, and default value options.
+ * Supports date validation and default value options.
  */
 Fliplet.FormBuilder.field('date', {
   name: 'Date picker',
