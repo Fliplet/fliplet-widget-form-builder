@@ -1,6 +1,11 @@
 /**
- * Buttons field component – renders form action buttons (Submit/Clear).
- * Configurable button labels and visibility options.
+ * @fileoverview Buttons field – renders form action buttons (Submit / Clear) for Fliplet forms.
+ *
+ * @component ButtonsField
+ * @vue-prop {Boolean} showSubmit  – Toggle Submit button (default `true`).
+ * @vue-prop {Boolean} showClear   – Toggle Clear button (default `true`).
+ * @vue-prop {String}  submitValue – Submit button label (default `'Submit'`).
+ * @vue-prop {String}  clearValue  – Clear button label (default `'Clear'`).
  */
 Fliplet.FormBuilder.field('buttons', {
   name: 'Form buttons',
