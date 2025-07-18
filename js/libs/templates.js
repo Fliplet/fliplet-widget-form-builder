@@ -68,21 +68,3 @@ Fliplet.FormBuilder.templates = function() {
   });
 };
 
-/**
- * Compile a Handlebars template by name.
- * @param {string} name - The template name.
- * @returns {Function} Compiled template function.
- */
-function compileTemplate(name) {
-  return Handlebars.compile(Fliplet.Widget.Templates[name]);
-}
-
-/**
- * Render a Handlebars template by name with context.
- * @param {string} name - The template name.
- * @param {Object} context - Data to pass to the template.
- * @returns {string} Rendered HTML.
- */
-function renderTemplate(name, context) {
-  return compileTemplate(name)(context);
-}
