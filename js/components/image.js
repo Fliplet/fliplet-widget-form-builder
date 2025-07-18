@@ -229,35 +229,34 @@ Fliplet.FormBuilder.field('image', {
           orientation: 0
         };
 
-        loadImage(
-          file,
-          function(img) {
-            if (img.type === 'error') {
-              $vm.hasCorruptedImage = true;
+        loadImage(file, function(img) {
+          if (img.type === 'error') {
+            $vm.hasCorruptedImage = true;
 
-              return;
-            }
+            return;
+          }
 
-            if (($vm.customWidth && img.width > $vm.customWidth) || ($vm.customHeight && img.height > $vm.customHeight)) {
-              $vm.isImageSizeExceeded = true;
+          if (($vm.customWidth && img.width > $vm.customWidth) || ($vm.customHeight && img.height > $vm.customHeight)) {
+            $vm.isImageSizeExceeded = true;
 
-              return;
-            }
+            return;
+          }
 
-            $vm.hasCorruptedImage = false;
-            $vm.isImageSizeExceeded = false;
-            $vm.value.push(file);
+          $vm.hasCorruptedImage = false;
+          $vm.isImageSizeExceeded = false;
 
-            if (addThumbnail) {
-              var scaledImage = loadImage.scale(img, options);
-              var imgBase64Url = scaledImage.toDataURL(mimeType, $vm.jpegQuality);
-              var flipletBase64Url = imgBase64Url + ';filename:' + file.name;
+          var scaledImage = loadImage.scale(img, options);
+          var imgBase64Url = scaledImage.toDataURL(mimeType, $vm.jpegQuality);
+          var flipletBase64Url = imgBase64Url + ';filename:' + file.name;
 
-              addThumbnailToCanvas(flipletBase64Url, $vm.value.length - 1, $vm);
-            }
+          $vm.value.push(flipletBase64Url);
 
-            $vm.$emit('_input', $vm.name, $vm.value);
-          });
+          if (addThumbnail) {
+            addThumbnailToCanvas(flipletBase64Url, $vm.value.length - 1, $vm);
+          }
+
+          $vm.$emit('_input', $vm.name, $vm.value);
+        });
       });
     },
     onFileClick: function(event) {
@@ -291,14 +290,16 @@ Fliplet.FormBuilder.field('image', {
 
       this.validateValue();
 
-      getPicture.then(function onSelectedPicture(img) {
-        const imgBase64Url = 'data:image/jpeg;base64,' + img;
+      getPicture.then(function onSelectedPicture(imgBase64Url) {
+        imgBase64Url = (imgBase64Url.indexOf('base64') > -1)
+          ? imgBase64Url
+          : 'data:image/jpeg;base64,' + imgBase64Url;
 
-        $vm.value.push(img);
+        $vm.value.push(imgBase64Url);
         addThumbnailToCanvas(imgBase64Url, $vm.value.length - 1, $vm);
         $vm.$emit('_input', $vm.name, $vm.value);
       }).catch(function(error) {
-        /* eslint-disable-next-line */
+      /* eslint-disable-next-line */
         console.error(error);
       });
     },
