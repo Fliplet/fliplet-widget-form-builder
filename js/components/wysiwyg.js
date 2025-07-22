@@ -1,7 +1,3 @@
-/**
- * WYSIWYG field component – renders a rich text editor with formatting tools in forms.
- * Supports HTML content creation with text styling, links, and embedded media.
- */
 Fliplet.FormBuilder.field('wysiwyg', {
   name: 'Rich text',
   category: 'Text inputs',
