@@ -1,5 +1,4 @@
 /* global SignaturePad */
-
 Fliplet.FormBuilder.field('signature', {
   name: 'Signature',
   category: 'Advanced',
