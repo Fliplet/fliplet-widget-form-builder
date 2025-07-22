@@ -1,7 +1,3 @@
-/**
- * Typeahead field component – renders an autocomplete search input in forms.
- * Provides real-time search suggestions as users type with data source integration.
- */
 Fliplet.FormBuilder.field('typeahead', {
   name: 'Typeahead (multi-select)',
   category: 'Multiple options',
