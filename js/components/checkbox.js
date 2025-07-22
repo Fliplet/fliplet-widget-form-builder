@@ -1,7 +1,3 @@
-/**
- * Checkbox field component – renders multiple checkbox options in forms.
- * Supports multi-select functionality and "select all" option.
- */
 Fliplet.FormBuilder.field('checkbox', {
   name: 'Checkboxes (multi-select)',
   category: 'Multiple options',
