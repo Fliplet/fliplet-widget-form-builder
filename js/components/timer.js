@@ -1,7 +1,3 @@
-/**
- * Timer field component – renders a countdown timer display in forms.
- * Supports duration tracking and automatic form actions upon timer completion.
- */
 Fliplet.FormBuilder.field('timer', {
   name: 'Timer',
   category: 'Date & time',
