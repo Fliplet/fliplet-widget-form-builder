@@ -1,7 +1,3 @@
-/**
- * Telephone field component – renders a phone number input with validation in forms.
- * Supports international formats, country code selection, and automatic formatting.
- */
 Fliplet.FormBuilder.field('telephone', {
   name: 'Telephone input',
   category: 'Text inputs',
