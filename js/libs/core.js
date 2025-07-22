@@ -1,11 +1,3 @@
-/**
- * core.js – Fliplet Form Builder: Core utility functions and event hub.
- *
- * Provides shared logic for field management, event handling, and data helpers.
- *
- * All exported functions and major logic blocks are documented with JSDoc.
- */
-
 /* eslint-disable eqeqeq */
 Fliplet.FormBuilder = (function() {
   var components = {};
