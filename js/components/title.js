@@ -1,7 +1,3 @@
-/**
- * Title field component – renders formatted heading text in forms.
- * Supports multiple heading levels and custom styling for form section headers.
- */
 Fliplet.FormBuilder.field('title', {
   name: 'Format Title',
   category: 'Formatting',
