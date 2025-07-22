@@ -46,6 +46,41 @@ function drawImageOnCanvas(img, canvas) {
 function addThumbnailToCanvas(imageURI, indexCanvas, self, isFileCanvas) {
   var $vm = self;
 
+  // Handle File objects
+  if (imageURI instanceof File) {
+    var reader = new FileReader();
+
+    reader.onload = function(e) {
+      var dataUrl = e.target.result;
+
+      $vm.$nextTick(function() {
+        if (!this.$refs.canvas) {
+          return;
+        }
+
+        var canvas = this.$refs.canvas[indexCanvas];
+        var context = canvas.getContext('2d');
+
+        canvas.width = canvas.clientWidth;
+        canvas.height = canvas.clientHeight;
+        context.clearRect(0, 0, canvas.width, canvas.height);
+
+        var img = new Image();
+
+        img.onload = function imageLoadedFromURI() {
+          drawImageOnCanvas(this, canvas);
+        };
+
+        img.src = dataUrl;
+      });
+    };
+
+    reader.readAsDataURL(imageURI);
+
+    return;
+  }
+
+  // Handle existing base64/URL logic
   if (!imageURI.match(/^http/)) {
     imageURI = (imageURI.indexOf('base64') > -1)
       ? imageURI.split(';filename:')[0]
@@ -1426,6 +1461,17 @@ Fliplet().then(async function() {
                 for (var i = 0; i < value.length; i++) {
                   appendField(field.name, value.item(i));
                 }
+              } else if (type === 'flImage' && Array.isArray(value)) {
+                // Handle File objects in image fields
+                value.forEach(function(item) {
+                  if (item instanceof File) {
+                    // Handle File object for upload
+                    appendField(field.name, item);
+                  } else {
+                    // Handle existing base64 strings or URLs
+                    appendField(field.name, item);
+                  }
+                });
               } else {
                 // Remove spaces and dashes from value (when it's a string)
                 if (typeof value === 'string' && ['flNumber', 'flTelephone'].indexOf(type) !== -1) {
@@ -1516,6 +1562,20 @@ Fliplet().then(async function() {
                   });
 
                   value = result;
+                }
+
+                if (type === 'flImage') {
+                  var imageResult = _.map(value, function(val) {
+                    if (!val) {
+                      return '';
+                    }
+
+                    // For File objects, return them as-is for binary upload
+                    // For existing URLs/base64, return the value
+                    return val instanceof File || typeof val === 'string' ? val : val.url || val;
+                  });
+
+                  value = imageResult;
                 }
 
                 if (type === 'flReorderList' && !value) {

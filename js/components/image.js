@@ -204,7 +204,7 @@ Fliplet.FormBuilder.field('image', {
       return new Promise(function(resolve, reject) {
         navigator.camera.getPicture(resolve, reject, {
           quality: $vm.jpegQuality,
-          destinationType: Camera.DestinationType.DATA_URL,
+          destinationType: Camera.DestinationType.FILE_URI, // Changed from DATA_URL
           sourceType: $vm.cameraSource,
           targetWidth: $vm.customWidth || 0, // Setting default value as 0 so that camera plugin API does not fail
           targetHeight: $vm.customHeight || 0,
@@ -246,16 +246,27 @@ Fliplet.FormBuilder.field('image', {
           $vm.isImageSizeExceeded = false;
 
           var scaledImage = loadImage.scale(img, options);
-          var imgBase64Url = scaledImage.toDataURL(mimeType, $vm.jpegQuality);
-          var flipletBase64Url = imgBase64Url + ';filename:' + file.name;
 
-          $vm.value.push(flipletBase64Url);
+          // Convert canvas to blob instead of base64
+          scaledImage.toBlob(function(blob) {
+            // Create a File object from the blob
+            var processedFile = new File([blob], file.name, {
+              type: mimeType,
+              lastModified: Date.now()
+            });
 
-          if (addThumbnail) {
-            addThumbnailToCanvas(flipletBase64Url, $vm.value.length - 1, $vm);
-          }
+            // Store the File object directly instead of base64
+            $vm.value.push(processedFile);
 
-          $vm.$emit('_input', $vm.name, $vm.value);
+            // Create base64 for thumbnail display only
+            if (addThumbnail) {
+              var imgBase64Url = scaledImage.toDataURL(mimeType, $vm.jpegQuality / 100);
+
+              addThumbnailToCanvas(imgBase64Url, $vm.value.length - 1, $vm);
+            }
+
+            $vm.$emit('_input', $vm.name, $vm.value);
+          }, mimeType, $vm.jpegQuality / 100);
         });
       });
     },
@@ -290,14 +301,38 @@ Fliplet.FormBuilder.field('image', {
 
       this.validateValue();
 
-      getPicture.then(function onSelectedPicture(imgBase64Url) {
-        imgBase64Url = (imgBase64Url.indexOf('base64') > -1)
-          ? imgBase64Url
-          : 'data:image/jpeg;base64,' + imgBase64Url;
+      getPicture.then(function onSelectedPicture(fileUri) {
+        // Convert file URI to File object
+        var fileName = fileUri.split('/').pop() || 'camera-image.jpg';
+        var mimeType = 'image/jpeg'; // Default for camera captures
 
-        $vm.value.push(imgBase64Url);
-        addThumbnailToCanvas(imgBase64Url, $vm.value.length - 1, $vm);
-        $vm.$emit('_input', $vm.name, $vm.value);
+        // Create a File object from the URI
+        fetch(fileUri)
+          .then(function(response) {
+            return response.blob();
+          })
+          .then(function(blob) {
+            var file = new File([blob], fileName, {
+              type: mimeType,
+              lastModified: Date.now()
+            });
+
+            $vm.value.push(file);
+
+            // Create base64 for thumbnail
+            var reader = new FileReader();
+
+            reader.onload = function(e) {
+              addThumbnailToCanvas(e.target.result, $vm.value.length - 1, $vm);
+            };
+
+            reader.readAsDataURL(file);
+
+            $vm.$emit('_input', $vm.name, $vm.value);
+          })
+          .catch(function(error) {
+            console.error('Error processing camera image:', error);
+          });
       }).catch(function(error) {
       /* eslint-disable-next-line */
         console.error(error);
@@ -314,8 +349,14 @@ Fliplet.FormBuilder.field('image', {
     },
     onImageClick: function(index) {
       var imagesData = {
-        images: _.map(this.value, function(imgURL) {
-          return { url: imgURL };
+        images: _.map(this.value, function(item) {
+          // Handle File objects by creating temporary URLs
+          if (item instanceof File) {
+            return { url: URL.createObjectURL(item) };
+          }
+
+          // Handle existing base64/URL strings
+          return { url: item };
         }),
         options: {
           index: index
