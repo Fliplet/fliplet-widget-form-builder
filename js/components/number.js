@@ -1,7 +1,3 @@
-/**
- * Number field component – renders a numeric input field with validation in forms.
- * Supports decimal precision, min/max constraints, and numeric formatting.
- */
 Fliplet.FormBuilder.field('number', {
   i18n: window.VueI18Next,
   name: 'Number input',
