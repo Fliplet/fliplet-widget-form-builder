@@ -1,7 +1,3 @@
-/**
- * Password field component – renders a secure password input field in forms.
- * Supports password visibility toggle and confirmation field validation.
- */
 Fliplet.FormBuilder.field('password', {
   name: 'Password input',
   category: 'Text inputs',
