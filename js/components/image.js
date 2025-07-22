@@ -1,4 +1,4 @@
-/* global Camera, addThumbnailToCanvas, loadImage */
+/* global Camera, addThumbnailToCanvas, loadImage, supportsBinaryUpload */
 
 /**
  * Image field component – renders an image capture and upload input in forms.
@@ -246,16 +246,47 @@ Fliplet.FormBuilder.field('image', {
           $vm.isImageSizeExceeded = false;
 
           var scaledImage = loadImage.scale(img, options);
-          var imgBase64Url = scaledImage.toDataURL(mimeType, $vm.jpegQuality);
-          var flipletBase64Url = imgBase64Url + ';filename:' + file.name;
 
-          $vm.value.push(flipletBase64Url);
+          if (supportsBinaryUpload()) {
+            scaledImage.toBlob(function(blob) {
+              blob.name = file.name;
 
-          if (addThumbnail) {
-            addThumbnailToCanvas(flipletBase64Url, $vm.value.length - 1, $vm);
+              Fliplet.Media.Files.upload(blob).then(function(result) {
+                var uploadedUrl = result.url || (result[0] && result[0].url);
+
+                $vm.value.push(uploadedUrl);
+
+                if (addThumbnail) {
+                  addThumbnailToCanvas(uploadedUrl, $vm.value.length - 1, $vm);
+                }
+
+                $vm.$emit('_input', $vm.name, $vm.value);
+              }).catch(function() {
+                // Fallback to base64 if upload fails
+                var imgBase64Url = scaledImage.toDataURL(mimeType, $vm.jpegQuality);
+                var flipletBase64Url = imgBase64Url + ';filename:' + file.name;
+
+                $vm.value.push(flipletBase64Url);
+
+                if (addThumbnail) {
+                  addThumbnailToCanvas(flipletBase64Url, $vm.value.length - 1, $vm);
+                }
+
+                $vm.$emit('_input', $vm.name, $vm.value);
+              });
+            }, mimeType, $vm.jpegQuality);
+          } else {
+            var imgBase64Url = scaledImage.toDataURL(mimeType, $vm.jpegQuality);
+            var flipletBase64Url = imgBase64Url + ';filename:' + file.name;
+
+            $vm.value.push(flipletBase64Url);
+
+            if (addThumbnail) {
+              addThumbnailToCanvas(flipletBase64Url, $vm.value.length - 1, $vm);
+            }
+
+            $vm.$emit('_input', $vm.name, $vm.value);
           }
-
-          $vm.$emit('_input', $vm.name, $vm.value);
         });
       });
     },

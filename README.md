@@ -94,6 +94,13 @@ The CLI mounts the repo and bypasses CDN cache so you can edit files live.
 2. Open the component settings (this loads `interface.html`) and build your form.
 3. Save, then preview the app – your field components will execute using `js/libs/form.js`.
 
+### Binary image uploads
+
+Image fields automatically detect whether the device or browser can upload binary
+files. When supported, image data is converted to a `Blob` and uploaded using
+`Fliplet.Media.Files.upload`. Devices that lack the necessary APIs fall back to
+submitting base64-encoded data so that uploads continue to work everywhere.
+
 ---
 
 ## Contributing

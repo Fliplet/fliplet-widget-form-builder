@@ -12,6 +12,21 @@ var allFormsInSlide = [];
 var currentFormUId;
 var currentMultiStepForm;
 
+/**
+ * Detect whether the current environment supports uploading binary blobs.
+ *
+ * The check verifies basic browser APIs (Blob, FormData, canvas.toBlob) so that
+ * binary uploads can be used on modern web browsers and Cordova devices with
+ * the required plugins installed.
+ *
+ * @returns {Boolean} True if binary uploads are supported
+ */
+window.supportsBinaryUpload = function supportsBinaryUpload() {
+  var canvas = document.createElement('canvas');
+
+  return !!(window.FileReader && window.Blob && window.FormData && canvas.toBlob);
+};
+
 function drawImageOnCanvas(img, canvas) {
   var imgWidth = img.width;
   var imgHeight = img.height;
