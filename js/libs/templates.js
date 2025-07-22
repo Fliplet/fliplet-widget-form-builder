@@ -59,4 +59,3 @@ Fliplet.FormBuilder.templates = function() {
     });
   });
 };
-
