@@ -1,8 +1,5 @@
 /* global SignaturePad */
-/**
- * Signature field component – renders a signature capture pad in forms.
- * Enables users to draw signatures using touch or mouse input with save functionality.
- */
+
 Fliplet.FormBuilder.field('signature', {
   name: 'Signature',
   category: 'Advanced',
