@@ -308,8 +308,10 @@ Fliplet.FormBuilder.field('image', {
           u8arr[n] = bstr.charCodeAt(n);
         }
 
+        const NativeFile = global.File;
+
         const filename = 'image upload-' + Date.now() + '.' + mime.split('/')[1];
-        const file = new File([u8arr], filename, {
+        const file = new NativeFile([u8arr], filename, {
           type: mime,
           lastModified: Date.now()
         });
