@@ -46,12 +46,18 @@ function drawImageOnCanvas(img, canvas) {
 function addThumbnailToCanvas(imageURI, indexCanvas, self, isFileCanvas) {
   var $vm = self;
 
-  if (!imageURI.match(/^http/)) {
-    imageURI = (imageURI.indexOf('base64') > -1)
-      ? imageURI.split(';filename:')[0]
-      : 'data:image/jpeg;base64,' + imageURI;
-  } else {
+  // Support File or Blob objects by converting them to local object URLs for preview
+  if (imageURI instanceof Blob || imageURI instanceof File) {
+    imageURI = URL.createObjectURL(imageURI);
+  }
+
+  // Skip further processing for blob or data URIs
+  if (typeof imageURI === 'string' && imageURI.match(/^http/)) {
     imageURI = Fliplet.Media.authenticate(imageURI);
+  } else if (typeof imageURI === 'string' && imageURI.indexOf('base64') > -1) {
+    imageURI = imageURI.split(';filename:')[0];
+  } else if (typeof imageURI === 'string' && !imageURI.startsWith('blob:') && !imageURI.startsWith('data:') && !imageURI.match(/^http/)) {
+    imageURI = 'data:image/jpeg;base64,' + imageURI;
   }
 
   $vm.$nextTick(function() {
@@ -1506,7 +1512,7 @@ Fliplet().then(async function() {
                   }
                 }
 
-                if (type === 'flFile') {
+                if (type === 'flFile' || type === 'flImage') {
                   var result = _.map(value, function(val) {
                     if (!val) {
                       return '';

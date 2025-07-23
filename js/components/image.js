@@ -135,6 +135,29 @@ Fliplet.FormBuilder.field('image', {
         this.value = [];
       }
     },
+    base64ToBlob: function(base64Data, contentType) {
+      contentType = contentType || '';
+
+      var sliceSize = 512;
+      var byteCharacters = atob(base64Data.replace(/^data:.+;base64,/, ''));
+      var byteArrays = [];
+
+      for (var offset = 0; offset < byteCharacters.length; offset += sliceSize) {
+        var slice = byteCharacters.slice(offset, offset + sliceSize);
+
+        var byteNumbers = new Array(slice.length);
+
+        for (var i = 0; i < slice.length; i++) {
+          byteNumbers[i] = slice.charCodeAt(i);
+        }
+
+        var byteArray = new Uint8Array(byteNumbers);
+
+        byteArrays.push(byteArray);
+      }
+
+      return new Blob(byteArrays, { type: contentType });
+    },
     requestPicture: function(fileInput) {
       var $vm = this;
       var boundingRect = fileInput.getBoundingClientRect();
@@ -246,16 +269,20 @@ Fliplet.FormBuilder.field('image', {
           $vm.isImageSizeExceeded = false;
 
           var scaledImage = loadImage.scale(img, options);
-          var imgBase64Url = scaledImage.toDataURL(mimeType, $vm.jpegQuality);
-          var flipletBase64Url = imgBase64Url + ';filename:' + file.name;
+          var quality = ($vm.jpegQuality && $vm.jpegQuality > 1) ? $vm.jpegQuality / 100 : 0.8;
 
-          $vm.value.push(flipletBase64Url);
+          // Convert the canvas to a Blob and create a File object for uploading
+          scaledImage.toBlob(function(blob) {
+            var processedFile = new File([blob], file.name, { type: mimeType });
 
-          if (addThumbnail) {
-            addThumbnailToCanvas(flipletBase64Url, $vm.value.length - 1, $vm);
-          }
+            $vm.value.push(processedFile);
 
-          $vm.$emit('_input', $vm.name, $vm.value);
+            if (addThumbnail) {
+              addThumbnailToCanvas(processedFile, $vm.value.length - 1, $vm);
+            }
+
+            $vm.$emit('_input', $vm.name, $vm.value);
+          }, mimeType, quality);
         });
       });
     },
@@ -295,8 +322,12 @@ Fliplet.FormBuilder.field('image', {
           ? imgBase64Url
           : 'data:image/jpeg;base64,' + imgBase64Url;
 
-        $vm.value.push(imgBase64Url);
-        addThumbnailToCanvas(imgBase64Url, $vm.value.length - 1, $vm);
+        var blob = $vm.base64ToBlob(imgBase64Url, 'image/jpeg');
+        var fileName = 'image_' + Date.now() + '.jpg';
+        var processedFile = new File([blob], fileName, { type: 'image/jpeg' });
+
+        $vm.value.push(processedFile);
+        addThumbnailToCanvas(processedFile, $vm.value.length - 1, $vm);
         $vm.$emit('_input', $vm.name, $vm.value);
       }).catch(function(error) {
       /* eslint-disable-next-line */
@@ -315,7 +346,7 @@ Fliplet.FormBuilder.field('image', {
     onImageClick: function(index) {
       var imagesData = {
         images: _.map(this.value, function(imgURL) {
-          return { url: imgURL };
+          return { url: typeof imgURL === 'string' ? imgURL : URL.createObjectURL(imgURL) };
         }),
         options: {
           index: index
