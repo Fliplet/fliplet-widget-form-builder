@@ -288,13 +288,6 @@ Fliplet.FormBuilder.field('image', {
         getPicture = $vm.getPicture();
       } else {
         getPicture = this.requestPicture(this.$refs.imageInput).then(function onRequestedPicture() {
-          if ($vm.cameraSource === Camera.PictureSourceType.PHOTOLIBRARY) {
-            $vm.forcedClick = true;
-            $($vm.$refs.imageInput).trigger('click');
-
-            return Promise.reject('Switch to HTML file input to select files');
-          }
-
           return $vm.getPicture();
         });
       }
@@ -302,40 +295,85 @@ Fliplet.FormBuilder.field('image', {
       this.validateValue();
 
       getPicture.then(function onSelectedPicture(fileUri) {
+        console.log('Received file URI:', fileUri);
+
         // Convert file URI to File object
         var fileName = fileUri.split('/').pop() || 'camera-image.jpg';
         var mimeType = 'image/jpeg'; // Default for camera captures
 
-        // Create a File object from the URI
-        fetch(fileUri)
-          .then(function(response) {
-            return response.blob();
-          })
-          .then(function(blob) {
-            var file = new File([blob], fileName, {
-              type: mimeType,
-              lastModified: Date.now()
+        // Handle different URI schemes
+        if (fileUri.startsWith('file://')) {
+          // Use Cordova File API for file:// URLs
+          if (window.resolveLocalFileSystemURL) {
+            $vm.convertFileUriToFile(fileUri, fileName, mimeType).then(function(file) {
+              $vm.value.push(file);
+
+              // Create base64 for thumbnail
+              var reader = new FileReader();
+
+              reader.onload = function(e) {
+                addThumbnailToCanvas(e.target.result, $vm.value.length - 1, $vm);
+              };
+
+              reader.readAsDataURL(file);
+
+              $vm.$emit('_input', $vm.name, $vm.value);
+            }).catch(function(error) {
+              console.error('Error processing file URI:', error);
+
+              // Fallback: try to use the fileUri as base64 if it contains base64 data
+              if (fileUri.indexOf('base64') > -1) {
+                $vm.value.push(fileUri);
+                addThumbnailToCanvas(fileUri, $vm.value.length - 1, $vm);
+                $vm.$emit('_input', $vm.name, $vm.value);
+              }
             });
+          } else {
+            console.warn('Cordova File plugin not available, falling back to base64');
 
-            $vm.value.push(file);
+            // Fallback for when Cordova File plugin is not available
+            if (fileUri.indexOf('base64') > -1) {
+              $vm.value.push(fileUri);
+              addThumbnailToCanvas(fileUri, $vm.value.length - 1, $vm);
+              $vm.$emit('_input', $vm.name, $vm.value);
+            } else {
+              console.error('Unable to process file URI without Cordova File plugin');
+            }
+          }
+        } else {
+          // Use fetch for other URLs (data: URLs, http URLs, etc.)
+          fetch(fileUri)
+            .then(function(response) {
+              return response.blob();
+            })
+            .then(function(blob) {
+              var file = new File([blob], fileName, {
+                type: mimeType,
+                lastModified: Date.now()
+              });
 
-            // Create base64 for thumbnail
-            var reader = new FileReader();
+              $vm.value.push(file);
 
-            reader.onload = function(e) {
-              addThumbnailToCanvas(e.target.result, $vm.value.length - 1, $vm);
-            };
+              // Create base64 for thumbnail
+              var reader = new FileReader();
 
-            reader.readAsDataURL(file);
+              reader.onload = function(e) {
+                addThumbnailToCanvas(e.target.result, $vm.value.length - 1, $vm);
+              };
 
-            $vm.$emit('_input', $vm.name, $vm.value);
-          })
-          .catch(function(error) {
-            console.error('Error processing camera image:', error);
-          });
+              reader.readAsDataURL(file);
+
+              $vm.$emit('_input', $vm.name, $vm.value);
+            })
+            .catch(function(error) {
+              console.error('Error processing camera image:', error);
+            });
+        }
       }).catch(function(error) {
-      /* eslint-disable-next-line */
-        console.error(error);
+        // Only log actual errors, not intentional rejections for photo library
+        if (error !== 'Switch to HTML file input to select files') {
+          console.error(error);
+        }
       });
     },
     onFileChange: function(e) {
@@ -378,6 +416,37 @@ Fliplet.FormBuilder.field('image', {
     },
     openFileDialog: function() {
       this.$refs.imageInput.click();
+    },
+    convertFileUriToFile: function(fileUri, fileName, mimeType) {
+      return new Promise(function(resolve, reject) {
+        window.resolveLocalFileSystemURL(fileUri, function(fileEntry) {
+          fileEntry.file(function(file) {
+            // Create a new File object with the desired name and type
+            var reader = new FileReader();
+
+            reader.onload = function(e) {
+              var arrayBuffer = e.target.result;
+              var blob = new Blob([arrayBuffer], { type: mimeType });
+              var newFile = new File([blob], fileName, {
+                type: mimeType,
+                lastModified: Date.now()
+              });
+
+              resolve(newFile);
+            };
+
+            reader.onerror = function(error) {
+              reject(error);
+            };
+
+            reader.readAsArrayBuffer(file);
+          }, function(error) {
+            reject(error);
+          });
+        }, function(error) {
+          reject(error);
+        });
+      });
     }
   }
 });
