@@ -1426,8 +1426,8 @@ Fliplet().then(async function() {
             $vm.fields.forEach(function(field) {
               if ((field._type === 'flImage' || field._type === 'flFile') && Array.isArray(field.value)) {
                 field.value.forEach(function(item) {
-                  if (item instanceof File) {
-                    console.log('Found File object in field:', field.name, 'type:', field._type);
+                  if (item instanceof File || item instanceof Blob) {
+                    console.log('Found File/Blob object in field:', field.name, 'type:', field._type, 'objectType:', item.constructor.name);
                     hasFileObjects = true;
                   }
                 });
@@ -1443,13 +1443,25 @@ Fliplet().then(async function() {
             function appendField(name, value) {
               if (useFormData) {
                 // For FormData, append each value
-                if (value instanceof File) {
-                  console.log('Appending File object to FormData:', name, value.name, value.type, value.size);
+                if (value instanceof File || value instanceof Blob) {
+                  console.log('Appending File/Blob object to FormData:', name, {
+                    fileName: value.name,
+                    fileType: value.type,
+                    fileSize: value.size,
+                    constructor: value.constructor.name,
+                    isFile: value instanceof File,
+                    isBlob: value instanceof Blob
+                  });
                   submissionData.append(name, value);
                 } else if (Array.isArray(value)) {
                   value.forEach(function(item, index) {
-                    if (item instanceof File) {
-                      console.log('Appending File object to FormData (array):', name + '[' + index + ']', item.name, item.type, item.size);
+                    if (item instanceof File || item instanceof Blob) {
+                      console.log('Appending File/Blob object to FormData (array):', name + '[' + index + ']', {
+                        fileName: item.name,
+                        fileType: item.type,
+                        fileSize: item.size,
+                        constructor: item.constructor.name
+                      });
                       submissionData.append(name + '[' + index + ']', item);
                     } else {
                       console.log('Appending non-File value to FormData:', name + '[' + index + ']', typeof item, item);
@@ -1605,10 +1617,32 @@ Fliplet().then(async function() {
                     // For FormData, handle File objects and other values separately
                     if (Array.isArray(value)) {
                       value.forEach(function(val, index) {
-                        console.log('Processing image value at index', index, ':', val instanceof File ? 'File object' : typeof val, val);
+                        var valueType;
 
                         if (val instanceof File) {
-                          // File objects will be handled by appendField
+                          valueType = 'File object';
+                        } else if (val instanceof Blob) {
+                          valueType = 'Blob object';
+                        } else {
+                          valueType = typeof val;
+                        }
+
+                        console.log('Processing image value at index', index, ':', valueType, val);
+                        console.log('Value constructor:', val.constructor.name);
+                        console.log('Value instanceof checks:', {
+                          isFile: val instanceof File,
+                          isBlob: val instanceof Blob,
+                          isObject: typeof val === 'object'
+                        });
+                        console.log('Value properties:', {
+                          name: val.name,
+                          type: val.type,
+                          size: val.size,
+                          lastModified: val.lastModified
+                        });
+
+                        if (val instanceof File || val instanceof Blob) {
+                          // File/Blob objects will be handled by appendField
                           appendField(field.name, val);
                         } else if (val) {
                           // Handle existing URLs/base64 strings

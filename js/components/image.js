@@ -306,7 +306,25 @@ Fliplet.FormBuilder.field('image', {
           // Use Cordova File API for file:// URLs
           if (window.resolveLocalFileSystemURL) {
             $vm.convertFileUriToFile(fileUri, fileName, mimeType).then(function(file) {
-              $vm.value.push(file);
+              console.log('File object created from URI:', file);
+              console.log('File properties:', {
+                name: file.name,
+                type: file.type,
+                size: file.size,
+                lastModified: file.lastModified,
+                constructor: file.constructor.name
+              });
+
+              // Prevent Vue reactivity by creating a non-reactive copy
+              var fileClone = new File([file], file.name, {
+                type: file.type,
+                lastModified: file.lastModified
+              });
+
+              console.log('File clone created:', fileClone);
+
+              $vm.value.push(fileClone);
+              console.log('File added to value array. Value length:', $vm.value.length);
 
               // Create base64 for thumbnail
               var reader = new FileReader();
@@ -426,13 +444,41 @@ Fliplet.FormBuilder.field('image', {
 
             reader.onload = function(e) {
               var arrayBuffer = e.target.result;
-              var blob = new Blob([arrayBuffer], { type: mimeType });
-              var newFile = new File([blob], fileName, {
-                type: mimeType,
-                lastModified: Date.now()
-              });
 
-              resolve(newFile);
+              // Try creating File directly first
+              try {
+                var newFile = new File([arrayBuffer], fileName, {
+                  type: mimeType,
+                  lastModified: Date.now()
+                });
+
+                console.log('File created successfully:', {
+                  name: newFile.name,
+                  type: newFile.type,
+                  size: newFile.size,
+                  constructor: newFile.constructor.name
+                });
+
+                resolve(newFile);
+              } catch (error) {
+                console.warn('File constructor failed, falling back to Blob:', error);
+
+                // Fallback to Blob if File constructor fails
+                var blob = new Blob([arrayBuffer], { type: mimeType });
+
+                // Add file properties to blob
+                blob.name = fileName;
+                blob.lastModified = Date.now();
+
+                console.log('Blob created as fallback:', {
+                  name: blob.name,
+                  type: blob.type,
+                  size: blob.size,
+                  constructor: blob.constructor.name
+                });
+
+                resolve(blob);
+              }
             };
 
             reader.onerror = function(error) {
