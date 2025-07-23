@@ -246,16 +246,19 @@ Fliplet.FormBuilder.field('image', {
           $vm.isImageSizeExceeded = false;
 
           var scaledImage = loadImage.scale(img, options);
-          var imgBase64Url = scaledImage.toDataURL(mimeType, $vm.jpegQuality);
-          var flipletBase64Url = imgBase64Url + ';filename:' + file.name;
 
-          $vm.value.push(flipletBase64Url);
+          scaledImage.toBlob(function(blob) {
+            blob.name = file.name;
+            $vm.value.push(blob);
 
-          if (addThumbnail) {
-            addThumbnailToCanvas(flipletBase64Url, $vm.value.length - 1, $vm);
-          }
+            if (addThumbnail) {
+              var imgBase64Url = scaledImage.toDataURL(mimeType, $vm.jpegQuality);
 
-          $vm.$emit('_input', $vm.name, $vm.value);
+              addThumbnailToCanvas(imgBase64Url, $vm.value.length - 1, $vm);
+            }
+
+            $vm.$emit('_input', $vm.name, $vm.value);
+          }, mimeType, $vm.jpegQuality / 100);
         });
       });
     },
@@ -295,7 +298,21 @@ Fliplet.FormBuilder.field('image', {
           ? imgBase64Url
           : 'data:image/jpeg;base64,' + imgBase64Url;
 
-        $vm.value.push(imgBase64Url);
+        var arr = imgBase64Url.split(',');
+        var mime = arr[0].match(/:(.*?);/)[1];
+        var bstr = atob(arr[1]);
+        var n = bstr.length;
+        var u8arr = new Uint8Array(n);
+
+        while (n--) {
+          u8arr[n] = bstr.charCodeAt(n);
+        }
+
+        var blob = new Blob([u8arr], { type: mime });
+
+        blob.name = 'image-' + Date.now() + '.' + mime.split('/')[1];
+
+        $vm.value.push(blob);
         addThumbnailToCanvas(imgBase64Url, $vm.value.length - 1, $vm);
         $vm.$emit('_input', $vm.name, $vm.value);
       }).catch(function(error) {
@@ -314,8 +331,12 @@ Fliplet.FormBuilder.field('image', {
     },
     onImageClick: function(index) {
       var imagesData = {
-        images: _.map(this.value, function(imgURL) {
-          return { url: imgURL };
+        images: _.map(this.value, function(img) {
+          if (img instanceof Blob) {
+            return { url: URL.createObjectURL(img) };
+          }
+
+          return { url: img };
         }),
         options: {
           index: index
