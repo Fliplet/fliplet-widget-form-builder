@@ -1424,14 +1424,17 @@ Fliplet().then(async function() {
             var hasFileObjects = false;
 
             $vm.fields.forEach(function(field) {
-              if (field._type === 'flImage' && Array.isArray(field.value)) {
+              if ((field._type === 'flImage' || field._type === 'flFile') && Array.isArray(field.value)) {
                 field.value.forEach(function(item) {
                   if (item instanceof File) {
+                    console.log('Found File object in field:', field.name, 'type:', field._type);
                     hasFileObjects = true;
                   }
                 });
               }
             });
+
+            console.log('Form submission will use:', hasFileObjects ? 'FormData (multipart)' : 'JSON object');
 
             // Use FormData for file uploads, regular object otherwise
             var useFormData = hasFileObjects;
@@ -1441,16 +1444,20 @@ Fliplet().then(async function() {
               if (useFormData) {
                 // For FormData, append each value
                 if (value instanceof File) {
+                  console.log('Appending File object to FormData:', name, value.name, value.type, value.size);
                   submissionData.append(name, value);
                 } else if (Array.isArray(value)) {
                   value.forEach(function(item, index) {
                     if (item instanceof File) {
+                      console.log('Appending File object to FormData (array):', name + '[' + index + ']', item.name, item.type, item.size);
                       submissionData.append(name + '[' + index + ']', item);
                     } else {
+                      console.log('Appending non-File value to FormData:', name + '[' + index + ']', typeof item, item);
                       submissionData.append(name + '[' + index + ']', item);
                     }
                   });
-                } else {
+                } else if (value !== null && value !== undefined) {
+                  console.log('Appending value to FormData:', name, typeof value, value);
                   submissionData.append(name, value);
                 }
               } else {
@@ -1592,10 +1599,14 @@ Fliplet().then(async function() {
                 }
 
                 if (type === 'flImage') {
+                  console.log('Processing flImage field:', field.name, 'useFormData:', useFormData, 'value:', value);
+
                   if (useFormData) {
                     // For FormData, handle File objects and other values separately
                     if (Array.isArray(value)) {
-                      value.forEach(function(val) {
+                      value.forEach(function(val, index) {
+                        console.log('Processing image value at index', index, ':', val instanceof File ? 'File object' : typeof val, val);
+
                         if (val instanceof File) {
                           // File objects will be handled by appendField
                           appendField(field.name, val);
@@ -1604,23 +1615,24 @@ Fliplet().then(async function() {
                           appendField(field.name, typeof val === 'string' ? val : val.url || val);
                         }
                       });
-
-                      return; // Skip the regular appendField call below
                     }
-                  } else {
-                    // For regular objects, map the values
-                    var imageResult = _.map(value, function(val) {
-                      if (!val) {
-                        return '';
-                      }
 
-                      // For File objects, return them as-is for binary upload
-                      // For existing URLs/base64, return the value
-                      return val instanceof File || typeof val === 'string' ? val : val.url || val;
-                    });
-
-                    value = imageResult;
+                    // Skip further processing for FormData image fields
+                    return;
                   }
+
+                  // For regular objects, map the values
+                  var imageResult = _.map(value, function(val) {
+                    if (!val) {
+                      return '';
+                    }
+
+                    // For File objects, return them as-is for binary upload
+                    // For existing URLs/base64, return the value
+                    return val instanceof File || typeof val === 'string' ? val : val.url || val;
+                  });
+
+                  value = imageResult;
                 }
 
                 if (type === 'flReorderList' && !value) {
@@ -1728,7 +1740,11 @@ Fliplet().then(async function() {
                 });
               }
 
+              console.log('Submitting form data:', useFormData ? 'FormData object' : 'Regular object', formData);
+
               if (entryId && entry && data.dataSourceId) {
+                console.log('Updating entry with ID:', entryId);
+
                 return connection.update(entryId, formData, {
                   offline: false,
                   ack: data.linkAction && data.redirect,
@@ -1737,6 +1753,8 @@ Fliplet().then(async function() {
               }
 
               if (data.dataStore && data.dataStore.indexOf('dataSource') > -1 && data.dataSourceId) {
+                console.log('Inserting new entry');
+
                 return connection.insert(formData, {
                   offline: data.offline,
                   ack: data.linkAction && data.redirect,
