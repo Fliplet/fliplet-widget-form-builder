@@ -308,19 +308,14 @@ Fliplet.FormBuilder.field('image', {
           u8arr[n] = bstr.charCodeAt(n);
         }
 
-        const NativeFile = global.File;
+        // For Cordova apps when we use new File constructor it is creating instance for cordova-plugin-file
+        // So we need to use Blob
 
-        const filename = 'image upload-' + Date.now() + '.' + mime.split('/')[1];
-        const file = new NativeFile([u8arr], filename, {
-          type: mime,
-          lastModified: Date.now()
-        });
+        const blob = new Blob([u8arr], { type: mime });
 
-        // var blob = new Blob([u8arr], { type: mime });
+        blob.name = 'image upload-' + Date.now() + '.' + mime.split('/')[1];
 
-        // blob.name = 'image-' + Date.now() + '.' + mime.split('/')[1];
-
-        $vm.value.push(file);
+        $vm.value.push(blob);
         addThumbnailToCanvas(imgBase64Url, $vm.value.length - 1, $vm);
         $vm.$emit('_input', $vm.name, $vm.value);
       }).catch(function(error) {
