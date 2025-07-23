@@ -308,11 +308,17 @@ Fliplet.FormBuilder.field('image', {
           u8arr[n] = bstr.charCodeAt(n);
         }
 
-        var blob = new Blob([u8arr], { type: mime });
+        const filename = 'image upload-' + Date.now() + '.' + mime.split('/')[1];
+        const file = new File([u8arr], filename, {
+          type: mime,
+          lastModified: Date.now()
+        });
 
-        blob.name = 'image-' + Date.now() + '.' + mime.split('/')[1];
+        // var blob = new Blob([u8arr], { type: mime });
 
-        $vm.value.push(blob);
+        // blob.name = 'image-' + Date.now() + '.' + mime.split('/')[1];
+
+        $vm.value.push(file);
         addThumbnailToCanvas(imgBase64Url, $vm.value.length - 1, $vm);
         $vm.$emit('_input', $vm.name, $vm.value);
       }).catch(function(error) {
