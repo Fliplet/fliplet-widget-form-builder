@@ -1,17 +1,6 @@
- /**
-  * Address field component – renders a smart address autocomplete field in forms.
-  * Supports Google Places API integration and manual address input options.
-  *
-  * @component address
-  * @category Location & Map
-  * @description Autocomplete address field leveraging Google Places. Can
-  * optionally fall back to manual entry and split the selected address into
-  * separate sub-fields.
-  * @prop {String}  placeholder                Placeholder text
-  * @prop {Array}   countryRestrictions        ISO country codes to restrict search
-  * @prop {Boolean} manualInput                Allow free-text entry
-  * @prop {Boolean} storeInSeparateFields      Persist individual address parts
-  * @prop {Object}  selectedFieldOptions       Mapping of address parts → field names
+/**
+ * Address field component – renders a smart address autocomplete field in forms.
+ * Supports Google Places API integration and manual address input options.
  */
 Fliplet.FormBuilder.field('address', {
   name: 'Address',

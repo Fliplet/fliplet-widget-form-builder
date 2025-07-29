@@ -1,6 +1,6 @@
 /**
  * A single-select radio button component that allows users to choose one option from a list.
- * 
+ *
  * @property {string} [description] - Optional description text displayed above the radio buttons
  * @property {Array<Object>} options - Array of option objects with label and optional id properties
  * @property {string} options[].label - Display text for the radio option
@@ -8,7 +8,7 @@
  * @property {boolean} [required=false] - Whether the field is required for form submission
  * @property {boolean} [readonly=false] - Whether the field is read-only and cannot be modified
  * @property {string} value - The currently selected option value (id or label)
- * 
+ *
  */
 Fliplet.FormBuilder.field('radio', {
   name: 'Radios (single-select)',

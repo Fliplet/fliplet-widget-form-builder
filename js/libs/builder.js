@@ -1,9 +1,9 @@
 /**
  * @fileoverview Form Builder Widget - Main Builder Interface
- * 
+ *
  * It provides a comprehensive interface for creating, configuring, and managing form widgets
  * within the Fliplet Studio environment.
- * 
+ *
  * @description
  * The Form Builder widget allows users to:
  * - Create and configure form fields with various input types
