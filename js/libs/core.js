@@ -24,15 +24,6 @@ Fliplet.FormBuilder = (function() {
     return 'fl' + component.charAt(0).toUpperCase() + component.slice(1);
   }
 
-  /**
-   * Utility to emit an event on the event hub.
-   * @param {string} eventName - The event name.
-   * @param {any} data - Data to emit with the event.
-   */
-  function emitEvent(eventName, data) {
-    eventHub.$emit(eventName, data);
-  }
-
   return {
     on: function(eventName, fn) {
       eventHub.$on(eventName, fn);
