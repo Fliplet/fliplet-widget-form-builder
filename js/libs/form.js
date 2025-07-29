@@ -43,6 +43,21 @@ function drawImageOnCanvas(img, canvas) {
 }
 
 /* eslint-disable-next-line */
+function dataURLToBlob(dataUrl) {
+  const arr = dataUrl.split(',');
+  const mime = arr[0].match(/:(.*?);/)[1];
+  const bstr = atob(arr[1]);
+  let n = bstr.length;
+  const u8arr = new Uint8Array(n);
+
+  while (n--) {
+    u8arr[n] = bstr.charCodeAt(n);
+  }
+
+  return new Blob([u8arr], { type: mime });
+}
+
+/* eslint-disable-next-line */
 function addThumbnailToCanvas(imageURI, indexCanvas, self, isFileCanvas) {
   var $vm = self;
 
@@ -1428,17 +1443,6 @@ Fliplet().then(async function() {
                 for (var i = 0; i < value.length; i++) {
                   appendField(field.name, value.item(i));
                 }
-              } else if (type === 'flImage' && Array.isArray(value) && value.length > 0) {
-                // Image field with Blob objects - convert to File objects for binary upload
-                for (var j = 0; j < value.length; j++) {
-                  var blob = value[j];
-
-                  if (blob instanceof Blob) {
-                    const file = new File([blob], blob.name, { type: blob.type });
-
-                    appendField(field.name, file);
-                  }
-                }
               } else {
                 // Remove spaces and dashes from value (when it's a string)
                 if (typeof value === 'string' && ['flNumber', 'flTelephone'].indexOf(type) !== -1) {
@@ -1627,8 +1631,6 @@ Fliplet().then(async function() {
                   source: data.uuid
                 });
               }
-
-              console.log('data.dataSourceId', data.dataSourceId, data.dataStore);
 
               if (data.dataStore && data.dataStore.indexOf('dataSource') > -1 && data.dataSourceId) {
                 return connection.insert(formData, {

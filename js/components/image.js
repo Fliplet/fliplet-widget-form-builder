@@ -1,4 +1,4 @@
-/* global Camera, addThumbnailToCanvas, loadImage */
+/* global Camera, addThumbnailToCanvas, loadImage, dataURLToBlob */
 
 /**
  * Image field component – renders an image capture and upload input in forms.
@@ -217,7 +217,6 @@ Fliplet.FormBuilder.field('image', {
     },
     processImage: function(file, addThumbnail) {
       var $vm = this;
-      var mimeType = file.type || 'image/png';
 
       this.validateValue();
 
@@ -229,36 +228,38 @@ Fliplet.FormBuilder.field('image', {
           orientation: 0
         };
 
-        loadImage(file, function(img) {
+        loadImage(file, async function(img) {
           if (img.type === 'error') {
             $vm.hasCorruptedImage = true;
 
             return;
           }
 
-          if (($vm.customWidth && img.width > $vm.customWidth) || ($vm.customHeight && img.height > $vm.customHeight)) {
-            $vm.isImageSizeExceeded = true;
-
-            return;
-          }
-
           $vm.hasCorruptedImage = false;
-          $vm.isImageSizeExceeded = false;
+
 
           var scaledImage = loadImage.scale(img, options);
 
-          scaledImage.toBlob(function(blob) {
-            blob.name = file.name;
+          const mimeType = file.type || 'image/png';
+          const imgBase64Url = scaledImage.toDataURL(mimeType, $vm.jpegQuality);
+
+          try {
+            const blob = dataURLToBlob(imgBase64Url);
+
+            blob.name = file.name || ('image-' + Date.now());
+
             $vm.value.push(blob);
 
             if (addThumbnail) {
-              var imgBase64Url = scaledImage.toDataURL(mimeType, $vm.jpegQuality);
-
               addThumbnailToCanvas(imgBase64Url, $vm.value.length - 1, $vm);
             }
 
             $vm.$emit('_input', $vm.name, $vm.value);
-          }, mimeType, $vm.jpegQuality / 100);
+          } catch (error) {
+            $vm.hasCorruptedImage = true;
+
+            return;
+          }
         });
       });
     },
@@ -298,22 +299,9 @@ Fliplet.FormBuilder.field('image', {
           ? imgBase64Url
           : 'data:image/jpeg;base64,' + imgBase64Url;
 
-        var arr = imgBase64Url.split(',');
-        var mime = arr[0].match(/:(.*?);/)[1];
-        var bstr = atob(arr[1]);
-        var n = bstr.length;
-        var u8arr = new Uint8Array(n);
+        const blob = dataURLToBlob(imgBase64Url);
 
-        while (n--) {
-          u8arr[n] = bstr.charCodeAt(n);
-        }
-
-        // For Cordova apps when we use new File constructor it is creating instance for cordova-plugin-file
-        // So we need to use Blob
-
-        const blob = new Blob([u8arr], { type: mime });
-
-        blob.name = 'image upload-' + Date.now() + '.' + mime.split('/')[1];
+        blob.name = 'image upload-' + Date.now() + '.' + blob.type.split('/')[1];
 
         $vm.value.push(blob);
         addThumbnailToCanvas(imgBase64Url, $vm.value.length - 1, $vm);
