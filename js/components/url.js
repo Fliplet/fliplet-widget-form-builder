@@ -1,6 +1,5 @@
 /**
  * URL field component – renders a URL input field with validation in forms.
- * Validates URL format and provides protocol handling for web links.
  */
 Fliplet.FormBuilder.field('url', {
   name: 'URL input',

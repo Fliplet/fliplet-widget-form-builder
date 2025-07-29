@@ -1,8 +1,9 @@
 /**
- * templates.js – Fliplet Form Builder: Template helpers.
+ * This module manages form templates for the Fliplet Form Builder widget.
+ * It provides both system templates (built-in) and organization-specific templates
+ * that can be retrieved from the Fliplet API.
  *
  * Provides utility functions for working with Handlebars templates.
- *
  * All exported functions and major logic blocks are documented with JSDoc.
  */
 
