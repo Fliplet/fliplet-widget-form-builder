@@ -220,6 +220,58 @@ Fliplet().then(function() {
           return !!el.required;
         });
       },
+      warningMessage() {
+        if (!this.settings || !this.settings.dataStore) {
+          return null;
+        }
+
+        const ds = this.settings.dataStore || [];
+        const hasDataSource = ds.includes('dataSource');
+        const hasEditDataSource = ds.includes('editDataSource');
+
+        if (hasDataSource && hasEditDataSource) {
+          return;
+        }
+
+        let message = `<b>${T('widgets.form.warningLabel')}: </b> `;
+
+        if (!this.settings.dataSourceId) {
+          message += T('widgets.form.noDatasourceLinked');
+        } else if (!hasDataSource && !hasEditDataSource) {
+          message += T('widgets.form.noAddOrUpdateWarning');
+        } else if (!hasDataSource && hasEditDataSource) {
+          message += T('widgets.form.noAddWarning');
+        } else if (hasDataSource && !hasEditDataSource) {
+          message += T('widgets.form.noUpdateWarning');
+        }
+
+        return message;
+      },
+      mediaWarningMessage() {
+        const MEDIA_TYPES = ['flFile', 'flImage', 'flSignature'];
+        // Filter fields that are of media type
+        const fileImageFields = this.fields.filter(f => MEDIA_TYPES.includes(f._type));
+
+        if (!fileImageFields.length) return null;
+
+        // Ensure nested properties exist to avoid undefined errors
+        fileImageFields.forEach(f => {
+          if (!('mediaFolderId' in f)) this.$set(f, 'mediaFolderId', null);
+          if (!('mediaFolderData' in f)) this.$set(f, 'mediaFolderData', { name: '' });
+        });
+
+        // Filter fields missing folder selection
+        const missingFields = fileImageFields.filter(f =>
+          !f.mediaFolderId || !f.mediaFolderData.name
+        );
+
+        if (!missingFields.length) return null;
+
+
+        const fieldNames = missingFields.map(f => f.name).join(', ');
+
+        return T('widgets.form.warningLabel') + T('widgets.form.mediaWarning', { fieldNames });
+      },
       missingColumns: function() {
         return this.newColumns.join(', ');
       },

@@ -98,9 +98,7 @@ nav > .btn {
   margin-top: 10px;
 }
 
-.add-field {
-  margin-top: -13px;
-}
+
 
 .form-control-static {
   min-height: 44px;
@@ -111,11 +109,7 @@ nav > .btn {
   background-color: #f8f8f8;
 }
 
-.add-field {
-  position: absolute;
-  top: 120px;
-  right: 15px;
-}
+
 
 .hide-fields {
   position: absolute;
