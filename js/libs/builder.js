@@ -227,6 +227,64 @@ Fliplet().then(function() {
           return !!el.required;
         });
       },
+      warningMessage() {
+        if (!this.settings || !this.settings.dataStore) {
+          return null;
+        }
+
+        const ds = this.settings.dataStore || [];
+        const hasDataSource = ds.includes('dataSource');
+        const hasEditDataSource = ds.includes('editDataSource');
+
+        if (hasDataSource && hasEditDataSource) {
+          return null;
+        }
+
+        let message = `<b>${T('widgets.form.warningLabel')}: </b> `;
+
+        if (!this.settings.dataSourceId) {
+          message += T('widgets.form.noDatasourceLinked');
+        } else if (!hasDataSource && !hasEditDataSource) {
+          message += T('widgets.form.noAddOrUpdateWarning');
+        } else if (!hasDataSource && hasEditDataSource) {
+          message += T('widgets.form.noAddWarning');
+        } else if (hasDataSource && !hasEditDataSource) {
+          message += T('widgets.form.noUpdateWarning');
+        }
+
+        return message;
+      },
+      mediaWarningMessage() {
+        const MEDIA_TYPES = ['flFile', 'flImage', 'flSignature'];
+
+        // Filter fields that are of media type
+        const mediaFields = this.fields.filter(f => MEDIA_TYPES.includes(f._type));
+
+        if (!mediaFields.length) {
+          return null;
+        }
+
+        // Ensure nested properties exist to ensure reactivity
+        mediaFields.forEach(f => {
+          if (!('mediaFolderId' in f)) {
+            this.$set(f, 'mediaFolderId', null);
+          }
+        });
+
+        // Filter fields missing folder selection
+        const misconfiguredFields = mediaFields.filter(f =>
+          !f.mediaFolderId
+        );
+
+        if (!misconfiguredFields.length) {
+          return null;
+        }
+
+
+        const fieldNames = misconfiguredFields.map(f => f.name).join(', ');
+
+        return T('widgets.form.warningLabel') + T('widgets.form.mediaWarning', { fieldNames });
+      },
       missingColumns: function() {
         return this.newColumns.join(', ');
       },
