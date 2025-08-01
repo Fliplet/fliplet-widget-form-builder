@@ -21,18 +21,10 @@ var data = Fliplet.Widget.getData(widgetId) || {};
 var isFormInSlider = false;
 
 Fliplet.Widget.findParents({ instanceId: widgetId }).then(function(parents) {
-  /**
-   * Parent widget with package 'com.fliplet.slide' or name 'Slide'.
-   * @type {Object}
-   */
   const formSlideParent = parents.find(parent =>
     parent.package === 'com.fliplet.slide' || parent.name === 'Slide'
   );
 
-  /**
-   * Parent widget with package 'com.fliplet.slider-container' or name 'Slider container'.
-   * @type {Object}
-   */
   const formSliderParent = parents.find(parent =>
     parent.package === 'com.fliplet.slider-container' || parent.name === 'Slider container'
   );
@@ -44,9 +36,6 @@ Fliplet.Widget.findParents({ instanceId: widgetId }).then(function(parents) {
 
 // Cleanup
 if (data.fields) {
-  /**
-   * Remove falsy fields from the data.fields array.
-   */
   data.fields = _.compact(data.fields);
 }
 

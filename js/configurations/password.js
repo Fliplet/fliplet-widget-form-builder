@@ -1,8 +1,3 @@
-/**
- * Password field configuration – handles password validation and generation settings.
- * Manages mutual exclusivity between password confirmation and autogeneration features.
- * Enforces minimum password length validation (8 characters minimum).
- */
 Fliplet.FormBuilder.configuration('password', {
   methods: {
     validatePasswordLength: function() {

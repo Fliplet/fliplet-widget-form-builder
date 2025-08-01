@@ -1,7 +1,3 @@
-/**
- * Map field component – renders an interactive map for location selection in forms.
- * Supports marker placement, address lookup, and coordinate capture.
- */
 Fliplet.FormBuilder.field('map', {
   name: 'Map',
   category: 'Location & Map',

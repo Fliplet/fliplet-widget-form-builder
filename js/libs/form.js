@@ -3,7 +3,6 @@
  * Handles form rendering, validation, submission, and data integration.
  *
  */
-
 var formBuilderInstances = [];
 var dataSourceColumnPromises = {};
 var allFormsInSlide = [];
