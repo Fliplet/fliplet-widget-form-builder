@@ -1,3 +1,13 @@
+/**
+ * @fileoverview Reorder-list field – draggable list for item prioritisation in Fliplet forms.
+ *
+ * Users can drag to establish custom ordering.
+ *
+ * @component ReorderListField
+ * @vue-prop {Array<Object>} options       – Default list items (`id`, `label`).
+ * @vue-prop {String}        optionsType   – 'dataSource' or 'static'.
+ * @vue-prop {Number}        dataSourceId  – Linked data-source ID when `optionsType` is 'dataSource'.
+ */
 Fliplet.FormBuilder.field('reorderList', {
   name: 'Reorder list',
   category: 'Multiple options',

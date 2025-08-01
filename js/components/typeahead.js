@@ -1,3 +1,7 @@
+/**
+ * This component renders a typeahead (autocomplete) input that supports multi-selection.
+ * Options can be configured manually or fetched from a data source.
+ */
 Fliplet.FormBuilder.field('typeahead', {
   name: 'Typeahead (multi-select)',
   category: 'Multiple options',

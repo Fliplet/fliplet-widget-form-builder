@@ -1,5 +1,9 @@
 /* global Camera, addThumbnailToCanvas, loadImage */
 
+/**
+ * Image field component – renders an image capture and upload input in forms.
+ * Supports camera capture, file upload.
+ */
 Fliplet.FormBuilder.field('image', {
   i18n: window.VueI18Next,
   name: 'Image upload',

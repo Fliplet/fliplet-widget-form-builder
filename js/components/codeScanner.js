@@ -1,3 +1,8 @@
+/**
+ * A Fliplet Form Builder field component that provides barcode/QR code scanning functionality.
+ * Allows users to scan barcodes or QR codes using their device's camera and automatically
+ * populate form fields with the scanned data.
+ */
 Fliplet.FormBuilder.field('codeScanner', {
   name: 'Code scanner',
   category: 'Advanced',

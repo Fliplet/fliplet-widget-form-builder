@@ -1,3 +1,19 @@
+/**
+ * @fileoverview Form Builder Widget - Main Builder Interface
+ *
+ * It provides a comprehensive interface for creating, configuring, and managing form widgets
+ * within the Fliplet Studio environment.
+ *
+ * @description
+ * The Form Builder widget allows users to:
+ * - Create and configure form fields with various input types
+ * - Set up data sources for form submissions
+ * - Configure email notifications and templates
+ * - Manage form templates and layouts
+ * - Handle multi-step forms within slider containers
+ * - Configure access rules and security settings
+ */
+
 /* eslint-disable eqeqeq */
 var widgetId = parseInt(Fliplet.Widget.getDefaultId(), 10);
 var widgetUuid = Fliplet.Widget.getUUID(widgetId);

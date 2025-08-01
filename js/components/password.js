@@ -1,3 +1,11 @@
+/**
+ * This component provides a password input field with advanced features including:
+ * - Password strength validation with customizable rules
+ * - Password confirmation field
+ * - Auto-generation of secure passwords
+ * - Password hashing support
+ * - Progress saving and population on update
+ */
 Fliplet.FormBuilder.field('password', {
   name: 'Password input',
   category: 'Text inputs',

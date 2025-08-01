@@ -1,3 +1,9 @@
+/**
+ * WYSIWYG field component - Renders a rich text editor powered by TinyMCE that allows users to create and edit
+ * formatted HTML content within forms. Supports text styling, links, tables, lists,
+ * and various formatting options with a comprehensive toolbar interface.
+ *
+ */
 Fliplet.FormBuilder.field('wysiwyg', {
   name: 'Rich text',
   category: 'Text inputs',

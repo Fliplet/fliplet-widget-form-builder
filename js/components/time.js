@@ -1,3 +1,6 @@
+/**
+ * Time field component – renders a time picker input for selecting hours and minutes.
+ */
 Fliplet.FormBuilder.field('time', {
   name: 'Time picker',
   category: 'Date & time',
