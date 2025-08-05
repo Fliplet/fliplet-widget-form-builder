@@ -723,7 +723,6 @@ Fliplet().then(async function() {
           isLoading: !!entryId,
           isLoadingMessage: T('widgets.form.retrievingData'),
           isConfigured: !!data.templateId,
-          isPlaceholder: data.isPlaceholder,
           fields: getFields(),
           error: null,
           errors: {},
