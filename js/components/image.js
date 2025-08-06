@@ -1,4 +1,4 @@
-/* global Camera, addThumbnailToCanvas, loadImage */
+/* global Camera, addThumbnailToCanvas, loadImage, dataURLToBlob */
 
 /**
  * Image field component – renders an image capture and upload input in forms.
@@ -217,7 +217,6 @@ Fliplet.FormBuilder.field('image', {
     },
     processImage: function(file, addThumbnail) {
       var $vm = this;
-      var mimeType = file.type || 'image/png';
 
       this.validateValue();
 
@@ -229,33 +228,38 @@ Fliplet.FormBuilder.field('image', {
           orientation: 0
         };
 
-        loadImage(file, function(img) {
+        loadImage(file, async function(img) {
           if (img.type === 'error') {
             $vm.hasCorruptedImage = true;
 
             return;
           }
 
-          if (($vm.customWidth && img.width > $vm.customWidth) || ($vm.customHeight && img.height > $vm.customHeight)) {
-            $vm.isImageSizeExceeded = true;
+          $vm.hasCorruptedImage = false;
+
+
+          var scaledImage = loadImage.scale(img, options);
+
+          const mimeType = file.type || 'image/png';
+          const imgBase64Url = scaledImage.toDataURL(mimeType, $vm.jpegQuality);
+
+          try {
+            const blob = dataURLToBlob(imgBase64Url);
+
+            blob.name = file.name || ('image-' + Date.now());
+
+            $vm.value.push(blob);
+
+            if (addThumbnail) {
+              addThumbnailToCanvas(imgBase64Url, $vm.value.length - 1, $vm);
+            }
+
+            $vm.$emit('_input', $vm.name, $vm.value);
+          } catch (error) {
+            $vm.hasCorruptedImage = true;
 
             return;
           }
-
-          $vm.hasCorruptedImage = false;
-          $vm.isImageSizeExceeded = false;
-
-          var scaledImage = loadImage.scale(img, options);
-          var imgBase64Url = scaledImage.toDataURL(mimeType, $vm.jpegQuality);
-          var flipletBase64Url = imgBase64Url + ';filename:' + file.name;
-
-          $vm.value.push(flipletBase64Url);
-
-          if (addThumbnail) {
-            addThumbnailToCanvas(flipletBase64Url, $vm.value.length - 1, $vm);
-          }
-
-          $vm.$emit('_input', $vm.name, $vm.value);
         });
       });
     },
@@ -295,7 +299,11 @@ Fliplet.FormBuilder.field('image', {
           ? imgBase64Url
           : 'data:image/jpeg;base64,' + imgBase64Url;
 
-        $vm.value.push(imgBase64Url);
+        const blob = dataURLToBlob(imgBase64Url);
+
+        blob.name = 'image upload-' + Date.now() + '.' + blob.type.split('/')[1];
+
+        $vm.value.push(blob);
         addThumbnailToCanvas(imgBase64Url, $vm.value.length - 1, $vm);
         $vm.$emit('_input', $vm.name, $vm.value);
       }).catch(function(error) {
@@ -314,8 +322,12 @@ Fliplet.FormBuilder.field('image', {
     },
     onImageClick: function(index) {
       var imagesData = {
-        images: _.map(this.value, function(imgURL) {
-          return { url: imgURL };
+        images: _.map(this.value, function(img) {
+          if (img instanceof Blob) {
+            return { url: URL.createObjectURL(img) };
+          }
+
+          return { url: img };
         }),
         options: {
           index: index
