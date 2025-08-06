@@ -127,6 +127,12 @@
       "customButton": {
         "defaultError": "Error encountered with '{{label}}' button"
       },
+      "typeahead": {
+        "maxItemsHelper": "Max {{maxItems}} item(s).",
+        "errors": {
+          "limitExceeded": "Only {{maxItems}} item(s) can be selected."
+        }
+      },
       "telephone": {
         "instruction": "Phone number can only contain <b>; , . ( ) - + SPACE * #</b> and numbers."
       },
