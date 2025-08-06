@@ -57,14 +57,20 @@ Fliplet.FormBuilder.field('typeahead', {
   },
   data: function() {
     return {
-      typeahead: null,
-      messages: {
-        exceededMaxItems: T('widgets.form.typeahead.errors.limitExceeded', { maxItems: this.maxItems }),
-        maxItemsHelper: T('widgets.form.typeahead.maxItemsHelper', { maxItems: this.maxItems })
-      }
+      typeahead: null
     };
   },
   computed: {
+    /**
+     * Computed messages for typeahead field
+     * @returns {Object} Messages object with translated strings
+     */
+    messages: function() {
+      return {
+        exceededMaxItems: T('widgets.form.typeahead.errors.limitExceeded', { maxItems: this.maxItems }),
+        maxItemsHelper: T('widgets.form.typeahead.maxItemsHelper', { maxItems: this.maxItems })
+      };
+    },
     /**
      * Checks if the current selection exceeds the maximum allowed items
      * @returns {boolean} True if the selection exceeds maxItems limit
