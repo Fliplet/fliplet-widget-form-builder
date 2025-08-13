@@ -705,9 +705,40 @@ Fliplet().then(async function() {
       return fields;
     }
 
-    function isFile(value) {
-      return value && typeof value.item === 'function';
+function isFile(value) {
+  return value && typeof value.item === 'function';
+}
+
+function objectToFormData(obj) {
+  var form = new FormData();
+
+  Object.keys(obj).forEach(function(key) {
+    var value = obj[key];
+
+    if (key === '_flSchema') {
+      form.append('_flSchema', JSON.stringify(value));
+      return;
     }
+
+    if (Array.isArray(value)) {
+      value.forEach(function(item) {
+        if (item instanceof File || item instanceof Blob) {
+          form.append(key, item);
+        } else if (item !== undefined && item !== null) {
+          form.append(key, item);
+        }
+      });
+    } else if (value instanceof File || value instanceof Blob) {
+      form.append(key, value);
+    } else if (value !== undefined && value !== null && typeof value === 'object') {
+      form.append(key, JSON.stringify(value));
+    } else if (value !== undefined) {
+      form.append(key, value);
+    }
+  });
+
+  return form;
+}
 
     var changeListeners = {};
 
@@ -1154,6 +1185,7 @@ Fliplet().then(async function() {
 
           var $vm = this;
           var formData = {};
+          var hasFileFields = false;
 
           $vm.triggerBlurEventOnInputs();
 
@@ -1421,6 +1453,7 @@ Fliplet().then(async function() {
 
               if (isFile(value)) {
                 // File input
+                hasFileFields = true;
                 for (var i = 0; i < value.length; i++) {
                   appendField(field.name, value.item(i));
                 }
@@ -1605,8 +1638,14 @@ Fliplet().then(async function() {
                 }
               });
 
+              var payload = formData;
+
+              if (hasFileFields || Object.keys(formData._flSchema).length) {
+                payload = objectToFormData(formData);
+              }
+
               if (entryId && entry && data.dataSourceId) {
-                return connection.update(entryId, formData, {
+                return connection.update(entryId, payload, {
                   offline: false,
                   ack: data.linkAction && data.redirect,
                   source: data.uuid
@@ -1614,7 +1653,7 @@ Fliplet().then(async function() {
               }
 
               if (data.dataStore && data.dataStore.indexOf('dataSource') > -1 && data.dataSourceId) {
-                return connection.insert(formData, {
+                return connection.insert(payload, {
                   offline: data.offline,
                   ack: data.linkAction && data.redirect,
                   source: data.uuid
