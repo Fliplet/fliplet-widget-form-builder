@@ -1451,9 +1451,19 @@ Fliplet().then(function() {
         $vm.initDataSourceProvider();
       }
 
-      Fliplet.Organizations.get().then(function(organizations) {
-        $vm.organizationName = organizations.length && organizations[0].name;
-      });
+      var cachedName = sessionStorage.getItem('fl-organization-name');
+
+      if (cachedName) {
+        $vm.organizationName = cachedName;
+      } else {
+        Fliplet.Organizations.get().then(function(organizations) {
+          $vm.organizationName = organizations.length && organizations[0].name;
+
+          if ($vm.organizationName) {
+            sessionStorage.setItem('fl-organization-name', $vm.organizationName);
+          }
+        });
+      }
 
       Fliplet.Widget.onSaveRequest(function() {
         if (window.emailTemplateAddProvider) {
