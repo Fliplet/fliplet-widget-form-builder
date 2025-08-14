@@ -2,7 +2,7 @@
 
 /**
  * Image field component – renders an image capture and upload input in forms.
- * Supports camera capture, file upload.
+ * Supports camera capture, file upload, and image compression options.
  */
 Fliplet.FormBuilder.field('image', {
   i18n: window.VueI18Next,
@@ -202,10 +202,13 @@ Fliplet.FormBuilder.field('image', {
       }
 
       return new Promise(function(resolve, reject) {
+        var isCamera = $vm.cameraSource === Camera.PictureSourceType.CAMERA;
+
         navigator.camera.getPicture(resolve, reject, {
           quality: $vm.jpegQuality,
-          destinationType: Camera.DestinationType.DATA_URL,
-          sourceType: $vm.cameraSource,
+          destinationType: isCamera
+          ? Camera.DestinationType.DATA_URL
+          : Camera.DestinationType.FILE_URI,          sourceType: $vm.cameraSource,
           targetWidth: $vm.customWidth || 0, // Setting default value as 0 so that camera plugin API does not fail
           targetHeight: $vm.customHeight || 0,
           popoverOptions: popoverOptions,
@@ -240,13 +243,20 @@ Fliplet.FormBuilder.field('image', {
 
           var scaledImage = loadImage.scale(img, options);
 
-          const mimeType = file.type || 'image/png';
-          const imgBase64Url = scaledImage.toDataURL(mimeType, $vm.jpegQuality);
+          // Always convert resized images to JPEG on web for consistency with native
+          const jpegMimeType = 'image/jpeg';
+          const imgBase64Url = scaledImage.toDataURL(jpegMimeType, $vm.jpegQuality);
 
           try {
             const blob = dataURLToBlob(imgBase64Url);
 
-            blob.name = file.name || ('image-' + Date.now());
+            // Ensure the file name extension matches the JPEG MIME type
+            const blobExtension = (blob.type && blob.type.split('/')[1]) || 'jpeg';
+            if (file && file.name) {
+              blob.name = file.name.replace(/\.[^/.]+$/, '') + '.' + blobExtension;
+            } else {
+              blob.name = 'image-' + Date.now() + '.' + blobExtension;
+            }
 
             $vm.value.push(blob);
 
@@ -274,38 +284,76 @@ Fliplet.FormBuilder.field('image', {
 
       var getPicture;
 
-      event.preventDefault();
-
+      // If we intentionally trigger the HTML file input (photo library case),
+      // allow the default click behavior to proceed so the picker opens.
       if (this.forcedClick) {
         this.forcedClick = false;
-        getPicture = $vm.getPicture();
-      } else {
-        getPicture = this.requestPicture(this.$refs.imageInput).then(function onRequestedPicture() {
-          if ($vm.cameraSource === Camera.PictureSourceType.PHOTOLIBRARY) {
-            $vm.forcedClick = true;
-            $($vm.$refs.imageInput).trigger('click');
+        return;
+      }
 
-            return Promise.reject('Switch to HTML file input to select files');
+      // Otherwise, we take over the click to present options
+      event.preventDefault();
+
+      getPicture = this.requestPicture(this.$refs.imageInput).then(function onRequestedPicture() {
+        if ($vm.cameraSource === Camera.PictureSourceType.PHOTOLIBRARY) {
+          $vm.forcedClick = true;
+
+          // Use native element click so the OS file picker opens reliably
+          if ($vm.$refs.imageInput && typeof $vm.$refs.imageInput.click === 'function') {
+            $vm.$refs.imageInput.click();
+          } else {
+            $($vm.$refs.imageInput).trigger('click');
           }
 
-          return $vm.getPicture();
-        });
-      }
+          return Promise.reject('Switch to HTML file input to select files');
+        }
+
+        return $vm.getPicture();
+      });
 
       this.validateValue();
 
-      getPicture.then(function onSelectedPicture(imgBase64Url) {
-        imgBase64Url = (imgBase64Url.indexOf('base64') > -1)
-          ? imgBase64Url
-          : 'data:image/jpeg;base64,' + imgBase64Url;
+      getPicture.then(function onSelectedPicture(result) {
+        // If we receive a FILE_URI (native camera/gallery), resolve it to a File to preserve the original name
+        if (typeof result === 'string' && (/^(file:|content:|cdvfile:)/i).test(result)) {
+          return new Promise(function(resolveFile, rejectFile) {
+            // Cordova File API: resolve URI to FileEntry → File object
+            window.resolveLocalFileSystemURL(result, function(entry) {
+              try {
+                entry.file(function(file) {
+                  resolveFile(file);
+                }, rejectFile);
+              } catch (e) {
+                rejectFile(e);
+              }
+            }, rejectFile);
+          }).then(function(file) {
+            // Use existing pipeline which keeps base name and switches extension to jpeg
+            $vm.processImage(file, true);
+          }).catch(function(err){
+            /* eslint-disable-next-line */
+            console.error('Failed to resolve file from URI', err);
+            // Fallback: mark as corrupted
+            $vm.hasCorruptedImage = true;
+          });
+        }
 
-        const blob = dataURLToBlob(imgBase64Url);
+        // Fallback for legacy base64 results
+        var imgBase64Url = (typeof result === 'string' && result.indexOf('base64') > -1)
+          ? result
+          : 'data:image/jpeg;base64,' + result;
 
-        blob.name = 'image upload-' + Date.now() + '.' + blob.type.split('/')[1];
-
-        $vm.value.push(blob);
-        addThumbnailToCanvas(imgBase64Url, $vm.value.length - 1, $vm);
-        $vm.$emit('_input', $vm.name, $vm.value);
+        try {
+          const blob = dataURLToBlob(imgBase64Url);
+          blob.name = 'image upload-' + Date.now() + '.' + blob.type.split('/')[1];
+          $vm.value.push(blob);
+          addThumbnailToCanvas(imgBase64Url, $vm.value.length - 1, $vm);
+          $vm.$emit('_input', $vm.name, $vm.value);
+        } catch (e) {
+          /* eslint-disable-next-line */
+          console.error('Failed to parse base64 image', e);
+          $vm.hasCorruptedImage = true;
+        }
       }).catch(function(error) {
       /* eslint-disable-next-line */
         console.error(error);
