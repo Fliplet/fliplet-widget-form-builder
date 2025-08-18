@@ -1,9 +1,14 @@
 /**
- * core.js – Fliplet Form Builder: Core utility functions and event hub.
+ * Main file for managing form components, events, and configurations in Fliplet Form Builder
  *
- * Provides shared logic for field management, event handling, and data helpers.
+ * This file provides a comprehensive form building system with the following capabilities:
+ * - Component registration and management
+ * - Event handling and communication
+ * - Form field configuration and validation
+ * - Multi-step form support
+ * - Data source integration
+ * - Template management
  *
- * All exported functions and major logic blocks are documented with JSDoc.
  */
 
 /* eslint-disable eqeqeq */
@@ -18,23 +23,6 @@ Fliplet.FormBuilder = (function() {
   function name(component) {
     return 'fl' + component.charAt(0).toUpperCase() + component.slice(1);
   }
-
-  /**
-   * Utility to emit an event on the event hub.
-   * @param {string} eventName - The event name.
-   * @param {any} data - Data to emit with the event.
-   * @returns {void}
-   */
-  /**
-   * Utility to emit an event on the event hub.
-   * @param {string} eventName - The event name.
-   * @param {any} data - Data to emit with the event.
-   * @returns {void}
-   */
-  // NOTE: Function disabled - replaced by direct eventHub.$emit calls
-  // function emitEvent(eventName, data) {
-  //   eventHub.$emit(eventName, data);
-  // }
 
   return {
     on: function(eventName, fn) {

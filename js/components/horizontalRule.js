@@ -1,6 +1,6 @@
 /**
- * Horizontal rule field component – renders a visual separator line in forms.
- * Provides styling options for thickness, color, and spacing customization.
+- * Horizontal rule (LIne Break) field component – renders a visual separator line in forms.
++ * Horizontal rule (Line Break) field component – renders a visual separator line in forms.
  */
 Fliplet.FormBuilder.field('horizontalRule', {
   name: 'Line break',

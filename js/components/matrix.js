@@ -1,6 +1,6 @@
 /**
  * Matrix field component – renders a grid-based selection interface in forms.
- * Supports multiple rows and columns with radio or checkbox selection modes.
+ * Supports multiple rows and columns with radio selection mode.
  */
 Fliplet.FormBuilder.field('matrix', {
   name: 'Matrix',
