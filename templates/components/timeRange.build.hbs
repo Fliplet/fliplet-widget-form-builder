@@ -1,23 +1,55 @@
 {{! Time range field with start and end time selection }}
 <template>
-  <div class="form-group fl-time-range" ref="timeRange" :class="{ 'readonly' : readonly }">
-    <div class="form-group fl-time-picker time-picker-start focus-outline">
-      <i class="fa fa-clock-o fa-fw"></i>
-      <input type="time" class="form-control" :name="name" :id="name"/>
-      <input type="text" class="form-control" :tabindex="readonly ? -1 : 0"/>
-      <i class="fa fa-times fa-fw"></i>
+  <div class="form-group fl-time-range" ref="timeRange" :class="{ 'readonly' : readonly }" role="group" :aria-label="'Time range for ' + (label || 'time period selection')" :aria-describedby="_ariaDescribedBy">
+    <div class="form-group fl-time-picker time-picker-start focus-outline" role="group" aria-label="Start time picker">
+      <i class="fa fa-clock-o fa-fw" aria-hidden="true"></i>
+      <input 
+        type="time" 
+        class="form-control" 
+        :name="name" 
+        :id="name"
+        :aria-label="'Start time for ' + (label || 'time range')"
+        :aria-describedby="_ariaDescribedBy"
+        :aria-invalid="_ariaInvalid"
+      />
+      <input 
+        type="text" 
+        class="form-control" 
+        :tabindex="readonly ? -1 : 0"
+        :aria-label="'Start time text input for ' + (label || 'time range')"
+        :aria-describedby="_ariaDescribedBy"
+        :aria-invalid="_ariaInvalid"
+      />
+      <i class="fa fa-times fa-fw" aria-hidden="true"></i>
     </div>
-    <div class="arrow-right">
-      <i class="icon fa fa-long-arrow-right fa-fw"></i>
+    
+    <div class="arrow-right" role="presentation" aria-hidden="true">
+      <i class="icon fa fa-long-arrow-right fa-fw" aria-hidden="true"></i>
     </div>
-    <div class="form-group fl-time-picker time-picker-end focus-outline">
-      <i class="fa fa-clock-o fa-fw"></i>
-      <input type="time" class="form-control" :name="name" :id="name"/>
-      <input type="text" class="form-control" :tabindex="readonly ? -1 : 0"/>
-      <i class="fa fa-times fa-fw"></i>
+    
+    <div class="form-group fl-time-picker time-picker-end focus-outline" role="group" aria-label="End time picker">
+      <i class="fa fa-clock-o fa-fw" aria-hidden="true"></i>
+      <input 
+        type="time" 
+        class="form-control" 
+        :name="name"
+        :id="name"
+        :aria-label="'End time for ' + (label || 'time range')"
+        :aria-describedby="_ariaDescribedBy"
+        :aria-invalid="_ariaInvalid"
+      />
+      <input 
+        type="text" 
+        class="form-control" 
+        :tabindex="readonly ? -1 : 0"
+        :aria-label="'End time text input for ' + (label || 'time range')"
+        :aria-describedby="_ariaDescribedBy"
+        :aria-invalid="_ariaInvalid"
+      />
+      <i class="fa fa-times fa-fw" aria-hidden="true"></i>
     </div>
   </div>
 </template>
-<p class="text-danger" v-if="$v.value.required === false && $v.value.$dirty">
+<p class="text-danger" v-if="$v.value.required === false && $v.value.$dirty" role="alert" aria-live="assertive">
   {{T "widgets.form.errors.required"}}
 </p>

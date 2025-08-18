@@ -44,21 +44,33 @@ Fliplet.FormBuilder.field('codeScanner', {
       var $vm = this;
 
       if (this.readonly) {
+        this.announceStatus('Scanner is disabled in read-only mode', 2000);
+
         return;
       }
+
+      this.announceStatus('Opening barcode scanner...', 1500);
 
       Fliplet.Barcode.scan().then(function(result) {
         if (result.text) {
           $vm.value = result.text;
+
+          $vm.announceAction(`Code scanned successfully: ${result.text}`, 2000);
+        } else {
+          $vm.announceStatus('No code detected, please try again', 2000);
         }
       })
         .catch(function(error) {
           $vm.errorMessage = Fliplet.parseError(error);
+
+          $vm.announceError(`Scanner error: ${$vm.errorMessage}`, 3000);
         });
     },
+
     onReset: function() {
       this.errorMessage = null;
     },
+
     scannerInput: function(event) {
       var el = event.target;
       var maxRows = 5;
@@ -67,6 +79,24 @@ Fliplet.FormBuilder.field('codeScanner', {
 
       while (el.scrollHeight > el.clientHeight && el.rows < maxRows) {
         el.rows++;
+      }
+    },
+
+    handleKeyDown: function(event) {
+      switch (event.key) {
+        case 'Enter':
+        case ' ':
+          event.preventDefault();
+          this.openScanner();
+          break;
+        case 'Escape':
+          event.preventDefault();
+          // Clear the scanned value
+          this.value = '';
+          this.announceStatus('Scanned code cleared', 1500);
+          break;
+        default:
+          break;
       }
     }
   },

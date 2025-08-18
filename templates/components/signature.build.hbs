@@ -1,30 +1,71 @@
 {{! Signature field with canvas drawing and edit/preview mode switching }}
 <template>
-  <div v-show="isEditable" class="signature-editor" :class="{ 'readonly' : readonly }">
-    <div class="field-signature focus-outline" tabindex="0">
-      <canvas :id="name" ref="canvas"></canvas>
+  <div role="group" :aria-label="'Signature field for ' + (label || 'signature')" :aria-describedby="_ariaDescribedBy">
+    <div v-show="isEditable" class="signature-editor" :class="{ 'readonly' : readonly }">
+      <div 
+        class="field-signature focus-outline" 
+        tabindex="0"
+        role="application"
+        :aria-label="'Signature drawing area. Use mouse or touch to draw your signature'"
+        :aria-describedby="readonly ? 'readonly-description' : 'drawing-instructions'"
+        @focus="onSignatureFocus()"
+        @keydown="handleSignatureKeyDown"
+      >
+        <canvas 
+          :id="name" 
+          ref="canvas"
+          :aria-label="'Signature canvas'"
+          :aria-describedby="readonly ? 'readonly-description' : 'drawing-instructions'"
+        ></canvas>
+        <a
+          href="#"
+          class="focus-outline btn-clear"
+          tabindex="0"
+          v-on:click.prevent="clean()"
+          v-on:keydown.space.prevent="clean()"
+          :class="{ 'hidden' : readonly }"
+          :aria-label="'Clear signature'"
+          :aria-describedby="_ariaDescribedBy"
+          @focus="onClearFocus()"
+        >
+          <i class="fa fa-times" aria-hidden="true"></i>
+          {{T "widgets.form.signature.actions.clear"}}
+        </a>
+      </div>
+    </div>
+    
+    <div 
+      v-show="!isEditable" 
+      class="field-signature focus-outline signature-preview" 
+      :class="{ 'readonly' : readonly }" 
+      tabindex="0"
+      role="img"
+      :aria-label="'Signature preview'"
+    >
+      <img :src="value" alt="signature image" />
       <a
         href="#"
-        class="focus-outline btn-clear"
-        tabindex="0"
-        v-on:click.prevent="clean()"
-        v-on:keydown.space.prevent="clean()"
+        v-on:click.prevent="isEditable = true"
         :class="{ 'hidden' : readonly }"
+        :aria-label="'Edit signature'"
+        :aria-describedby="_ariaDescribedBy"
+        tabindex="0"
+        @focus="onEditFocus()"
       >
-        <i class="fa fa-times"></i>
-        {{T "widgets.form.signature.actions.clear"}}
+        {{T "widgets.form.signature.actions.edit"}}
       </a>
     </div>
   </div>
-  <div v-show="!isEditable" class="field-signature focus-outline signature-preview" :class="{ 'readonly' : readonly }" tabindex="0">
-    <img :src="value" alt="signature image" />
-    <a
-      href="#"
-      v-on:click.prevent="isEditable = true"
-      :class="{ 'hidden' : readonly }"
-    >
-      {{T "widgets.form.signature.actions.edit"}}
-    </a>
+
+  <div id="drawing-instructions" class="sr-only">
+    Use your mouse or finger to draw your signature in the canvas area. Press the clear button to start over.
   </div>
-  <p class="text-danger" v-if="$v.value.required === false && $v.value.$dirty">{{T "widgets.form.errors.required"}}</p>
+
+  <div id="readonly-description" class="sr-only">
+    This signature field is in read-only mode and cannot be modified.
+  </div>
+
+  <p class="text-danger" v-if="$v.value.required === false && $v.value.$dirty" role="alert" aria-live="assertive">
+    {{T "widgets.form.errors.required"}}
+  </p>
 </template>

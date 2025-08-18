@@ -1,10 +1,25 @@
 {{! Typeahead field with multi-select capability and item limit validation }}
 <template>
-  <div class="form-group fl-typeahead" :class="{ 'readonly' : readonly }" ref="typeahead">
-    <select multiple placeholder="Start typing..."></select>
+  <div class="form-group fl-typeahead" :class="{ 'readonly' : readonly }" ref="typeahead" role="group" :aria-label="'Typeahead for ' + (label || 'multi-select options')" :aria-describedby="_ariaDescribedBy">
+    <select 
+      multiple 
+      placeholder="Start typing..."
+      :aria-label="_ariaLabel"
+      :aria-describedby="_ariaDescribedBy"
+      :aria-invalid="_ariaInvalid"
+      :disabled="readonly"
+      tabindex="0"
+      @focus="onTypeaheadFocus()"
+      @blur="onTypeaheadBlur()"
+    ></select>
   </div>
-  <div class="text-danger" v-if="reachedMaxItems">Only \{{maxItems}} item(s) can be selected.</div>
+  
+  <div v-if="reachedMaxItems" class="text-danger" role="alert" aria-live="assertive">
+    <span class="sr-only">Maximum items reached: </span>
+    <span>Only \{{maxItems}} item(s) can be selected.</span>
+  </div>
 </template>
-<p class="text-danger" v-if="$v.value.required === false && $v.value.$dirty">{{T
-    "widgets.form.errors.required"
-  }}</p>
+
+<p class="text-danger" v-if="$v.value.required === false && $v.value.$dirty" role="alert" aria-live="assertive">
+  {{T "widgets.form.errors.required"}}
+</p>

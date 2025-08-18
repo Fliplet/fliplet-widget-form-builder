@@ -1,44 +1,88 @@
 {{! Date range field with predefined ranges and start/end date selection }}
 <template>
-  <label
-    v-if="showPredefinedRanges"
-    :for="name"
-    class="form-group select-proxy-display"
-    :class="{ 'input-focused': isInputFocused , 'readonly': readonly }"
-  >
-    <select
-      class="form-control hidden-select focus-outline"
-      name="predefinedRanges"
-      v-model.lazy="selectedRange"
-      v-on:keydown.prevent="readonly ? false : true"
-      tabindex="0"
-      @blur="onBlur()"
+  <div class="date-range-group" role="group" :aria-label="'Date range picker for ' + (label || 'date range selection')">
+    <label
+      v-if="showPredefinedRanges"
+      :for="name"
+      class="form-group select-proxy-display"
+      :class="{ 'input-focused': isInputFocused , 'readonly': readonly }"
     >
-      <option v-for="option in predefinedRanges" :value="option" :disabled="option.disabled">
-        \{{ option.label || option.id }}
-      </option>
-    </select>
-    <span class="icon fa fa-chevron-down"></span>
-    <span class="select-value-proxy"><template v-if="selectedRange && selectedRange !== {}">\{{ selectedRange.label }}</template><template v-else>\{{ placeholder }}</template></span>
-  </label>
-  <div class="form-group fl-date-range" ref="dateRange">
-    <div class="form-group fl-date-picker date-picker-start focus-outline">
-      <i class="fa fa-calendar fa-fw"></i>
-      <input type="date" class="form-control" :name="`start-${name}`" :id="`start-${name}`"/>
-      <input type="text" class="form-control" :tabindex="readonly ? -1 : 0"/>
-      <i class="fa fa-times fa-fw"></i>
-    </div>
-    <div class="arrow-right">
-      <i class="icon fa fa-long-arrow-right fa-fw"></i>
-    </div>
-    <div class="form-group fl-date-picker date-picker-end focus-outline">
-      <i class="fa fa-calendar fa-fw"></i>
-      <input type="date" class="form-control" :name="`end-${name}`" :id="`end-${name}`"/>
-      <input type="text" class="form-control" :tabindex="readonly ? -1 : 0"/>
-      <i class="fa fa-times fa-fw"></i>
+      <select
+        class="form-control hidden-select focus-outline"
+        name="predefinedRanges"
+        v-model.lazy="selectedRange"
+        v-on:keydown.prevent="readonly ? false : true"
+        :aria-label="_ariaLabel + ' - Select predefined date range'"
+        :aria-describedby="_ariaDescribedBy"
+        :aria-invalid="_ariaInvalid"
+        :disabled="readonly"
+        tabindex="0"
+        @blur="onBlur()"
+      >
+        <option v-for="option in predefinedRanges" :value="option" :disabled="option.disabled">
+          \{{ option.label || option.id }}
+        </option>
+      </select>
+      <span class="icon fa fa-chevron-down" aria-hidden="true"></span>
+      <span class="select-value-proxy">
+        <template v-if="selectedRange && selectedRange !== {}">\{{ selectedRange.label }}</template>
+        <template v-else>\{{ placeholder }}</template>
+      </span>
+    </label>
+    
+    <div class="form-group fl-date-range" ref="dateRange" role="group" aria-label="Start and end date selection">
+      <div class="form-group fl-date-picker date-picker-start focus-outline" role="group" aria-label="Start date">
+        <i class="fa fa-calendar fa-fw" aria-hidden="true"></i>
+        <input 
+          type="date" 
+          class="form-control" 
+          :name="`start-${name}`" 
+          :id="`start-${name}`"
+          :aria-label="_ariaLabel + ' - Start date'"
+          :aria-describedby="_ariaDescribedBy"
+          :aria-invalid="_ariaInvalid"
+          tabindex="0"
+        />
+        <input 
+          type="text" 
+          class="form-control" 
+          :tabindex="readonly ? -1 : 0"
+          :aria-label="_ariaLabel + ' - Start date display'"
+          :aria-describedby="_ariaDescribedBy"
+          :aria-invalid="_ariaInvalid"
+        />
+        <i class="fa fa-times fa-fw" aria-hidden="true"></i>
+      </div>
+      
+      <div class="arrow-right" aria-hidden="true">
+        <i class="icon fa fa-long-arrow-right fa-fw"></i>
+      </div>
+      
+      <div class="form-group fl-date-picker date-picker-end focus-outline" role="group" aria-label="End date">
+        <i class="fa fa-calendar fa-fw" aria-hidden="true"></i>
+        <input 
+          type="date" 
+          class="form-control" 
+          :name="`end-${name}`" 
+          :id="`end-${name}`"
+          :aria-label="_ariaLabel + ' - End date'"
+          :aria-describedby="_ariaDescribedBy"
+          :aria-invalid="_ariaInvalid"
+          tabindex="0"
+        />
+        <input 
+          type="text" 
+          class="form-control" 
+          :tabindex="readonly ? -1 : 0"
+          :aria-label="_ariaLabel + ' - End date display'"
+          :aria-describedby="_ariaDescribedBy"
+          :aria-invalid="_ariaInvalid"
+        />
+        <i class="fa fa-times fa-fw" aria-hidden="true"></i>
+      </div>
     </div>
   </div>
 </template>
-<p class="text-danger" v-if="$v.value.required === false && $v.value.$dirty">
+<p class="text-danger" v-if="$v.value.required === false && $v.value.$dirty" role="alert" aria-live="assertive">
   {{T "widgets.form.errors.required"}}
 </p>

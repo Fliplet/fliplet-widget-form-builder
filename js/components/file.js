@@ -114,19 +114,32 @@ Fliplet.FormBuilder.field('file', {
         });
 
         $vm.value = _.sortBy(newFiles, ['name']);
-      }).catch(function() {});
+
+        if (newFiles.length > 0) {
+          $vm.announceStatus(`${newFiles.length} file${newFiles.length !== 1 ? 's' : ''} loaded`, 2000);
+        }
+      }).catch(function() {
+        $vm.announceError('Failed to load file data', 3000);
+      });
     },
+
     showLocalDateFormat: function(date) {
       return TD(date, { format: 'L' });
     },
+
     onFileItemClick: function(url) {
-      Fliplet.Navigate.file(url);
+      if (url) {
+        this.announceAction('Opening file', 1500);
+        Fliplet.Navigate.file(url);
+      }
     },
+
     isFileImage: function(file) {
       if (file && file.type) {
         return (file.type.indexOf('image') >= 0);
       }
     },
+
     /**
      * Format bytes as human-readable text.
      *
@@ -153,6 +166,7 @@ Fliplet.FormBuilder.field('file', {
 
       return TN(bytes.toFixed(decimals)) + ' ' + units[unitIndex];
     },
+
     onReset: function() {
       var $vm = this;
 
@@ -160,7 +174,10 @@ Fliplet.FormBuilder.field('file', {
       $vm.selectedFileName = '';
 
       $vm.$emit('_input', $vm.name, $vm.value);
+
+      $vm.announceStatus('File upload reset', 1500);
     },
+
     validateValue: function() {
       if (typeof this.value === 'string' && this.value) {
         this.value = [this.value];
@@ -170,6 +187,7 @@ Fliplet.FormBuilder.field('file', {
         this.value = [];
       }
     },
+
     processImage: function(file, isAddElem) {
       var $vm = this;
 
@@ -180,6 +198,8 @@ Fliplet.FormBuilder.field('file', {
             if (isAddElem) {
               $vm.value.push(file);
               $vm.$emit('_input', $vm.name, $vm.value);
+
+              $vm.announceAction(`Image ${file.name} processed and added`, 2000);
             }
           }, {
             canvas: true,
@@ -189,8 +209,10 @@ Fliplet.FormBuilder.field('file', {
           });
       });
     },
+
     removeFile: function(index) {
       var $vm = this;
+      var fileName = $vm.value[index].name;
 
       this.validateValue();
 
@@ -206,7 +228,10 @@ Fliplet.FormBuilder.field('file', {
       });
 
       $vm.$emit('_input', $vm.name, $vm.value);
+
+      $vm.announceAction(`File ${fileName} removed`, 2000);
     },
+
     updateValue: function(e) {
       var $vm = this;
       var files = $vm.$refs.fileInput.files;
@@ -220,14 +245,69 @@ Fliplet.FormBuilder.field('file', {
           this.processImage(file, true);
         } else {
           $vm.value.push(file);
+
+          $vm.announceAction(`File ${file.name} added`, 2000);
         }
       }
 
       $vm.$emit('_input', $vm.name, $vm.value);
       e.target.value = '';
+
+      if (files.length > 0) {
+        $vm.announceStatus(`${files.length} file${files.length !== 1 ? 's' : ''} selected`, 2000);
+      }
     },
+
     openFileDialog: function() {
+      if (this.readonly) {
+        this.announceStatus('File upload is disabled in read-only mode', 2000);
+
+        return;
+      }
+
+      this.announceStatus('Opening file selection dialog', 1500);
       this.$refs.fileInput.click();
+    },
+
+    handleFileKeyDown: function(event, file, index) {
+      switch (event.key) {
+        case 'Enter':
+        case ' ':
+          event.preventDefault();
+
+          if (file.url) {
+            this.onFileItemClick(file.url);
+          }
+
+          break;
+        case 'Delete':
+        case 'Backspace':
+          event.preventDefault();
+
+          if (!this.readonly) {
+            this.removeFile(index);
+          }
+
+          break;
+        default:
+          break;
+      }
+    },
+
+    handleRemoveKeyDown: function(event, index) {
+      switch (event.key) {
+        case 'Enter':
+        case ' ':
+          event.preventDefault();
+
+          if (!this.readonly) {
+            this.removeFile(index);
+          }
+
+          break;
+        default:
+          break;
+      }
     }
   }
 });

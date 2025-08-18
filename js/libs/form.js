@@ -735,7 +735,8 @@ Fliplet().then(async function() {
           now: moment().locale('en').format('HH:mm'),
           id: data.id,
           entryId: entryId,
-          redirect: data.redirect
+          redirect: data.redirect,
+          fieldMap: new Map()
         };
       },
       computed: {
@@ -978,6 +979,7 @@ Fliplet().then(async function() {
           }
 
           this.errors[fieldName] = error;
+
         },
         triggerChange: function(fieldName, value) {
           if (changeListeners[fieldName]) {
@@ -1000,47 +1002,19 @@ Fliplet().then(async function() {
             }
           }
 
-          this.fields.some(function(field) {
-            if (field.name === fieldName) {
-              if (field._type === 'flPassword' && fromPasswordConfirmation) {
-                field.passwordConfirmation = value;
-              } else if (field._type === 'flMap' && field.mapStatusError) {
-                if (field.value.address.id) {
-                  value = {
-                    address: '',
-                    latLong: null
-                  };
-                } else if (value.address) {
-                  field.mapStatusError = '';
-                }
+          // Use optimized field update
+          const fieldUpdated = this.updateFieldValue(fieldName, value, fromPasswordConfirmation);
 
-                field.value = value;
-              } else {
-                field.value = value;
-              }
-
-              if (!skipOnChange) {
-                $vm.triggerChange(fieldName, value);
-              }
-
-              return true;
-            }
-          });
+          if (fieldUpdated && !skipOnChange) {
+            $vm.triggerChange(fieldName, value);
+          }
 
           if (data.saveProgress && typeof this.saveProgressed === 'function') {
             this.saveProgressed();
           }
         },
         onChange: function(fieldName, fn, runOnBind) {
-          var field;
-
-          this.fields.some(function(f) {
-            if (f.name === fieldName) {
-              field = f;
-
-              return true;
-            }
-          });
+          const field = this.getFieldByName(fieldName);
 
           if (!field) {
             throw new Error('A field with the name ' + fieldName + ' has not been found in this form.');
@@ -1062,29 +1036,17 @@ Fliplet().then(async function() {
           }
         },
         toggleField: function(fieldName, isEnabled) {
-          this.fields.some(function(field) {
-            if (field.name === fieldName) {
-              field.enabled = !!isEnabled;
+          const field = this.getFieldByName(fieldName);
 
-              return true;
-            }
-          });
+          if (field) {
+            field.enabled = !!isEnabled;
+          }
         },
         getWidgetInstanceData: function() {
           return data;
         },
         getField: function(fieldName) {
-          var found;
-
-          this.fields.some(function(field) {
-            if (field.name === fieldName) {
-              found = field;
-
-              return true;
-            }
-          });
-
-          return found;
+          return this.getFieldByName(fieldName);
         },
 
         /**
@@ -1170,25 +1132,30 @@ Fliplet().then(async function() {
           $vm.isFormValid = true;
 
           var invalidFields = [];
+          var hasValidationErrors = false;
 
-          $vm.$children.forEach(function(inputField) {
-            // checks if component have vuelidate validation object
-            if (inputField.$v) {
-              inputField.$v.$touch();
+          const fieldsToValidate = $vm.$children.filter(function(inputField) {
+            return !!inputField.$v;
+          });
 
-              if (inputField.$v.$invalid) {
-                if (inputField.$v.passwordConfirmation) {
-                  inputField.isValid = !inputField.$v.value.$invalid;
-                  inputField.isPasswordConfirmed = !inputField.$v.value.$invalid && !inputField.$v.passwordConfirmation.$invalid;
-                } else {
-                  inputField.isValid = false;
-                }
+          fieldsToValidate.forEach(function(inputField) {
+            inputField.$v.$touch();
 
-                invalidFields.push(inputField);
-                $vm.isFormValid = false;
+            if (inputField.$v.$invalid) {
+              hasValidationErrors = true;
+
+              if (inputField.$v.passwordConfirmation) {
+                inputField.isValid = !inputField.$v.value.$invalid;
+                inputField.isPasswordConfirmed = !inputField.$v.value.$invalid && !inputField.$v.passwordConfirmation.$invalid;
+              } else {
+                inputField.isValid = false;
               }
+
+              invalidFields.push(inputField);
             }
           });
+
+          $vm.isFormValid = !hasValidationErrors;
 
           /**
            * Showing an error message
@@ -1677,6 +1644,14 @@ Fliplet().then(async function() {
               }
 
               $vm.isSent = true;
+
+              const successMessage = T('widgets.form.submissionSuccess');
+
+              // Show success toast
+              Fliplet.UI.Toast(successMessage, {
+                type: 'success'
+              });
+
               $vm.fields.forEach(function(field) {
                 if (field._type === 'flPassword' && field.passwordConfirmation) {
                   field.passwordConfirmation = '';
@@ -2001,10 +1976,49 @@ Fliplet().then(async function() {
               swiper.on('touchMove', () => handleTouchMove(swiper, swiperContainer, data, allFormsInSlide, $vm));
             }, 0);
           }
+        },
+        // Initialize field map for faster lookups
+        initializeFieldMap: function() {
+          this.fieldMap.clear();
+          this.fields.forEach(function(field) {
+            this.fieldMap.set(field.name, field);
+          }.bind(this));
+        },
+        getFieldByName: function(fieldName) {
+          return this.fieldMap.get(fieldName);
+        },
+        updateFieldValue: function(fieldName, value, fromPasswordConfirmation) {
+          const field = this.getFieldByName(fieldName);
+
+          if (!field) {
+            return false;
+          }
+
+          if (field._type === 'flPassword' && fromPasswordConfirmation) {
+            field.passwordConfirmation = value;
+          } else if (field._type === 'flMap' && field.mapStatusError) {
+            if (field.value.address && field.value.address.id) {
+              value = {
+                address: '',
+                latLong: null
+              };
+            } else if (value.address) {
+              field.mapStatusError = '';
+            }
+
+            field.value = value;
+          } else {
+            field.value = value;
+          }
+
+          return true;
         }
       },
       mounted: function() {
         var $vm = this;
+
+        // Initialize field map for faster lookups
+        this.initializeFieldMap();
 
         this.saveProgressed = debounce(this.saveProgress, saveDelay);
 
@@ -2349,6 +2363,15 @@ Fliplet().then(async function() {
           });
         });
         this.attachCustomButtonListener();
+      },
+      watch: {
+        fields: {
+          handler: function() {
+            // Update field map when fields change
+            this.initializeFieldMap();
+          },
+          deep: true
+        }
       }
     });
 

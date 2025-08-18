@@ -114,6 +114,7 @@ Fliplet.FormBuilder.field('map', {
       this.$emit('_input', this.name, value);
       this.mapField.clear();
     },
+
     handleClickOutside: function(e) {
       const suggestionsList = this.$el.querySelector('.google-autocomplete');
 
@@ -122,6 +123,7 @@ Fliplet.FormBuilder.field('map', {
         this.suggestionSelected = false;
       }
     },
+
     handleKeyDown: function(e) {
       const suggestionsCount = this.addressSuggestions.length;
 
@@ -135,6 +137,10 @@ Fliplet.FormBuilder.field('map', {
 
           if (this.activeSuggestionIndex < suggestionsCount - 1) {
             this.activeSuggestionIndex += 1;
+
+            const suggestion = this.addressSuggestions[this.activeSuggestionIndex];
+
+            this.announceStatus(`Suggestion ${this.activeSuggestionIndex + 1} of ${suggestionsCount}: ${suggestion.label}`, 1000);
           }
 
           break;
@@ -144,6 +150,10 @@ Fliplet.FormBuilder.field('map', {
 
           if (this.activeSuggestionIndex > 0) {
             this.activeSuggestionIndex -= 1;
+
+            const suggestion = this.addressSuggestions[this.activeSuggestionIndex];
+
+            this.announceStatus(`Suggestion ${this.activeSuggestionIndex + 1} of ${suggestionsCount}: ${suggestion.label}`, 1000);
           }
 
           break;
@@ -161,11 +171,36 @@ Fliplet.FormBuilder.field('map', {
 
           break;
 
+        case 'Escape':
+          e.preventDefault();
+
+          // Clear suggestions
+          this.addressSuggestions = [];
+          this.suggestionSelected = false;
+          this.activeSuggestionIndex = -1;
+
+          this.announceStatus('Address suggestions cleared', 1500);
+
+          break;
+
         default:
           this.suggestionSelected = false;
           break;
       }
     },
+
+    handleSuggestionKeyDown: function(event, option) {
+      switch (event.key) {
+        case 'Enter':
+        case ' ':
+          event.preventDefault();
+          this.selectSuggestion(option);
+          break;
+        default:
+          break;
+      }
+    },
+
     updateAddressSuggestions: function() {
       if (this.isSelectOnMapClicked) {
         this.addressSuggestions = [];
@@ -175,12 +210,17 @@ Fliplet.FormBuilder.field('map', {
       }
 
       this.addressSuggestions = [{ id: null, label: 'Select location on map' }];
+
+      this.announceStatus('Address suggestions updated', 1500);
     },
+
     selectSuggestion: function(option) {
       if (option.label === 'Select location on map') {
         this.clearAddressAndMapValues();
         Fliplet.UI.Toast.dismiss();
         this.isSelectOnMapClicked = true;
+
+        this.announceAction('Map selection mode activated. Click on the map to select a location', 3000);
 
         return;
       }
@@ -195,7 +235,10 @@ Fliplet.FormBuilder.field('map', {
       this.selectedSuggestion = option;
       this.mapField.set(option.label, false, option.id);
       this.updateValue();
+
+      this.announceAction(`Location selected: ${option.label}`, 2500);
     },
+
     clearAddressAndMapValues: function() {
       this.addressSuggestions = [];
       this.mapAddressField.clear();
@@ -205,7 +248,10 @@ Fliplet.FormBuilder.field('map', {
         latLong: null
       };
       this.$emit('_input', this.name, this.value, false, true);
+
+      this.announceStatus('Location values cleared', 1500);
     },
+
     initMap: function() {
       this.mapField = Fliplet.UI.MapField(this.$refs.mapField, this.$refs.mapAddressLookUp, {
         readonly: this.readonly,
@@ -213,11 +259,13 @@ Fliplet.FormBuilder.field('map', {
         value: this.value
       });
     },
+
     initAutocomplete: async function() {
       this.mapAddressField = Fliplet.UI.AddressField(this.$refs.mapAddressLookUp);
 
       this.mapAddressField.change(this.onChange);
     },
+
     onChange: function(value) {
       if (!value) {
         this.mapField.clear();
@@ -257,6 +305,8 @@ Fliplet.FormBuilder.field('map', {
 
               this.updateAddressSuggestions();
               this.$emit('_input', this.name, this.value);
+
+              this.announceAction(`Address found: ${value}`, 2000);
             }, timeout);
           } else if (this.mapField.checkIfAddressChangedByDragging()) {
             this.updateAddressSuggestions();
@@ -271,6 +321,8 @@ Fliplet.FormBuilder.field('map', {
             };
             this.suggestionSelected = false;
             this.$emit('_input', this.name, this.value, false, true);
+
+            this.announceAction(`Address updated from map: ${value}`, 2000);
           } else {
             if (suggestions.length === 1 && value.trim() !== '') {
               if (this.addressSuggestions.length && this.addressSuggestions[0].label === 'Select location on map') {
@@ -278,6 +330,8 @@ Fliplet.FormBuilder.field('map', {
               }
 
               this.mapField.displayToastMessage("We couldn't find the address. Please double-check and re-enter the correct details.");
+
+              this.announceError('Address not found. Please check your input', 3000);
             } else {
               Fliplet.UI.Toast.dismiss();
             }
@@ -285,11 +339,21 @@ Fliplet.FormBuilder.field('map', {
             this.addressSuggestions = suggestions;
             this.suggestionSelected = false;
             this.$emit('_input', this.name, this.value, false, true);
+
+            // Announce suggestions loaded
+            if (suggestions.length > 1) {
+              this.announceStatus(`${suggestions.length - 1} address suggestions found`, 2000);
+            }
           }
         });
     },
+
     onReset: function() {
       this.clearAddressAndMapValues();
+    },
+
+    onFocus: function() {
+      this.announceStatus('Address search field focused. Start typing to search for addresses', 2000);
     }
   },
   validations: function() {

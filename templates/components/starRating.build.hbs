@@ -1,30 +1,47 @@
-<div
-  class="inverse-direction focus-outline input-star-rating"
-  tabindex="0"
-  v-on:keydown.up.prevent="readonly ? false : increaseRatingValue()"
-  v-on:keydown.right.prevent="readonly ? false : increaseRatingValue()"
-  v-on:keydown.down.prevent="readonly ? false : decreaseRatingValue()"
-  v-on:keydown.left.prevent="readonly ? false : decreaseRatingValue()"
-  @blur="onBlur()"
->
-  <template v-for="(option, index) in values">
-    <input
-      class="rating-input"
-      :name="name"
-      type="radio"
-      :id="name + '-' + index"
-      v-model="value"
-      :value="option.id"
-      v-on:change="readonly ? false : updateValue()"
-      v-on:input="readonly ? false : onInput($event)"
-      tabindex="-1"
-      :readonly="readonly"
-      :class="{ 'readonly' : readonly }"
-    >
-    <label class="rating-star" :class="{ 'readonly' : readonly }" :for="name + '-' + index">
-      <i class="fa fa-star-o"></i>
-      <i class="fa fa-star"></i>
-    </label>
-  </template>
+<div role="group" :aria-label="'Star rating for ' + (label || 'rating')" :aria-describedby="_ariaDescribedBy">
+  <div
+    class="inverse-direction focus-outline input-star-rating"
+    tabindex="0"
+    role="radiogroup"
+    :aria-label="'Rating scale from 1 to ' + values.length + ' stars'"
+    v-on:keydown.up.prevent="readonly ? false : increaseRatingValue()"
+    v-on:keydown.right.prevent="readonly ? false : increaseRatingValue()"
+    v-on:keydown.down.prevent="readonly ? false : decreaseRatingValue()"
+    v-on:keydown.left.prevent="readonly ? false : decreaseRatingValue()"
+    @blur="onBlur()"
+    @focus="onRatingFocus()"
+  >
+    <template v-for="(option, index) in values">
+      <input
+        class="rating-input"
+        :name="name"
+        type="radio"
+        :id="name + '-' + index"
+        v-model="value"
+        :value="option.id"
+        v-on:change="readonly ? false : updateValue()"
+        v-on:input="readonly ? false : onInput($event)"
+        tabindex="-1"
+        :readonly="readonly"
+        :class="{ 'readonly' : readonly }"
+        :aria-label="'Rate ' + (index + 1) + ' star' + (index === 0 ? '' : 's')"
+        :aria-describedby="_ariaDescribedBy"
+        :aria-invalid="_ariaInvalid"
+      >
+      <label 
+        class="rating-star" 
+        :class="{ 'readonly' : readonly }" 
+        :for="name + '-' + index"
+        :aria-label="'Rate ' + (index + 1) + ' star' + (index === 0 ? '' : 's')"
+        @focus="onStarFocus(index)"
+        @blur="onStarBlur()"
+      >
+        <i class="fa fa-star-o" aria-hidden="true"></i>
+        <i class="fa fa-star" aria-hidden="true"></i>
+      </label>
+    </template>
+  </div>
 </div>
-<p class="text-danger" v-if="$v.value.required === false && $v.value.$dirty">{{T "widgets.form.errors.required"}}</p>
+<p class="text-danger" v-if="$v.value.required === false && $v.value.$dirty" role="alert" aria-live="assertive">
+  {{T "widgets.form.errors.required"}}
+</p>

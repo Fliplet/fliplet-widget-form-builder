@@ -24,5 +24,42 @@ Fliplet.FormBuilder.field('telephone', {
     }
 
     return rules;
+  },
+  methods: {
+    /**
+     * Handle telephone focus
+     * @returns {void}
+     */
+    onTelephoneFocus: function() {
+      if (this.readonly) {
+        this.announceStatus('Telephone field is disabled in read-only mode', 2000);
+
+        return;
+      }
+
+      this.announceStatus('Telephone field focused. Enter your phone number using digits, spaces, dashes, and parentheses', 4000);
+    },
+
+    /**
+     * Handle telephone keyboard events
+     * @param {Event} event - Keyboard event
+     * @returns {void}
+     */
+    handleTelephoneKeyDown: function(event) {
+      switch (event.key) {
+        case 'Escape':
+          event.preventDefault();
+
+          // Clear the input
+          this.value = '';
+          this.$emit('_input', this.name, this.value);
+
+          this.announceStatus('Telephone number cleared', 1500);
+          break;
+
+        default:
+          break;
+      }
+    }
   }
 });

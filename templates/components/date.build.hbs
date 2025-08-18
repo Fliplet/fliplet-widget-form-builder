@@ -1,14 +1,34 @@
 <template v-if="autofill === 'always' && defaultSource === 'submission'">
-  Today
-</template>
-<template v-else>
-  <div class="form-group fl-date-picker" :class="{ 'readonly' : readonly }" ref="datePicker">
-    <i class="fa fa-calendar fa-fw"></i>
-    <input type="date" class="form-control" :name="name" :id="name"/>
-    <input type="text" class="form-control" :tabindex="readonly ? -1 : 0"/>
-    <i class="fa fa-times fa-fw"></i>
+  <div class="date-display" role="status" aria-live="polite">
+    <span class="sr-only">Current date: </span>
+    Today
   </div>
 </template>
-<p class="text-danger" v-if="$v.value.required === false && $v.value.$dirty">
+<template v-else>
+  <div class="form-group fl-date-picker" :class="{ 'readonly' : readonly }" ref="datePicker" role="group" :aria-label="'Date picker for ' + (label || 'date selection')">
+    <i class="fa fa-calendar fa-fw" aria-hidden="true"></i>
+    <input 
+      type="date" 
+      class="form-control" 
+      :name="name" 
+      :id="name"
+      :aria-label="_ariaLabel + ' - Select date'"
+      :aria-describedby="_ariaDescribedBy"
+      :aria-invalid="_ariaInvalid"
+      :placeholder="placeholder"
+      tabindex="0"
+    />
+    <input 
+      type="text" 
+      class="form-control" 
+      :tabindex="readonly ? -1 : 0"
+      :aria-label="_ariaLabel + ' - Date display'"
+      :aria-describedby="_ariaDescribedBy"
+      :aria-invalid="_ariaInvalid"
+    />
+    <i class="fa fa-times fa-fw" aria-hidden="true"></i>
+  </div>
+</template>
+<p class="text-danger" v-if="$v.value.required === false && $v.value.$dirty" role="alert" aria-live="assertive">
   {{T "widgets.form.errors.required"}}
 </p>

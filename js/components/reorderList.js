@@ -113,12 +113,18 @@ Fliplet.FormBuilder.field('reorderList', {
       this.orderedOptions.splice(event.newIndex, 0, this.orderedOptions.splice(event.oldIndex, 1)[0]);
 
       this.value = this.orderedOptions.map((option) => option.id ? option.id : option.label);
+
+      if (this.orderedOptions[event.newIndex]) {
+        const movedItem = this.orderedOptions[event.newIndex];
+
+        this.announceAction(`Moved ${movedItem.label || movedItem.id} to position ${event.newIndex + 1}`, 2000);
+      }
     },
     onReset: function(data) {
       if (data.id === this.$parent.id) {
         this.orderedOptions = _.cloneDeep(this.options);
 
-        return;
+        this.announceStatus('List order reset to default', 1500);
       }
     }
   }
