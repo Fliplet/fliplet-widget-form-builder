@@ -1451,6 +1451,10 @@ form hr {
   font-weight: 700;
 }
 
+.fl-paragraph-editor .tox .tox-tbtn--select.tox-tbtn--bespoke {
+  width: 70px;
+}
+
 /* Prevent hover styles from appearing on the label */
 .fl-paragraph-editor .tox .tox-toolbar__group > .tox-tbtn--select:first-child:hover,
 .fl-paragraph-editor .tox .tox-toolbar__group > .tox-tbtn--select:first-child:focus {
