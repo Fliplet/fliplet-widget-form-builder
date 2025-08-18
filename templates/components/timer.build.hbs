@@ -1,12 +1,61 @@
+{{! Timer field with stopwatch/countdown functionality }}
 <template>
-  <div class="form-group fl-timer" ref="timer">
-    <input type="text" class="form-control focus-outline" readonly="true" tabindex="0" v-model="stringValue"/>
-    <button v-if="!readonly && (status === 'stopped' && value)" class="btn btn-primary" v-on:click.prevent="reset">Reset</button>
-    <button v-if="!readonly && status === 'stopped'" class="btn btn-primary" v-on:click.prevent="start">Start</button>
-    <button v-if="!readonly && status === 'running'" class="btn btn-primary" v-on:click.prevent="stop">Stop</button>
+  <div class="form-group fl-timer" ref="timer" role="group" :aria-label="'Timer for ' + (label || 'time tracking')" :aria-describedby="_ariaDescribedBy">
+    <input 
+      type="text" 
+      class="form-control focus-outline" 
+      readonly="true" 
+      tabindex="0" 
+      v-model="stringValue"
+      :aria-label="_ariaLabel"
+      :aria-describedby="_ariaDescribedBy"
+      :aria-invalid="_ariaInvalid"
+      :disabled="readonly"
+      @focus="onTimerFocus()"
+    />
+    
+    <button 
+      v-if="!readonly && (status === 'stopped' && value)" 
+      class="btn btn-primary" 
+      v-on:click.prevent="reset"
+      :aria-label="'Reset timer to ' + formatSeconds(initialTimerValue)"
+      :aria-describedby="_ariaDescribedBy"
+      tabindex="0"
+      @keydown="handleResetKeyDown"
+    >
+      Reset
+    </button>
+    
+    <button 
+      v-if="!readonly && status === 'stopped'" 
+      class="btn btn-primary" 
+      v-on:click.prevent="start"
+      :aria-label="'Start ' + type + (type === 'timer' ? ' countdown' : ' stopwatch')"
+      :aria-describedby="_ariaDescribedBy"
+      tabindex="0"
+      @keydown="handleStartKeyDown"
+    >
+      Start
+    </button>
+    
+    <button 
+      v-if="!readonly && status === 'running'" 
+      class="btn btn-primary" 
+      v-on:click.prevent="stop"
+      :aria-label="'Stop ' + type + (type === 'timer' ? ' countdown' : ' stopwatch')"
+      :aria-describedby="_ariaDescribedBy"
+      tabindex="0"
+      @keydown="handleStopKeyDown"
+    >
+      Stop
+    </button>
   </div>
 </template>
-<p class="text-danger" v-if="hasRequiredError">{{T "widgets.form.timer.required"}}</p>
-<p class="text-danger" v-if="$v.value.required === false && $v.value.$dirty">
+
+<p class="text-danger" v-if="hasRequiredError" role="alert" aria-live="assertive">
+  {{T "widgets.form.timer.required"}}
+</p>
+
+<p class="text-danger" v-if="$v.value.required === false && $v.value.$dirty" role="alert" aria-live="assertive">
   {{T "widgets.form.errors.required"}}
 </p>

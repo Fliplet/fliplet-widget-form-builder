@@ -103,6 +103,33 @@ Fliplet.FormBuilder.field('typeahead', {
     this.$emit('_input', this.name, this.value, false, true);
   },
   methods: {
+    /**
+     * Handle typeahead focus
+     * @returns {void}
+     */
+    onTypeaheadFocus: function() {
+      if (this.readonly) {
+        this.announceStatus('Typeahead is disabled in read-only mode', 2000);
+
+        return;
+      }
+
+      const instructions = `Typeahead focused. ${this.freeInput ? 'You can type custom values or ' : ''}Select from available options. ${this.maxItems ? `Maximum ${this.maxItems} items allowed.` : ''}`;
+
+      this.announceStatus(instructions, 4000);
+    },
+
+    /**
+     * Handle typeahead blur
+     * @returns {void}
+     */
+    onTypeaheadBlur: function() {
+      if (this.value && this.value.length > 0) {
+        this.announceStatus(`Selected ${this.value.length} item${this.value.length !== 1 ? 's' : ''}`, 2000);
+      }
+    },
+
+
     initTypeahead: function() {
       var $vm = this;
 
@@ -123,6 +150,13 @@ Fliplet.FormBuilder.field('typeahead', {
       this.typeahead.change(function(value) {
         $vm.value = value;
         $vm.updateValue();
+
+        // Announce selection change
+        if (value && value.length > 0) {
+          $vm.announceStatus(`Selected ${value.length} item${value.length !== 1 ? 's' : ''}`, 2000);
+        } else {
+          $vm.announceStatus('Selection cleared', 1500);
+        }
       });
     },
     onBeforeSubmit: function() {

@@ -121,7 +121,10 @@ Fliplet.FormBuilder.field('checkbox', {
       this.highlightError();
 
       this.$emit('_input', this.name, ordered);
+
+      this.announceSelectionChange(ordered);
     },
+
     clickHandler: function(option) {
       var val = option.id || option.label;
       var index = this.value.indexOf(val);
@@ -134,9 +137,31 @@ Fliplet.FormBuilder.field('checkbox', {
 
       this.updateValue();
     },
+
     selectAllClickHandler: function() {
       this.selectedAll = !this.selectedAll;
+
+      this.announceSelectAllAction(this.selectedAll);
     },
+
+    announceSelectionChange: function(selectedValues) {
+      const count = selectedValues.length;
+      const total = this.options.length;
+      const message = count === 0
+        ? 'No options selected'
+        : `${count} of ${total} options selected`;
+
+      this.announceStatus(message, 1000);
+    },
+
+    announceSelectAllAction: function(isSelected) {
+      const message = isSelected
+        ? 'All options selected'
+        : 'All options deselected';
+
+      this.announceStatus(message, 1000);
+    },
+
     onReset: function(data) {
       if (!data || data.id !== this.$parent.id) {
         return;

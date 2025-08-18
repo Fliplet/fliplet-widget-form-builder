@@ -1,7 +1,7 @@
 <div class="hidden" data-form-builder-id="{{ id }}">
-  <form v-if="isConfigured" v-on:submit.prevent="onSubmit" class="fl-form" v-bind:class="{ 'form-offline': isOffline, 'loading-form': isSending || isLoading && !blockScreen }">
+  <form v-if="isConfigured" v-on:submit.prevent="onSubmit" class="fl-form" v-bind:class="{ 'form-offline': isOffline, 'loading-form': isSending || isLoading && !blockScreen }" role="form" aria-label="Form submission">
     <template v-if="isSending">
-      <div class="sending-form">
+      <div class="sending-form" role="status" aria-live="polite" aria-label="Form submission status">
         <div class="spinner-holder animated">
           <div class="spinner-overlay" data-translate="widgets.form.loading">Loading...</div>
           <p v-html="isSendingMessage"></p>
@@ -9,30 +9,32 @@
       </div>
     </template>
     <template v-if="isLoading && !blockScreen">
-      <div class="sending-form">
+      <div class="sending-form" role="status" aria-live="polite" aria-label="Form loading status">
         <div class="spinner-holder animated">
           <div class="spinner-overlay" data-translate="widgets.form.loading">Loading...</div>
           <p v-html="isLoadingMessage"></p>
         </div>
       </div>
     </template>
-    <div v-if="!isSent" class="form-html">
-      <div v-if="isOffline" class="text-danger w-full" v-bind:class="{ 'cover-form' : blockScreen }" v-html="isOfflineMessage"></div>
-      <div v-if="hasRequiredFields" class="w-full required-info-label">\{{$t("widgets.form.sending.requiredFields")}}</div>
+    <div v-if="!isSent" class="form-html" role="main" ref="formContent">
+      <div v-if="isOffline" class="text-danger w-full" v-bind:class="{ 'cover-form' : blockScreen }" v-html="isOfflineMessage" role="alert" aria-live="assertive"></div>
+      <div v-if="hasRequiredFields" class="w-full required-info-label" role="note" aria-live="polite">
+        <span>\{{$t("widgets.form.sending.requiredFields")}}</span>
+      </div>
       <template v-for="field in fields">
         <component :is="field._type" v-bind="field" v-on:_input="onInput" v-on:_error="onError" v-on:_reset="reset" v-on:getDataSourceColumnValues="getDataSourceColumnValues" v-if="field.enabled"></component>
       </template>
-      <div class="callout callout-danger w-full" v-if="error">
+      <div class="callout callout-danger w-full" v-if="error" role="alert" aria-live="assertive">
         <p>\{{ error }}</p>
       </div>
     </div>
     <transition name="fade">
-      <div v-if="isSent && !redirect">{{{ resultHtml }}}</div>
+      <div v-if="isSent && !redirect" role="status" aria-live="polite" class="form-result">{{{ resultHtml }}}</div>
     </transition>
   </form>
   <div v-else-if="!isConfigured && isPlaceholder">
-    <form class="fl-form placeholder">
-      <div class="form-html">
+    <form class="fl-form placeholder" role="form" aria-label="Example form">
+      <div class="form-html" role="main" ref="exampleFormContent">
         <div class="form-group clearfix" _type="flTitle">
           <h2>Example form</h2>
         </div>
@@ -41,14 +43,14 @@
         </div>
         <div class="form-group clearfix" _type="flInput">
           <label>Name</label>
-          <input type="text" name="field-1" placeholder="Enter your name" class="form-control">
+          <input type="text" name="field-1" placeholder="Enter your name" class="form-control" aria-label="Name field - Enter your full name">
         </div>
         <div class="form-group clearfix" _type="flSelect">
           <label>Type of enquiry</label>
           <label class="select-proxy-display">
-            <span class="icon fa fa-chevron-down"></span>
+            <span class="icon fa fa-chevron-down" aria-hidden="true"></span>
             <span class="select-value-proxy">-- Select one</span>
-            <select name="field-3" class="form-control hidden-select">
+            <select name="field-3" class="form-control hidden-select" aria-label="Type of enquiry - Select the type of enquiry from the dropdown">
               <option value="">-- Select one</option>
               <option value="Option 1">Option 1</option>
               <option value="Option 2">Option 2</option>
@@ -57,16 +59,16 @@
         </div>
         <div class="form-group clearfix" _type="flTextarea">
           <label>Message</label>
-          <textarea name="field-2" rows="4" class="form-control"></textarea>
+          <textarea name="field-2" rows="4" class="form-control" aria-label="Message field - Enter your message or enquiry details"></textarea>
         </div>
-        <div class="form-btns clearfix">
-          <button type="submit" class="btn btn-primary pull-right">Submit</button>
-          <button type="reset" class="btn btn-secondary pull-right">Clear</button>
+        <div class="form-btns clearfix" role="group" aria-label="Form actions">
+          <button type="submit" class="btn btn-primary pull-right" aria-label="Submit the form with your information">Submit</button>
+          <button type="reset" class="btn btn-secondary pull-right" aria-label="Clear all form fields and start over">Clear</button>
         </div>
       </div>
     </form>
   </div>
-  <div v-else class="col-sm-12 loading-message">
+  <div v-else class="col-sm-12 loading-message" role="status" aria-live="polite">
     <!-- Show loading animation -->
     <div class="spinner-holder animated">
       <div class="spinner-overlay">Loading...</div>

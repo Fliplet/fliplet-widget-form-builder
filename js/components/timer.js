@@ -73,6 +73,69 @@ Fliplet.FormBuilder.field('timer', {
     }
   },
   methods: {
+    /**
+     * Handle timer input focus
+     * @returns {void}
+     */
+    onTimerFocus: function() {
+      if (this.readonly) {
+        this.announceStatus('Timer display is disabled in read-only mode', 2000);
+
+        return;
+      }
+
+      const timerType = this.type === 'timer' ? 'countdown timer' : 'stopwatch';
+      const status = this.status === 'running' ? 'running' : 'stopped';
+      const currentTime = this.stringValue || this.formatSeconds(this.initialTimerValue);
+
+      this.announceStatus(`${timerType} ${status}. Current time: ${currentTime}`, 4000);
+    },
+
+    /**
+     * Handle reset button keyboard events
+     * @param {Event} event - Keyboard event
+     * @returns {void}
+     */
+    handleResetKeyDown: function(event) {
+      if (event.key === 'Enter' || event.key === ' ') {
+        event.preventDefault();
+        this.reset();
+        this.announceStatus('Timer reset to ' + this.formatSeconds(this.initialTimerValue), 2000);
+      }
+    },
+
+    /**
+     * Handle start button keyboard events
+     * @param {Event} event - Keyboard event
+     * @returns {void}
+     */
+    handleStartKeyDown: function(event) {
+      if (event.key === 'Enter' || event.key === ' ') {
+        event.preventDefault();
+        this.start();
+
+        const timerType = this.type === 'timer' ? 'countdown timer' : 'stopwatch';
+
+        this.announceStatus(`${timerType} started`, 1500);
+      }
+    },
+
+    /**
+     * Handle stop button keyboard events
+     * @param {Event} event - Keyboard event
+     * @returns {void}
+     */
+    handleStopKeyDown: function(event) {
+      if (event.key === 'Enter' || event.key === ' ') {
+        event.preventDefault();
+        this.stop();
+
+        const timerType = this.type === 'timer' ? 'countdown timer' : 'stopwatch';
+
+        this.announceStatus(`${timerType} stopped`, 1500);
+      }
+    },
+
     formatSeconds: function(seconds) {
       var hours = Math.floor(seconds / 3600);
       var minutes = Math.floor((seconds % 3600) / 60);

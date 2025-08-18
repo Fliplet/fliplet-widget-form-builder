@@ -1,14 +1,29 @@
+{{! Time picker field with accessibility support }}
 <template v-if="autofill === 'always' && defaultSource === 'submission'">
-  Now
-</template>
-<template v-else>
-  <div class="form-group fl-time-picker" :class="{ 'readonly' : readonly }" ref="timePicker">
-    <i class="fa fa-clock-o fa-fw"></i>
-    <input type="time" class="form-control" :name="name" :id="name" :tabindex="readonly ? -1 : 0"/>
-    <input type="text" class="form-control" :tabindex="readonly ? -1 : 0"/>
-    <i class="fa fa-times fa-fw"></i>
+  <div role="status" aria-live="polite">
+    <span class="sr-only">Current time will be automatically filled: </span>
+    <span>Now</span>
   </div>
 </template>
-<p class="text-danger" v-if="$v.value.required === false && $v.value.$dirty">
+<template v-else>
+  <div class="form-group fl-time-picker" :class="{ 'readonly' : readonly }" ref="timePicker" role="group" :aria-label="'Time picker for ' + (label || 'time selection')" :aria-describedby="_ariaDescribedBy">
+    <i class="fa fa-clock-o fa-fw" aria-hidden="true"></i>
+    <input 
+      type="time" 
+      class="form-control" 
+      :name="name" 
+      :id="name"
+      :aria-label="_ariaLabel"
+      :aria-describedby="_ariaDescribedBy"
+      :aria-invalid="_ariaInvalid"
+      :readonly="readonly"
+      :tabindex="readonly ? -1 : 0"
+    />
+    <input  type="text"  class="form-control"  :tabindex="readonly ? -1 : 0"/>
+    <i class="fa fa-times fa-fw" aria-hidden="true"></i>
+  </div>
+</template>
+
+<p class="text-danger" v-if="$v.value.required === false && $v.value.$dirty" role="alert" aria-live="assertive">
   {{T "widgets.form.errors.required"}}
 </p>

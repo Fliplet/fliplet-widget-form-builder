@@ -1,4 +1,17 @@
 <template>
-<button class="custom-btn btn" :class="[buttonStyle, className]" :data-button-action="buttonAction && buttonAction.action || ''" data-can-swipe="false"
- tabindex="0" v-html="buttonLabel || 'Button'" @click.prevent="runCustomFunction"></button>
+  <div role="group" :aria-label="'Custom button: ' + (buttonLabel || 'Button')">
+    <button 
+      class="custom-btn btn" 
+      :class="[buttonStyle, className]" 
+      :data-button-action="buttonAction && buttonAction.action || ''" 
+      data-can-swipe="false"
+      :aria-label="_ariaLabel + ' - ' + (buttonAction && buttonAction.action || 'Custom action')"
+      :aria-describedby="_ariaDescribedBy"
+      :aria-invalid="_ariaInvalid"
+      tabindex="0" 
+      v-html="buttonLabel || 'Button'" 
+      @click.prevent="runCustomFunction"
+      @keydown="handleKeyDown"
+    />
+  </div>
 </template>

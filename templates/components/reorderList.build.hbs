@@ -1,8 +1,27 @@
 {{! Reorderable list field with drag-and-drop sorting functionality }}
 <template>
-  <div class="list-group col" v-sortable="sortableOptions">
-    <div class="list-group-item" v-for="option in orderedOptions" :key="option.id || option.label" :data-id="option.id || option.label" :class="{ 'readonly' : readonly }">
-      <div v-if="!readonly" class="list-icons">
+  <div 
+    class="list-group col" 
+    v-sortable="sortableOptions"
+    role="list"
+    :aria-label="'Reorderable list for ' + (label || 'items')"
+    :aria-describedby="_ariaDescribedBy"
+  >
+    <div 
+      class="list-group-item" 
+      v-for="(option, index) in orderedOptions" 
+      :key="option.id || option.label" 
+      :data-id="option.id || option.label" 
+      :class="{ 'readonly' : readonly }"
+      role="listitem"
+      :aria-label="'Item ' + (index + 1) + ': ' + (option.label || option.id)"
+      :aria-describedby="readonly ? 'readonly-description' : 'drag-instructions'"
+      tabindex="0"
+      @keydown="handleItemKeyDown($event, index)"
+      @focus="onItemFocus(index)"
+      @blur="onItemBlur()"
+    >
+      <div v-if="!readonly" class="list-icons" aria-hidden="true">
         <div class="dots">
           <svg width="6" height="17" viewBox="0 0 6 17" fill="none" xmlns="http://www.w3.org/2000/svg">
             <circle cx="5" cy="1.5" r="1" fill="currentColor"/>
@@ -19,7 +38,7 @@
           </svg>
         </div>
       </div>
-      \{{option.label}}
+      <span>\{{option.label}}</span>
     </div>
   </div>
 </template>

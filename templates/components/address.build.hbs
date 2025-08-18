@@ -1,16 +1,31 @@
 {{! Address field with Google Places autocomplete and suggestion selection }}
-  <div class="form-group fl-address-field" ref="addressField">
+  <div class="form-group fl-address-field" ref="addressField" role="group">
     <input
       type="text"
       class="form-control focus-outline"
       :placeholder="placeholder"
       :readonly="readonly"
+      :aria-label="_ariaLabel"
+      :aria-describedby="_ariaDescribedBy"
+      :aria-invalid="_ariaInvalid"
+      :aria-expanded="addressSuggestions.length > 0"
+      :aria-autocomplete="'list'"
+      :aria-activedescendant="activeSuggestionIndex >= 0 ? name + '-suggestion-' + activeSuggestionIndex : null"
       tabindex="0"
       @keydown="handleKeyDown"
+      @blur="onBlur"
     />
-    <ul v-if="suggestionSelected" class="google-autocomplete">
-      <li v-for="(option, index) in addressSuggestions" :key="index" @click="selectSuggestion(option)" :class="{ 'active': index === activeSuggestionIndex }">
-        <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" width="17" height="17" viewBox="0 0 256 256" xml:space="preserve">
+    
+    <ul v-if="suggestionSelected" class="google-autocomplete" role="listbox" :aria-label="'Address suggestions for ' + (label || 'address field')" :aria-expanded="true">
+      <li v-for="(option, index) in addressSuggestions" 
+        :key="index" 
+        @click="selectSuggestion(option)" 
+        :class="{ 'active': index === activeSuggestionIndex }"
+        role="option"
+        :aria-selected="index === activeSuggestionIndex"
+        tabindex="-1"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" width="17" height="17" viewBox="0 0 256 256" xml:space="preserve" aria-hidden="true">
           <defs>
           </defs>
           <g style="stroke: none; stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: none; fill-rule: nonzero; opacity: 1;" transform="translate(1.4065934065934016 1.4065934065934016) scale(2.81 2.81)">
@@ -22,5 +37,7 @@
     </ul>
   </div>
 
-  <p class="text-danger" v-if="$v.value.required === false && $v.value.$dirty">{{T "widgets.form.errors.required"}}</p>
+  <p class="text-danger" v-if="$v.value.required === false && $v.value.$dirty" role="alert" aria-live="assertive">
+    {{T "widgets.form.errors.required"}}
+  </p>
 

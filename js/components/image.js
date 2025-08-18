@@ -104,11 +104,17 @@ Fliplet.FormBuilder.field('image', {
       });
 
       $vm.$emit('_input', $vm.name, $vm.value);
+
+      $vm.announceAction(`Image ${index + 1} removed`, 2000);
     },
+
     onReset: function() {
       this.value = [];
       this.$emit('_input', this.name, this.value);
+
+      this.announceStatus('Image upload reset', 1500);
     },
+
     onBeforeSubmit: function() {
       $(this.$refs.imageInput).parents('.form-group').removeClass('has-error');
 
@@ -123,9 +129,12 @@ Fliplet.FormBuilder.field('image', {
       if (!this.value.length) {
         $(this.$refs.imageInput).parents('.form-group').addClass('has-error');
 
+        this.announceError('Image upload is required', 3000);
+
         return Promise.reject(T('widgets.form.image.required'));
       }
     },
+
     validateValue: function() {
       if (typeof this.value === 'string' && this.value) {
         this.value = [this.value];
@@ -135,6 +144,7 @@ Fliplet.FormBuilder.field('image', {
         this.value = [];
       }
     },
+
     requestPicture: function(fileInput) {
       var $vm = this;
       var boundingRect = fileInput.getBoundingClientRect();
@@ -173,13 +183,19 @@ Fliplet.FormBuilder.field('image', {
               case 1:
                 $vm.cameraSource = Camera.PictureSourceType.CAMERA;
 
+                $vm.announceStatus('Camera selected for image capture', 2000);
+
                 return resolve();
               case 2:
               default:
                 $vm.cameraSource = Camera.PictureSourceType.PHOTOLIBRARY;
 
+                $vm.announceStatus('Photo library selected for image selection', 2000);
+
                 return resolve();
               case 3:
+                $vm.announceStatus('Image selection cancelled', 1500);
+
                 return;
             }
           },
@@ -188,6 +204,7 @@ Fliplet.FormBuilder.field('image', {
         );
       });
     },
+
     getPicture: function() {
       var $vm = this;
       var popoverOptions = {
@@ -215,6 +232,7 @@ Fliplet.FormBuilder.field('image', {
         });
       });
     },
+
     processImage: function(file, addThumbnail) {
       var $vm = this;
       var mimeType = file.type || 'image/png';
@@ -256,9 +274,12 @@ Fliplet.FormBuilder.field('image', {
           }
 
           $vm.$emit('_input', $vm.name, $vm.value);
+
+          $vm.announceAction(`Image ${file.name} processed and added`, 2000);
         });
       });
     },
+
     onFileClick: function(event) {
       // Native
       var $vm = this;
@@ -298,11 +319,16 @@ Fliplet.FormBuilder.field('image', {
         $vm.value.push(imgBase64Url);
         addThumbnailToCanvas(imgBase64Url, $vm.value.length - 1, $vm);
         $vm.$emit('_input', $vm.name, $vm.value);
+
+        $vm.announceAction('Image captured and added', 2000);
       }).catch(function(error) {
-      /* eslint-disable-next-line */
+        $vm.announceError('Failed to capture image', 3000);
+
+        /* eslint-disable-next-line */
         console.error(error);
       });
     },
+
     onFileChange: function(e) {
       var files = this.$refs.imageInput.files;
 
@@ -311,7 +337,12 @@ Fliplet.FormBuilder.field('image', {
       }
 
       e.target.value = '';
+
+      if (files.length > 0) {
+        this.announceStatus(`${files.length} image${files.length !== 1 ? 's' : ''} selected`, 2000);
+      }
     },
+
     onImageClick: function(index) {
       var imagesData = {
         images: _.map(this.value, function(imgURL) {
@@ -322,8 +353,11 @@ Fliplet.FormBuilder.field('image', {
         }
       };
 
+      this.announceStatus(`Opening image ${index + 1} in preview`, 1500);
+
       Fliplet.Navigate.previewImages(imagesData);
     },
+
     drawImagesAfterInit: function() {
       if (this.readonly) {
         return;
@@ -335,8 +369,27 @@ Fliplet.FormBuilder.field('image', {
         addThumbnailToCanvas(image, index, $vm);
       });
     },
+
     openFileDialog: function() {
+      this.announceStatus('Opening image selection dialog', 1500);
       this.$refs.imageInput.click();
+    },
+
+    // Add method to handle keyboard navigation for remove buttons
+    handleRemoveKeyDown: function(event, index) {
+      switch (event.key) {
+        case 'Enter':
+        case ' ':
+          event.preventDefault();
+
+          if (!this.readonly) {
+            this.removeImage(index);
+          }
+
+          break;
+        default:
+          break;
+      }
     }
   }
 });

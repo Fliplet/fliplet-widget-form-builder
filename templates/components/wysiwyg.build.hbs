@@ -1,17 +1,31 @@
-<textarea
-  class="form-control"
-  v-model.trim.lazy="$v.value.$model"
-  ref="textarea"
-  :name="name"
-  :id="tinymceId"
-  :placeholder="placeholder"
-  :readonly="readonly"
-></textarea>
-<div
-  class="ghost-tinymce"
-  :class="{ 'readonly' : readonly }"
-  ref="ghost"
-  v-html="value"
-  v-if="isInterface">
+<div role="group" :aria-label="'Rich text editor for ' + (label || 'formatted content')" :aria-describedby="_ariaDescribedBy">
+  <textarea
+    class="form-control"
+    v-model.trim.lazy="$v.value.$model"
+    ref="textarea"
+    :name="name"
+    :id="tinymceId"
+    :placeholder="placeholder"
+    :readonly="readonly"
+    :aria-label="_ariaLabel"
+    :aria-describedby="_ariaDescribedBy"
+    :aria-invalid="_ariaInvalid"
+    tabindex="0"
+  ></textarea>
+  
+  <div
+    class="ghost-tinymce"
+    :class="{ 'readonly' : readonly }"
+    ref="ghost"
+    v-html="value"
+    v-if="isInterface"
+    role="application"
+    :aria-label="'Rich text preview for ' + (label || 'formatted content')"
+    :aria-describedby="_ariaDescribedBy"
+  >
+  </div>
 </div>
-<p class="text-danger" v-if="$v.value.required === false && $v.value.$dirty">{{T "widgets.form.errors.required"}}</p>
+
+<p class="text-danger" v-if="$v.value.required === false && $v.value.$dirty" role="alert" aria-live="assertive">
+  {{T "widgets.form.errors.required"}}
+</p>

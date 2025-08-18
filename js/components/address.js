@@ -109,6 +109,8 @@ Fliplet.FormBuilder.field('address', {
   },
   destroyed: function() {
     Fliplet.Hooks.off('beforeFormSubmit', this.onBeforeSubmit);
+
+    this.cleanup();
   },
   mounted: function() {
     this.initAutocomplete('', this.countryRestrictions);
@@ -126,6 +128,9 @@ Fliplet.FormBuilder.field('address', {
     }
   },
   methods: {
+    cleanup: function() {
+      document.removeEventListener('click', this.handleClickOutside);
+    },
     handleKeyDown: function(event) {
       const suggestionsCount = this.addressSuggestions.length;
 
@@ -139,6 +144,8 @@ Fliplet.FormBuilder.field('address', {
 
           if (this.activeSuggestionIndex < suggestionsCount - 1) {
             this.activeSuggestionIndex += 1;
+
+            this.announceSuggestionSelection();
           }
 
           break;
@@ -148,6 +155,8 @@ Fliplet.FormBuilder.field('address', {
 
           if (this.activeSuggestionIndex > 0) {
             this.activeSuggestionIndex -= 1;
+
+            this.announceSuggestionSelection();
           }
 
           break;
@@ -161,6 +170,8 @@ Fliplet.FormBuilder.field('address', {
             this.lastChosenAutocompleteValue = selectedSuggestion.label;
             this.selectSuggestion(selectedSuggestion);
             this.activeSuggestionIndex = -1;
+
+            this.announceAddressSelection(selectedSuggestion.label);
           }
 
           break;
@@ -178,20 +189,30 @@ Fliplet.FormBuilder.field('address', {
       }
     },
     selectSuggestion: async function(option) {
-      this.value = option;
-      this.addressSuggestions = [];
-      this.suggestionSelected = true;
-      this.activeSuggestionIndex = -1;
+      try {
+        this.value = option;
+        this.addressSuggestions = [];
+        this.suggestionSelected = true;
+        this.activeSuggestionIndex = -1;
 
-      const data = await this.addressField.getAddressComponents(option.id);
+        this.announceLoadingState();
 
-      this.addressComponents = data;
+        const data = await this.addressField.getAddressComponents(option.id);
 
-      this.addressField.set(option.label);
-      this.lastChosenAutocompleteValue = option.label;
-      this.updateValue();
+        this.addressComponents = data;
 
-      this.onChange();
+        this.addressField.set(option.label);
+        this.lastChosenAutocompleteValue = option.label;
+        this.updateValue();
+
+        this.onChange();
+
+        this.announceAddressSelection(option.label);
+      } catch (error) {
+        console.error('Error selecting address suggestion:', error);
+
+        this.announceError('Failed to load address details. Please try again.');
+      }
     },
     extractAddressComponents: function(place) {
       const addressData = {
@@ -285,25 +306,73 @@ Fliplet.FormBuilder.field('address', {
       this.updateFieldOptions();
       this.updateSelectedFieldsOptions();
 
-      const assignedValues = Object.values(this.selectedFieldOptions)
-        .filter(value => value && this.fieldOptions.some(option => option.label === value))
-        .map(value => value);
+      const assignedValues = new Set(
+        Object.values(this.selectedFieldOptions)
+          .filter(value => value && this.fieldOptions.some(option => option.label === value))
+      );
 
       this.fieldOptions.forEach(option => {
-        option.disabled = assignedValues.includes(option.label);
+        option.disabled = assignedValues.has(option.label);
       });
     },
     initAutocomplete: async function(input, countryRestrictions) {
-      this.addressField = Fliplet.UI.AddressField(this.$refs.addressField);
+      try {
+        this.addressField = Fliplet.UI.AddressField(this.$refs.addressField);
 
-      const suggestions = await this.addressField.getAutocompleteSuggestions(input, countryRestrictions);
+        const suggestions = await this.addressField.getAutocompleteSuggestions(input, countryRestrictions);
 
-      if (typeof this.value === 'object') {
-        this.addressSuggestions = [];
-        this.suggestionSelected = true;
-      } else {
-        this.addressSuggestions = suggestions;
+        if (typeof this.value === 'object') {
+          this.addressSuggestions = [];
+          this.suggestionSelected = true;
+        } else {
+          this.addressSuggestions = suggestions;
+
+          if (suggestions.length > 0) {
+            this.announceSuggestionsLoaded(suggestions.length);
+          }
+        }
+      } catch (error) {
+        console.error('Error loading address suggestions:', error);
+
+        this.announceError('Failed to load address suggestions. Please try again.');
       }
+    },
+
+    announceSuggestionSelection: function() {
+      if (this.activeSuggestionIndex >= 0 && this.addressSuggestions[this.activeSuggestionIndex]) {
+        const suggestion = this.addressSuggestions[this.activeSuggestionIndex];
+        const message = `Suggestion ${this.activeSuggestionIndex + 1} of ${this.addressSuggestions.length}: ${suggestion.label}`;
+
+        this.announceStatus(message, 1000);
+      }
+    },
+
+    announceAddressSelection: function(addressLabel) {
+      const message = `Address selected: ${addressLabel}`;
+
+      this.announceAction(message, 1500);
+    },
+
+    announceSuggestionsCleared: function() {
+      this.announceStatus('Address suggestions cleared', 1000);
+    },
+
+    announceLoadingState: function() {
+      this.announceStatus('Loading address details...', 2000);
+    },
+
+    announceFieldUpdate: function(value) {
+      if (value && typeof value === 'string' && value.trim()) {
+        const message = `Address field updated to: ${value}`;
+
+        this.announceStatus(message, 1500);
+      }
+    },
+
+    announceSuggestionsLoaded: function(suggestionCount) {
+      const message = `${suggestionCount} address suggestions loaded. Use arrow keys to navigate and Enter to select.`;
+
+      this.announceStatus(message, 2000);
     },
     onChange: function() {
       this.addressField.change((value) => {
@@ -330,11 +399,12 @@ Fliplet.FormBuilder.field('address', {
 
         this.updateSelectedFieldsProperty('readonly', this.manualInput);
 
-
         if (!this.manualInput && this.addressComponents.length) {
           this.suggestionSelected = true;
           this.value = value;
           this.updateValue();
+
+          this.announceFieldUpdate(value);
         } else {
           this.value = value;
           this.updateValue();

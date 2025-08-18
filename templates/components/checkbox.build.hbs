@@ -1,24 +1,31 @@
 <template>
-  <template>
+  <div class="checkbox-group" role="group" :aria-label="'Checkbox group for ' + (label || 'options')">
     <template v-if="addSelectAll">
       <div class="checkbox checkbox-icon" :class="{ 'readonly' : readonly }">
         <input
           type="checkbox"
           :id="name + '-' + 'select-all'"
           v-model="selectedAll"
+          :aria-label="_ariaLabel + ' - Select all options'"
+          :aria-describedby="_ariaDescribedBy"
+          :aria-invalid="_ariaInvalid"
           tabindex="-1"
         >
         <label @click="selectAllClickHandler()">
           <span
             class="check focus-outline"
             tabindex="0"
+            role="checkbox"
+            :aria-checked="selectedAll"
+            :aria-label="'Select all options'"
           >
-            <i class="fa fa-check"></i>
+            <i class="fa fa-check" aria-hidden="true"></i>
           </span>
           <span class="option-item">{{T "widgets.form.checkbox.selectAll"}}</span>
         </label>
       </div>
     </template>
+    
     <template v-for="(option, index) in options">
       <div class="checkbox checkbox-icon" :class="{ 'readonly' : readonly }">
         <input
@@ -27,21 +34,31 @@
           :name="name"
           v-model.lazy="$v.value.$model"
           :value="option.id || option.label"
+          :aria-label="_ariaLabel + ' - ' + (option.label || option.id)"
+          :aria-describedby="_ariaDescribedBy"
+          :aria-invalid="_ariaInvalid"
           tabindex="-1"
         >
         <label v-on:click="clickHandler(option)">
           <span
             class="check focus-outline"
             tabindex="0"
+            role="checkbox"
+            :aria-checked="value.includes(option.id || option.label)"
+            :aria-label="option.label || option.id"
             v-on:keydown.space.prevent="readonly ? false : clickHandler(option)"
+            v-on:keydown.enter.prevent="readonly ? false : clickHandler(option)"
             @blur="onBlur()"
           >
-            <i class="fa fa-check"></i>
+            <i class="fa fa-check" aria-hidden="true"></i>
           </span>
           <span class="option-item">\{{ option.label || option.id }}</span>
         </label>
       </div>
     </template>
-  </template>
-  <p class="text-danger" v-if="$v.value.required === false && $v.value.$dirty">{{ T "widgets.form.errors.required" }}</p>
+  </div>
+  
+  <p class="text-danger" v-if="$v.value.required === false && $v.value.$dirty" role="alert" aria-live="assertive">
+    {{ T "widgets.form.errors.required" }}
+  </p>
 </template>

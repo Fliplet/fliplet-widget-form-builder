@@ -73,6 +73,24 @@ Fliplet.FormBuilder.field('matrix', {
     },
 
     /**
+     * Check if an option is selected
+     * @param {Number} rowIndex - a row index
+     * @param {Number} colIndex - a column index
+     * @returns {Boolean} whether the option is selected
+     */
+    isOptionSelected: function(rowIndex, colIndex) {
+      if (!this.value || !this.rowOptions[rowIndex]) {
+        return false;
+      }
+
+      const row = this.rowOptions[rowIndex];
+      const column = this.columnOptions[colIndex];
+      const selectedValue = this.value[row.id || row.label];
+
+      return selectedValue === (column.id || column.label);
+    },
+
+    /**
      * Click handler for each radio button in matrix
      * @param {Object} row - a row object which includes id and label
      * @param {Object} column - a column object which includes id and label
@@ -98,6 +116,9 @@ Fliplet.FormBuilder.field('matrix', {
       this.value[row.id || row.label] = column ? column.id || column.label : undefined;
 
       this.$emit('_input', this.name, this.value);
+
+      // Announce selection
+      this.announceAction(`Selected ${column.label} for ${row.label}`, 2000);
     },
 
     /**
@@ -109,15 +130,20 @@ Fliplet.FormBuilder.field('matrix', {
     focusHandler: function(rowIndex, colIndex) {
       var $vm = this;
 
-      if (rowIndex >= 0 && colIndex >= 0) {
-        var row = this.rowOptions[rowIndex];
-        var col = this.columnOptions[colIndex];
 
-        $('#' + $vm.getOptionId(rowIndex, colIndex, 'span')).focus();
-
-        this.value[row.id || row.label] = col.id || col.label;
-        this.clickHandler(row, col, rowIndex, colIndex);
+      // Validate bounds
+      if (rowIndex < 0 || rowIndex >= this.rowOptions.length
+          || colIndex < 0 || colIndex >= this.columnOptions.length) {
+        return;
       }
+
+      var row = this.rowOptions[rowIndex];
+      var col = this.columnOptions[colIndex];
+
+      $('#' + $vm.getOptionId(rowIndex, colIndex, 'span')).focus();
+
+      this.value[row.id || row.label] = col.id || col.label;
+      this.clickHandler(row, col, rowIndex, colIndex);
     },
 
     /**
@@ -193,6 +219,8 @@ Fliplet.FormBuilder.field('matrix', {
           this.value = '';
         }
       }
+
+      this.announceStatus('Matrix selections cleared', 1500);
     },
 
     /**

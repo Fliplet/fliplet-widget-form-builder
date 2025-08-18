@@ -1,29 +1,49 @@
 {{! Matrix field rendering a grid of radio buttons with keyboard navigation support }}
-<div class="fl-matrix" ref="matrix">
-  <table>
+<div class="fl-matrix" ref="matrix" role="group" :aria-label="'Matrix for ' + (label || 'grid selection')">
+  <table role="grid" :aria-label="'Selection matrix with ' + rowOptions.length + ' rows and ' + columnOptions.length + ' columns'">
     <thead>
       <tr>
-        <th></th>
-        <th v-for="(column, index) in columnOptions">\{{ column.label }}</th>
+        <th scope="col"></th>
+        <th v-for="(column, index) in columnOptions" scope="col" :id="'col-' + index">\{{ column.label }}</th>
       </tr>
     </thead>
     <tbody>
-      <tr v-for="(row, rowIndex) in rowOptions">
-        <th>\{{ row.label }}</th>
-        <td v-for="(column, colIndex) in columnOptions">
+      <tr v-for="(row, rowIndex) in rowOptions" :id="'row-' + rowIndex">
+        <th scope="row" :id="'row-header-' + rowIndex">\{{ row.label }}</th>
+        <td v-for="(column, colIndex) in columnOptions" :headers="'row-header-' + rowIndex + ' col-' + colIndex">
           <div class="radio radio-icon" :class="{ 'readonly' : readonly }">
-            <input type="radio" class="matrix-radio-input" :id="getOptionId(rowIndex, colIndex, 'input')" :name="getOptionName(rowIndex)" :value="column.id" v-model.lazy="$v.value.$model" tabindex="-1">
-            <label v-on:click="readonly ? false : clickHandler(row, column, rowIndex, colIndex)">
-              <span class="check focus-outline"
+            <input 
+              type="radio" 
+              class="matrix-radio-input" 
+              :id="getOptionId(rowIndex, colIndex, 'input')" 
+              :name="getOptionName(rowIndex)" 
+              :value="column.id" 
+              v-model.lazy="$v.value.$model" 
+              :aria-label="'Select ' + column.label + ' for ' + row.label"
+              :aria-describedby="_ariaDescribedBy"
+              :aria-invalid="_ariaInvalid"
+              :disabled="readonly"
+              tabindex="-1"
+            >
+            <label 
+              v-on:click="readonly ? false : clickHandler(row, column, rowIndex, colIndex)"
+              :for="getOptionId(rowIndex, colIndex, 'input')"
+            >
+              <span 
+                class="check focus-outline"
                 :id="getOptionId(rowIndex, colIndex,'span')"
+                :aria-label="'Select ' + column.label + ' for ' + row.label"
+                :aria-checked="isOptionSelected(rowIndex, colIndex)"
+                role="radio"
                 v-on:keydown.right.prevent="readonly ? false : focusHandler(rowIndex, colIndex + 1)"
                 v-on:keydown.down.prevent="readonly ? false : focusHandler(rowIndex, colIndex + 1)"
                 v-on:keydown.left.prevent="readonly ? false : focusHandler(rowIndex, colIndex - 1)"
                 v-on:keydown.up.prevent="readonly ? false : focusHandler(rowIndex, colIndex - 1)"
                 v-on:keydown.space.prevent="readonly ? false : focusHandler(rowIndex, colIndex)"
+                v-on:keydown.enter.prevent="readonly ? false : focusHandler(rowIndex, colIndex)"
                 tabindex="0"
               >
-                <i class="fa fa-circle"></i>
+                <i class="fa fa-circle" aria-hidden="true"></i>
               </span>
             </label>
           </div>
@@ -32,4 +52,6 @@
     </tbody>
   </table>
 </div>
-<p class="text-danger" v-if="$v.value.required === false && $v.value.$dirty">{{T "widgets.form.errors.required"}}</p>
+<p class="text-danger" v-if="$v.value.required === false && $v.value.$dirty" role="alert" aria-live="assertive">
+  {{T "widgets.form.errors.required"}}
+</p>

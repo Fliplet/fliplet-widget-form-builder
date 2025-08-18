@@ -37,5 +37,20 @@ Fliplet.FormBuilder.field('url', {
     }
 
     return rules;
+  },
+  methods: {
+    /**
+     * Handle URL input focus
+     * @returns {void}
+     */
+    onUrlFocus: function() {
+      if (this.readonly) {
+        this.announceStatus('URL input is disabled in read-only mode', 2000);
+
+        return;
+      }
+
+      this.announceStatus('URL input focused. Enter a valid web address including http:// or https://', 4000);
+    }
   }
 });

@@ -1,14 +1,23 @@
-<textarea
-  class="form-control focus-outline"
-  v-model.trim.lazy="$v.value.$model"
-  v-on:change="updateValue()"
-  v-on:input="onInput($event)"
-  :name="name"
-  :id="name"
-  :placeholder="placeholder"
-  :rows="rows"
-  tabindex="0"
-  :readonly="readonly"
-  @blur="onBlur()"
-></textarea>
-<p class="text-danger" v-if="$v.value.required === false && $v.value.$dirty">{{T "widgets.form.errors.required"}}</p>
+{{! Textarea field with multi-line text input }}
+<div role="group" :aria-label="'Text area for ' + (label || 'text input')" :aria-describedby="_ariaDescribedBy">
+  <textarea
+    class="form-control focus-outline"
+    v-model.trim.lazy="$v.value.$model"
+    v-on:change="updateValue()"
+    v-on:input="onInput($event)"
+    :name="name"
+    :id="name"
+    :placeholder="placeholder"
+    :rows="rows"
+    :aria-label="_ariaLabel"
+    :aria-describedby="_ariaDescribedBy"
+    :aria-invalid="_ariaInvalid"
+    tabindex="0"
+    :readonly="readonly"
+    @blur="onBlur()"
+  ></textarea>
+</div>
+
+<p class="text-danger" v-if="$v.value.required === false && $v.value.$dirty" role="alert" aria-live="assertive">
+  {{T "widgets.form.errors.required"}}
+</p>

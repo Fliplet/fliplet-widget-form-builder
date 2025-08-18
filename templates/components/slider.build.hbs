@@ -1,12 +1,24 @@
-<div class="form-group fl-range-slider" :class="{ 'readonly': readonly }" ref="slider">
- <input
-    type="range"
-    :name="name"
-    :id="name"
-    :min="min"
-    :max="max"
-    :step="step"
-    v-model="value"
-    :tabindex="readonly ? -1 : 0"
-  />
+<div role="group" :aria-label="'Slider for ' + (label || 'value selection')" :aria-describedby="_ariaDescribedBy">
+  <div class="form-group fl-range-slider" :class="{ 'readonly': readonly }" ref="slider">
+    <input
+      type="range"
+      :name="name"
+      :id="name"
+      :min="min"
+      :max="max"
+      :step="step"
+      v-model="value"
+      :tabindex="readonly ? -1 : 0"
+      :aria-label="_ariaLabel"
+      :aria-describedby="_ariaDescribedBy"
+      :aria-invalid="_ariaInvalid"
+      :aria-valuemin="min"
+      :aria-valuemax="max"
+      :aria-valuenow="value"
+      :aria-valuetext="getSliderValueText()"
+      :disabled="readonly"
+      @focus="onSliderFocus()"
+      @blur="onSliderBlur()"
+    />
+  </div>
 </div>

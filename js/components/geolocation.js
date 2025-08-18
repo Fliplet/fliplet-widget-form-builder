@@ -71,7 +71,10 @@ Fliplet.FormBuilder.field('geolocation', {
         `${result.coords.latitude},${result.coords.longitude}`,
         result.coords.accuracy
       ];
+
+      this.announceAction(`Location captured: ${result.coords.latitude}, ${result.coords.longitude}`, 2500);
     },
+
     getDeviceLocation: function() {
       return Fliplet.Navigator.location({
         maximumAge: 0,
@@ -79,12 +82,21 @@ Fliplet.FormBuilder.field('geolocation', {
         enableHighAccuracy: true
       });
     },
+
     getLocation: function() {
       var $vm = this;
+
+      if (this.readonly) {
+        this.announceStatus('Geolocation is disabled in read-only mode', 2000);
+
+        return;
+      }
 
       $vm.showFeedback = true;
       $vm.isLoading = true;
       $vm.errorOccurred = false;
+
+      this.announceStatus('Requesting your current location...', 2000);
 
       var location = this.getDeviceLocation();
 
@@ -99,9 +111,13 @@ Fliplet.FormBuilder.field('geolocation', {
       }).catch(function(err) {
         $vm.isLoading = false;
         $vm.showFeedback = false;
+
+        $vm.announceError(`Location error: ${$vm.getErrorMessage(err)}`, 4000);
+
         $vm.openToastMessage(err);
       });
     },
+
     updateLocation: function() {
       this.timeOut = undefined;
 
@@ -111,6 +127,8 @@ Fliplet.FormBuilder.field('geolocation', {
       $vm.showFeedback = true;
       $vm.isLoading = true;
       $vm.errorOccurred = false;
+
+      this.announceStatus('Updating your current location...', 2000);
 
       location.then(function(res) {
         $vm.setValue(res);
@@ -124,9 +142,13 @@ Fliplet.FormBuilder.field('geolocation', {
       }).catch(function(err) {
         $vm.isLoading = false;
         $vm.showFeedback = false;
+
+        $vm.announceError(`Location update error: ${$vm.getErrorMessage(err)}`, 4000);
+
         $vm.openToastMessage(err);
       });
     },
+
     getErrorMessage: function(error) {
       error = error || {};
 
@@ -147,6 +169,7 @@ Fliplet.FormBuilder.field('geolocation', {
           return T('widgets.form.geolocation.errors.unknownError');
       }
     },
+
     openToastMessage: function(error) {
       var supportsSettings = Fliplet.Navigator.supportsAppSettings();
 
@@ -167,8 +190,11 @@ Fliplet.FormBuilder.field('geolocation', {
         tapToDismiss: false // Ensures the toast message is only dismissed through the action button
       });
     },
+
     onBeforeSubmit: function() {
       if (this.isLoading) {
+        this.announceStatus('Location is still being determined. Please wait.', 3000);
+
         Fliplet.UI.Toast({
           type: 'regular',
           message: T('widgets.form.geolocation.loadingLocation'),
@@ -188,6 +214,8 @@ Fliplet.FormBuilder.field('geolocation', {
           code: 'inaccurateCoords'
         };
 
+        this.announceError('Location accuracy is too low. Please try again.', 4000);
+
         this.openToastMessage(error);
 
         return Promise.reject('');
@@ -195,10 +223,32 @@ Fliplet.FormBuilder.field('geolocation', {
         return Promise.reject('');
       }
     },
+
     onReset: function(data) {
       if (data.id === this.$parent.id) {
         this.firstTimeSaved = false;
         this.showFeedback = false;
+      }
+    },
+
+    handleKeyDown: function(event) {
+      switch (event.key) {
+        case 'Enter':
+        case ' ':
+          event.preventDefault();
+
+          if (!this.readonly && !this.isLoading) {
+            if (!this.firstTimeSaved) {
+              this.getLocation();
+            } else {
+              this.updateLocation();
+            }
+          }
+
+          break;
+
+        default:
+          break;
       }
     }
   },
