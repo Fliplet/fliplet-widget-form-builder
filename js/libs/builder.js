@@ -69,6 +69,33 @@ if (data.settings && data.settings.emailTemplate) {
   data.settings.emailTemplate;
 }
 
+// TODO: Move to utils.js once lodash is removed
+/**
+ * Escapes HTML special characters in a string to prevent XSS attacks.
+ * This is particularly important for user-provided field names that get rendered in HTML.
+ *
+ * @param {string} str - The string to escape
+ * @returns {string} The escaped string safe for HTML rendering
+ */
+function escapeHtml(str) {
+  if (typeof str !== 'string') {
+    return str;
+  }
+
+  const htmlEscapes = {
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#x27;',
+    '/': '&#x2F;'
+  };
+
+  return str.replace(/[&<>"'/]/g, function(match) {
+    return htmlEscapes[match];
+  });
+}
+
 function changeSelectText() {
   setTimeout(function() {
     $('.hidden-select:not(.component .hidden-select)').each(function() {
@@ -227,7 +254,13 @@ Fliplet().then(function() {
           return !!el.required;
         });
       },
-      warningMessage() {
+      /**
+       * Generates a warning message based on data store configuration and data source settings.
+       * Checks if the form has proper data source configuration for add/update operations.
+       *
+       * @returns {string|null} Warning message HTML string if configuration issues exist, null if no warnings
+       */
+      dataSourceWarningMessage() {
         if (!this.settings || !this.settings.dataStore) {
           return null;
         }
@@ -254,6 +287,12 @@ Fliplet().then(function() {
 
         return message;
       },
+      /**
+       * Generates a warning message for media fields that don't have a media folder configured.
+       * Checks fields of type 'flFile', 'flImage', and 'flSignature' for missing mediaFolderId.
+       *
+       * @returns {string|null} Warning message string if media fields are misconfigured, null if no warnings
+       */
       mediaWarningMessage() {
         const MEDIA_TYPES = ['flFile', 'flImage', 'flSignature'];
 
@@ -280,8 +319,7 @@ Fliplet().then(function() {
           return null;
         }
 
-
-        const fieldNames = misconfiguredFields.map(f => f.name).join(', ');
+        const fieldNames = misconfiguredFields.map(f => escapeHtml(f.name)).join(', ');
 
         return T('widgets.form.warningLabel') + T('widgets.form.mediaWarning', { fieldNames });
       },
