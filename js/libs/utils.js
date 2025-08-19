@@ -7,6 +7,7 @@
  * Deep clone an object using structuredClone or JSON fallback
  * Replacement for _.cloneDeep()
  * @param {*} obj - Object to clone
+ * @param {WeakMap} cache - Cache for circular references
  * @returns {*} Cloned object
  */
 function cloneDeep(obj, cache = new WeakMap()) {
@@ -34,20 +35,27 @@ function cloneDeep(obj, cache = new WeakMap()) {
 
   if (Array.isArray(obj)) {
     const result = obj.map(item => cloneDeep(item, cache));
+
     cache.set(obj, result);
+
     return result;
   }
 
   if (typeof obj === 'object') {
-    const cloned = obj instanceof Map
-      ? new Map()
-      : obj instanceof Set
-        ? new Set()
-        : {};
+    let cloned;
+
+    if (obj instanceof Map) {
+      cloned = new Map();
+    } else if (obj instanceof Set) {
+      cloned = new Set();
+    } else {
+      cloned = {};
+    }
+
     cache.set(obj, cloned);
 
     for (const key in obj) {
-      if (Object.prototype.hasOwnProperty.call(obj, key)) {
+      if (has(obj, key)) {
         cloned[key] = cloneDeep(obj[key], cache);
       }
     }
@@ -70,9 +78,11 @@ function debounce(func, wait, immediate) {
   let timeout;
 
   return function executedFunction(...args) {
-    const later = () => {
+    const context = this;
+
+    const later = function() {
       timeout = null;
-      if (!immediate) func.apply(this, args);
+      if (!immediate) func.apply(context, args);
     };
 
     const callNow = immediate && !timeout;
@@ -80,7 +90,7 @@ function debounce(func, wait, immediate) {
     clearTimeout(timeout);
     timeout = setTimeout(later, wait);
 
-    if (callNow) func.apply(this, args);
+    if (callNow) func.apply(context, args);
   };
 }
 
@@ -91,6 +101,10 @@ function debounce(func, wait, immediate) {
  * @returns {string} Kebab-cased string
  */
 function kebabCase(str) {
+  if (!str) {
+    return '';
+  }
+
   return str
     .replace(/([a-z])([A-Z])/g, '$1-$2')
     .replace(/[\s_]+/g, '-')
@@ -122,45 +136,16 @@ function compact(array) {
 }
 
 /**
- * Deep merge objects (similar to _.assignIn but recursive)
- * Replacement for _.assignIn() with deep merging
- * @param {Object} target - Target object
- * @param {...Object} sources - Source objects to merge
- * @returns {Object} Merged object
- */
-function assignIn(target, ...sources) {
-  let result = target;
-
-  if (!result || typeof result !== 'object') {
-    result = {};
-  }
-
-  sources.forEach(source => {
-    if (source && typeof source === 'object') {
-      Object.keys(source).forEach(key => {
-        if (source[key] && typeof source[key] === 'object' && !Array.isArray(source[key])) {
-          result[key] = assignIn(result[key] || {}, source[key]);
-        } else {
-          result[key] = source[key];
-        }
-      });
-    }
-  });
-
-  return result;
-}
-
-/**
  * Check if object has a property
  * Replacement for _.has()
  * @param {Object} obj - Object to check
- * @param {string} path - Property path
+ * @param {string|Array} path - Property path (string or array)
  * @returns {boolean} True if property exists
  */
 function has(obj, path) {
   if (!obj || typeof obj !== 'object') return false;
 
-  const keys = path.split('.');
+  const keys = Array.isArray(path) ? path : path.split('.');
   let current = obj;
 
   for (const key of keys) {
@@ -219,6 +204,15 @@ function sortBy(array, iteratee) {
     const aVal = getValue(a);
     const bVal = getValue(b);
 
+    // Handle undefined, null, and other falsy values
+    if (aVal === undefined && bVal === undefined) return 0;
+    if (aVal === undefined) return 1;
+    if (bVal === undefined) return -1;
+
+    if (aVal === null && bVal === null) return 0;
+    if (aVal === null) return 1;
+    if (bVal === null) return -1;
+
     if (aVal < bVal) return -1;
     if (aVal > bVal) return 1;
 
@@ -242,13 +236,52 @@ function isEqual(a, b) {
 
   if (typeof a !== 'object') return false;
 
-  if (Array.isArray(a) !== Array.isArray(b)) return false;
+  // Handle Date objects
+  if (a instanceof Date && b instanceof Date) {
+    return a.getTime() === b.getTime();
+  }
 
-  if (Array.isArray(a)) {
+  // Handle RegExp objects
+  if (a instanceof RegExp && b instanceof RegExp) {
+    return a.source === b.source && a.flags === b.flags;
+  }
+
+  // Handle Map objects
+  if (a instanceof Map && b instanceof Map) {
+    if (a.size !== b.size) return false;
+
+    for (const [key, value] of a) {
+      if (!b.has(key) || !isEqual(value, b.get(key))) {
+        return false;
+      }
+    }
+
+    return true;
+  }
+
+  // Handle Set objects
+  if (a instanceof Set && b instanceof Set) {
+    if (a.size !== b.size) return false;
+
+    for (const value of a) {
+      if (!b.has(value)) {
+        return false;
+      }
+    }
+
+    return true;
+  }
+
+
+  // Handle Array objects
+  if (Array.isArray(a) && Array.isArray(b)) {
     if (a.length !== b.length) return false;
 
     return a.every((item, index) => isEqual(item, b[index]));
   }
+
+  // Handle plain objects
+  if (Array.isArray(a) !== Array.isArray(b)) return false;
 
   const keysA = Object.keys(a);
   const keysB = Object.keys(b);
@@ -258,22 +291,191 @@ function isEqual(a, b) {
   return keysA.every(key => isEqual(a[key], b[key]));
 }
 
-// Export utilities for use in other files
-if (typeof module !== 'undefined' && module.exports) {
-  module.exports = {
-    cloneDeep,
-    debounce,
-    kebabCase,
-    isEmpty,
-    compact,
-    assignIn,
-    has,
-    uniq,
-    uniqWith,
-    sortBy,
-    isEqual
-  };
+/**
+ * Check if value is a valid number
+ * Replacement for _.isNumber()
+ * @param {*} value - Value to check
+ * @returns {boolean} True if value is a valid number
+ */
+function isNumber(value) {
+  return typeof value === 'number' && !isNaN(value);
 }
+
+/**
+ * Check if value is a string
+ * Replacement for _.isString()
+ * @param {*} value - Value to check
+ * @returns {boolean} True if value is a string
+ */
+function isString(value) {
+  return typeof value === 'string';
+}
+
+/**
+ * Check if value is null or undefined
+ * Replacement for _.isNil()
+ * @param {*} value - Value to check
+ * @returns {boolean} True if value is null or undefined
+ */
+function isNil(value) {
+  return value === null || value === undefined;
+}
+
+/**
+ * Check if value is a plain object (not null, not array)
+ * Replacement for _.isObject()
+ * @param {*} value - Value to check
+ * @returns {boolean} True if value is a plain object
+ */
+function isObject(value) {
+  return value !== null && value !== undefined && typeof value === 'object' && !Array.isArray(value);
+}
+
+/**
+ * Get nested property value from object using dot notation or array path
+ * Replacement for _.get()
+ * @param {Object} object - Source object
+ * @param {string|Array} path - Property path (string with dots or array of keys)
+ * @param {*} defaultValue - Default value if path doesn't exist
+ * @returns {*} Value at path or defaultValue
+ */
+function get(object, path, defaultValue) {
+  if (!object || typeof object !== 'object') return defaultValue;
+
+  const keys = Array.isArray(path) ? path : path.split('.');
+  let result = object;
+
+  for (const key of keys) {
+    if (result === null || result === undefined || !Object.prototype.hasOwnProperty.call(result, key)) {
+      return defaultValue;
+    }
+
+    result = result[key];
+  }
+
+  return result;
+}
+
+
+/**
+ * Create object with properties omitted based on predicate
+ * Replacement for _.omitBy()
+ * @param {Object} object - Source object
+ * @param {Function} predicate - Function to test each property (value, key) => boolean
+ * @returns {Object} New object with properties that don't match predicate
+ */
+function omitBy(object, predicate) {
+  const result = {};
+
+  for (const [key, value] of Object.entries(object)) {
+    if (!predicate(value, key)) {
+      result[key] = value;
+    }
+  }
+
+  return result;
+}
+
+/**
+ * Transform object keys using iteratee function
+ * Replacement for _.mapKeys()
+ * @param {Object} object - Source object
+ * @param {Function} iteratee - Function to transform keys (value, key) => newKey
+ * @returns {Object} New object with transformed keys
+ */
+function mapKeys(object, iteratee) {
+  const result = {};
+
+  for (const [key, value] of Object.entries(object)) {
+    const newKey = iteratee(value, key);
+
+    result[newKey] = value;
+  }
+
+  return result;
+}
+
+/**
+ * Create array by calling iteratee n times
+ * Replacement for _.times()
+ * @param {number} n - Number of times to call iteratee
+ * @param {Function} iteratee - Function to call for each index
+ * @returns {Array} Array of results from iteratee calls
+ */
+function times(n, iteratee) {
+  const result = [];
+
+  for (let i = 0; i < n; i++) {
+    result.push(iteratee(i));
+  }
+
+  return result;
+}
+
+/**
+ * Create array of values from first array not included in second array
+ * Replacement for _.difference()
+ * @param {Array} array - Source array
+ * @param {Array} values - Values to exclude
+ * @returns {Array} New array with excluded values removed
+ */
+function difference(array, values) {
+  return array.filter(item => !values.includes(item));
+}
+
+/**
+ * Remove elements from array that match predicate
+ * Replacement for _.remove()
+ * @param {Array} array - Array to modify
+ * @param {Function} predicate - Function to test each element
+ * @returns {Array} Array of removed elements
+ */
+function remove(array, predicate) {
+  const toRemove = [];
+
+  for (let i = array.length - 1; i >= 0; i--) {
+    if (predicate(array[i])) {
+      toRemove.push(array.splice(i, 1)[0]);
+    }
+  }
+
+  return toRemove.reverse();
+}
+
+/**
+ * Extend target object with properties from source objects
+ * Replacement for _.extend()
+ * @param {Object} target - Target object to extend
+ * @param {...Object} sources - Source objects to copy properties from
+ * @returns {Object} Extended target object
+ */
+function extend(target, ...sources) {
+  return Object.assign(target, ...sources);
+}
+
+Fliplet.FormBuilderUtils = {
+  cloneDeep,
+  debounce,
+  kebabCase,
+  isEmpty,
+  isNumber,
+  isString,
+  isNil,
+  isObject,
+  get,
+  omitBy,
+  mapKeys,
+  times,
+  difference,
+  remove,
+  extend,
+  compact,
+  has,
+  uniq,
+  uniqWith,
+  sortBy,
+  isEqual
+};
 
 // Make utilities available globally for browser usage
 if (typeof window !== 'undefined') {
@@ -282,8 +484,18 @@ if (typeof window !== 'undefined') {
     debounce,
     kebabCase,
     isEmpty,
+    isNumber,
+    isString,
+    isNil,
+    isObject,
+    get,
+    omitBy,
+    mapKeys,
+    times,
+    difference,
+    remove,
+    extend,
     compact,
-    assignIn,
     has,
     uniq,
     uniqWith,

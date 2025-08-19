@@ -86,24 +86,6 @@ Fliplet.FormBuilder.field('file', {
     this.selectedFiles.length = 0;
   },
   methods: {
-    /**
-     * Sorts an array based on iteratee function results
-     * @param {Array} array - array to sort
-     * @param {Function} iteratee - function to determine sort value
-     * @returns {Array} sorted array
-     */
-    sortBy: function(array, iteratee) {
-      return array.slice().sort(function(a, b) {
-        var valueA = iteratee(a);
-        var valueB = iteratee(b);
-
-        if (valueA < valueB) return -1;
-        if (valueA > valueB) return 1;
-
-        return 0;
-      });
-    },
-
     loadFileData: function() {
       var $vm = this;
       var isFileDataLoaded = false;
@@ -131,7 +113,7 @@ Fliplet.FormBuilder.field('file', {
           return file;
         });
 
-        $vm.value = $vm.sortBy(newFiles, function(file) { return file.name; });
+        $vm.value = Fliplet.FormBuilderUtils.sortBy(newFiles, function(file) { return file.name; });
       }).catch(function() {});
     },
     showLocalDateFormat: function(date) {

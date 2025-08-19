@@ -47,7 +47,7 @@ if (data.fields) {
   /**
    * Remove falsy fields from the data.fields array.
    */
-  data.fields = data.fields.filter(Boolean);
+  data.fields = Fliplet.FormBuilderUtils.compact(data.fields);
 }
 
 if (Array.isArray(data.onSubmit) && data.onSubmit.length) {
@@ -426,7 +426,7 @@ Fliplet().then(function() {
         $vm.settings.name = $vm.settings.displayName;
 
         // Cleanup
-        this.settings.fields = this.fields.filter(Boolean);
+        this.settings.fields = Fliplet.FormBuilderUtils.compact(this.fields);
 
         return Fliplet.Widget.save(this.settings).then(function onSettingsUpdated() {
           return $vm.updateDataSourceHooks();
@@ -700,7 +700,7 @@ Fliplet().then(function() {
           ds.columns = ds.columns || [];
 
           var hooksDeleted;
-          var columns = [...new Set(newColumns.concat(ds.columns))];
+          var columns = Fliplet.FormBuilderUtils.uniq(newColumns.concat(ds.columns));
 
           // remove existing hooks for the operations from the same widget instance
           ds.hooks = (ds.hooks || []).filter(function(hook) {
@@ -728,7 +728,7 @@ Fliplet().then(function() {
               payload: payload
             });
           } else if (!hooksDeleted) {
-            if (JSON.stringify(columns.sort()) === JSON.stringify(ds.columns.sort())) {
+            if (Fliplet.FormBuilderUtils.isEqual(columns.sort(), ds.columns.sort())) {
               return; // no need to update
             }
           }
@@ -1141,11 +1141,11 @@ Fliplet().then(function() {
         let isCurrentForm = false;
         let currentFormDsId = currentForm.dataSourceId;
 
-        for (let form of allFormsInSlide) {
+        allFormsInSlide.some(function(form) {
           const formDsId = form.dataSourceId;
 
           if (form.sliderContainerId !== currentForm.sliderContainerId) {
-            continue;
+            return false;
           }
 
           if (currentForm.id === form.id) {
@@ -1153,16 +1153,20 @@ Fliplet().then(function() {
           }
 
           if (currentFormDsId !== formDsId) {
-            continue;
+            return false;
           }
 
           let hasFlButton = false;
 
-          for (let i = form.fields.length - 1; i >= 0; i--) {
-            const field = form.fields[i];
+          form.fields.slice().reverse().some(function(field) {
+            if (field._type === 'flButtons' && field.showSubmit !== false && currentFormDsId === formDsId) {
+              hasFlButton = true;
 
-            if (field._type === 'flButtons' && field.showSubmit !== false && currentFormDsId === formDsId) { hasFlButton = true; break; }
-          }
+              return true; // break the loop
+            }
+
+            return false;
+          });
 
           if (!hasFlButton && currentFormDsId.id === formDsId.id) {
             currentMultiStepForm.push(form);
@@ -1172,11 +1176,14 @@ Fliplet().then(function() {
             }
 
             currentMultiStepForm.push(form);
-            break;
+
+            return true; // break the outer loop
           } else {
             currentMultiStepForm = [];
           }
-        }
+
+          return false;
+        });
 
         return currentMultiStepForm;
       },

@@ -64,7 +64,7 @@ Fliplet.FormBuilder.field('radio', {
     var $vm = this;
 
     var selectedOption = $vm.options.find(function(option) {
-      return (Object.prototype.hasOwnProperty.call(option, 'label') && Object.prototype.hasOwnProperty.call(option, 'id')) ? option.id === $vm.value : option.label === $vm.value;
+      return (Fliplet.FormBuilderUtils.has(option, 'label') && Fliplet.FormBuilderUtils.has(option, 'id')) ? option.id === $vm.value : option.label === $vm.value;
     });
 
     this.value = selectedOption ? this.value : '';

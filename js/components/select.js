@@ -65,6 +65,8 @@ Fliplet.FormBuilder.field('select', {
     return rules;
   },
   methods: {
+    isNumber: Fliplet.FormBuilderUtils.isNumber,
+    isString: Fliplet.FormBuilderUtils.isString,
     onReset: function(data) {
       if (!data || data.id !== this.$parent.id) {
         return;
