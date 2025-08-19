@@ -60,32 +60,7 @@ Fliplet.FormBuilder.field('matrix', {
      * @returns {String} an ID unique to the row
      */
     getOptionId: function(rowIndex, columnIndex, type) {
-      return this.toKebabCase(this.$parent.id + '-' + this.name + '-' + rowIndex + '-' + columnIndex + '-' + type);
-    },
-
-    /**
-     * Converts a string to kebab-case
-     * @param {String} str - string to convert
-     * @returns {String} kebab-case string
-     */
-    toKebabCase: function(str) {
-      return str
-        .replace(/([a-z])([A-Z])/g, '$1-$2')
-        .replace(/[\s_]+/g, '-')
-        .toLowerCase();
-    },
-
-    /**
-     * Checks if value is empty (null, undefined, empty object, empty array, empty string)
-     * @param {*} value - value to check
-     * @returns {Boolean} true if empty
-     */
-    isEmpty: function(value) {
-      if (value === null || value === undefined) return true;
-      if (typeof value === 'string' || Array.isArray(value)) return value.length === 0;
-      if (typeof value === 'object') return Object.keys(value).length === 0;
-
-      return false;
+      return Fliplet.FormBuilderUtils.kebabCase(this.$parent.id + '-' + this.name + '-' + rowIndex + '-' + columnIndex + '-' + type);
     },
 
     /**
@@ -94,7 +69,7 @@ Fliplet.FormBuilder.field('matrix', {
      * @returns {String} a name unique to the row
      */
     getOptionName: function(rowIndex) {
-      return this.toKebabCase(this.name + '-' + rowIndex);
+      return Fliplet.FormBuilderUtils.kebabCase(this.name + '-' + rowIndex);
     },
 
     /**
@@ -166,7 +141,7 @@ Fliplet.FormBuilder.field('matrix', {
     setValue: function() {
       var $vm = this;
 
-      if ($vm.value === undefined || this.isEmpty($vm.value)) {
+      if ($vm.value === undefined || Fliplet.FormBuilderUtils.isEmpty($vm.value)) {
         this.setDefaultValue();
       } else {
         if (typeof $vm.value === 'string') {
@@ -176,13 +151,13 @@ Fliplet.FormBuilder.field('matrix', {
         Object.keys($vm.value).forEach(function(value) {
           var key = $vm.value[value];
           var rowIndex = $vm.rowOptions.findIndex(function(row) {
-            return (Object.prototype.hasOwnProperty.call(row, 'label') && Object.prototype.hasOwnProperty.call(row, 'id')) ? row.id === value || row.label === value : row.label === value;
+            return (Fliplet.FormBuilderUtils.has(row, 'label') && Fliplet.FormBuilderUtils.has(row, 'id')) ? row.id === value || row.label === value : row.label === value;
           });
 
           var row = $vm.rowOptions[rowIndex];
 
           var colIndex = $vm.columnOptions.findIndex(function(col) {
-            return (Object.prototype.hasOwnProperty.call(col, 'label') && Object.prototype.hasOwnProperty.call(col, 'id')) ? col.id === key || col.label === key : col.label === key;
+            return (Fliplet.FormBuilderUtils.has(col, 'label') && Fliplet.FormBuilderUtils.has(col, 'id')) ? col.id === key || col.label === key : col.label === key;
           });
 
           var col = $vm.columnOptions[colIndex];
@@ -242,7 +217,7 @@ Fliplet.FormBuilder.field('matrix', {
       if (val === '') {
         val = {};
         checkFlag = 'clear';
-      } else if (!this.isEmpty(val)) {
+      } else if (!Fliplet.FormBuilderUtils.isEmpty(val)) {
         var result = [];
 
         Object.keys(val).forEach(function(key) {
@@ -286,9 +261,13 @@ Fliplet.FormBuilder.field('matrix', {
     onBeforeSubmit: function(data) {
       var $vm = this;
 
+      if (!data[this.name]) {
+        return;
+      }
+
       Object.keys(data[this.name]).forEach(function(val) {
         var row = $vm.rowOptions.find(function(row) {
-          return (Object.prototype.hasOwnProperty.call(row, 'label') && Object.prototype.hasOwnProperty.call(row, 'id')) ? row.id === val : row.label === val;
+          return (Fliplet.FormBuilderUtils.has(row, 'label') && Fliplet.FormBuilderUtils.has(row, 'id')) ? row.id === val : row.label === val;
         });
 
         if (!row) {

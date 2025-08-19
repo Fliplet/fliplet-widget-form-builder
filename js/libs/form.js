@@ -11,144 +11,6 @@ var currentFormUId;
 var currentMultiStepForm;
 
 // Native JavaScript helper functions to replace lodash
-function compact(array) {
-  return array.filter(Boolean);
-}
-
-function isEmpty(value) {
-  if (value === null || value === undefined) return true;
-  if (Array.isArray(value) || typeof value === 'string') return value.length === 0;
-  if (typeof value === 'object') return Object.keys(value).length === 0;
-
-  return false;
-}
-
-function isNil(value) {
-  return value === null || value === undefined;
-}
-
-function isObject(value) {
-  return value !== null && value !== undefined && typeof value === 'object' && !Array.isArray(value);
-}
-
-function isString(value) {
-  return typeof value === 'string';
-}
-
-function isArray(value) {
-  return Array.isArray(value);
-}
-
-function isNumber(value) {
-  return typeof value === 'number' && !isNaN(value);
-}
-
-function has(object, key) {
-  return Object.prototype.hasOwnProperty.call(object, key);
-}
-
-function get(object, path, defaultValue) {
-  if (!object || typeof object !== 'object') return defaultValue;
-
-  const keys = Array.isArray(path) ? path : path.split('.');
-  let result = object;
-
-  for (const key of keys) {
-    if (result === null || result === undefined || !Object.prototype.hasOwnProperty.call(result, key)) {
-      return defaultValue;
-    }
-
-    result = result[key];
-  }
-
-  return result;
-}
-
-function omitBy(object, predicate) {
-  const result = {};
-
-  for (const [key, value] of Object.entries(object)) {
-    if (!predicate(value, key)) {
-      result[key] = value;
-    }
-  }
-
-  return result;
-}
-
-function mapKeys(object, iteratee) {
-  const result = {};
-
-  for (const [key, value] of Object.entries(object)) {
-    iteratee(value, key);
-  }
-
-  return result;
-}
-
-function times(n, iteratee) {
-  const result = [];
-
-  for (let i = 0; i < n; i++) {
-    result.push(iteratee(i));
-  }
-
-  return result;
-}
-
-function uniq(array) {
-  return [...new Set(array)];
-}
-
-function sortBy(array, iteratee) {
-  return array.slice().sort((a, b) => {
-    const aVal = typeof iteratee === 'function' ? iteratee(a) : a[iteratee];
-    const bVal = typeof iteratee === 'function' ? iteratee(b) : b[iteratee];
-
-    if (aVal < bVal) return -1;
-    if (aVal > bVal) return 1;
-
-    return 0;
-  });
-}
-
-function difference(array, values) {
-  return array.filter(item => !values.includes(item));
-}
-
-function remove(array, predicate) {
-  const toRemove = [];
-
-  for (let i = array.length - 1; i >= 0; i--) {
-    if (predicate(array[i])) {
-      toRemove.push(array.splice(i, 1)[0]);
-    }
-  }
-
-  return toRemove.reverse();
-}
-
-function debounce(func, wait, immediate) {
-  var timeout;
-
-  return function() {
-    var context = this;
-    var args = arguments;
-    var later = function() {
-      timeout = null;
-      if (!immediate) func.apply(context, args);
-    };
-    var callNow = immediate && !timeout;
-
-    clearTimeout(timeout);
-    timeout = setTimeout(later, wait);
-    if (callNow) func.apply(context, args);
-  };
-}
-
-function extend(target, ...sources) {
-  return Object.assign(target, ...sources);
-}
 
 function drawImageOnCanvas(img, canvas) {
   var imgWidth = img.width;
@@ -235,7 +97,7 @@ function getDataSourceColumnValues(field) {
     // If there's no cache, return new values, i.e.
     return Fliplet.DataSources.connect(id).then(function(connection) {
       return connection.getIndex(column).then(function onSuccess(values) {
-        field.options = compact(values.map(function(option) {
+        field.options = Fliplet.FormBuilderUtils.compact(values.map(function(option) {
           if (!option) {
             return;
           }
@@ -413,7 +275,7 @@ Fliplet().then(async function() {
           }
 
           field.rowOptions.forEach(function(row) {
-            if (has(matrixValue, row.label)) {
+            if (Fliplet.FormBuilderUtils.has(matrixValue, row.label)) {
               return;
             }
 
@@ -446,12 +308,12 @@ Fliplet().then(async function() {
           if (field._type === 'flMatrix') {
             var matrixValue = {};
 
-            mapKeys(Fliplet.Navigate.query, function(value, key) {
+            Fliplet.FormBuilderUtils.mapKeys(Fliplet.Navigate.query, function(value, key) {
               if (key === field.defaultValueKey) {
                 field.rowOptions.forEach(function(row) {
                   var val = row.id ? row.id : row.label;
 
-                  if (!has(matrixValue, val)) {
+                  if (!Fliplet.FormBuilderUtils.has(matrixValue, val)) {
                     matrixValue[val] = value;
                   }
                 });
@@ -508,13 +370,13 @@ Fliplet().then(async function() {
       result.then(function(val) {
         if (field._type === 'flCheckbox') {
           if (!Array.isArray(val)) {
-            val = compact([val]);
+            val = Fliplet.FormBuilderUtils.compact([val]);
           }
 
           field.value = val;
         } else if (field._type === 'flTypeahead' || field._type === 'flReorderList') {
           if (!Array.isArray(val)) {
-            val = compact([val]);
+            val = Fliplet.FormBuilderUtils.compact([val]);
           }
 
           setTypeaheadFieldValue(field, val);
@@ -528,12 +390,12 @@ Fliplet().then(async function() {
           field.value = val;
         }
 
-        debounce();
+        Fliplet.FormBuilderUtils.debounce();
       });
     }
 
     function getFields(isEditMode) {
-      var fields = compact(JSON.parse(JSON.stringify(data.fields || [])));
+      var fields = Fliplet.FormBuilderUtils.compact(JSON.parse(JSON.stringify(data.fields || [])));
 
       const queryParams = Object.fromEntries(new URLSearchParams(location.search));
       const isAdmin = queryParams.beta === 'true';
@@ -603,7 +465,7 @@ Fliplet().then(async function() {
               case 'flMatrix':
                 var option = {};
 
-                if (isEmpty(entry.data)) {
+                if (Fliplet.FormBuilderUtils.isEmpty(entry.data)) {
                   return;
                 }
 
@@ -647,7 +509,7 @@ Fliplet().then(async function() {
                 break;
             }
 
-            if (has(field, '_submit') && !field._submit) {
+            if (Fliplet.FormBuilderUtils.has(field, '_submit') && !field._submit) {
               return; // do not update the field value
             }
 
@@ -659,7 +521,7 @@ Fliplet().then(async function() {
               case 'flTypeahead':
               case 'flReorderList':
                 if (!Array.isArray(fieldData)) {
-                  fieldData = compact([fieldData]);
+                  fieldData = Fliplet.FormBuilderUtils.compact([fieldData]);
                 }
 
                 break;
@@ -675,7 +537,7 @@ Fliplet().then(async function() {
               case 'flTelephone':
               case 'flUrl':
                 if (Array.isArray(fieldData)) {
-                  fieldData = compact(fieldData).join(', ');
+                  fieldData = Fliplet.FormBuilderUtils.compact(fieldData).join(', ');
                 }
 
                 break;
@@ -683,7 +545,7 @@ Fliplet().then(async function() {
               case 'flTextarea':
               case 'flWysiwyg':
                 if (Array.isArray(fieldData)) {
-                  fieldData = compact(fieldData).join('\n');
+                  fieldData = Fliplet.FormBuilderUtils.compact(fieldData).join('\n');
                 }
 
                 break;
@@ -734,7 +596,7 @@ Fliplet().then(async function() {
 
                 break;
               case 'flStarRating':
-                field.options = times(5, function(i) {
+                field.options = Fliplet.FormBuilderUtils.times(5, function(i) {
                   return {
                     id: '' + (i + 1)
                   };
@@ -1436,7 +1298,7 @@ Fliplet().then(async function() {
                       formData[`${field.name} [End]`] = value.end;
                     }
                   } else if (type === 'flMatrix') {
-                    if (!isEmpty(value)) {
+                    if (!Fliplet.FormBuilderUtils.isEmpty(value)) {
                       field.rowOptions.forEach(function(rowOpt) {
                         var val = rowOpt.id || rowOpt.label;
                         var rowFound = Object.entries(value).some(function([row, col]) {
@@ -1649,7 +1511,7 @@ Fliplet().then(async function() {
                     appendField(`${field.name} [End]`, value.end);
                   }
                 } else if (type === 'flMatrix') {
-                  if (!isEmpty(value)) {
+                  if (!Fliplet.FormBuilderUtils.isEmpty(value)) {
                     field.rowOptions.forEach(function(rowOpt) {
                       var val = rowOpt.id || rowOpt.label;
                       var rowFound = Object.entries(value).some(function([row, col]) {
@@ -1773,16 +1635,16 @@ Fliplet().then(async function() {
               // Emails are only sent by the client when data source hooks aren't set
               if (!data.dataSourceId) {
                 if (data.emailTemplateAdd && data.onSubmit && data.onSubmit.indexOf('templatedEmailAdd') > -1) {
-                  operation = Fliplet.Communicate.sendEmail(extend({}, data.emailTemplateAdd), formData);
+                  operation = Fliplet.Communicate.sendEmail(Fliplet.FormBuilderUtils.extend({}, data.emailTemplateAdd), formData);
                 }
 
                 if (data.emailTemplateEdit && data.onSubmit && data.onSubmit.indexOf('templatedEmailEdit') > -1) {
-                  operation = Fliplet.Communicate.sendEmail(extend({}, data.emailTemplateEdit), formData);
+                  operation = Fliplet.Communicate.sendEmail(Fliplet.FormBuilderUtils.extend({}, data.emailTemplateEdit), formData);
                 }
               }
 
               if (data.generateEmailTemplate && data.onSubmit && data.onSubmit.indexOf('generateEmail') > -1) {
-                operation = Fliplet.Communicate.composeEmail(extend({}, data.generateEmailTemplate), formData);
+                operation = Fliplet.Communicate.composeEmail(Fliplet.FormBuilderUtils.extend({}, data.generateEmailTemplate), formData);
               }
 
               if (data.linkAction && data.redirect === true) {
@@ -1867,10 +1729,10 @@ Fliplet().then(async function() {
                 record = { data: record };
               }
 
-              record.data = omitBy(record.data, function(value) {
-                return isNil(value)
-                  || (isObject(value) && isEmpty(value))
-                  || (isString(value) && !value.length);
+              record.data = Fliplet.FormBuilderUtils.omitBy(record.data, function(value) {
+                return Fliplet.FormBuilderUtils.isNil(value)
+                  || (Fliplet.FormBuilderUtils.isObject(value) && Fliplet.FormBuilderUtils.isEmpty(value))
+                  || (Fliplet.FormBuilderUtils.isString(value) && !value.length);
               });
               entry = record;
 
@@ -1978,6 +1840,11 @@ Fliplet().then(async function() {
         attachCustomButtonListener: function() {
           const $vm = this;
           const formElement = document.querySelector(`[data-id="${data.id}"]`);
+
+          if (!formElement) {
+            return;
+          }
+
           const currentSlide = formElement.closest('.swiper-slide');
           let isTouchMoveTriggered = false;
 
@@ -2129,7 +1996,7 @@ Fliplet().then(async function() {
       mounted: function() {
         var $vm = this;
 
-        this.saveProgressed = debounce(this.saveProgress, saveDelay);
+        this.saveProgressed = Fliplet.FormBuilderUtils.debounce(this.saveProgress, saveDelay);
 
         $(getRootElement()).removeClass('hidden');
 
@@ -2152,13 +2019,13 @@ Fliplet().then(async function() {
         }
 
         this.loadEntryForUpdate().then(function() {
-          var debouncedUpdate = debounce(function() {
+          var debouncedUpdate = Fliplet.FormBuilderUtils.debounce(function() {
             $form.$forceUpdate();
             $vm.saveProgressed();
           }, 10);
 
           function validateCheckboxValue(value, options) {
-            value = isArray(value) ? value : [value];
+            value = Array.isArray(value) ? value : [value];
 
             if (options.length) {
               var valueProp = options[0].id ? 'id' : 'label';
@@ -2168,9 +2035,9 @@ Fliplet().then(async function() {
                   return opt[valueProp] === elem;
                 });
               });
-              value = uniq(value);
+              value = Fliplet.FormBuilderUtils.uniq(value);
 
-              value = sortBy(value, function(val) {
+              value = Fliplet.FormBuilderUtils.sortBy(value, function(val) {
                 return options.findIndex(function(option) {
                   return option[valueProp] === val;
                 });
@@ -2376,8 +2243,8 @@ Fliplet().then(async function() {
 
                     if (field._type === 'flSelect') {
                       // remove all invalid options
-                      remove(values, function(val) {
-                        return !(isObject(val) || isNumber(val) || (isString(val) && val.trim()));
+                      Fliplet.FormBuilderUtils.remove(values, function(val) {
+                        return !(Fliplet.FormBuilderUtils.isObject(val) || Fliplet.FormBuilderUtils.isNumber(val) || (Fliplet.FormBuilderUtils.isString(val) && val.trim()));
                       });
                     }
 
@@ -2401,10 +2268,10 @@ Fliplet().then(async function() {
                       return { id: option };
                     });
 
-                    if (!isEmpty(field.value)) {
+                    if (!Fliplet.FormBuilderUtils.isEmpty(field.value)) {
                       switch (field._type) {
                         case 'flCheckbox':
-                          var selectedValues = difference(field.value, values);
+                          var selectedValues = Fliplet.FormBuilderUtils.difference(field.value, values);
 
                           field.value = selectedValues.length ? [] : field.value;
                           break;
@@ -2442,7 +2309,7 @@ Fliplet().then(async function() {
                   data.fieldEventListeners = eventListeners;
                 },
                 off: function(eventName, fn) {
-                  var eventListeners = get(data, ['fieldEventListeners', field.name, eventName]);
+                  var eventListeners = Fliplet.FormBuilderUtils.get(data, ['fieldEventListeners', field.name, eventName]);
 
                   if (!eventListeners) {
                     return;

@@ -141,7 +141,7 @@ Fliplet.FormBuilder = (function() {
                   this.rowOptions.forEach(function(row) {
                     var val = row.id ? row.id : row.label;
 
-                    if (!Object.prototype.hasOwnProperty.call(matrixValue, val)) {
+                    if (!Fliplet.FormBuilderUtils.has(matrixValue, val)) {
                       matrixValue[val] = value;
                     }
                   });
@@ -216,22 +216,8 @@ Fliplet.FormBuilder = (function() {
         }
       };
 
-      // Custom debounce implementation
-      var debounce = function(func, wait) {
-        var timeout;
 
-        return function() {
-          var context = this;
-          var args = arguments;
-
-          clearTimeout(timeout);
-          timeout = setTimeout(function() {
-            func.apply(context, args);
-          }, wait);
-        };
-      };
-
-      component.methods.onInput = debounce(function($event) {
+      component.methods.onInput = Fliplet.FormBuilderUtils.debounce(function($event) {
         this.$emit('_input', this.name, $event.target.value, false, true);
       }, 200);
 
@@ -680,7 +666,7 @@ Fliplet.FormBuilder = (function() {
       component.computed._hasErrors = function() {
         this._getErrors();
 
-        return Object.keys(this.errors).length > 0;
+        return !Fliplet.FormBuilderUtils.isEmpty(this.errors);
       };
 
       component.methods._hasDuplicateOptions  = function(options) {
@@ -862,8 +848,8 @@ Fliplet.FormBuilder = (function() {
 
           if (componentName === 'flAddress') {
             this._initAddressTypeahead();
-            this.localSelectedFieldOptions = JSON.parse(JSON.stringify(this.selectedFieldOptions));
-            this.localFieldOptions = JSON.parse(JSON.stringify(this.fieldOptions));
+            this.localSelectedFieldOptions = Fliplet.FormBuilderUtils.cloneDeep(this.selectedFieldOptions);
+            this.localFieldOptions = Fliplet.FormBuilderUtils.cloneDeep(this.fieldOptions);
           }
 
           if (componentName === 'flParagraph') {
@@ -916,20 +902,15 @@ Fliplet.FormBuilder = (function() {
         component.methods.enableAutomatch = component.methods._enableAutomatch;
       }
 
-      component.methods._matchFields = function() {
-        var self = this;
+      component.methods._matchFields = Fliplet.FormBuilderUtils.debounce(function() {
+        if (!self._showNameField) {
+          self.name = self._componentName === 'flCustomButton' ? self.buttonLabel : self.label;
+        }
 
-        clearTimeout(self._matchFieldsTimeout);
-        self._matchFieldsTimeout = setTimeout(function() {
-          if (!self._showNameField) {
-            self.name = self._componentName === 'flCustomButton' ? self.buttonLabel : self.label;
-          }
-
-          if (currentMultiStepForm.length) {
-            self.hasFieldDuplicatesInMultiStepForm = self._checkDuplicateFieldsInMultiStepForm();
-          }
-        }, 200);
-      };
+        if (currentMultiStepForm.length) {
+          self.hasFieldDuplicatesInMultiStepForm = self._checkDuplicateFieldsInMultiStepForm();
+        }
+      });
 
       if (!component.methods.matchFields) {
         component.methods.matchFields = component.methods._matchFields;

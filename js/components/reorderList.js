@@ -50,7 +50,7 @@ Fliplet.FormBuilder.field('reorderList', {
   },
   data: function() {
     return {
-      orderedOptions: this.cloneDeep(this.options),
+      orderedOptions: Fliplet.FormBuilderUtils.cloneDeep(this.options),
       sortableOptions: {
         sort: true,
         group: {
@@ -84,7 +84,7 @@ Fliplet.FormBuilder.field('reorderList', {
     options: {
       immediate: true,
       handler(val) {
-        this.orderedOptions = this.cloneDeep(val);
+        this.orderedOptions = Fliplet.FormBuilderUtils.cloneDeep(val);
       }
     },
     value: function(val) {
@@ -109,31 +109,6 @@ Fliplet.FormBuilder.field('reorderList', {
     }
   },
   methods: {
-    /**
-     * Creates a deep clone of a value
-     * @param {*} value - value to clone
-     * @returns {*} cloned value
-     */
-    cloneDeep: function(value) {
-      if (value === null || typeof value !== 'object') return value;
-      if (value instanceof Date) return new Date(value.getTime());
-      if (Array.isArray(value)) return value.map(this.cloneDeep.bind(this));
-
-      if (typeof value === 'object') {
-        var cloned = {};
-
-        for (var key in value) {
-          if (Object.prototype.hasOwnProperty.call(value, key)) {
-            cloned[key] = this.cloneDeep(value[key]);
-          }
-        }
-
-        return cloned;
-      }
-
-      return value;
-    },
-
     onSort: function(event) {
       this.orderedOptions.splice(event.newIndex, 0, this.orderedOptions.splice(event.oldIndex, 1)[0]);
 
@@ -141,7 +116,7 @@ Fliplet.FormBuilder.field('reorderList', {
     },
     onReset: function(data) {
       if (data.id === this.$parent.id) {
-        this.orderedOptions = this.cloneDeep(this.options);
+        this.orderedOptions = Fliplet.FormBuilderUtils.cloneDeep(this.options);
 
         return;
       }
