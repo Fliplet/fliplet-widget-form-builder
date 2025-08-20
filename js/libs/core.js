@@ -1207,8 +1207,8 @@ Fliplet.FormBuilder = (function() {
           target: this.$refs.textarea,
           menubar: false,
           branding: false,
-          plugins: 'lists',
-          toolbar: 'bold italic underline | fontsize_label fontsize',
+          plugins: 'lists code',
+          toolbar: ['bold italic underline code', 'fontsize_label fontsize'].join('|'),
           font_size_formats: '8px 10px 12px 14px 18px 24px 36px',
           setup: function(editor) {
             $vm._editor = editor;
