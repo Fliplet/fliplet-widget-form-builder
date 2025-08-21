@@ -903,12 +903,12 @@ Fliplet.FormBuilder = (function() {
       }
 
       component.methods._matchFields = Fliplet.FormBuilderUtils.debounce(function() {
-        if (!self._showNameField) {
-          self.name = self._componentName === 'flCustomButton' ? self.buttonLabel : self.label;
+        if (!this._showNameField) {
+          this.name = this._componentName === 'flCustomButton' ? this.buttonLabel : this.label;
         }
 
         if (currentMultiStepForm.length) {
-          self.hasFieldDuplicatesInMultiStepForm = self._checkDuplicateFieldsInMultiStepForm();
+          this.hasFieldDuplicatesInMultiStepForm = this._checkDuplicateFieldsInMultiStepForm();
         }
       });
 

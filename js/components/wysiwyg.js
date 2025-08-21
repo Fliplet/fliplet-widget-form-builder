@@ -41,14 +41,14 @@ Fliplet.FormBuilder.field('wysiwyg', {
   watch: {
     value: function(val) {
       // This happens when the value is updated programmatically via the FormBuilder field().val() method
-      const formatedVal = Fliplet.FormBuilderUtils.isNumber(val) ? val.toString() : val;
+      const formattedVal = Fliplet.FormBuilderUtils.isNumber(val) ? val.toString() : val;
 
-      if (this.editor && formatedVal !== this.editor.getContent()) {
-        return this.editor.setContent(formatedVal || '', { format: 'raw' });
+      if (this.editor && formattedVal !== this.editor.getContent()) {
+        return this.editor.setContent(formattedVal || '', { format: 'raw' });
       }
 
-      if (formatedVal !== this.value) {
-        this.value = formatedVal;
+      if (formattedVal !== this.value) {
+        this.value = formattedVal;
       }
     }
   },
