@@ -1,3 +1,5 @@
-<div>
-  <div class="timeStamp">timestamp will be recorded upon submission</div>
+<div role="group" :aria-label="'Timestamp for ' + (label || 'automatic time recording')" :aria-describedby="_ariaDescribedBy">
+  <div class="timeStamp" role="status" aria-live="polite">
+    <span>timestamp will be recorded upon submission</span>
+  </div>
 </div>

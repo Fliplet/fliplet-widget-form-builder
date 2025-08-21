@@ -181,7 +181,10 @@ Fliplet.FormBuilder.field('dateRange', {
       this.selectedRange = null;
 
       this.dateRange.clear();
+
+      this.announceStatus('Date range reset', 1500);
     },
+
     initDaterange: function() {
       var $vm = this;
 
@@ -199,8 +202,13 @@ Fliplet.FormBuilder.field('dateRange', {
       this.dateRange.change(function(value) {
         $vm.value = value;
         $vm.updateValue();
+
+        if (value && value.start && value.end) {
+          $vm.announceAction(`Date range selected: ${value.start} to ${value.end}`, 2500);
+        }
       });
     },
+
     getDate: function(option) {
       switch (option) {
         case 'today':
@@ -242,11 +250,13 @@ Fliplet.FormBuilder.field('dateRange', {
           return this.value;
       }
     },
+
     formatDate: function(date) {
       return typeof date !== 'undefined' && moment(date).isValid()
         ? moment(date).locale('en').format('YYYY-MM-DD')
         : moment().locale('en').format('YYYY-MM-DD');
     },
+
     onBeforeSubmit: function(data) {
       // Empty date fields are validated to null before this hook is called
       if (this.autofill === 'always' && data[this.name] === null) {

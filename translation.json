@@ -4,6 +4,7 @@
       "loading": "Loading...",
       "savingData": "Saving data...",
       "retrievingData": "Retrieving data...",
+      "submissionSuccess": "Form submitted successfully!",
       "sending": {
         "requiredFields": "* Required fields"
       },
@@ -138,11 +139,11 @@
       },
       "errors": {
         "required": "Field is required.",
-        "fieldsNotFilled": "Please complete all required fields.",
-        "unableToLoadEntry": "Unable to load entry",
-        "offlineDataError": "The data can only be updated when connected to the internet.",
-        "offlineFormError": "This form can only be submitted when connected to the internet.",
-        "locationError": "Address processing failed. Check your connection and try again."
+        "fieldsNotFilled": "Please complete all required fields before submitting the form.",
+        "unableToLoadEntry": "Unable to load entry. Please try refreshing the page.",
+        "offlineDataError": "The data can only be updated when connected to the internet. Please check your connection and try again.",
+        "offlineFormError": "This form can only be submitted when connected to the internet. Please check your connection and try again.",
+        "locationError": "Address processing failed. Please check your internet connection and try again."
       }
     }
   }

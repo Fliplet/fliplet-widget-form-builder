@@ -118,6 +118,28 @@ Fliplet.FormBuilder.field('password', {
     }
   },
   methods: {
+    /**
+     * Handle focus events
+     * @returns {void}
+     */
+    onFocus: function() {
+      this.isFocused = true;
+
+      const instructions = this.autogenerate
+        ? 'Auto-generated password field. Press Tab to continue or generate new password.'
+        : 'Enter your password. Requirements will be shown below.';
+
+      this.announceStatus(instructions, 4000);
+    },
+
+    /**
+     * Handle confirmation focus events
+     * @returns {void}
+     */
+    onConfirmFocus: function() {
+      this.announceStatus('Confirm your password by entering it again', 3000);
+    },
+
     generateRandomPassword: function(length) {
       var alphabet = 'abcdefghijklmnopqrstuvwxyz!#$%&*-ABCDEFGHIJKLMNOP1234567890';
       var password = '';

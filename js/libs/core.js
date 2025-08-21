@@ -206,11 +206,25 @@ Fliplet.FormBuilder = (function() {
           if ($vm.$v.passwordConfirmation) {
             $vm.isValid = !$vm.$v.value.$error;
 
+            // Announce validation status to screen readers
+            $vm.announceValidationStatus();
+
             return;
           }
 
           $vm.isValid = !$vm.$v.value.$error;
+
+          // Announce validation status to screen readers
+          $vm.announceValidationStatus();
         }
+      };
+
+      component.methods.announceValidationStatus = function() {
+        const fieldName = this.name || 'Field';
+        const isValid = this.isValid;
+        const message = isValid ? `${fieldName} is valid` : `${fieldName} has validation errors`;
+
+        this.announceError(message, 1500);
       };
 
       component.methods.onInput = _.debounce(function($event) {
@@ -229,6 +243,59 @@ Fliplet.FormBuilder = (function() {
           this.$emit('_reset');
         };
       }
+
+      // Add helper method for accessibility announcements
+      component.methods.announceToScreenReader = function(message, options) {
+        const defaultOptions = {
+          role: 'status',
+          priority: 'polite', // 'polite' or 'assertive'
+          duration: 2000,
+          className: 'sr-only'
+        };
+
+        const config = Object.assign({}, defaultOptions, options);
+
+        const announcement = document.createElement('div');
+
+        announcement.setAttribute('role', config.role);
+        announcement.setAttribute('aria-live', config.priority);
+        announcement.className = config.className;
+        announcement.textContent = message;
+        document.body.appendChild(announcement);
+
+        setTimeout(() => {
+          if (announcement.parentNode) {
+            announcement.parentNode.removeChild(announcement);
+          }
+        }, config.duration);
+      };
+
+      // Add helper method for status announcements
+      component.methods.announceStatus = function(message, duration) {
+        this.announceToScreenReader(message, {
+          role: 'status',
+          priority: 'polite',
+          duration: duration || 1500
+        });
+      };
+
+      // Add helper method for error announcements
+      component.methods.announceError = function(message, duration) {
+        this.announceToScreenReader(message, {
+          role: 'alert',
+          priority: 'assertive',
+          duration: duration || 3000
+        });
+      };
+
+      // Add helper method for action announcements
+      component.methods.announceAction = function(message, duration) {
+        this.announceToScreenReader(message, {
+          role: 'status',
+          priority: 'polite',
+          duration: duration || 1500
+        });
+      };
 
       if (!component.computed) {
         component.computed = {};
@@ -297,6 +364,37 @@ Fliplet.FormBuilder = (function() {
         });
 
         return option ? (option.label || option.id) : this.value;
+      };
+
+      // Add accessibility computed properties
+      component.computed._ariaLabel = function() {
+        const label = this.label || this.name || 'Form field';
+        const required = this.required ? ' (required)' : '';
+        const readonly = this.readonly ? ' (read only)' : '';
+
+        return `${label}${required}${readonly}`;
+      };
+
+      component.computed._ariaDescribedBy = function() {
+        const descriptions = [];
+
+        if (this.description) {
+          descriptions.push(`${this.name}-description`);
+        }
+
+        if (this.required) {
+          descriptions.push(`${this.name}-required`);
+        }
+
+        if (!this.isValid) {
+          descriptions.push(`${this.name}-error`);
+        }
+
+        return descriptions.length > 0 ? descriptions.join(' ') : null;
+      };
+
+      component.computed._ariaInvalid = function() {
+        return this.$v && this.$v.value && this.$v.value.$error ? 'true' : 'false';
       };
 
       if (!component.mounted) {
@@ -413,11 +511,13 @@ Fliplet.FormBuilder = (function() {
 
       // On submit event
       component.methods._onSubmit = function() {
-        if (!this.defaultValueKey && this._componentsWithPersonalization.includes(this._componentName) && this.defaultValueSource !== 'default') {
-          return 'Key field is required';
-        }
+        // Enhanced validation with better error messages
+        const validationErrors = this.validateConfiguration();
 
-        if (this._fieldNameError || this._fieldLabelError || this._hasErrors) {
+        if (validationErrors.length > 0) {
+          // Show validation errors to user
+          this.showConfigurationErrors(validationErrors);
+
           return;
         }
 
@@ -430,6 +530,60 @@ Fliplet.FormBuilder = (function() {
           }
         });
 
+        try {
+          this.processConfigurationData(data);
+        } catch (error) {
+          this.showConfigurationErrors(['Configuration processing failed. Please try again.']);
+          console.error('Configuration processing error:', error);
+        }
+      };
+
+      component.methods.validateConfiguration = function() {
+        const errors = [];
+
+        if (!this.defaultValueKey && this._componentsWithPersonalization
+            && this._componentsWithPersonalization.includes(this._componentName)
+            && this.defaultValueSource !== 'default') {
+          errors.push('Key field is required for personalization');
+        }
+
+        if (this._fieldNameError) {
+          errors.push('Field name has errors');
+        }
+
+        if (this._fieldLabelError) {
+          errors.push('Field label has errors');
+        }
+
+        if (this._hasErrors) {
+          errors.push('Configuration has errors');
+        }
+
+        return errors;
+      };
+
+      // Add method to show configuration errors
+      component.methods.showConfigurationErrors = function(errors) {
+        const errorMessage = errors.join('. ');
+
+        // Announce to screen readers
+        const announcement = document.createElement('div');
+
+        announcement.setAttribute('role', 'alert');
+        announcement.setAttribute('aria-live', 'assertive');
+        announcement.className = 'sr-only';
+        announcement.textContent = `Configuration errors: ${errorMessage}`;
+        document.body.appendChild(announcement);
+
+        setTimeout(() => {
+          if (announcement.parentNode) {
+            announcement.parentNode.removeChild(announcement);
+          }
+        }, 3000);
+      };
+
+      // Add method to process configuration data
+      component.methods.processConfigurationData = function(data) {
         if (this._componentName === 'flInput') {
           if (this.generateGuid) {
             data.idType = 'guid';

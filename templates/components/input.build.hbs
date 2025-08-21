@@ -1,14 +1,22 @@
-<input
-  type="text"
-  class="form-control focus-outline"
-  v-model.trim.lazy="$v.value.$model"
-  v-on:change="readonly ? false : updateValue()"
-  v-on:input="readonly ? false : onInput($event)"
-  :name="name"
-  :id="name"
-  :placeholder="placeholder"
-  tabindex="0"
-  :readonly="readonly"
-  @blur="onBlur()"
-/>
-<p class="text-danger" v-if="$v.value.required === false && $v.value.$dirty">{{T "widgets.form.errors.required"}}</p>
+<div class="input-group" role="group" :aria-label="'Text input for ' + (label || 'text entry')">
+  <input
+    type="text"
+    class="form-control focus-outline"
+    v-model.trim.lazy="$v.value.$model"
+    v-on:change="readonly ? false : updateValue()"
+    v-on:input="readonly ? false : onInput($event)"
+    :name="name"
+    :id="name"
+    :placeholder="placeholder"
+    :aria-label="_ariaLabel + ' - Text input field'"
+    :aria-describedby="_ariaDescribedBy"
+    :aria-invalid="_ariaInvalid"
+    tabindex="0"
+    :readonly="readonly"
+    @blur="onBlur"
+  />
+</div>
+
+<p class="text-danger" v-if="$v.value.required === false && $v.value.$dirty" role="alert" aria-live="assertive">
+  {{T "widgets.form.errors.required"}}
+</p>

@@ -1,17 +1,32 @@
 {{! Image upload field with canvas preview, size validation, and custom dimensions }}
-<div class="form-group fileUpload" :class="{ 'fileUpload-disabled' : readonly, 'fileUpload-padding-top': value.length }">
+<div class="form-group fileUpload" :class="{ 'fileUpload-disabled' : readonly, 'fileUpload-padding-top': value.length }" role="group" :aria-label="'Image upload for ' + (label || 'image attachment')">
   <div class="row" v-if="value.length">
-    <div v-for="(image, index) in value">
+    <div v-for="(image, index) in value" class="image-item" role="listitem">
       <div class="canvas-holder">
-        <canvas ref="canvas"></canvas>
-        <button class="canvas-remove" :class="{ 'hidden' : readonly }" type="button" v-on:click="removeImage(index)"></button>
+        <canvas ref="canvas" :aria-label="'Image preview ' + (index + 1)"></canvas>
+        <button 
+          class="canvas-remove" 
+          :class="{ 'hidden' : readonly }" 
+          type="button" 
+          :aria-label="'Remove image ' + (index + 1)"
+          tabindex="0"
+          v-on:click="removeImage(index)"
+          @keydown="handleRemoveKeyDown($event, index)"
+          v-if="!readonly"
+        ></button>
       </div>
     </div>
   </div>
+  
   <label
     class="btn btn-primary focus-outline"
     tabindex="0"
+    :aria-label="_ariaLabel + ' - Select images to upload'"
+    :aria-describedby="_ariaDescribedBy"
+    :aria-invalid="_ariaInvalid"
+    :disabled="readonly"
     v-on:keydown.space.prevent="openFileDialog()"
+    v-on:keydown.enter.prevent="openFileDialog()"
   >
     <i class="fa fa-plus" :class="{ 'hidden' : readonly }" aria-hidden="true"></i>
     <span>{{T "widgets.form.image.instruction"}}</span>
@@ -24,14 +39,23 @@
       class="input-file selectfile"
       accept="image/gif, image/jpg, image/jpeg, image/tiff, image/png"
       :data-folder-id="mediaFolderId"
+      :aria-label="_ariaLabel + ' - Image input'"
       v-on:click="onFileClick"
       v-on:change="onFileChange($event)"
       tabindex="-1"
     />
   </label>
-  <p class="text-danger" v-if="hasCorruptedImage">{{T "widgets.form.image.invalid"}}</p>
-  <p class="text-danger" v-if="isImageSizeExceeded">\{{$t("widgets.form.image.imageSizeExceeded", { maxImageSize: customWidth + 'x' + customHeight })}}</p>
-  <p class="text-danger" v-if="$v.value.required === false && $v.value.$dirty">{{T
-      "widgets.form.errors.required"
-    }}</p>
+  
+  
+  <p class="text-danger" v-if="hasCorruptedImage" role="alert" aria-live="assertive">
+    {{T "widgets.form.image.invalid"}}
+  </p>
+
+  <p class="text-danger" v-if="isImageSizeExceeded" role="alert" aria-live="assertive">
+    \{{$t("widgets.form.image.imageSizeExceeded", { maxImageSize: customWidth + 'x' + customHeight })}}
+  </p>
+
+  <p class="text-danger" v-if="$v.value.required === false && $v.value.$dirty" role="alert" aria-live="assertive">
+    {{T "widgets.form.errors.required"}}
+  </p>
 </div>

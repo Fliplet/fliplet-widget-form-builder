@@ -1,5 +1,5 @@
 {{! Custom select dropdown with styled appearance and keyboard accessibility }}
-<template>
+<div role="group" :aria-label="'Dropdown for ' + (label || 'selection')" :aria-describedby="_ariaDescribedBy">
   <label
     :for="name"
     class="select-proxy-display"
@@ -15,6 +15,10 @@
       v-on:focus="isInputFocused = true"
       v-on:blur="isInputFocused = false"
       v-on:keydown.prevent="readonly ? false : true"
+      :aria-label="_ariaLabel"
+      :aria-describedby="_ariaDescribedBy"
+      :aria-invalid="_ariaInvalid"
+      :disabled="readonly"
       tabindex="0"
       @blur="onBlur()"
     >
@@ -23,9 +27,15 @@
         \{{ option.label || option.id }}
       </option>
     </select>
-    <span class="icon fa fa-chevron-down"></span>
-    <span class="select-value-proxy"><template v-if="value && value !== ''">\{{ _selectedLabel }}</template><template v-else>\{{ placeholder }}</template></span>
+    <span class="icon fa fa-chevron-down" aria-hidden="true"></span>
+    <span class="select-value-proxy" role="status" aria-live="polite">
+      <template v-if="value && value !== ''">\{{ _selectedLabel }}</template>
+      <template v-else>\{{ placeholder }}</template>
+    </span>
   </label>
-  <p class="text-danger" v-if="$v.value.required === false && $v.value.$dirty">{{T "widgets.form.errors.required"}}</p>
-</template>
+  
+  <p class="text-danger" v-if="$v.value.required === false && $v.value.$dirty" role="alert" aria-live="assertive">
+    {{T "widgets.form.errors.required"}}
+  </p>
+</div>
 

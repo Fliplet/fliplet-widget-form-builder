@@ -44,8 +44,11 @@ Fliplet.FormBuilder.field('input', {
       if (!this.value && this.idType === 'guid' && data.id !== this.$parent.id) {
         this.value = Fliplet.guid();
         this.updateValue();
+
+        this.announceStatus('New GUID generated', 1500);
       }
     },
+
     onReset: function(data) {
       if (!data || data.id !== this.$parent.id) {
         return;

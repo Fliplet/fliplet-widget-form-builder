@@ -28,7 +28,6 @@ Fliplet.FormBuilder.field('date', {
   data: function() {
     return {
       datePicker: null,
-      isInputFocused: false,
       isPreview: Fliplet.Env.get('preview'),
       today: moment().locale('en').format('YYYY-MM-DD')
     };
@@ -122,8 +121,13 @@ Fliplet.FormBuilder.field('date', {
         $vm.empty = false;
         $vm.value = value;
         $vm.updateValue();
+
+        if (value) {
+          $vm.announceAction(`Date selected: ${value}`, 2000);
+        }
       });
     },
+
     onBeforeSubmit: function(data) {
       if (this.autofill === 'default' && !this.empty && this.value) {
         data[this.name] = this.value;

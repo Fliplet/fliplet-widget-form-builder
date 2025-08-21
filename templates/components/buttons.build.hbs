@@ -1,6 +1,26 @@
-<template v-if="showSubmit">
-<button :type="submitType" class="btn btn-primary pull-right focus-outline" tabindex="0">\{{ submitValue }}</button>
-</template>
-<template v-if="showClear">
-<button :type="clearType" class="btn btn-secondary pull-right focus-outline" tabindex="0" @click="resetForm()">\{{ clearValue }}</button>
-</template>
+<div class="form-btns clearfix" role="group" aria-label="Form action buttons">
+  <template v-if="showSubmit">
+    <button 
+      :type="submitType" 
+      class="btn btn-primary pull-right focus-outline" 
+      tabindex="0"
+      :aria-label="_ariaLabel + ' - Submit form'"
+      :aria-describedby="_ariaDescribedBy"
+    >
+      \{{ submitValue }}
+    </button>
+  </template>
+  
+  <template v-if="showClear">
+    <button 
+      :type="clearType" 
+      class="btn btn-secondary pull-right focus-outline" 
+      :aria-label="_ariaLabel + ' - Clear form'"
+      :aria-describedby="_ariaDescribedBy"
+      tabindex="0"
+      @click="resetForm()"
+    >
+      \{{ clearValue }}
+    </button>
+  </template>
+</div>

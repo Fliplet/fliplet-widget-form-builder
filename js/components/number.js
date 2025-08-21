@@ -54,6 +54,22 @@ Fliplet.FormBuilder.field('number', {
     return rules;
   },
   methods: {
+    /**
+     * Handle focus events
+     * @returns {void}
+     */
+    onFocus: function() {
+      const instructions = this.positiveOnly
+        ? 'Enter a positive number'
+        : 'Enter a number';
+
+      if (this.decimals > 0) {
+        this.announceStatus(`${instructions} with up to ${this.decimals} decimal places`, 3000);
+      } else {
+        this.announceStatus(`${instructions}`, 2000);
+      }
+    },
+
     positiveValidator: function() {
       return window.validators.helpers.withParams(
         {
