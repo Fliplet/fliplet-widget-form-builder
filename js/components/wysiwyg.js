@@ -41,14 +41,14 @@ Fliplet.FormBuilder.field('wysiwyg', {
   watch: {
     value: function(val) {
       // This happens when the value is updated programmatically via the FormBuilder field().val() method
-      val = _.isNumber(val) ? _.toString(val) : val;
+      const formattedVal = Fliplet.FormBuilderUtils.isNumber(val) ? val.toString() : val;
 
-      if (this.editor && val !== this.editor.getContent()) {
-        return this.editor.setContent(val || '', { format: 'raw' });
+      if (this.editor && formattedVal !== this.editor.getContent()) {
+        return this.editor.setContent(formattedVal || '', { format: 'raw' });
       }
 
-      if (val !== this.value) {
-        this.value = val;
+      if (formattedVal !== this.value) {
+        this.value = formattedVal;
       }
     }
   },
@@ -81,7 +81,7 @@ Fliplet.FormBuilder.field('wysiwyg', {
     var $vm = this;
     var lineHeight = 55;
 
-    this.tinymceId = _.kebabCase(this.name) + '-' + $(this.$refs.textarea).parents('[data-form-builder-id]').data('formBuilderId');
+    this.tinymceId = Fliplet.FormBuilderUtils.kebabCase(this.name) + '-' + $(this.$refs.textarea).parents('[data-form-builder-id]').data('formBuilderId');
 
     var config = {
       target: this.$refs.textarea,
@@ -204,15 +204,15 @@ Fliplet.FormBuilder.field('wysiwyg', {
       }).then(function() {
         var pluginPaths = ['plugins', 'mobile.plugins'];
 
-        _.forEach(pluginPaths, function(path) {
-          var plugins = _.get(config, path);
+        pluginPaths.forEach(function(path) {
+          var plugins = Fliplet.FormBuilderUtils.get(config, path);
 
           if (typeof plugins === 'string') {
             // Use array of plugins (as TinyMCE's preferred format) if string is provided
             plugins = plugins.split(' ');
           }
 
-          _.set(config, path, plugins);
+          Fliplet.FormBuilderUtils.set(config, path, plugins);
         });
 
         tinymce.init(config);

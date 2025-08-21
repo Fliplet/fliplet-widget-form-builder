@@ -19,7 +19,12 @@
       @blur="onBlur()"
     >
       <option v-if="placeholder" value="">\{{ placeholder }}</option>
-      <option v-for="option in options" :value="(_.isNumber(option.id) || _.isString(option.id)) ? option.id : option.label" :disabled="option.disabled">
+      <option
+        v-for="option in options"
+        :key="option.id || option.label"
+        :value="(isNumber(option.id) || isString(option.id)) ? option.id : option.label"
+        :disabled="option.disabled"
+      >
         \{{ option.label || option.id }}
       </option>
     </select>

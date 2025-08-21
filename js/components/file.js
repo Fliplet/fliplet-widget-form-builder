@@ -51,10 +51,10 @@ Fliplet.FormBuilder.field('file', {
   },
   computed: {
     selectedFileName: function() {
-      return _.map(this.value, 'name').join(', ');
+      return this.value.map(function(file) { return file.name; }).join(', ');
     },
     isValueUrlLink: function() {
-      return _.some(this.value, function(value) {
+      return this.value.some(function(value) {
         return typeof value === 'string' && Fliplet.Media.isRemoteUrl(value);
       });
     }
@@ -89,7 +89,7 @@ Fliplet.FormBuilder.field('file', {
     loadFileData: function() {
       var $vm = this;
       var isFileDataLoaded = false;
-      var fileIDs = _.map(this.value, function(fileURL) {
+      var fileIDs = this.value.map(function(fileURL) {
         if (typeof fileURL === 'string' && /v1\/media\/files\/([0-9]+)/.test(fileURL)) {
           return +fileURL.match(/v1\/media\/files\/([0-9]+)/)[1];
         }
@@ -107,13 +107,13 @@ Fliplet.FormBuilder.field('file', {
         files: fileIDs,
         fields: ['name', 'url', 'metadata', 'createdAt']
       }).then(function(files) {
-        var newFiles = _.map(files, function(file) {
+        var newFiles = files.map(function(file) {
           file.size = file.metadata.size;
 
           return file;
         });
 
-        $vm.value = _.sortBy(newFiles, ['name']);
+        $vm.value = Fliplet.FormBuilderUtils.sortBy(newFiles, function(file) { return file.name; });
       }).catch(function() {});
     },
     showLocalDateFormat: function(date) {

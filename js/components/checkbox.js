@@ -57,18 +57,18 @@ Fliplet.FormBuilder.field('checkbox', {
         var $vm = this;
 
         // Sort selected options by their index as a checkbox input option
-        var ordered = _.sortBy(this.value, function(val) {
-          return _.findIndex($vm.options, function(option) {
+        var ordered = Fliplet.FormBuilderUtils.sortBy(this.value, function(val) {
+          return $vm.options.findIndex(function(option) {
             return (option.id || option.label) === val;
           });
         });
 
         // Get all options label in array format
-        var allOptions = _.map(this.options, function(option) {
+        var allOptions = this.options.map(function(option) {
           return option.id || option.label;
         });
 
-        this.selectedAll = _.isEqual(ordered, allOptions);
+        this.selectedAll = Fliplet.FormBuilderUtils.isEqual(ordered, allOptions);
       }
     },
     selectedAll: {
@@ -90,7 +90,7 @@ Fliplet.FormBuilder.field('checkbox', {
           this.value = [];
         }
 
-        if (!_.isEqual(oldValue, this.value)) {
+        if (!Fliplet.FormBuilderUtils.isEqual(oldValue, this.value)) {
           this.updateValue();
         }
       }
@@ -112,9 +112,9 @@ Fliplet.FormBuilder.field('checkbox', {
       var $vm = this;
 
       // Sort selected options by their index as a checkbox input option
-      var ordered = _.sortBy(this.value, function(val) {
-        return _.findIndex($vm.options, function(option) {
-          return (option.label || option.id) === val;
+      var ordered = Fliplet.FormBuilderUtils.sortBy(this.value, function(val) {
+        return $vm.options.findIndex(function(option) {
+          return (option.id || option.label) === val;
         });
       });
 
@@ -155,8 +155,8 @@ Fliplet.FormBuilder.field('checkbox', {
       var selectedOptions = [];
 
       this.value.forEach(function(value) {
-        var selectedOption = _.find($vm.options, function(option) {
-          return (_.has(option, 'label') && _.has(option, 'id')) ? option.id === value : option.label === value;
+        var selectedOption = $vm.options.find(function(option) {
+          return (Fliplet.FormBuilderUtils.has(option, 'label') && Fliplet.FormBuilderUtils.has(option, 'id')) ? option.id === value : option.label === value;
         });
 
         if (selectedOption) {
@@ -164,7 +164,7 @@ Fliplet.FormBuilder.field('checkbox', {
         }
       });
 
-      this.value = selectedOptions.length ? _.uniqWith(this.value, _.isEqual) : [];
+      this.value = selectedOptions.length ? Array.from(new Set(this.value)) : [];
     }
 
     if (!!this.defaultValue) {
