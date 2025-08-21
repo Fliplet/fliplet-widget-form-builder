@@ -114,7 +114,7 @@ Fliplet.FormBuilder.field('checkbox', {
       // Sort selected options by their index as a checkbox input option
       var ordered = Fliplet.FormBuilderUtils.sortBy(this.value, function(val) {
         return $vm.options.findIndex(function(option) {
-          return (option.label || option.id) === val;
+          return (option.id || option.label) === val;
         });
       });
 
@@ -164,7 +164,7 @@ Fliplet.FormBuilder.field('checkbox', {
         }
       });
 
-      this.value = selectedOptions.length ? Fliplet.FormBuilderUtils.uniqWith(this.value, Fliplet.FormBuilderUtils.isEqual) : [];
+      this.value = selectedOptions.length ? Array.from(new Set(this.value)) : [];
     }
 
     if (!!this.defaultValue) {

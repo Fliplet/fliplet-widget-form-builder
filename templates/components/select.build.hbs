@@ -21,6 +21,7 @@
       <option v-if="placeholder" value="">\{{ placeholder }}</option>
       <option
         v-for="option in options"
+        :key="option.id || option.label"
         :value="(isNumber(option.id) || isString(option.id)) ? option.id : option.label"
         :disabled="option.disabled"
       >

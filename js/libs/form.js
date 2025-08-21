@@ -10,8 +10,6 @@ var allFormsInSlide = [];
 var currentFormUId;
 var currentMultiStepForm;
 
-// Native JavaScript helper functions to replace lodash
-
 function drawImageOnCanvas(img, canvas) {
   var imgWidth = img.width;
   var imgHeight = img.height;
@@ -389,8 +387,6 @@ Fliplet().then(async function() {
         } else {
           field.value = val;
         }
-
-        Fliplet.FormBuilderUtils.debounce();
       });
     }
 
@@ -2271,7 +2267,7 @@ Fliplet().then(async function() {
                     if (!Fliplet.FormBuilderUtils.isEmpty(field.value)) {
                       switch (field._type) {
                         case 'flCheckbox':
-                          var selectedValues = Fliplet.FormBuilderUtils.difference(field.value, values);
+                          const selectedValues = Fliplet.FormBuilderUtils.difference(field.value, values);
 
                           field.value = selectedValues.length ? [] : field.value;
                           break;

@@ -41,37 +41,18 @@ Fliplet.FormBuilder.field('wysiwyg', {
   watch: {
     value: function(val) {
       // This happens when the value is updated programmatically via the FormBuilder field().val() method
-      val = Fliplet.FormBuilderUtils.isNumber(val) ? val.toString() : val;
+      const formatedVal = Fliplet.FormBuilderUtils.isNumber(val) ? val.toString() : val;
 
-      if (this.editor && val !== this.editor.getContent()) {
-        return this.editor.setContent(val || '', { format: 'raw' });
+      if (this.editor && formatedVal !== this.editor.getContent()) {
+        return this.editor.setContent(formatedVal || '', { format: 'raw' });
       }
 
-      if (val !== this.value) {
-        this.value = val;
+      if (formatedVal !== this.value) {
+        this.value = formatedVal;
       }
     }
   },
   methods: {
-    /**
-     * Sets a nested property on an object using dot notation
-     * @param {Object} obj - object to set property on
-     * @param {String} path - dot-separated path
-     * @param {*} value - value to set
-     * @returns {void}
-     */
-    setNestedProperty: function(obj, path, value) {
-      var keys = path.split('.');
-      var lastKey = keys.pop();
-      var target = keys.reduce(function(current, key) {
-        current[key] = current[key] || {};
-
-        return current[key];
-      }, obj);
-
-      target[lastKey] = value;
-    },
-
     onReset: function() {
       if (this.editor) {
         try {
@@ -231,7 +212,7 @@ Fliplet.FormBuilder.field('wysiwyg', {
             plugins = plugins.split(' ');
           }
 
-          $vm.setNestedProperty(config, path, plugins);
+          Fliplet.FormBuilderUtils.set(config, path, plugins);
         });
 
         tinymce.init(config);

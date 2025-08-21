@@ -4,7 +4,7 @@
  */
 
 /**
- * Deep clone an object using structuredClone or JSON fallback
+ * Deep clone an object using structuredClone or a recursive fallback
  * Replacement for _.cloneDeep()
  * @param {*} obj - Object to clone
  * @param {WeakMap} cache - Cache for circular references
@@ -30,7 +30,11 @@ function cloneDeep(obj, cache = new WeakMap()) {
   }
 
   if (obj instanceof RegExp) {
-    return new RegExp(obj);
+    const result = new RegExp(obj.source, obj.flags);
+
+    result.lastIndex = obj.lastIndex || 0;
+
+    return result;
   }
 
   if (Array.isArray(obj)) {
@@ -46,12 +50,30 @@ function cloneDeep(obj, cache = new WeakMap()) {
 
     if (obj instanceof Map) {
       cloned = new Map();
+      cache.set(obj, cloned);
+
+      for (const [key, value] of obj.entries()) {
+        const clonedKey = cloneDeep(key, cache);
+        const clonedValue = cloneDeep(value, cache);
+
+        cloned.set(clonedKey, clonedValue);
+      }
+
+      return cloned;
     } else if (obj instanceof Set) {
       cloned = new Set();
-    } else {
-      cloned = {};
+      cache.set(obj, cloned);
+
+      for (const value of obj.values()) {
+        const clonedValue = cloneDeep(value, cache);
+
+        cloned.add(clonedValue);
+      }
+
+      return cloned;
     }
 
+    cloned = {};
     cache.set(obj, cloned);
 
     for (const key in obj) {
@@ -120,6 +142,7 @@ function kebabCase(str) {
 function isEmpty(value) {
   if (value === null || value === undefined) return true;
   if (typeof value === 'string' || Array.isArray(value)) return value.length === 0;
+  if (value instanceof Map || value instanceof Set) return value.size === 0;
   if (typeof value === 'object') return Object.keys(value).length === 0;
 
   return false;
@@ -144,6 +167,7 @@ function compact(array) {
  */
 function has(obj, path) {
   if (!obj || typeof obj !== 'object') return false;
+  if (typeof path !== 'string' && !Array.isArray(path)) return false;
 
   const keys = Array.isArray(path) ? path : path.split('.');
   let current = obj;
@@ -167,25 +191,6 @@ function has(obj, path) {
  */
 function uniq(array) {
   return [...new Set(array)];
-}
-
-/**
- * Get unique values from array using a comparator function
- * Replacement for _.uniqWith()
- * @param {Array} array - Array to process
- * @param {Function} comparator - Function to compare values
- * @returns {Array} Array with unique values
- */
-function uniqWith(array, comparator) {
-  const result = [];
-
-  for (const item of array) {
-    if (!result.some(existing => comparator(existing, item))) {
-      result.push(item);
-    }
-  }
-
-  return result;
 }
 
 /**
@@ -341,6 +346,7 @@ function isObject(value) {
  */
 function get(object, path, defaultValue) {
   if (!object || typeof object !== 'object') return defaultValue;
+  if (typeof path !== 'string' && !Array.isArray(path)) return defaultValue;
 
   const keys = Array.isArray(path) ? path : path.split('.');
   let result = object;
@@ -356,6 +362,40 @@ function get(object, path, defaultValue) {
   return result;
 }
 
+/**
+ * Set a value at a nested path in an object, creating intermediate objects as needed
+ * Replicates _.set() behaviour for limited use cases
+ * @param {Object} object - Target object to modify
+ * @param {string|Array} path - Property path (string with dots or array of keys)
+ * @param {*} value - Value to set
+ * @returns {Object} Modified object
+ */
+function set(object, path, value) {
+  if (!object || typeof object !== 'object') {
+    return object;
+  }
+
+  const keys = Array.isArray(path) ? path : path.split('.');
+  let current = object;
+
+  // Navigate to the parent of the target property
+  for (let i = 0; i < keys.length - 1; i++) {
+    const key = keys[i];
+
+    if (current[key] === undefined || current[key] === null) {
+      current[key] = {};
+    }
+
+    current = current[key];
+  }
+
+  // Set the final value
+  const finalKey = keys[keys.length - 1];
+
+  current[finalKey] = value;
+
+  return object;
+}
 
 /**
  * Create object with properties omitted based on predicate
@@ -420,7 +460,9 @@ function times(n, iteratee) {
  * @returns {Array} New array with excluded values removed
  */
 function difference(array, values) {
-  return array.filter(item => !values.includes(item));
+  const valueSet = new Set(values);
+
+  return array.filter(item => !valueSet.has(item));
 }
 
 /**
@@ -463,6 +505,7 @@ Fliplet.FormBuilderUtils = {
   isNil,
   isObject,
   get,
+  set,
   omitBy,
   mapKeys,
   times,
@@ -472,7 +515,6 @@ Fliplet.FormBuilderUtils = {
   compact,
   has,
   uniq,
-  uniqWith,
   sortBy,
   isEqual
 };
@@ -489,6 +531,7 @@ if (typeof window !== 'undefined') {
     isNil,
     isObject,
     get,
+    set,
     omitBy,
     mapKeys,
     times,
@@ -498,7 +541,6 @@ if (typeof window !== 'undefined') {
     compact,
     has,
     uniq,
-    uniqWith,
     sortBy,
     isEqual
   };

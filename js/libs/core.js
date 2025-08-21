@@ -294,9 +294,9 @@ Fliplet.FormBuilder = (function() {
           return this.value;
         }
 
-        var vm = this;
+        const vm = this;
 
-        var option = this.options.find(function(opt) {
+        const option = this.options.find(function(opt) {
           return opt.id == vm.value;
         });
 
@@ -407,8 +407,8 @@ Fliplet.FormBuilder = (function() {
       componentName = name(componentName);
 
       // Extend from base component
-      var baseComponent = components[componentName];
-      var pickedProps = {
+      const baseComponent = components[componentName];
+      const pickedProps = {
         props: baseComponent.props,
         computed: baseComponent.computed
       };
@@ -615,7 +615,7 @@ Fliplet.FormBuilder = (function() {
           return 'Please provide a Field Name';
         }
 
-        var existing = this._fields.findIndex(function(field) {
+        const existing = this._fields.findIndex(function(field) {
           return field.name === this.name;
         }.bind(this));
 

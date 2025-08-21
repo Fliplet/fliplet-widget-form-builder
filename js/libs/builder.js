@@ -269,7 +269,7 @@ Fliplet().then(function() {
 
           $(event.item).remove();
 
-          var fieldsWithSameName = this.fields.filter(function(item) {
+          const fieldsWithSameName = this.fields.filter(function(item) {
             return item.name.match(component.name.replace('(', '\\(').replace(')', '\\)'));
           });
 
