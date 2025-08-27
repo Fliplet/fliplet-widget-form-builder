@@ -287,6 +287,7 @@ Fliplet.FormBuilder.field('image', {
 
       if (this.forcedClick) {
         this.forcedClick = false;
+        getPicture = $vm.getPicture();
         return;
       }
 
@@ -325,10 +326,33 @@ Fliplet.FormBuilder.field('image', {
                 rejectFile(e);
               }
             }, rejectFile);
-          }).then(function(file) {
-            // Use existing pipeline which keeps base name and switches extension to jpeg
-            $vm.processImage(file, true);
-          }).catch(function(err){
+          })
+          .then(function(file) {
+            // Read the Cordova File as ArrayBuffer
+            return new Promise(function(resolve, reject) {
+              const reader = new FileReader();
+              reader.onloadend = function() {
+                resolve({
+                  arrayBuffer: reader.result,
+                  name: file.name,
+                  type: file.type || 'image/jpeg'
+                });
+              };
+              reader.onerror = function(err) {
+                reject(err);
+              };
+              reader.readAsArrayBuffer(file);
+            });
+          })
+          .then(function({ arrayBuffer, name, type }) {
+            // Create a proper Blob from the raw bytes
+            const blob = new Blob([arrayBuffer], { type });
+            blob.name = name || 'image-' + Date.now() + '.jpg';
+
+            // Use existing pipeline
+            $vm.processImage(blob, true);
+          })
+          .catch(function(err){
             /* eslint-disable-next-line */
             console.error('Failed to resolve file from URI', err);
             // Fallback: mark as corrupted
