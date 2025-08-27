@@ -321,7 +321,7 @@ Fliplet().then(function() {
 
         const fieldNames = misconfiguredFields.map(f => escapeHtml(f.name)).join(', ');
 
-        return T('widgets.form.warningLabel') + T('widgets.form.mediaWarning', { fieldNames });
+        return `<b>${T('widgets.form.warningLabel')}: </b> ${T('widgets.form.mediaWarning', { fieldNames })}`;
       },
       missingColumns: function() {
         return this.newColumns.join(', ');
