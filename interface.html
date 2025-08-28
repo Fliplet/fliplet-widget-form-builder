@@ -305,6 +305,8 @@
         <div v-show="section === 'form'" class="section-holder clearfix">
           <section class="form-preview" v-bind:class="{ 'col-sm-6': isAddingFields, 'col-sm-12': !isAddingFields }">
             <div class="alert alert-info">Break up long forms into simple, user-friendly steps to boost form completion rates. <a href="https://help.fliplet.com/multi-step-form/" target="_blank" rel="noopener noreferrer">Learn more</a></div>
+            <div v-if="dataSourceWarningMessage" class="alert alert-warning" role="alert" aria-live="polite" v-html="dataSourceWarningMessage"></div>
+            <div v-if="mediaWarningMessage" class="alert alert-warning" role="alert" aria-live="polite" v-html="mediaWarningMessage"></div>
             <a href="#" v-if="!isAddingFields" v-on:click.prevent="isAddingFields = true" class="btn btn-primary btn-xs add-field pull-right">Add fields <i class="fa fa-plus"></i></a>
             <h2><small>Your form</small> <span class="required-info-label" v-bind:class="{'isRequired': hasRequiredFields}">* Required fields</span></h2>
             <form class="form-html" v-sortable="{ group: { name: 'fields', pull: false }, scrollSensitivity: 116, scrollSpeed: 10, onAdd: onAdd, onUpdate: onSort }">
