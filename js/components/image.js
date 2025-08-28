@@ -207,8 +207,8 @@ Fliplet.FormBuilder.field('image', {
         navigator.camera.getPicture(resolve, reject, {
           quality: $vm.jpegQuality,
           destinationType: isCamera
-          ? Camera.DestinationType.FILE_URI
-          : Camera.DestinationType.DATA_URL,
+            ? Camera.DestinationType.FILE_URI
+            : Camera.DestinationType.DATA_URL,
           sourceType: $vm.cameraSource,
           targetWidth: $vm.customWidth || 0, // Setting default value as 0 so that camera plugin API does not fail
           targetHeight: $vm.customHeight || 0,
@@ -253,6 +253,7 @@ Fliplet.FormBuilder.field('image', {
 
             // Ensure the file name extension matches the JPEG MIME type
             const blobExtension = (blob.type && blob.type.split('/')[1]) || 'jpeg';
+
             if (file && file.name) {
               blob.name = file.name.replace(/\.[^/.]+$/, '') + '.' + blobExtension;
             } else {
@@ -288,6 +289,7 @@ Fliplet.FormBuilder.field('image', {
       if (this.forcedClick) {
         this.forcedClick = false;
         getPicture = $vm.getPicture();
+
         return;
       }
 
@@ -327,37 +329,41 @@ Fliplet.FormBuilder.field('image', {
               }
             }, rejectFile);
           })
-          .then(function(file) {
+            .then(function(file) {
             // Read the Cordova File as ArrayBuffer
-            return new Promise(function(resolve, reject) {
-              const reader = new FileReader();
-              reader.onloadend = function() {
-                resolve({
-                  arrayBuffer: reader.result,
-                  name: file.name,
-                  type: file.type || 'image/jpeg'
-                });
-              };
-              reader.onerror = function(err) {
-                reject(err);
-              };
-              reader.readAsArrayBuffer(file);
-            });
-          })
-          .then(function({ arrayBuffer, name, type }) {
-            // Create a proper Blob from the raw bytes
-            const blob = new Blob([arrayBuffer], { type });
-            blob.name = name || 'image-' + Date.now() + '.jpg';
+              return new Promise(function(resolve, reject) {
+                const reader = new FileReader();
 
-            // Use existing pipeline
-            $vm.processImage(blob, true);
-          })
-          .catch(function(err){
+                reader.onloadend = function() {
+                  resolve({
+                    arrayBuffer: reader.result,
+                    name: file.name,
+                    type: file.type || 'image/jpeg'
+                  });
+                };
+
+                reader.onerror = function(err) {
+                  reject(err);
+                };
+
+                reader.readAsArrayBuffer(file);
+              });
+            })
+            .then(function({ arrayBuffer, name, type }) {
+            // Create a proper Blob from the raw bytes
+              const blob = new Blob([arrayBuffer], { type });
+
+              blob.name = name || 'image-' + Date.now() + '.jpg';
+
+              // Use existing pipeline
+              $vm.processImage(blob, true);
+            })
+            .catch(function(err) {
             /* eslint-disable-next-line */
             console.error('Failed to resolve file from URI', err);
-            // Fallback: mark as corrupted
-            $vm.hasCorruptedImage = true;
-          });
+              // Fallback: mark as corrupted
+              $vm.hasCorruptedImage = true;
+            });
         }
 
         // Fallback for legacy base64 results
@@ -367,6 +373,7 @@ Fliplet.FormBuilder.field('image', {
 
         try {
           const blob = dataURLToBlob(imgBase64Url);
+
           blob.name = 'image upload-' + Date.now() + '.' + blob.type.split('/')[1];
           $vm.value.push(blob);
           addThumbnailToCanvas(imgBase64Url, $vm.value.length - 1, $vm);
