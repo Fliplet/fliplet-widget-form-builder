@@ -1,4 +1,4 @@
-/* global Camera, addThumbnailToCanvas, loadImage, dataURLToBlob */
+/* global Camera, addThumbnailToCanvas, loadImage */
 
 /**
  * Image field component – renders an image capture and upload input in forms.
@@ -202,13 +202,9 @@ Fliplet.FormBuilder.field('image', {
       }
 
       return new Promise(function(resolve, reject) {
-        var isCamera = $vm.cameraSource === Camera.PictureSourceType.CAMERA;
-
         navigator.camera.getPicture(resolve, reject, {
           quality: $vm.jpegQuality,
-          destinationType: isCamera
-            ? Camera.DestinationType.FILE_URI
-            : Camera.DestinationType.DATA_URL,
+          destinationType: Camera.DestinationType.DATA_URL,
           sourceType: $vm.cameraSource,
           targetWidth: $vm.customWidth || 0, // Setting default value as 0 so that camera plugin API does not fail
           targetHeight: $vm.customHeight || 0,
@@ -221,6 +217,7 @@ Fliplet.FormBuilder.field('image', {
     },
     processImage: function(file, addThumbnail) {
       var $vm = this;
+      var mimeType = file.type || 'image/png';
 
       this.validateValue();
 
@@ -232,46 +229,33 @@ Fliplet.FormBuilder.field('image', {
           orientation: 0
         };
 
-        loadImage(file, async function(img) {
+        loadImage(file, function(img) {
           if (img.type === 'error') {
             $vm.hasCorruptedImage = true;
 
             return;
           }
 
-          $vm.hasCorruptedImage = false;
-
-
-          var scaledImage = loadImage.scale(img, options);
-
-          // Always convert resized images to JPEG on web for consistency with native
-          const jpegMimeType = 'image/jpeg';
-          const imgBase64Url = scaledImage.toDataURL(jpegMimeType, $vm.jpegQuality);
-
-          try {
-            const blob = dataURLToBlob(imgBase64Url);
-
-            // Ensure the file name extension matches the JPEG MIME type
-            const blobExtension = (blob.type && blob.type.split('/')[1]) || 'jpeg';
-
-            if (file && file.name) {
-              blob.name = file.name.replace(/\.[^/.]+$/, '') + '.' + blobExtension;
-            } else {
-              blob.name = 'image-' + Date.now() + '.' + blobExtension;
-            }
-
-            $vm.value.push(blob);
-
-            if (addThumbnail) {
-              addThumbnailToCanvas(imgBase64Url, $vm.value.length - 1, $vm);
-            }
-
-            $vm.$emit('_input', $vm.name, $vm.value);
-          } catch (error) {
-            $vm.hasCorruptedImage = true;
+          if (($vm.customWidth && img.width > $vm.customWidth) || ($vm.customHeight && img.height > $vm.customHeight)) {
+            $vm.isImageSizeExceeded = true;
 
             return;
           }
+
+          $vm.hasCorruptedImage = false;
+          $vm.isImageSizeExceeded = false;
+
+          var scaledImage = loadImage.scale(img, options);
+          var imgBase64Url = scaledImage.toDataURL(mimeType, $vm.jpegQuality);
+          var flipletBase64Url = imgBase64Url + ';filename:' + file.name;
+
+          $vm.value.push(flipletBase64Url);
+
+          if (addThumbnail) {
+            addThumbnailToCanvas(flipletBase64Url, $vm.value.length - 1, $vm);
+          }
+
+          $vm.$emit('_input', $vm.name, $vm.value);
         });
       });
     },
@@ -286,103 +270,34 @@ Fliplet.FormBuilder.field('image', {
 
       var getPicture;
 
+      event.preventDefault();
+
       if (this.forcedClick) {
         this.forcedClick = false;
         getPicture = $vm.getPicture();
-
-        return;
-      }
-
-      event.preventDefault();
-
-      getPicture = this.requestPicture(this.$refs.imageInput).then(function onRequestedPicture() {
-        if ($vm.cameraSource === Camera.PictureSourceType.PHOTOLIBRARY) {
-          $vm.forcedClick = true;
-
-          // Use native element click so the OS file picker opens reliably
-          if ($vm.$refs.imageInput && typeof $vm.$refs.imageInput.click === 'function') {
-            $vm.$refs.imageInput.click();
-          } else {
+      } else {
+        getPicture = this.requestPicture(this.$refs.imageInput).then(function onRequestedPicture() {
+          if ($vm.cameraSource === Camera.PictureSourceType.PHOTOLIBRARY) {
+            $vm.forcedClick = true;
             $($vm.$refs.imageInput).trigger('click');
+
+            return Promise.reject('Switch to HTML file input to select files');
           }
 
-          return Promise.reject('Switch to HTML file input to select files');
-        }
-
-        return $vm.getPicture();
-      });
+          return $vm.getPicture();
+        });
+      }
 
       this.validateValue();
 
-      getPicture.then(function onSelectedPicture(result) {
-        // If we receive a FILE_URI (native camera/gallery), resolve it to a File to preserve the original name
-        if (typeof result === 'string' && (/^(file:|content:|cdvfile:)/i).test(result)) {
-          return new Promise(function(resolveFile, rejectFile) {
-            // Cordova File API: resolve URI to FileEntry → File object
-            window.resolveLocalFileSystemURL(result, function(entry) {
-              try {
-                entry.file(function(file) {
-                  resolveFile(file);
-                }, rejectFile);
-              } catch (e) {
-                rejectFile(e);
-              }
-            }, rejectFile);
-          })
-            .then(function(file) {
-            // Read the Cordova File as ArrayBuffer
-              return new Promise(function(resolve, reject) {
-                const reader = new FileReader();
+      getPicture.then(function onSelectedPicture(imgBase64Url) {
+        imgBase64Url = (imgBase64Url.indexOf('base64') > -1)
+          ? imgBase64Url
+          : 'data:image/jpeg;base64,' + imgBase64Url;
 
-                reader.onloadend = function() {
-                  resolve({
-                    arrayBuffer: reader.result,
-                    name: file.name,
-                    type: file.type || 'image/jpeg'
-                  });
-                };
-
-                reader.onerror = function(err) {
-                  reject(err);
-                };
-
-                reader.readAsArrayBuffer(file);
-              });
-            })
-            .then(function({ arrayBuffer, name, type }) {
-            // Create a proper Blob from the raw bytes
-              const blob = new Blob([arrayBuffer], { type });
-
-              blob.name = name || 'image-' + Date.now() + '.jpg';
-
-              // Use existing pipeline
-              $vm.processImage(blob, true);
-            })
-            .catch(function(err) {
-            /* eslint-disable-next-line */
-            console.error('Failed to resolve file from URI', err);
-              // Fallback: mark as corrupted
-              $vm.hasCorruptedImage = true;
-            });
-        }
-
-        // Fallback for legacy base64 results
-        var imgBase64Url = (typeof result === 'string' && result.indexOf('base64') > -1)
-          ? result
-          : 'data:image/jpeg;base64,' + result;
-
-        try {
-          const blob = dataURLToBlob(imgBase64Url);
-
-          blob.name = 'image upload-' + Date.now() + '.' + blob.type.split('/')[1];
-          $vm.value.push(blob);
-          addThumbnailToCanvas(imgBase64Url, $vm.value.length - 1, $vm);
-          $vm.$emit('_input', $vm.name, $vm.value);
-        } catch (e) {
-          /* eslint-disable-next-line */
-          console.error('Failed to parse base64 image', e);
-          $vm.hasCorruptedImage = true;
-        }
+        $vm.value.push(imgBase64Url);
+        addThumbnailToCanvas(imgBase64Url, $vm.value.length - 1, $vm);
+        $vm.$emit('_input', $vm.name, $vm.value);
       }).catch(function(error) {
       /* eslint-disable-next-line */
         console.error(error);
@@ -399,12 +314,8 @@ Fliplet.FormBuilder.field('image', {
     },
     onImageClick: function(index) {
       var imagesData = {
-        images: _.map(this.value, function(img) {
-          if (img instanceof Blob) {
-            return { url: URL.createObjectURL(img) };
-          }
-
-          return { url: img };
+        images: _.map(this.value, function(imgURL) {
+          return { url: imgURL };
         }),
         options: {
           index: index
