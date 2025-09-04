@@ -127,7 +127,7 @@ Fliplet.FormBuilder.field('password', {
         password += alphabet.charAt(Math.floor(Math.random() * alphabet.length));
       }
 
-      _.forEach(this.rules, function(value) {
+      this.rules.forEach(function(value) {
         if (!value.test(password)) {
           isValid = false;
         }
