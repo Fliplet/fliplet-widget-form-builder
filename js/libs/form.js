@@ -3,6 +3,7 @@
  * Handles form rendering, validation, submission, and data integration.
  *
  */
+
 var formBuilderInstances = [];
 var dataSourceColumnPromises = {};
 var allFormsInSlide = [];
@@ -1156,6 +1157,14 @@ Fliplet().then(async function() {
 
           $vm.triggerBlurEventOnInputs();
 
+          var trackEventOp = Fliplet.Analytics.trackEvent({
+            category: 'form',
+            action: 'submit'
+          });
+
+          if (!(trackEventOp instanceof Promise)) {
+            trackEventOp = Promise.resolve();
+          }
 
           // form validation
           $vm.isFormValid = true;
@@ -1398,15 +1407,9 @@ Fliplet().then(async function() {
               return;
             }
 
-            const formFieldNames = [];
-            const formFieldTypes = [];
-
             $vm.fields.forEach(function(field) {
               var value = field.value;
               var type = field._type;
-
-              formFieldNames.push(field.name);
-              formFieldTypes.push(type);
 
               if (field._submit === false || !field.enabled) {
                 return;
@@ -1579,18 +1582,6 @@ Fliplet().then(async function() {
                 }
               }
             });
-
-            let trackEventOp = Fliplet.App.Analytics.event({
-              category: 'form',
-              action: 'submit',
-              formFieldNames,
-              formFieldTypes,
-              multiStep: data.isFormInSlide
-            });
-
-            if (!(trackEventOp instanceof Promise)) {
-              trackEventOp = Promise.resolve();
-            }
 
             formPromise.then(function(form) {
               return Fliplet.Hooks.run('beforeFormSubmit', formData, form);
