@@ -27,11 +27,11 @@ Fliplet.FormBuilder.field('customButton', {
   },
   methods: {
     runCustomFunction: function() {
-      var $vm = this;
+      const $vm = this;
 
       Fliplet.FormBuilder.get().then(function(form) {
-        var foundField = $vm.$parent.fields.find(function(field) { return field.name === $vm.name; });
-        var button = Object.assign({}, foundField, { $el: $vm.$el });
+        const foundField = $vm.$parent.fields.find(function(field) { return field.name === $vm.name; });
+        const button = Object.assign({}, foundField, { $el: $vm.$el });
 
         if ($vm.buttonAction) {
           $vm.buttonAction.context = {
@@ -45,7 +45,7 @@ Fliplet.FormBuilder.field('customButton', {
           try {
             return Fliplet.Navigate.to($vm.buttonAction);
           } catch (err) {
-            var defaultError = T('widgets.form.customButton.defaultError', { label: $vm.buttonLabel });
+            const defaultError = T('widgets.form.customButton.defaultError', { label: $vm.buttonLabel });
 
             Fliplet.UI.Toast.error(err, defaultError);
           }

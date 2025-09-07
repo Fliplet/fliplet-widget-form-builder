@@ -82,7 +82,7 @@ Fliplet.FormBuilder.field('matrix', {
      */
     clickHandler: function(row, column, rowIndex, colIndex) {
       if (rowIndex >= 0 && colIndex >= 0) {
-        var el = this.getOptionId(rowIndex, colIndex, 'input');
+        const el = this.getOptionId(rowIndex, colIndex, 'input');
 
         $('#' + el).prop('checked', true);
       }
@@ -107,11 +107,11 @@ Fliplet.FormBuilder.field('matrix', {
      * @returns {undefined}
      */
     focusHandler: function(rowIndex, colIndex) {
-      var $vm = this;
+      const $vm = this;
 
       if (rowIndex >= 0 && colIndex >= 0) {
-        var row = this.rowOptions[rowIndex];
-        var col = this.columnOptions[colIndex];
+        const row = this.rowOptions[rowIndex];
+        const col = this.columnOptions[colIndex];
 
         $('#' + $vm.getOptionId(rowIndex, colIndex, 'span')).focus();
 
@@ -125,7 +125,7 @@ Fliplet.FormBuilder.field('matrix', {
      * @returns {undefined}
      */
     setDefaultValue: function() {
-      var $vm = this;
+      const $vm = this;
 
       $vm.value = {};
 
@@ -139,7 +139,7 @@ Fliplet.FormBuilder.field('matrix', {
      * @returns {undefined}
      */
     setValue: function() {
-      var $vm = this;
+      const $vm = this;
 
       if ($vm.value === undefined || Fliplet.FormBuilderUtils.isEmpty($vm.value)) {
         this.setDefaultValue();
@@ -149,18 +149,18 @@ Fliplet.FormBuilder.field('matrix', {
         }
 
         Object.keys($vm.value).forEach(function(value) {
-          var key = $vm.value[value];
-          var rowIndex = $vm.rowOptions.findIndex(function(row) {
+          const key = $vm.value[value];
+          const rowIndex = $vm.rowOptions.findIndex(function(row) {
             return (Fliplet.FormBuilderUtils.has(row, 'label') && Fliplet.FormBuilderUtils.has(row, 'id')) ? row.id === value || row.label === value : row.label === value;
           });
 
-          var row = $vm.rowOptions[rowIndex];
+          const row = $vm.rowOptions[rowIndex];
 
-          var colIndex = $vm.columnOptions.findIndex(function(col) {
+          const colIndex = $vm.columnOptions.findIndex(function(col) {
             return (Fliplet.FormBuilderUtils.has(col, 'label') && Fliplet.FormBuilderUtils.has(col, 'id')) ? col.id === key || col.label === key : col.label === key;
           });
 
-          var col = $vm.columnOptions[colIndex];
+          const col = $vm.columnOptions[colIndex];
 
           // setTimeout using to load all HTML and then execute below piece of code.
           setTimeout(function() {
@@ -210,18 +210,18 @@ Fliplet.FormBuilder.field('matrix', {
         }
       }
 
-      var checkFlag = 'set';
-      var $vm = this;
-      var columnOpt = [];
+      let checkFlag = 'set';
+      const $vm = this;
+      const columnOpt = [];
 
       if (val === '') {
         val = {};
         checkFlag = 'clear';
       } else if (!Fliplet.FormBuilderUtils.isEmpty(val)) {
-        var result = [];
+        const result = [];
 
         Object.keys(val).forEach(function(key) {
-          var value = val[key];
+          const value = val[key];
 
           if (typeof value !== 'undefined') {
             result.push(value);
@@ -230,7 +230,7 @@ Fliplet.FormBuilder.field('matrix', {
 
         if (result.length > 0) {
           result.forEach(function(col) {
-            var foundColumn = $vm.columnOptions.find(function(column) {
+            const foundColumn = $vm.columnOptions.find(function(column) {
               return column.label === col || column.id === col;
             });
 
@@ -259,14 +259,14 @@ Fliplet.FormBuilder.field('matrix', {
     },
 
     onBeforeSubmit: function(data) {
-      var $vm = this;
+      const $vm = this;
 
       if (!data[this.name]) {
         return;
       }
 
       Object.keys(data[this.name]).forEach(function(val) {
-        var row = $vm.rowOptions.find(function(row) {
+        const row = $vm.rowOptions.find(function(row) {
           return (Fliplet.FormBuilderUtils.has(row, 'label') && Fliplet.FormBuilderUtils.has(row, 'id')) ? row.id === val : row.label === val;
         });
 
@@ -285,12 +285,12 @@ Fliplet.FormBuilder.field('matrix', {
         return;
       }
 
-      var validColumns = [];
-      var $vm = this;
+      const validColumns = [];
+      const $vm = this;
 
       Object.keys(this.value).forEach(function(rowKey) {
-        var columnKey = $vm.value[rowKey];
-        var foundCol = $vm.columnOptions.find(function(col) {
+        const columnKey = $vm.value[rowKey];
+        const foundCol = $vm.columnOptions.find(function(col) {
           return col.label === columnKey || col.id === columnKey;
         });
 
@@ -303,8 +303,8 @@ Fliplet.FormBuilder.field('matrix', {
     }
   },
   validations: function() {
-    var $vm = this;
-    var rules = {
+    const $vm = this;
+    const rules = {
       value: {}
     };
 

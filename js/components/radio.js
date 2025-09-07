@@ -32,7 +32,7 @@ Fliplet.FormBuilder.field('radio', {
     }
   },
   validations: function() {
-    var rules = {
+    const rules = {
       value: {}
     };
 
@@ -48,7 +48,7 @@ Fliplet.FormBuilder.field('radio', {
       this.updateValue();
     },
     focusHandler: function(index) {
-      var newIndex = index;
+      let newIndex = index;
 
       if (index > this.options.length - 1) {
         newIndex = 0;

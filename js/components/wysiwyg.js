@@ -23,7 +23,7 @@ Fliplet.FormBuilder.field('wysiwyg', {
     }
   },
   validations: function() {
-    var rules = {
+    const rules = {
       value: {}
     };
 
@@ -63,7 +63,7 @@ Fliplet.FormBuilder.field('wysiwyg', {
       }
     },
     addBulletedListShortcutsWindows: function() {
-      var $vm = this;
+      const $vm = this;
 
       // For Windows
       this.editor.addShortcut('ctrl+shift+8', 'UnorderedList', function() {
@@ -78,12 +78,12 @@ Fliplet.FormBuilder.field('wysiwyg', {
     }
   },
   mounted: function() {
-    var $vm = this;
-    var lineHeight = 55;
+    const $vm = this;
+    const lineHeight = 55;
 
     this.tinymceId = Fliplet.FormBuilderUtils.kebabCase(this.name) + '-' + $(this.$refs.textarea).parents('[data-form-builder-id]').data('formBuilderId');
 
-    var config = {
+    const config = {
       target: this.$refs.textarea,
       mobile: {
         toolbar_mode: 'floating',
@@ -136,7 +136,7 @@ Fliplet.FormBuilder.field('wysiwyg', {
         editor.on('init', function() {
           $vm.addBulletedListShortcutsWindows();
 
-          var mobileEditorSocket = $('.tinymce-mobile-editor-socket');
+          const mobileEditorSocket = $('.tinymce-mobile-editor-socket');
 
           if (mobileEditorSocket) {
             mobileEditorSocket.height('auto');
@@ -154,7 +154,7 @@ Fliplet.FormBuilder.field('wysiwyg', {
           if ($vm.isInterface) {
             // iFrames don't work with the form builder's Sortable feature
             // Instead, the iFrame is swapped with a <div></div> of the same dimensions
-            var $el = $($vm.$refs.ghost);
+            const $el = $($vm.$refs.ghost);
 
             $el.width(editor.iframeElement.style.width).height(editor.iframeElement.style.height);
             $(editor.iframeElement).replaceWith($el);
@@ -164,13 +164,13 @@ Fliplet.FormBuilder.field('wysiwyg', {
         editor.on('keydown', $vm.addBulletedListShortcutsMac);
 
         editor.on('focus', function() {
-          var $el = $(editor.iframeElement);
+          const $el = $(editor.iframeElement);
 
           $el.parent().parent().addClass('focus-outline');
         });
 
         editor.on('blur', function() {
-          var $el = $(editor.iframeElement);
+          const $el = $(editor.iframeElement);
 
           $el.parent().parent().removeClass('focus-outline');
           $vm.onBlur();
@@ -202,10 +202,10 @@ Fliplet.FormBuilder.field('wysiwyg', {
         field: this,
         config: config
       }).then(function() {
-        var pluginPaths = ['plugins', 'mobile.plugins'];
+        const pluginPaths = ['plugins', 'mobile.plugins'];
 
         pluginPaths.forEach(function(path) {
-          var plugins = Fliplet.FormBuilderUtils.get(config, path);
+          let plugins = Fliplet.FormBuilderUtils.get(config, path);
 
           if (typeof plugins === 'string') {
             // Use array of plugins (as TinyMCE's preferred format) if string is provided

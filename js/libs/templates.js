@@ -7,7 +7,7 @@
  * All exported functions and major logic blocks are documented with JSDoc.
  */
 
-var systemTemplates = [{
+const systemTemplates = [{
   id: 1,
   settings: {
     displayName: 'Blank',
@@ -29,9 +29,9 @@ var systemTemplates = [{
 ];
 
 Fliplet.FormBuilder.templates = function() {
-  var organizationId = Fliplet.Env.get('organizationId');
+  const organizationId = Fliplet.Env.get('organizationId');
 
-  var operation = Fliplet.Env.get('development') || !organizationId
+  const operation = Fliplet.Env.get('development') || !organizationId
     ? Promise.resolve([])
     : Fliplet.API.request({
       url: [

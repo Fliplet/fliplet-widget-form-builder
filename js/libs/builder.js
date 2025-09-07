@@ -15,10 +15,10 @@
  */
 
 /* eslint-disable eqeqeq */
-var widgetId = parseInt(Fliplet.Widget.getDefaultId(), 10);
-var widgetUuid = Fliplet.Widget.getUUID(widgetId);
-var data = Fliplet.Widget.getData(widgetId) || {};
-var isFormInSlider = false;
+const widgetId = parseInt(Fliplet.Widget.getDefaultId(), 10);
+const widgetUuid = Fliplet.Widget.getUUID(widgetId);
+const data = Fliplet.Widget.getData(widgetId) || {};
+let isFormInSlider = false;
 
 Fliplet.Widget.findParents({ instanceId: widgetId }).then(function(parents) {
   /**
@@ -72,7 +72,7 @@ if (data.settings && data.settings.emailTemplate) {
 function changeSelectText() {
   setTimeout(function() {
     $('.hidden-select:not(.component .hidden-select)').each(function() {
-      var selectedText = $(this).find('option:selected').text();
+      const selectedText = $(this).find('option:selected').text();
 
       if (selectedText !== '') {
         $(this).parents('.select-proxy-display').find('.select-value-proxy').html(selectedText);
@@ -84,13 +84,13 @@ function changeSelectText() {
 }
 
 function attachObservers() {
-  var $accordion = $('#componentsAccordion');
+  const $accordion = $('#componentsAccordion');
 
-  var recalculateHeight = function(obj) {
-    var $panelHeading = $('.panel-heading');
-    var tabsHeight = $panelHeading.outerHeight() * $panelHeading.length;
-    var borders = $panelHeading.length * 3;
-    var wrapperHeight = $('.components-list .form-html').innerHeight() - tabsHeight;
+  const recalculateHeight = function(obj) {
+    const $panelHeading = $('.panel-heading');
+    const tabsHeight = $panelHeading.outerHeight() * $panelHeading.length;
+    const borders = $panelHeading.length * 3;
+    const wrapperHeight = $('.components-list .form-html').innerHeight() - tabsHeight;
 
     obj.children('.panel-body').css('height', wrapperHeight - borders);
     obj.children('.panel-body').fadeIn(250);
@@ -111,9 +111,9 @@ function attachObservers() {
 }
 
 function formatSeconds(seconds) {
-  var hours = Math.floor(seconds / 3600);
-  var minutes = Math.floor((seconds % 3600) / 60);
-  var remainingSeconds = Math.floor(seconds % 60);
+  const hours = Math.floor(seconds / 3600);
+  const minutes = Math.floor((seconds % 3600) / 60);
+  const remainingSeconds = Math.floor(seconds % 60);
 
   return { hours, minutes, seconds: remainingSeconds };
 }
@@ -150,22 +150,22 @@ function generateFormDefaults(data) {
   }, data);
 }
 
-var selector = '#app';
+const selector = '#app';
 
 // Constants
-var SAVE_BUTTON_LABELS = {
+const SAVE_BUTTON_LABELS = {
   SAVE: 'Save',
   SAVE_AND_CLOSE: 'Save & Close'
 };
 
-var CANCEL_BUTTON_LABEL = 'Cancel';
+const CANCEL_BUTTON_LABEL = 'Cancel';
 
 // Wait for form fields to be ready, as they get defined after translations are initialized
 Fliplet().then(function() {
   new Vue({
     el: selector,
     data: function() {
-      var formSettings = generateFormDefaults(data);
+      const formSettings = generateFormDefaults(data);
 
       return {
         categories: Fliplet.FormBuilder.categories(),
@@ -244,7 +244,7 @@ Fliplet().then(function() {
     },
     methods: {
       generateColumns: function() {
-        var $vm = this;
+        const $vm = this;
 
         Fliplet.DataSources.update(this.settings.dataSourceId, {
           newColumns: this.newColumns
@@ -258,9 +258,9 @@ Fliplet().then(function() {
         this.fields.splice(event.newIndex, 0, this.fields.splice(event.oldIndex, 1)[0]);
       },
       onAdd: function(event) {
-        var componentName;
-        var component;
-        var value;
+        let componentName;
+        let component;
+        let value;
 
         if (event.item.parentElement.className !== 'panel-body') {
           componentName = event.item.dataset.field;
@@ -273,9 +273,9 @@ Fliplet().then(function() {
             return item.name.match(component.name.replace('(', '\\(').replace(')', '\\)'));
           });
 
-          var index = fieldsWithSameName.length;
-          var defaultName = component.name + (index ? '-' + index : '');
-          var data = {
+          const index = fieldsWithSameName.length;
+          const defaultName = component.name + (index ? '-' + index : '');
+          const data = {
             _type: componentName,
             _submit: typeof component.submit !== 'undefined' ? component.submit : true,
             name: defaultName,
@@ -299,7 +299,7 @@ Fliplet().then(function() {
         this.toggleAccessType('update', this.showExtraEdit);
       },
       deleteField: function(fieldLabel, index) {
-        var $vm = this;
+        const $vm = this;
 
         Fliplet.Modal.confirm({
           message: '<p>Are you sure you want to delete the following field?</p><p><strong>' + fieldLabel + '</strong></p>',
@@ -331,7 +331,7 @@ Fliplet().then(function() {
         this.$forceUpdate();
 
         if (field._type === 'flAddress') {
-          var options = this.fields.map(function(field) {
+          const options = this.fields.map(function(field) {
             if (field._type !== 'flButtons' && field._type !== 'flAddress') {
               return { label: field.label, disabled: false };
             }
@@ -364,7 +364,7 @@ Fliplet().then(function() {
         Fliplet.Widget.toggleCancelButton(true);
       },
       onFieldSettingChanged: function(fieldData) {
-        var $vm = this;
+        const $vm = this;
 
         Object.keys(fieldData).forEach(function(prop) {
           $vm.activeField[prop] = fieldData[prop];
@@ -401,7 +401,7 @@ Fliplet().then(function() {
       save: function(initial) {
         this.selectedOptions = this.activeField.selectedFieldOptions;
 
-        var $vm = this;
+        const $vm = this;
 
         if (initial) {
           // Untick "Set template" checkbox when creating a form from Template
@@ -434,7 +434,7 @@ Fliplet().then(function() {
       },
       createDefaultBodyTemplate: function(fields) {
         // Creates default email template
-        var defaultEmailTemplate = '<h1>' + this.settings.name + '</h1><p>A form submission has been received.</p>';
+        let defaultEmailTemplate = '<h1>' + this.settings.name + '</h1><p>A form submission has been received.</p>';
 
         defaultEmailTemplate += '<ul>';
 
@@ -448,7 +448,7 @@ Fliplet().then(function() {
         return defaultEmailTemplate;
       },
       configureEmailTemplateAdd: async function() {
-        var $vm = this;
+        const $vm = this;
 
         this.currentMultiStepFormFields = await this.getCurrentMultiStepFormFields();
 
@@ -460,7 +460,7 @@ Fliplet().then(function() {
           }
         }
 
-        var emailProviderData = ($vm.settings && $vm.settings.emailTemplateAdd) || $vm.defaultEmailSettings;
+        const emailProviderData = ($vm.settings && $vm.settings.emailTemplateAdd) || $vm.defaultEmailSettings;
 
         emailProviderData.options = {
           usage: {
@@ -483,14 +483,14 @@ Fliplet().then(function() {
           $vm.emailTemplateAdd = result.data;
           $vm.settings.emailTemplateAdd = JSON.parse(JSON.stringify($vm.emailTemplateAdd));
 
-          var operation;
+          let operation;
 
           if ($vm.settings.dataStore.indexOf('dataSource') > -1 && $vm.settings.dataSourceId) {
-            var payload = JSON.parse(JSON.stringify($vm.emailTemplateAdd));
+            const payload = JSON.parse(JSON.stringify($vm.emailTemplateAdd));
 
             operation = Fliplet.DataSources.getById($vm.settings.dataSourceId).then(function(dataSource) {
               // First check if any email hook exists
-              var emailHookExists = dataSource.hooks.some(function(hook) {
+              const emailHookExists = dataSource.hooks.some(function(hook) {
                 return hook.type === 'email';
               });
 
@@ -532,8 +532,8 @@ Fliplet().then(function() {
         });
       },
       configureEmailTemplateEdit: function() {
-        var $vm = this;
-        var emailProviderData = ($vm.settings && $vm.settings.emailTemplateEdit) || $vm.defaultEmailSettings;
+        const $vm = this;
+        const emailProviderData = ($vm.settings && $vm.settings.emailTemplateEdit) || $vm.defaultEmailSettings;
 
         emailProviderData.options = {
           usage: {
@@ -556,14 +556,14 @@ Fliplet().then(function() {
           $vm.emailTemplateEdit = result.data;
           $vm.settings.emailTemplateEdit = JSON.parse(JSON.stringify($vm.emailTemplateEdit));
 
-          var operation;
+          let operation;
 
           if ($vm.settings.dataStore.indexOf('editDataSource') > -1 && $vm.settings.dataSourceId) {
-            var payload = JSON.parse(JSON.stringify($vm.emailTemplateEdit));
+            const payload = JSON.parse(JSON.stringify($vm.emailTemplateEdit));
 
             operation = Fliplet.DataSources.getById($vm.settings.dataSourceId).then(function(dataSource) {
               // First check if any email hook exists
-              var emailHookExists = dataSource.hooks.some(function(hook) {
+              const emailHookExists = dataSource.hooks.some(function(hook) {
                 return hook.type === 'email';
               });
 
@@ -605,7 +605,7 @@ Fliplet().then(function() {
         });
       },
       configureEmailTemplateForCompose: async function() {
-        var $vm = this;
+        const $vm = this;
 
         this.currentMultiStepFormFields = await this.getCurrentMultiStepFormFields();
 
@@ -617,7 +617,7 @@ Fliplet().then(function() {
           }
         }
 
-        var emailProviderData = ($vm.settings && $vm.settings.generateEmailTemplate) || $vm.defaultEmailSettingsForCompose;
+        const emailProviderData = ($vm.settings && $vm.settings.generateEmailTemplate) || $vm.defaultEmailSettingsForCompose;
 
         emailProviderData.options = {
           usage: {
@@ -675,8 +675,8 @@ Fliplet().then(function() {
         });
       },
       updateDataSourceHooks: function() {
-        var dataSourceId = this.settings.dataSourceId;
-        var newColumns = this.fields
+        const dataSourceId = this.settings.dataSourceId;
+        const newColumns = this.fields
           .filter(function(field) {
             return field._submit !== false;
           })
@@ -684,7 +684,7 @@ Fliplet().then(function() {
             return field.name;
           });
 
-        var fieldsToHash = this.fields
+        const fieldsToHash = this.fields
           .filter(function(field) {
             return !!field.hash;
           })
@@ -699,12 +699,12 @@ Fliplet().then(function() {
         return Fliplet.DataSources.getById(dataSourceId).then(function(ds) {
           ds.columns = ds.columns || [];
 
-          var hooksDeleted;
-          var columns = Fliplet.FormBuilderUtils.uniq(newColumns.concat(ds.columns));
+          let hooksDeleted;
+          const columns = Fliplet.FormBuilderUtils.uniq(newColumns.concat(ds.columns));
 
           // remove existing hooks for the operations from the same widget instance
           ds.hooks = (ds.hooks || []).filter(function(hook) {
-            var remove = hook.widgetInstanceId == widgetId && hook.type == 'operations';
+            const remove = hook.widgetInstanceId == widgetId && hook.type == 'operations';
 
             if (remove) {
               hooksDeleted = true;
@@ -715,7 +715,7 @@ Fliplet().then(function() {
 
           // add fields that need to be hashed to data source hooks
           if (fieldsToHash) {
-            var payload = {};
+            const payload = {};
 
             fieldsToHash.forEach(function(field) {
               payload[field] = ['hash'];
@@ -739,7 +739,7 @@ Fliplet().then(function() {
         });
       },
       triggerSave: function() {
-        var $vm = this;
+        const $vm = this;
 
         if ($vm.chooseTemplate) {
           if ($vm.settings.templateId) {
@@ -784,7 +784,7 @@ Fliplet().then(function() {
         Fliplet.Studio.emit('widget-save-label-reset');
         Fliplet.Widget.toggleSaveButton(true);
 
-        var $vm = this;
+        const $vm = this;
 
         this.settings.previewingTemplate = '';
 
@@ -797,11 +797,11 @@ Fliplet().then(function() {
         });
       },
       updateFormSettings: function(templateId, preview) {
-        var formTemplate = this.templates.find(function(template) {
+        const formTemplate = this.templates.find(function(template) {
           return template.id === templateId;
         });
 
-        var settings = formTemplate.settings;
+        const settings = formTemplate.settings;
 
         settings.templateId = formTemplate.id;
         settings.isPlaceholder = false;
@@ -817,8 +817,8 @@ Fliplet().then(function() {
         }
       },
       toggleReadMore: function(more, templateId) {
-        var $vm = this;
-        var index = $vm.readMore.indexOf(templateId);
+        const $vm = this;
+        const index = $vm.readMore.indexOf(templateId);
 
         if (more) {
           $vm.readMore.push(templateId);
@@ -838,9 +838,9 @@ Fliplet().then(function() {
         return string;
       },
       initDataSourceProvider: function() {
-        var $vm = this;
-        var displayName = encodeURIComponent($vm.settings.displayName);
-        var dataSourceData = {
+        const $vm = this;
+        const displayName = encodeURIComponent($vm.settings.displayName);
+        const dataSourceData = {
           dataSourceTitle: 'Form data source',
           dataSourceId: $vm.settings.dataSourceId,
           appId: Fliplet.Env.get('appId'),
@@ -875,11 +875,11 @@ Fliplet().then(function() {
         });
       },
       initLinkProvider: function() {
-        var $vm = this;
-        var page = Fliplet.Widget.getPage();
-        var omitPages = page ? [page.id] : [];
+        const $vm = this;
+        const page = Fliplet.Widget.getPage();
+        const omitPages = page ? [page.id] : [];
 
-        var action = $.extend(true, {
+        const action = $.extend(true, {
           action: 'screen',
           page: '',
           transition: 'slide.left',
@@ -908,14 +908,14 @@ Fliplet().then(function() {
         });
       },
       toggleAccessType: function(type, isTypeActive) {
-        var accessRuleIndex = -1;
-        var defaultRule = {
+        let accessRuleIndex = -1;
+        const defaultRule = {
           allow: 'all',
           type: type.split()
         };
 
         this.accessRules.forEach(function(rule, index) {
-          var typeIndex = rule.type.indexOf(type);
+          const typeIndex = rule.type.indexOf(type);
 
           if (typeIndex !== -1) {
             accessRuleIndex = index;
@@ -929,7 +929,7 @@ Fliplet().then(function() {
         }
       },
       setupCodeEditor: function() {
-        var $vm = this;
+        const $vm = this;
 
         tinymce.init({
           target: $vm.$refs.resulthtml,
@@ -963,7 +963,7 @@ Fliplet().then(function() {
 
               // initialize value if it was set prior to initialization
               if ($vm.settings.resultHtml) {
-                var updatedHtml = $vm.convertVueEventAttributes($vm.settings.resultHtml);
+                const updatedHtml = $vm.convertVueEventAttributes($vm.settings.resultHtml);
 
                 editor.setContent(updatedHtml, { format: 'raw' });
               }
@@ -978,20 +978,20 @@ Fliplet().then(function() {
 
       // Converts @event attributes to v-on:event
       convertVueEventAttributes: function(html) {
-        var $html = $('<div/>').append(html);
-        var $allElements = $html.find('*');
+        const $html = $('<div/>').append(html);
+        const $allElements = $html.find('*');
 
-        for (var i = 0; i < $allElements.length; i++) {
-          var el = $allElements[i];
-          var $el = $(el);
+        for (let i = 0; i < $allElements.length; i++) {
+          const el = $allElements[i];
+          const $el = $(el);
 
-          for (var j = 0; j < el.attributes.length; j++) {
-            var attr = el.attributes[j];
+          for (let j = 0; j < el.attributes.length; j++) {
+            const attr = el.attributes[j];
 
             if (attr.name.startsWith('@')) {
-              var event = attr.name.split('.');
-              var newAttrName = event[0].replace('@', 'v-on:');
-              var newAttrValue = attr.value === 'start()' ? 'start($event)' : attr.value;
+              const event = attr.name.split('.');
+              const newAttrName = event[0].replace('@', 'v-on:');
+              const newAttrValue = attr.value === 'start()' ? 'start($event)' : attr.value;
 
               $el.attr(newAttrName, newAttrValue);
               $el.removeAttr(attr.name);
@@ -1006,7 +1006,7 @@ Fliplet().then(function() {
           return Promise.resolve(); // do not load templates when editing a form as such UI is not shown
         }
 
-        var $vm = this;
+        const $vm = this;
 
         return Fliplet.FormBuilder.templates().then(function(templates) {
           $vm.templates = templates.system.concat(templates.organization);
@@ -1014,7 +1014,7 @@ Fliplet().then(function() {
           $vm.organizationTemplates = templates.organization;
 
           if (!$vm.organizationTemplates.length) {
-            var blankTemplateId = $vm.systemTemplates[0].id;
+            const blankTemplateId = $vm.systemTemplates[0].id;
 
             $vm.settings.isPlaceholder = false;
             $vm.useTemplate(blankTemplateId);
@@ -1027,8 +1027,8 @@ Fliplet().then(function() {
         });
       },
       setNewColumns: function(columns) {
-        var fieldNames = [];
-        var fields = this.fields
+        const fieldNames = [];
+        const fields = this.fields
           .filter(function(field) {
             return field._submit !== false;
           });
@@ -1056,7 +1056,7 @@ Fliplet().then(function() {
 
             case 'flMatrix':
               field.rowOptions.forEach(function(row) {
-                var val = row.id ? row.id : row.label;
+                const val = row.id ? row.id : row.label;
 
                 fieldNames.push(`${field.name} [${val}]`);
               });
@@ -1139,7 +1139,7 @@ Fliplet().then(function() {
       getCurrentMultiStepForm: async function(allFormsInSlide, currentForm) {
         let currentMultiStepForm = [];
         let isCurrentForm = false;
-        let currentFormDsId = currentForm.dataSourceId;
+        const currentFormDsId = currentForm.dataSourceId;
 
         allFormsInSlide.some(function(form) {
           const formDsId = form.dataSourceId;
@@ -1228,7 +1228,7 @@ Fliplet().then(function() {
         }
       },
       'section': function() {
-        var $vm = this;
+        const $vm = this;
 
         $vm.setupCodeEditor();
         changeSelectText();
@@ -1244,7 +1244,7 @@ Fliplet().then(function() {
         }
       },
       'settings.onSubmit': function(array) {
-        var $vm = this;
+        const $vm = this;
 
         if (array.indexOf('generateEmail') > -1) {
           this.toggleGenerateEmail = true;
@@ -1265,7 +1265,7 @@ Fliplet().then(function() {
               dataSource.hooks = dataSource.hooks || [];
 
               if (dataSource.hooks.length) {
-                var index = dataSource.hooks.findIndex(function(o) {
+                const index = dataSource.hooks.findIndex(function(o) {
                   return o.widgetInstanceId == widgetId && o.runOn.indexOf('insert') > -1;
                 });
 
@@ -1293,7 +1293,7 @@ Fliplet().then(function() {
               dataSource.hooks = dataSource.hooks || [];
 
               if (dataSource.hooks.length) {
-                var index = dataSource.hooks.findIndex(function(o) {
+                const index = dataSource.hooks.findIndex(function(o) {
                   return o.widgetInstanceId == widgetId && o.runOn.indexOf('update') > -1;
                 });
 
@@ -1325,7 +1325,7 @@ Fliplet().then(function() {
         immediate: true,
         handler: function() {
           if (this.settings.dataSourceId) {
-            var $vm = this;
+            const $vm = this;
 
             this.getDataSourceColumns().then(function(columns) {
               $vm.setNewColumns(columns);
@@ -1335,7 +1335,7 @@ Fliplet().then(function() {
       }
     },
     created: function() {
-      var $vm = this;
+      const $vm = this;
 
       Fliplet.FormBuilder.on('field-settings-changed', this.onFieldSettingChanged);
 
@@ -1406,13 +1406,13 @@ Fliplet().then(function() {
       window.generateEmailProvider = null;
       window.linkProvider = null;
 
-      var $vm = this;
+      const $vm = this;
 
       $vm.settings.name = $vm.settings.name || 'Untitled form';
 
       $vm.settings.fields.forEach(function(field) {
         if (field._type === 'flTimer') {
-          var displayValues = formatSeconds(field.initialTimerValue);
+          const displayValues = formatSeconds(field.initialTimerValue);
 
           field.hours = displayValues.hours;
           field.minutes = displayValues.minutes;
@@ -1444,7 +1444,7 @@ Fliplet().then(function() {
         $($vm.$refs.formSettings).find('[data-toggle="tooltip"]').tooltip();
       }
 
-      var savedLinkData = $vm.settings && $vm.settings.linkAction;
+      const savedLinkData = $vm.settings && $vm.settings.linkAction;
 
       $.extend(true, {
         action: 'screen',
@@ -1498,7 +1498,7 @@ Fliplet().then(function() {
       });
 
       Fliplet.Widget.onCancelRequest(function() {
-        var emailProviderNames = [
+        const emailProviderNames = [
           'emailTemplateAddProvider',
           'emailTemplateEditProvider',
           'generateEmailProvider'
@@ -1520,7 +1520,7 @@ Fliplet().then(function() {
       });
     },
     updated: function() {
-      var $vm = this;
+      const $vm = this;
 
       if (!window.linkProvider) {
         $vm.initLinkProvider();

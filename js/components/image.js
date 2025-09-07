@@ -67,7 +67,7 @@ Fliplet.FormBuilder.field('image', {
     forcedClick: false
   },
   validations: function() {
-    var rules = {
+    const rules = {
       value: {}
     };
 
@@ -92,7 +92,7 @@ Fliplet.FormBuilder.field('image', {
   },
   methods: {
     removeImage: function(index) {
-      var $vm = this;
+      const $vm = this;
 
       // this is used to trigger onChange event even if user deletes and than uploads same image
       $vm.$refs.imageInput.value = null;
@@ -136,8 +136,8 @@ Fliplet.FormBuilder.field('image', {
       }
     },
     requestPicture: function(fileInput) {
-      var $vm = this;
-      var boundingRect = fileInput.getBoundingClientRect();
+      const $vm = this;
+      let boundingRect = fileInput.getBoundingClientRect();
 
       while (boundingRect.width === 0 || boundingRect.height === 0) {
         if (!fileInput.parentNode) {
@@ -151,7 +151,7 @@ Fliplet.FormBuilder.field('image', {
       return new Promise(function(resolve) {
         $vm.boundingRect = fileInput.getBoundingClientRect();
 
-        var buttonLabels = [
+        let buttonLabels = [
           T('widgets.form.image.actionLabels.takePhoto'),
           T('widgets.form.image.actionLabels.choosePhoto'),
           T('widgets.form.image.actionLabels.cancel')
@@ -189,8 +189,8 @@ Fliplet.FormBuilder.field('image', {
       });
     },
     getPicture: function() {
-      var $vm = this;
-      var popoverOptions = {
+      const $vm = this;
+      const popoverOptions = {
         arrowDir: Camera.PopoverArrowDirection.ARROW_ANY
       };
 
@@ -216,13 +216,13 @@ Fliplet.FormBuilder.field('image', {
       });
     },
     processImage: function(file, addThumbnail) {
-      var $vm = this;
-      var mimeType = file.type || 'image/png';
+      const $vm = this;
+      const mimeType = file.type || 'image/png';
 
       this.validateValue();
 
       loadImage.parseMetaData(file, function() {
-        var options = {
+        const options = {
           canvas: true,
           maxWidth: $vm.customWidth,
           maxHeight: $vm.customHeight,
@@ -245,9 +245,9 @@ Fliplet.FormBuilder.field('image', {
           $vm.hasCorruptedImage = false;
           $vm.isImageSizeExceeded = false;
 
-          var scaledImage = loadImage.scale(img, options);
-          var imgBase64Url = scaledImage.toDataURL(mimeType, $vm.jpegQuality);
-          var flipletBase64Url = imgBase64Url + ';filename:' + file.name;
+          const scaledImage = loadImage.scale(img, options);
+          const imgBase64Url = scaledImage.toDataURL(mimeType, $vm.jpegQuality);
+          const flipletBase64Url = imgBase64Url + ';filename:' + file.name;
 
           $vm.value.push(flipletBase64Url);
 
@@ -261,14 +261,14 @@ Fliplet.FormBuilder.field('image', {
     },
     onFileClick: function(event) {
       // Native
-      var $vm = this;
+      const $vm = this;
 
       // Web
       if (Fliplet.Env.is('web') || !navigator.camera) {
         return;
       }
 
-      var getPicture;
+      let getPicture;
 
       event.preventDefault();
 
@@ -304,16 +304,16 @@ Fliplet.FormBuilder.field('image', {
       });
     },
     onFileChange: function(e) {
-      var files = this.$refs.imageInput.files;
+      const files = this.$refs.imageInput.files;
 
-      for (var i = 0; i < files.length; i++) {
+      for (let i = 0; i < files.length; i++) {
         this.processImage(files.item(i), true);
       }
 
       e.target.value = '';
     },
     onImageClick: function(index) {
-      var imagesData = {
+      const imagesData = {
         images: this.value.map(function(imgURL) {
           return { url: imgURL };
         }),
@@ -329,7 +329,7 @@ Fliplet.FormBuilder.field('image', {
         return;
       }
 
-      var $vm = this;
+      const $vm = this;
 
       $vm.value.forEach(function(image, index) {
         addThumbnailToCanvas(image, index, $vm);

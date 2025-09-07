@@ -66,7 +66,7 @@ Fliplet.FormBuilder.field('typeahead', {
     }
   },
   validations: function() {
-    var rules = {
+    const rules = {
       value: {}
     };
 
@@ -104,7 +104,7 @@ Fliplet.FormBuilder.field('typeahead', {
   },
   methods: {
     initTypeahead: function() {
-      var $vm = this;
+      const $vm = this;
 
       if (this.typeahead && !this.$refs.typeahead) {
         return;

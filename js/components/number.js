@@ -31,7 +31,7 @@ Fliplet.FormBuilder.field('number', {
     }
   },
   validations: function() {
-    var rules = {
+    const rules = {
       value: {
         integer: window.validators.integer,
         maxLength: window.validators.maxLength(15)
@@ -75,7 +75,7 @@ Fliplet.FormBuilder.field('number', {
           value: maxNumbersAfterPoint
         },
         function(value) {
-          var decimal = /^(-?\d+((\.)\d{1,10})?)$/;
+          const decimal = /^(-?\d+((\.)\d{1,10})?)$/;
 
           if (!value) {
             return true;
@@ -91,10 +91,10 @@ Fliplet.FormBuilder.field('number', {
             return false;
           }
 
-          var currentNumbersAfterPoint = 0;
+          let currentNumbersAfterPoint = 0;
 
           if (Math.floor(value) !== value) {
-            var valueParts = value.toString().split('.');
+            const valueParts = value.toString().split('.');
 
             currentNumbersAfterPoint = valueParts[1] ? valueParts[1].length : 0;
           }

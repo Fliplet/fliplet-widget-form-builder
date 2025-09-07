@@ -54,17 +54,17 @@ Fliplet.FormBuilder.field('checkbox', {
           return;
         }
 
-        var $vm = this;
+        const $vm = this;
 
         // Sort selected options by their index as a checkbox input option
-        var ordered = Fliplet.FormBuilderUtils.sortBy(this.value, function(val) {
+        const ordered = Fliplet.FormBuilderUtils.sortBy(this.value, function(val) {
           return $vm.options.findIndex(function(option) {
             return (option.id || option.label) === val;
           });
         });
 
         // Get all options label in array format
-        var allOptions = this.options.map(function(option) {
+        const allOptions = this.options.map(function(option) {
           return option.id || option.label;
         });
 
@@ -77,8 +77,8 @@ Fliplet.FormBuilder.field('checkbox', {
           return;
         }
 
-        var $vm = this;
-        var oldValue = this.value;
+        const $vm = this;
+        const oldValue = this.value;
 
         if (val) {
           this.value = [];
@@ -97,7 +97,7 @@ Fliplet.FormBuilder.field('checkbox', {
     }
   },
   validations: function() {
-    var rules = {
+    const rules = {
       value: {}
     };
 
@@ -109,10 +109,10 @@ Fliplet.FormBuilder.field('checkbox', {
   },
   methods: {
     updateValue: function() {
-      var $vm = this;
+      const $vm = this;
 
       // Sort selected options by their index as a checkbox input option
-      var ordered = Fliplet.FormBuilderUtils.sortBy(this.value, function(val) {
+      const ordered = Fliplet.FormBuilderUtils.sortBy(this.value, function(val) {
         return $vm.options.findIndex(function(option) {
           return (option.id || option.label) === val;
         });
@@ -123,8 +123,8 @@ Fliplet.FormBuilder.field('checkbox', {
       this.$emit('_input', this.name, ordered);
     },
     clickHandler: function(option) {
-      var val = option.id || option.label;
-      var index = this.value.indexOf(val);
+      const val = option.id || option.label;
+      const index = this.value.indexOf(val);
 
       if (index === -1) {
         this.value.push(val);
@@ -149,13 +149,13 @@ Fliplet.FormBuilder.field('checkbox', {
     }
   },
   created: function() {
-    var $vm = this;
+    const $vm = this;
 
     if (this.value.length > 0) {
-      var selectedOptions = [];
+      const selectedOptions = [];
 
       this.value.forEach(function(value) {
-        var selectedOption = $vm.options.find(function(option) {
+        const selectedOption = $vm.options.find(function(option) {
           return (Fliplet.FormBuilderUtils.has(option, 'label') && Fliplet.FormBuilderUtils.has(option, 'id')) ? option.id === value : option.label === value;
         });
 
