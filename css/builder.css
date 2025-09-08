@@ -98,10 +98,6 @@ nav > .btn {
   margin-top: 10px;
 }
 
-.add-field {
-  margin-top: -13px;
-}
-
 .form-control-static {
   min-height: 44px;
   line-height: 30px;
@@ -109,12 +105,6 @@ nav > .btn {
 
 .form-control[readonly] {
   background-color: #f8f8f8;
-}
-
-.add-field {
-  position: absolute;
-  top: 120px;
-  right: 15px;
 }
 
 .hide-fields {
@@ -1449,6 +1439,10 @@ form hr {
 .fl-paragraph-editor .tox .tox-toolbar__group > .tox-tbtn--select:first-child .tox-tbtn__select-label {
   background: transparent;
   font-weight: 700;
+}
+
+.fl-paragraph-editor .tox .tox-tbtn--select.tox-tbtn--bespoke {
+  width: 70px;
 }
 
 /* Prevent hover styles from appearing on the label */

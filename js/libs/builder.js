@@ -69,6 +69,33 @@ if (data.settings && data.settings.emailTemplate) {
   data.settings.emailTemplate;
 }
 
+// TODO: Move to utils.js once lodash is removed
+/**
+ * Escapes HTML special characters in a string to prevent XSS attacks.
+ * This is particularly important for user-provided field names that get rendered in HTML.
+ *
+ * @param {string} str - The string to escape
+ * @returns {string} The escaped string safe for HTML rendering
+ */
+function escapeHtml(str) {
+  if (typeof str !== 'string') {
+    return str;
+  }
+
+  const htmlEscapes = {
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#x27;',
+    '/': '&#x2F;'
+  };
+
+  return str.replace(/[&<>"'/]/g, function(match) {
+    return htmlEscapes[match];
+  });
+}
+
 function changeSelectText() {
   setTimeout(function() {
     $('.hidden-select:not(.component .hidden-select)').each(function() {
@@ -226,6 +253,75 @@ Fliplet().then(function() {
         return this.fields.some(function(el) {
           return !!el.required;
         });
+      },
+      /**
+       * Generates a warning message based on data store configuration and data source settings.
+       * Checks if the form has proper data source configuration for add/update operations.
+       *
+       * @returns {string|null} Warning message HTML string if configuration issues exist, null if no warnings
+       */
+      dataSourceWarningMessage() {
+        if (!this.settings || !this.settings.dataStore) {
+          return null;
+        }
+
+        const ds = this.settings.dataStore || [];
+        const hasDataSource = ds.includes('dataSource');
+        const hasEditDataSource = ds.includes('editDataSource');
+
+        if (hasDataSource && hasEditDataSource) {
+          return null;
+        }
+
+        let message = `<b>${T('widgets.form.warningLabel')}: </b> `;
+
+        if (!this.settings.dataSourceId) {
+          message += T('widgets.form.noDatasourceLinked');
+        } else if (!hasDataSource && !hasEditDataSource) {
+          message += T('widgets.form.noAddOrUpdateWarning');
+        } else if (!hasDataSource && hasEditDataSource) {
+          message += T('widgets.form.noAddWarning');
+        } else if (hasDataSource && !hasEditDataSource) {
+          message += T('widgets.form.noUpdateWarning');
+        }
+
+        return message;
+      },
+      /**
+       * Generates a warning message for media fields that don't have a media folder configured.
+       * Checks fields of type 'flFile', 'flImage', and 'flSignature' for missing mediaFolderId.
+       *
+       * @returns {string|null} Warning message string if media fields are misconfigured, null if no warnings
+       */
+      mediaWarningMessage() {
+        const MEDIA_TYPES = ['flFile', 'flImage', 'flSignature'];
+
+        // Filter fields that are of media type
+        const mediaFields = this.fields.filter(f => MEDIA_TYPES.includes(f._type));
+
+        if (!mediaFields.length) {
+          return null;
+        }
+
+        // Ensure nested properties exist to ensure reactivity
+        mediaFields.forEach(f => {
+          if (!('mediaFolderId' in f)) {
+            this.$set(f, 'mediaFolderId', null);
+          }
+        });
+
+        // Filter fields missing folder selection
+        const misconfiguredFields = mediaFields.filter(f =>
+          !f.mediaFolderId
+        );
+
+        if (!misconfiguredFields.length) {
+          return null;
+        }
+
+        const fieldNames = misconfiguredFields.map(f => escapeHtml(f.name)).join(', ');
+
+        return `<b>${T('widgets.form.warningLabel')}: </b> ${T('widgets.form.mediaWarning', { fieldNames })}`;
       },
       missingColumns: function() {
         return this.newColumns.join(', ');
@@ -490,19 +586,14 @@ Fliplet().then(function() {
 
             operation = Fliplet.DataSources.getById($vm.settings.dataSourceId).then(function(dataSource) {
               // First check if any email hook exists
-              const emailHookExists = dataSource.hooks.some(function(hook) {
-                return hook.type === 'email';
+              const emailHook = dataSource.hooks.find(function(hook) {
+                return hook.type === 'email' && hook.widgetInstanceId === widgetId && hook.runOn.includes('insert');
               });
 
-              if (emailHookExists) {
-                // Update existing email hooks
-                dataSource.hooks.forEach(function(hook) {
-                  if (hook.type === 'email') {
-                    hook.payload = payload;
-                    hook.widgetInstanceId = widgetId;
-                    hook.triggers = [widgetUuid];
-                  }
-                });
+              if (emailHook) {
+                // Update existing email hook
+                emailHook.payload = payload;
+                emailHook.triggers = [widgetUuid];
               } else {
                 // Add new hook only if no email hook exists
                 dataSource.hooks.push({
@@ -563,19 +654,14 @@ Fliplet().then(function() {
 
             operation = Fliplet.DataSources.getById($vm.settings.dataSourceId).then(function(dataSource) {
               // First check if any email hook exists
-              const emailHookExists = dataSource.hooks.some(function(hook) {
-                return hook.type === 'email';
+              const emailHook = dataSource.hooks.find(function(hook) {
+                return hook.type === 'email' && hook.widgetInstanceId === widgetId && hook.runOn.includes('update');
               });
 
-              if (emailHookExists) {
-                // Update existing email hooks
-                dataSource.hooks.forEach(function(hook) {
-                  if (hook.type === 'email') {
-                    hook.payload = payload;
-                    hook.widgetInstanceId = widgetId;
-                    hook.triggers = [widgetUuid];
-                  }
-                });
+              if (emailHook) {
+                // Update existing email hook
+                emailHook.payload = payload;
+                emailHook.triggers = [widgetUuid];
               } else {
                 // Add new hook only if no email hook exists
                 dataSource.hooks.push({
