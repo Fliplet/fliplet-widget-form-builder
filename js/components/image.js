@@ -1,5 +1,8 @@
 /* global Camera, addThumbnailToCanvas, loadImage, dataURLToBlob */
 
+const MAX_IMAGE_WIDTH = 3000;
+const MAX_IMAGE_HEIGHT = 3000;
+
 /**
  * Image field component – renders an image capture and upload input in forms.
  * Supports camera capture, file upload, and image compression options.
@@ -229,9 +232,9 @@ Fliplet.FormBuilder.field('image', {
       await new Promise((resolve) => loadImage.parseMetaData(file, resolve));
     
       const options = {
-        canvas: !!($vm.customWidth || $vm.customHeight),        // use canvas to manipulate the image
-        maxWidth: $vm.customWidth,
-        maxHeight: $vm.customHeight,
+        canvas: true,        // use canvas to manipulate the image
+        maxWidth: $vm.customWidth || MAX_IMAGE_WIDTH,
+        maxHeight: $vm.customHeight || MAX_IMAGE_HEIGHT,
         orientation: 0       // set to 0 by default; can read EXIF if needed
       };
     
