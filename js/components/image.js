@@ -224,21 +224,20 @@ Fliplet.FormBuilder.field('image', {
     },
     processImage: async function(file, addThumbnail = true) {
       const $vm = this;
-    
-      // Validate current value before adding new images
-      this.validateValue();
-    
-      // Parse EXIF metadata (orientation, etc.)
-      await new Promise((resolve) => loadImage.parseMetaData(file, resolve));
-    
-      const options = {
-        canvas: true,        // use canvas to manipulate the image
-        maxWidth: $vm.customWidth || MAX_IMAGE_WIDTH,
-        maxHeight: $vm.customHeight || MAX_IMAGE_HEIGHT,
-        orientation: 0       // set to 0 by default; can read EXIF if needed
-      };
-    
       try {
+        // Validate current value before adding new images
+        this.validateValue();
+
+        // Parse EXIF metadata (orientation, etc.)
+        await new Promise((resolve) => loadImage.parseMetaData(file, resolve));
+
+        const options = {
+          canvas: true,        // use canvas to manipulate the image
+          maxWidth: $vm.customWidth || MAX_IMAGE_WIDTH,
+          maxHeight: $vm.customHeight || MAX_IMAGE_HEIGHT,
+          orientation: 0       // set to 0 by default; can read EXIF if needed
+        };
+    
         // Load the image into a canvas
         const img = await new Promise((resolve) => loadImage(file, resolve, options));
     
@@ -304,7 +303,11 @@ Fliplet.FormBuilder.field('image', {
 
       if (this.forcedClick) {
         this.forcedClick = false;
-        getPicture = $vm.getPicture();
+        try {
+          getPicture = $vm.getPicture();
+        } catch (error) {
+          console.error('Failed to get picture', error);
+        }
 
         return;
       }
