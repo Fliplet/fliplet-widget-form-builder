@@ -219,62 +219,75 @@ Fliplet.FormBuilder.field('image', {
         });
       });
     },
-    processImage: function(file, addThumbnail) {
-      var $vm = this;
-
+    processImage: async function(file, addThumbnail = true) {
+      const $vm = this;
+    
+      // Validate current value before adding new images
       this.validateValue();
-
-      loadImage.parseMetaData(file, function() {
-        var options = {
-          canvas: true,
-          maxWidth: $vm.customWidth,
-          maxHeight: $vm.customHeight,
-          orientation: 0
-        };
-
-        loadImage(file, async function(img) {
-          if (img.type === 'error') {
-            $vm.hasCorruptedImage = true;
-
-            return;
-          }
-
-          $vm.hasCorruptedImage = false;
-
-
-          var scaledImage = loadImage.scale(img, options);
-
-          // Always convert resized images to JPEG on web for consistency with native
-          const jpegMimeType = 'image/jpeg';
-          const imgBase64Url = scaledImage.toDataURL(jpegMimeType, $vm.jpegQuality);
-
-          try {
-            const blob = dataURLToBlob(imgBase64Url);
-
-            // Ensure the file name extension matches the JPEG MIME type
-            const blobExtension = (blob.type && blob.type.split('/')[1]) || 'jpeg';
-
-            if (file && file.name) {
-              blob.name = file.name.replace(/\.[^/.]+$/, '') + '.' + blobExtension;
-            } else {
-              blob.name = 'image-' + Date.now() + '.' + blobExtension;
-            }
-
-            $vm.value.push(blob);
-
-            if (addThumbnail) {
-              addThumbnailToCanvas(imgBase64Url, $vm.value.length - 1, $vm);
-            }
-
-            $vm.$emit('_input', $vm.name, $vm.value);
-          } catch (error) {
-            $vm.hasCorruptedImage = true;
-
-            return;
-          }
+    
+      // Parse EXIF metadata (orientation, etc.)
+      await new Promise((resolve) => loadImage.parseMetaData(file, resolve));
+    
+      const options = {
+        canvas: !!($vm.customWidth || $vm.customHeight),        // use canvas to manipulate the image
+        maxWidth: $vm.customWidth,
+        maxHeight: $vm.customHeight,
+        orientation: 0       // set to 0 by default; can read EXIF if needed
+      };
+    
+      try {
+        // Load the image into a canvas
+        const img = await new Promise((resolve) => loadImage(file, resolve, options));
+    
+        if (!img || img.type === 'error') {
+          $vm.hasCorruptedImage = true;
+          console.error('Failed to load image', file.name);
+          return;
+        }
+    
+        $vm.hasCorruptedImage = false;
+    
+        // Convert the canvas to a WebP Blob
+        const blob = await new Promise((resolve) => {
+          img.toBlob(
+            (b) => resolve(b),
+            'image/webp',             // Changed to WebP
+            $vm.jpegQuality || 0.8    // Compression quality (0–1)
+          );
         });
-      });
-    },
+    
+        if (!blob) {
+          $vm.hasCorruptedImage = true;
+          console.error('Blob creation failed for', file.name);
+          return;
+        }
+    
+        // Assign proper filename and extension
+        const blobExtension = (blob.type && blob.type.split('/')[1]) || 'webp';
+        blob.name = file.name
+          ? file.name.replace(/\.[^/.]+$/, '') + '.' + blobExtension
+          : 'image-' + Date.now() + '.' + blobExtension;
+    
+        // Add the blob to the component's value
+        $vm.value.push(blob);
+    
+        // Generate thumbnail if needed
+        if (addThumbnail) {
+          const reader = new FileReader();
+          reader.onload = function (e) {
+            addThumbnailToCanvas(e.target.result, $vm.value.length - 1, $vm);
+          };
+          reader.readAsDataURL(blob); // Convert blob to base64 for thumbnail preview
+        }
+    
+        // Emit the updated value for parent component
+        $vm.$emit('_input', $vm.name, $vm.value);
+    
+      } catch (err) {
+        $vm.hasCorruptedImage = true;
+        console.error('Error processing image', file.name, err);
+      }
+    },    
     onFileClick: function(event) {
       // Native
       var $vm = this;
