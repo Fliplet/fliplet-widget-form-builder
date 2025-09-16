@@ -30,42 +30,6 @@
       <div v-if="isSent && !redirect">{{{ resultHtml }}}</div>
     </transition>
   </form>
-  <div v-else-if="!isConfigured && isPlaceholder">
-    <form class="fl-form placeholder">
-      <div class="form-html">
-        <div class="form-group clearfix" _type="flTitle">
-          <h2>Example form</h2>
-        </div>
-        <div class="form-group clearfix" _type="flParagraph">
-          <p>Click on this example to configure your own form</p>
-        </div>
-        <div class="form-group clearfix" _type="flInput">
-          <label>Name</label>
-          <input type="text" name="field-1" placeholder="Enter your name" class="form-control">
-        </div>
-        <div class="form-group clearfix" _type="flSelect">
-          <label>Type of enquiry</label>
-          <label class="select-proxy-display">
-            <span class="icon fa fa-chevron-down"></span>
-            <span class="select-value-proxy">-- Select one</span>
-            <select name="field-3" class="form-control hidden-select">
-              <option value="">-- Select one</option>
-              <option value="Option 1">Option 1</option>
-              <option value="Option 2">Option 2</option>
-            </select>
-          </label>
-        </div>
-        <div class="form-group clearfix" _type="flTextarea">
-          <label>Message</label>
-          <textarea name="field-2" rows="4" class="form-control"></textarea>
-        </div>
-        <div class="form-btns clearfix">
-          <button type="submit" class="btn btn-primary pull-right">Submit</button>
-          <button type="reset" class="btn btn-secondary pull-right">Clear</button>
-        </div>
-      </div>
-    </form>
-  </div>
   <div v-else class="col-sm-12 loading-message">
     <!-- Show loading animation -->
     <div class="spinner-holder animated">

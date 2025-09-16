@@ -147,14 +147,11 @@ function generateFormDefaults(data) {
     name: '',
     dataSourceId: '',
     templateId: '',
-    previewingTemplate: '',
     fields: [],
     offline: true,
-    isPlaceholder: false,
     redirect: false,
     dataStore: [],
     onSubmit: [],
-    template: false,
     saveProgress: true,
     autobindProfileEditing: false,
     resultHtml: Fliplet.Widget.Templates['templates.configurations.form-result'](),
@@ -194,14 +191,7 @@ Fliplet().then(function() {
         dataSources: [],
         section: 'form', // form or settings
         settings: formSettings,
-        templates: [],
-        readMore: [],
-        systemTemplates: [],
-        organizationTemplates: [],
-        chooseTemplate: (!formSettings.templateId || formSettings.previewingTemplate !== ''),
-        toChangeTemplate: false,
-        permissionToChange: false,
-        newTemplate: '',
+        chooseTemplate: (!formSettings.templateId),
         redirect: formSettings.redirect,
         toggleTemplatedEmailAdd: formSettings.onSubmit.indexOf('templatedEmailAdd') > -1,
         toggleTemplatedEmailEdit: formSettings.onSubmit.indexOf('templatedEmailEdit') > -1,
@@ -224,8 +214,6 @@ Fliplet().then(function() {
         emailTemplateEdit: formSettings.emailTemplateEdit || undefined,
         generateEmailTemplate: formSettings.generateEmailTemplate || undefined,
         showDataSourceSettings: !!formSettings.dataSourceId,
-        organizationName: '',
-        editor: undefined,
         accessRules: [
           {
             allow: 'all',
@@ -461,40 +449,10 @@ Fliplet().then(function() {
         Fliplet.Widget.toggleCancelButton(true);
         this.closeEdit(true);
       },
-      changeTemplate: function() {
-        this.toChangeTemplate = true;
-        Fliplet.Studio.emit('widget-mode', 'normal');
-
-        if (this.toChangeTemplate) {
-          Fliplet.Studio.emit('widget-save-label-update', {
-            text: 'Update form template'
-          });
-          Fliplet.Widget.toggleSaveButton(false);
-        }
-
-        changeSelectText();
-      },
-      goBack: function() {
-        this.toChangeTemplate = false;
-        Fliplet.Studio.emit('widget-save-label-reset');
-        Fliplet.Widget.toggleSaveButton(true);
-
-        if (this.isAddingFields) {
-          Fliplet.Studio.emit('widget-mode', 'wide');
-        }
-      },
-      save: function(initial) {
+      save: function() {
         this.selectedOptions = this.activeField.selectedFieldOptions;
 
         var $vm = this;
-
-        if (initial) {
-          // Untick "Set template" checkbox when creating a form from Template
-          $vm.settings.template = false;
-
-          // Clear the default description
-          $vm.settings.description = '';
-        }
 
         if (this.settings.onSubmit.indexOf('templatedEmailAdd') > -1) {
           this.settings.emailTemplateAdd = this.emailTemplateAdd || this.defaultEmailSettings;
@@ -821,18 +779,6 @@ Fliplet().then(function() {
           return;
         }
 
-        if ($vm.toChangeTemplate) {
-          if ($vm.newTemplate) {
-            $vm.isAddingFields = false;
-            $vm.toChangeTemplate = false;
-            $vm.permissionToChange = false;
-            $vm.settings.templateId = $vm.newTemplate;
-            Fliplet.Studio.emit('widget-save-label-reset');
-          }
-
-          return;
-        }
-
         // Add progress
         $('.spinner-holder p').text('Please wait while we save your changes...');
         $(selector).addClass('is-loading');
@@ -843,69 +789,26 @@ Fliplet().then(function() {
           Fliplet.Studio.emit('reload-page-preview');
         });
       },
-      previewTemplate: function(templateId) {
-        this.updateFormSettings(templateId, true);
-
-        this.save(true).then(function onSettingsSaved() {
-          Fliplet.Studio.emit('reload-widget-instance', Fliplet.Widget.getDefaultId());
-        });
-      },
-      useTemplate: function(templateId) {
+      useTemplate: function(template) {
         Fliplet.Studio.emit('widget-save-label-reset');
         Fliplet.Widget.toggleSaveButton(true);
 
         var $vm = this;
 
-        this.settings.previewingTemplate = '';
+        var settings = template.settings;
 
-        this.updateFormSettings(templateId, false);
-
-        $vm.save(true).then(function onSettingsSaved() {
-          $(selector).removeClass('is-loading');
-          Fliplet.Studio.emit('reload-widget-instance', Fliplet.Widget.getDefaultId());
-          $vm.triggerSave();
-        });
-      },
-      updateFormSettings: function(templateId, preview) {
-        var formTemplate = _.find(this.templates, function(template) {
-          return template.id === templateId;
-        });
-
-        var settings = formTemplate.settings;
-
-        settings.templateId = formTemplate.id;
-        settings.isPlaceholder = false;
+        settings.templateId = template.id;
         settings.name = this.settings.name;
 
         this.settings = generateFormDefaults(settings);
         this.fields = this.settings.fields;
 
-        if (this.chooseTemplate && preview) {
-          this.settings.previewingTemplate = templateId;
 
-          return;
-        }
-      },
-      toggleReadMore: function(more, templateId) {
-        var $vm = this;
-        var index = $vm.readMore.indexOf(templateId);
-
-        if (more) {
-          $vm.readMore.push(templateId);
-
-          return;
-        }
-
-        if (index > -1) {
-          $vm.readMore.splice(index, 1);
-        }
-      },
-      truncate: function(string, maxChars) {
-        if (string.length > maxChars) {
-          return string.substring(0, maxChars) + '...';
-        }
-
-        return string;
+        $vm.save().then(function onSettingsSaved() {
+          $(selector).removeClass('is-loading');
+          Fliplet.Studio.emit('reload-widget-instance', Fliplet.Widget.getDefaultId());
+          $vm.triggerSave();
+        });
       },
       initDataSourceProvider: function() {
         var $vm = this;
@@ -1069,29 +972,16 @@ Fliplet().then(function() {
         return $html.html();
       },
       loadTemplates: function() {
-        if (data.fields && data.templateId && !data.previewingTemplate) {
-          return Promise.resolve(); // do not load templates when editing a form as such UI is not shown
+        if (data.fields && data.templateId) {
+          return; // do not load templates when editing a form as such UI is not shown
         }
 
         var $vm = this;
 
-        return Fliplet.FormBuilder.templates().then(function(templates) {
-          $vm.templates = templates.system.concat(templates.organization);
-          $vm.systemTemplates = templates.system;
-          $vm.organizationTemplates = templates.organization;
+        var templates = Fliplet.FormBuilder.templates();
+        var blankTemplate = templates.system[0];
 
-          if (!$vm.organizationTemplates.length) {
-            var blankTemplateId = $vm.systemTemplates[0].id;
-
-            $vm.settings.isPlaceholder = false;
-            $vm.useTemplate(blankTemplateId);
-          } else {
-            Fliplet.Widget.save(_.assign(data, { isPlaceholder: true })).then(function() {
-              $(selector).removeClass('is-loading');
-              Fliplet.Studio.emit('reload-widget-instance', Fliplet.Widget.getDefaultId());
-            });
-          }
-        });
+        $vm.useTemplate(blankTemplate);
       },
       setNewColumns: function(columns) {
         var fieldNames = [];
@@ -1275,9 +1165,6 @@ Fliplet().then(function() {
           this.settings.dataStore = [];
         }
       },
-      'permissionToChange': function(newVal) {
-        Fliplet.Widget.toggleSaveButton(newVal);
-      },
       'isAddingFields': function(newVal) {
         if (newVal) {
           Fliplet.Studio.emit('widget-mode', 'wide');
@@ -1376,11 +1263,6 @@ Fliplet().then(function() {
           type: 'to'
         });
       },
-      'settings.template': function(value) {
-        if (value) {
-          this.editor.setContent(this.settings.description);
-        }
-      },
       fields: {
         deep: true,
         immediate: true,
@@ -1408,43 +1290,8 @@ Fliplet().then(function() {
         }
       });
 
-      this.loadTemplates().then(function() {
-        if ($vm.organizationTemplates.length || data.fields) {
-          $(selector).removeClass('is-loading');
-        }
-
-        tinymce.init({
-          target: $vm.$refs.templateDescription,
-          plugins: ['lists', 'advlist', 'image', 'charmap', 'code',
-            'searchreplace', 'wordcount', 'insertdatetime', 'table'
-          ],
-          toolbar: [
-            'formatselect |',
-            'bold italic underline strikethrough |',
-            'forecolor backcolor |',
-            'alignleft aligncenter alignright alignjustify | bullist numlist outdent indent |',
-            'blockquote subscript superscript | table insertdatetime charmap hr |',
-            'removeformat | code'
-          ].join(' '),
-          menubar: false,
-          statusbar: false,
-          min_height: 300,
-          setup: function(ed) {
-            $vm.editor = ed;
-            $vm.editor.on('keyup paste', function() {
-              $vm.settings.description = $vm.editor.getContent();
-            });
-          }
-        });
-
-        if ($vm.chooseTemplate && $vm.$refs.templateGallery) {
-          setTimeout(function() {
-            $($vm.$refs.templateGallery).find('[data-toggle="tooltip"]').tooltip({
-              container: 'body'
-            });
-          }, 500);
-        }
-      });
+      this.loadTemplates();
+      $(selector).removeClass('is-loading');
 
       Fliplet.Studio.onEvent(function(evt) {
         if (evt.detail.type === 'widgetCancel') {
@@ -1493,11 +1340,6 @@ Fliplet().then(function() {
         Fliplet.Studio.emit('widget-save-label-update', {
           text: ''
         });
-
-        // Init tooltip
-        if ($vm.$refs.templateGallery) {
-          $($vm.$refs.templateGallery).find('[data-toggle="tooltip"]').tooltip();
-        }
       }
 
       // Init tooltip
@@ -1526,9 +1368,6 @@ Fliplet().then(function() {
         $vm.initDataSourceProvider();
       }
 
-      Fliplet.Organizations.get().then(function(organizations) {
-        $vm.organizationName = organizations.length && organizations[0].name;
-      });
 
       Fliplet.Widget.onSaveRequest(function() {
         if (window.emailTemplateAddProvider) {
