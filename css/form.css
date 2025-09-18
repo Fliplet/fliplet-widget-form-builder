@@ -187,6 +187,27 @@ form.placeholder button {
   font-size: 85%;
 }
 
+.single-submission-box{
+  padding-top: 18px;
+}
+
+.single-submission-text{
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 16px;
+  color: #464545;
+  letter-spacing: 0%;
+}
+
+.field-selection-single-submission{
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 41px;
+  color: #464545;
+  letter-spacing: 0%;
+  margin-left: 2px;
+}
+
 /* Buttons */
 
 .btn-primary {
@@ -270,8 +291,21 @@ a {
 /* FORM STYLES */
 
 .form-group .control-label label {
-  margin-bottom: 0;
+  margin-bottom: 20px;
   padding-top: 5px;
+}
+
+.single-submission-label {
+  font-weight: 700;
+  font-size: 15px;
+  line-height: 100%;
+}
+
+.single-submission-check-label {
+  padding-top: -4px;
+  font-weight: 400;
+  font-size: 15px;
+  line-height: 100%;
 }
 
 .form-control {

@@ -1030,6 +1030,13 @@ Fliplet().then(async function() {
             this.saveProgressed();
           }
         },
+        onSetDefaultValues: function(defaultValue) {
+          // data.singleSubmission check enable
+          // check data.singlesubmission is equalt defaultValue.key;
+          // check existing record. if yes stop the rendering and show popup
+
+          console.log('Setting default value for field:', defaultValue, data);
+        },
         onChange: function(fieldName, fn, runOnBind) {
           var field;
 
@@ -1718,6 +1725,18 @@ Fliplet().then(async function() {
         },
         loadEntryForUpdate: function(fn) {
           var $vm = this;
+          // if (singleSubmissionSelected) {
+          //   const entry = Fliplet.DataSources.connect(data.dataSourceId, { offline: false }).then(function(ds) {
+          //       return ds.find({
+          //         where: {
+          //           [singleSubmissionField.label]: settings.singleSubmissionField
+          //         }
+          //       });
+          //     });
+          //     if(entry){
+                
+          //     }
+          // }
 
           if (entryId || fn) {
             $vm.isLoading = true;
