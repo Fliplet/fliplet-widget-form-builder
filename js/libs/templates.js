@@ -1,7 +1,6 @@
 /**
  * This module manages form templates for the Fliplet Form Builder widget.
- * It provides both system templates (built-in) and organization-specific templates
- * that can be retrieved from the Fliplet API.
+ * It provides system templates (built-in) for form creation.
  *
  * Provides utility functions for working with Handlebars templates.
  * All exported functions and major logic blocks are documented with JSDoc.
@@ -29,43 +28,8 @@ const systemTemplates = [{
 ];
 
 Fliplet.FormBuilder.templates = function() {
-  const organizationId = Fliplet.Env.get('organizationId');
-
-  const operation = Fliplet.Env.get('development') || !organizationId
-    ? Promise.resolve([])
-    : Fliplet.API.request({
-      url: [
-        'v1/widget-instances',
-        '?organizationId=' + organizationId,
-        '&package=com.fliplet.form-builder',
-        '&publishedOnly=true',
-        '&where=' + encodeURIComponent(JSON.stringify({
-          $contains: {
-            template: true
-          },
-          name: {
-            $ne: null
-          }
-        }))
-      ].join('')
-    }).then(function(response) {
-      response.widgetInstances.forEach(function(instance) {
-        instance.settings.displayName = instance.settings.name;
-      });
-
-      return Promise.resolve(response.widgetInstances);
-    });
-
-  return operation.then(function(organizationTemplates) {
-    organizationTemplates.forEach(function(tpl) {
-      tpl.app = tpl.pages.length && tpl.pages[0].app || {};
-      tpl.createdDescription = (tpl.settings.createdBy && tpl.settings.createdBy.fullName) + ' in ' + tpl.app.name;
-    });
-
-    return Promise.resolve({
-      system: systemTemplates,
-      organization: organizationTemplates
-    });
-  });
+  return {
+    system: systemTemplates
+  };
 };
 
