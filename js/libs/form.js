@@ -3,11 +3,11 @@
  * Handles form rendering, validation, submission, and data integration.
  *
  */
-var formBuilderInstances = [];
-var dataSourceColumnPromises = {};
-var allFormsInSlide = [];
-var currentFormUId;
-var currentMultiStepForm;
+const formBuilderInstances = [];
+const dataSourceColumnPromises = {};
+const allFormsInSlide = [];
+let currentFormUId;
+let currentMultiStepForm;
 
 function drawImageOnCanvas(img, canvas) {
   let imgWidth = img.width;
