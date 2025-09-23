@@ -50,7 +50,7 @@ Fliplet.FormBuilder.field('reorderList', {
   },
   data: function() {
     return {
-      orderedOptions: _.cloneDeep(this.options),
+      orderedOptions: Fliplet.FormBuilderUtils.cloneDeep(this.options),
       sortableOptions: {
         sort: true,
         group: {
@@ -84,7 +84,7 @@ Fliplet.FormBuilder.field('reorderList', {
     options: {
       immediate: true,
       handler(val) {
-        this.orderedOptions = _.cloneDeep(val);
+        this.orderedOptions = Fliplet.FormBuilderUtils.cloneDeep(val);
       }
     },
     value: function(val) {
@@ -116,7 +116,7 @@ Fliplet.FormBuilder.field('reorderList', {
     },
     onReset: function(data) {
       if (data.id === this.$parent.id) {
-        this.orderedOptions = _.cloneDeep(this.options);
+        this.orderedOptions = Fliplet.FormBuilderUtils.cloneDeep(this.options);
 
         return;
       }

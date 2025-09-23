@@ -32,7 +32,7 @@ Fliplet.FormBuilder.field('radio', {
     }
   },
   validations: function() {
-    var rules = {
+    const rules = {
       value: {}
     };
 
@@ -48,7 +48,7 @@ Fliplet.FormBuilder.field('radio', {
       this.updateValue();
     },
     focusHandler: function(index) {
-      var newIndex = index;
+      let newIndex = index;
 
       if (index > this.options.length - 1) {
         newIndex = 0;
@@ -61,10 +61,10 @@ Fliplet.FormBuilder.field('radio', {
     }
   },
   created: function() {
-    var $vm = this;
+    const $vm = this;
 
-    var selectedOption = _.find($vm.options, function(option) {
-      return (_.has(option, 'label') && _.has(option, 'id')) ? option.id === $vm.value : option.label === $vm.value;
+    const selectedOption = $vm.options.find(function(option) {
+      return (Fliplet.FormBuilderUtils.has(option, 'label') && Fliplet.FormBuilderUtils.has(option, 'id')) ? option.id === $vm.value : option.label === $vm.value;
     });
 
     this.value = selectedOption ? this.value : '';

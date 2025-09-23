@@ -61,12 +61,37 @@ Fliplet.FormBuilder.field('typeahead', {
     };
   },
   computed: {
+    /**
+     * Computed messages for typeahead field
+     * @returns {Object} Messages object with translated strings
+     */
+    messages: function() {
+      return {
+        exceededMaxItems: T('widgets.form.typeahead.errors.limitExceeded', { maxItems: this.maxItems }),
+        maxItemsHelper: T('widgets.form.typeahead.maxItemsHelper', { maxItems: this.maxItems })
+      };
+    },
+    /**
+     * Checks if the current selection exceeds the maximum allowed items
+     * @returns {boolean} True if the selection exceeds maxItems limit
+     */
+    exceededMaxItems: function() {
+      return this.maxItems && this.value && this.value.length > this.maxItems;
+    },
+    /**
+     * Checks if the current selection has reached the maximum allowed items
+     * @returns {boolean} True if the selection has reached or exceeded maxItems limit
+     */
     reachedMaxItems: function() {
-      return this.value && this.value.length === this.maxItems;
+      return this.maxItems && this.value && this.value.length >= this.maxItems;
     }
   },
+  /**
+   * Defines validation rules for the typeahead field
+   * @returns {Object} Validation rules object
+   */
   validations: function() {
-    var rules = {
+    const rules = {
       value: {}
     };
 
@@ -74,8 +99,16 @@ Fliplet.FormBuilder.field('typeahead', {
       rules.value.required = window.validators.required;
     }
 
+    if (this.maxItems) {
+      rules.value.maxLength = window.validators.maxLength(this.maxItems);
+    }
+
     return rules;
   },
+  /**
+   * Initializes default values and sets up form submission hooks
+   * @returns {void}
+   */
   created: function() {
     if (!!this.defaultValue && this.optionsType === 'manual') {
       this.value = this.defaultValue.split(/\n/);
@@ -87,9 +120,17 @@ Fliplet.FormBuilder.field('typeahead', {
 
     Fliplet.Hooks.on('beforeFormSubmit', this.onBeforeSubmit);
   },
+  /**
+   * Cleans up event listeners to prevent memory leaks
+   * @returns {void}
+   */
   destroyed: function() {
     Fliplet.Hooks.off('beforeFormSubmit', this.onBeforeSubmit);
   },
+  /**
+   * Initializes the typeahead functionality and sets up default values
+   * @returns {void}
+   */
   mounted: function() {
     if (this.defaultValueSource !== 'default') {
       this.setValueFromDefaultSettings({
@@ -103,8 +144,13 @@ Fliplet.FormBuilder.field('typeahead', {
     this.$emit('_input', this.name, this.value, false, true);
   },
   methods: {
+    /**
+     * Initializes the typeahead component with configuration options
+     * Sets up event listeners and handles initial state
+     * @returns {void}
+     */
     initTypeahead: function() {
-      var $vm = this;
+      const $vm = this;
 
       if (this.typeahead && !this.$refs.typeahead) {
         return;
@@ -115,7 +161,6 @@ Fliplet.FormBuilder.field('typeahead', {
         value: this.value,
         options: this.options,
         freeInput: this.freeInput,
-        maxItems: this.maxItems,
         placeholder: this.placeholder,
         order: this.optionsType === 'dataSource' ? 'asc' : null
       });
@@ -123,24 +168,58 @@ Fliplet.FormBuilder.field('typeahead', {
       this.typeahead.change(function(value) {
         $vm.value = value;
         $vm.updateValue();
+        $vm.handleMaxItemsLock();
       });
+
+      // Check if initial value already reaches maxItems limit
+      this.handleMaxItemsLock();
     },
+    /**
+     * Handles locking/unlocking the typeahead based on maxItems limit
+     * Prevents further selection when the limit is reached
+     * @returns {void}
+     */
+    handleMaxItemsLock: function() {
+      if (!this.typeahead || !this.maxItems) {
+        return;
+      }
+
+      if (this.reachedMaxItems) {
+        this.typeahead.lock();
+      } else {
+        this.typeahead.unlock();
+      }
+    },
+    /**
+     * Hook called before form submission
+     * Ensures the current typeahead value is captured for submission
+     * @returns {void}
+     */
     onBeforeSubmit: function() {
       this.value = this.typeahead.get();
     }
   },
   watch: {
+    /**
+     * Watches for changes in the value prop
+     * Updates the typeahead component and handles max items locking
+     * @param {Array} val - The new value array
+     * @returns {void}
+     */
     value: function(val) {
-      if (this.maxItems && val.length > this.maxItems) {
-        val = val.slice(0, this.maxItems);
-      }
-
       if (this.typeahead) {
         this.typeahead.set(val);
       }
 
+      this.handleMaxItemsLock();
       this.$emit('_input', this.name, val);
     },
+    /**
+     * Watches for changes in the options prop
+     * Updates the typeahead component with new options
+     * @param {Array} val - The new options array
+     * @returns {void}
+     */
     options: function(val) {
       if (this.typeahead) {
         this.typeahead.options(val);
