@@ -4,6 +4,12 @@
       "loading": "Loading...",
       "savingData": "Saving data...",
       "retrievingData": "Retrieving data...",
+      "mediaWarning": "No storage folder is selected for {{fieldNames}} field(s).",
+      "warningLabel": "Warning",
+      "noDatasourceLinked": "No data source is linked.",
+      "noAddOrUpdateWarning": "Data will only be added or updated in the data source if the corresponding checkboxes <b>Add new submissions to a data source</b> and <b>Update existing entries in the data source</b> are checked in the settings.",
+      "noAddWarning": "New submissions will not be saved to a data source unless <b>Add new submissions to a data source</b> checkbox is checked in the settings.",
+      "noUpdateWarning": "Existing entries will not be updated in the data source unless <b>Update existing entries in the data source</b> checkbox is checked in the settings.",
       "sending": {
         "requiredFields": "* Required fields"
       },
@@ -126,6 +132,12 @@
       },
       "customButton": {
         "defaultError": "Error encountered with '{{label}}' button"
+      },
+      "typeahead": {
+        "maxItemsHelper": "Max {{maxItems}} item(s).",
+        "errors": {
+          "limitExceeded": "Only {{maxItems}} item(s) can be selected."
+        }
       },
       "telephone": {
         "instruction": "Phone number can only contain <b>; , . ( ) - + SPACE * #</b> and numbers."

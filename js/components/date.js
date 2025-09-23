@@ -1,6 +1,6 @@
 /**
  * Date field component – renders a date picker input in forms.
- * Supports date validation, format customization, and default value options.
+ * Supports date validation and default value options.
  */
 Fliplet.FormBuilder.field('date', {
   name: 'Date picker',
@@ -34,7 +34,7 @@ Fliplet.FormBuilder.field('date', {
     };
   },
   validations: function() {
-    var rules = {
+    const rules = {
       value: {}
     };
 
@@ -109,7 +109,7 @@ Fliplet.FormBuilder.field('date', {
         return;
       }
 
-      var $vm = this;
+      const $vm = this;
 
       this.datePicker = Fliplet.UI.DatePicker(this.$refs.datePicker, {
         required: this.required || this.autofill === 'always',

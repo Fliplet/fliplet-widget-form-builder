@@ -1,6 +1,14 @@
 /**
- * Number field component – renders a numeric input field with validation in forms.
- * Supports decimal precision, min/max constraints, and numeric formatting.
+ * Number field component.
+ *
+ * @component number
+ * @category Text inputs
+ * @description Renders a numeric input with built-in validators for
+ * integers, decimal precision and also has positive-only mode.
+ * @prop {String}  placeholder   Placeholder text
+ * @prop {Boolean} positiveOnly  Restrict input to ≥ 0
+ * @prop {Number}  decimals      Allowed decimal places
+ * @prop {String}  description   Additional helper text
  */
 Fliplet.FormBuilder.field('number', {
   i18n: window.VueI18Next,
@@ -23,7 +31,7 @@ Fliplet.FormBuilder.field('number', {
     }
   },
   validations: function() {
-    var rules = {
+    const rules = {
       value: {
         integer: window.validators.integer,
         maxLength: window.validators.maxLength(15)
@@ -67,7 +75,7 @@ Fliplet.FormBuilder.field('number', {
           value: maxNumbersAfterPoint
         },
         function(value) {
-          var decimal = /^(-?\d+((\.)\d{1,10})?)$/;
+          const decimal = /^(-?\d+((\.)\d{1,10})?)$/;
 
           if (!value) {
             return true;
@@ -79,14 +87,14 @@ Fliplet.FormBuilder.field('number', {
 
           value = parseFloat(value);
 
-          if (_.isNaN(value)) {
+          if (Number.isNaN(value)) {
             return false;
           }
 
-          var currentNumbersAfterPoint = 0;
+          let currentNumbersAfterPoint = 0;
 
           if (Math.floor(value) !== value) {
-            var valueParts = value.toString().split('.');
+            const valueParts = value.toString().split('.');
 
             currentNumbersAfterPoint = valueParts[1] ? valueParts[1].length : 0;
           }

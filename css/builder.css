@@ -50,11 +50,6 @@ main {
   overflow: auto;
 }
 
-main.select-template {
-  margin-top: 57px;
-  height: calc(100% - 57px);
-  padding-top: 20px;
-}
 
 .builder {
   position: relative;
@@ -98,10 +93,6 @@ nav > .btn {
   margin-top: 10px;
 }
 
-.add-field {
-  margin-top: -13px;
-}
-
 .form-control-static {
   min-height: 44px;
   line-height: 30px;
@@ -109,12 +100,6 @@ nav > .btn {
 
 .form-control[readonly] {
   background-color: #f8f8f8;
-}
-
-.add-field {
-  position: absolute;
-  top: 120px;
-  right: 15px;
 }
 
 .hide-fields {
@@ -128,17 +113,6 @@ nav > .btn {
   text-align: center;
 }
 
-.change-template .panel {
-  margin-top: 30px;
-}
-
-.change-template .back-btn {
-  padding: 15px 0;
-}
-
-.choose-template label {
-  color: #14505e;
-}
 
 .options-help-text {
   padding-top: 8px;
@@ -156,83 +130,6 @@ nav > .btn {
   height: calc(1.5em * 5.75);
 }
 
-/* TEMPLATES GALLERY */
-
-.templates-sub-title {
-  margin-top: 10px;
-}
-
-.gallery-heading {
-  background-color: #dcdae0;
-  padding: 5px 15px;
-  margin-left: -15px;
-  margin-right: -15px;
-  margin-bottom: 15px;
-}
-
-.template-wrapper {
-  margin-bottom: 15px;
-  padding-bottom: 15px;
-  border-bottom: 1px solid #e4e9eb;
-}
-
-.template-wrapper:last-child {
-  padding-bottom: 0;
-  border-bottom: none;
-}
-
-.template-wrapper .template-icon-wrapper {
-  position: relative;
-  margin-right: 10px;
-  height: 65px;
-}
-
-.template-wrapper .template-icon-wrapper .template-icon {
-  width: 65px;
-  height: 65px;
-  border: 1px solid #ccc;
-  background-color: #e3e9eb;
-  border-radius: 21%;
-  overflow: hidden;
-}
-
-.template-wrapper .template-created-info {
-  position: absolute;
-  top: 50%;
-  right: 0;
-  margin-top: -8px;
-  width: 16px;
-  height: 16px;
-  font-size: 12px;
-  line-height: 16px;
-  text-align: center;
-  background-color: rgba(0, 0, 0, 0.65);
-  color: #fff;
-  border-radius: 32px;
-}
-
-.template-wrapper .template-title {
-  position: relative;
-  color: #14505e;
-  margin-top: 0;
-  padding-right: 20px;
-}
-
-.template-wrapper .template-desc {
-  margin-bottom: 10px;
-}
-
-.readmore,
-.readless,
-.selectLabel {
-  display: block;
-}
-
-.help-block.description {
-  font-size: 85%;
-}
-
-/* END OF TEMPLATES GALLERY */
 
 .component {
   position: relative;
@@ -277,7 +174,6 @@ nav > .btn {
   background-color: #ffffff;
 }
 
-.template-controls .btn + .btn,
 .component .btn + .btn {
   margin-top: 0;
 }
@@ -1449,6 +1345,10 @@ form hr {
 .fl-paragraph-editor .tox .tox-toolbar__group > .tox-tbtn--select:first-child .tox-tbtn__select-label {
   background: transparent;
   font-weight: 700;
+}
+
+.fl-paragraph-editor .tox .tox-tbtn--select.tox-tbtn--bespoke {
+  width: 70px;
 }
 
 /* Prevent hover styles from appearing on the label */

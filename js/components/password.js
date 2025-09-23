@@ -1,6 +1,10 @@
 /**
- * Password field component – renders a secure password input field in forms.
- * Supports password visibility toggle and confirmation field validation.
+ * This component provides a password input field with advanced features including:
+ * - Password strength validation with customizable rules
+ * - Password confirmation field
+ * - Auto-generation of secure passwords
+ * - Password hashing support
+ * - Progress saving and population on update
  */
 Fliplet.FormBuilder.field('password', {
   name: 'Password input',
@@ -72,7 +76,7 @@ Fliplet.FormBuilder.field('password', {
     };
   },
   validations: function() {
-    var rules = {
+    const rules = {
       value: {
         required: this.required && window.validators.required,
         minLength: window.validators.minLength(this.passwordMinLength),
@@ -115,15 +119,15 @@ Fliplet.FormBuilder.field('password', {
   },
   methods: {
     generateRandomPassword: function(length) {
-      var alphabet = 'abcdefghijklmnopqrstuvwxyz!#$%&*-ABCDEFGHIJKLMNOP1234567890';
-      var password = '';
-      var isValid = true;
+      const alphabet = 'abcdefghijklmnopqrstuvwxyz!#$%&*-ABCDEFGHIJKLMNOP1234567890';
+      let password = '';
+      let isValid = true;
 
-      for (var x = 0; x < length; x++) {
+      for (let x = 0; x < length; x++) {
         password += alphabet.charAt(Math.floor(Math.random() * alphabet.length));
       }
 
-      _.forEach(this.rules, function(value) {
+      this.rules.forEach(function(value) {
         if (!value.test(password)) {
           isValid = false;
         }

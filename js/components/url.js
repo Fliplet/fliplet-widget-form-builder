@@ -1,6 +1,5 @@
 /**
  * URL field component – renders a URL input field with validation in forms.
- * Validates URL format and provides protocol handling for web links.
  */
 Fliplet.FormBuilder.field('url', {
   name: 'URL input',
@@ -22,7 +21,7 @@ Fliplet.FormBuilder.field('url', {
     };
   },
   validations: function() {
-    var rules = {
+    const rules = {
       value: {
         url: function(value) {
           // Normalize()ing to NFD Unicode normal form decomposes combined graphemes into the combination of simple ones using a regex character class to match the U+0300 → U+036F range

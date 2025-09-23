@@ -1,6 +1,8 @@
 /**
- * WYSIWYG field component – renders a rich text editor with formatting tools in forms.
- * Supports HTML content creation with text styling, links, and embedded media.
+ * WYSIWYG field component - Renders a rich text editor powered by TinyMCE that allows users to create and edit
+ * formatted HTML content within forms. Supports text styling, links, tables, lists,
+ * and various formatting options with a comprehensive toolbar interface.
+ *
  */
 Fliplet.FormBuilder.field('wysiwyg', {
   name: 'Rich text',
@@ -21,7 +23,7 @@ Fliplet.FormBuilder.field('wysiwyg', {
     }
   },
   validations: function() {
-    var rules = {
+    const rules = {
       value: {}
     };
 
@@ -39,14 +41,14 @@ Fliplet.FormBuilder.field('wysiwyg', {
   watch: {
     value: function(val) {
       // This happens when the value is updated programmatically via the FormBuilder field().val() method
-      val = _.isNumber(val) ? _.toString(val) : val;
+      const formattedVal = Fliplet.FormBuilderUtils.isNumber(val) ? val.toString() : val;
 
-      if (this.editor && val !== this.editor.getContent()) {
-        return this.editor.setContent(val || '', { format: 'raw' });
+      if (this.editor && formattedVal !== this.editor.getContent()) {
+        return this.editor.setContent(formattedVal || '', { format: 'raw' });
       }
 
-      if (val !== this.value) {
-        this.value = val;
+      if (formattedVal !== this.value) {
+        this.value = formattedVal;
       }
     }
   },
@@ -61,7 +63,7 @@ Fliplet.FormBuilder.field('wysiwyg', {
       }
     },
     addBulletedListShortcutsWindows: function() {
-      var $vm = this;
+      const $vm = this;
 
       // For Windows
       this.editor.addShortcut('ctrl+shift+8', 'UnorderedList', function() {
@@ -76,12 +78,12 @@ Fliplet.FormBuilder.field('wysiwyg', {
     }
   },
   mounted: function() {
-    var $vm = this;
-    var lineHeight = 55;
+    const $vm = this;
+    const lineHeight = 55;
 
-    this.tinymceId = _.kebabCase(this.name) + '-' + $(this.$refs.textarea).parents('[data-form-builder-id]').data('formBuilderId');
+    this.tinymceId = Fliplet.FormBuilderUtils.kebabCase(this.name) + '-' + $(this.$refs.textarea).parents('[data-form-builder-id]').data('formBuilderId');
 
-    var config = {
+    const config = {
       target: this.$refs.textarea,
       mobile: {
         toolbar_mode: 'floating',
@@ -134,7 +136,7 @@ Fliplet.FormBuilder.field('wysiwyg', {
         editor.on('init', function() {
           $vm.addBulletedListShortcutsWindows();
 
-          var mobileEditorSocket = $('.tinymce-mobile-editor-socket');
+          const mobileEditorSocket = $('.tinymce-mobile-editor-socket');
 
           if (mobileEditorSocket) {
             mobileEditorSocket.height('auto');
@@ -152,7 +154,7 @@ Fliplet.FormBuilder.field('wysiwyg', {
           if ($vm.isInterface) {
             // iFrames don't work with the form builder's Sortable feature
             // Instead, the iFrame is swapped with a <div></div> of the same dimensions
-            var $el = $($vm.$refs.ghost);
+            const $el = $($vm.$refs.ghost);
 
             $el.width(editor.iframeElement.style.width).height(editor.iframeElement.style.height);
             $(editor.iframeElement).replaceWith($el);
@@ -162,13 +164,13 @@ Fliplet.FormBuilder.field('wysiwyg', {
         editor.on('keydown', $vm.addBulletedListShortcutsMac);
 
         editor.on('focus', function() {
-          var $el = $(editor.iframeElement);
+          const $el = $(editor.iframeElement);
 
           $el.parent().parent().addClass('focus-outline');
         });
 
         editor.on('blur', function() {
-          var $el = $(editor.iframeElement);
+          const $el = $(editor.iframeElement);
 
           $el.parent().parent().removeClass('focus-outline');
           $vm.onBlur();
@@ -200,17 +202,17 @@ Fliplet.FormBuilder.field('wysiwyg', {
         field: this,
         config: config
       }).then(function() {
-        var pluginPaths = ['plugins', 'mobile.plugins'];
+        const pluginPaths = ['plugins', 'mobile.plugins'];
 
-        _.forEach(pluginPaths, function(path) {
-          var plugins = _.get(config, path);
+        pluginPaths.forEach(function(path) {
+          let plugins = Fliplet.FormBuilderUtils.get(config, path);
 
           if (typeof plugins === 'string') {
             // Use array of plugins (as TinyMCE's preferred format) if string is provided
             plugins = plugins.split(' ');
           }
 
-          _.set(config, path, plugins);
+          Fliplet.FormBuilderUtils.set(config, path, plugins);
         });
 
         tinymce.init(config);

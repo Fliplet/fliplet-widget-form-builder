@@ -1,6 +1,14 @@
 /**
- * Radio field component – renders radio button options for single selection in forms.
- * Supports custom options and data source integration for dynamic choices.
+ * A single-select radio button component that allows users to choose one option from a list.
+ *
+ * @property {string} [description] - Optional description text displayed above the radio buttons
+ * @property {Array<Object>} options - Array of option objects with label and optional id properties
+ * @property {string} options[].label - Display text for the radio option
+ * @property {string} [options[].id] - Unique identifier for the option (optional, falls back to label)
+ * @property {boolean} [required=false] - Whether the field is required for form submission
+ * @property {boolean} [readonly=false] - Whether the field is read-only and cannot be modified
+ * @property {string} value - The currently selected option value (id or label)
+ *
  */
 Fliplet.FormBuilder.field('radio', {
   name: 'Radios (single-select)',
@@ -24,7 +32,7 @@ Fliplet.FormBuilder.field('radio', {
     }
   },
   validations: function() {
-    var rules = {
+    const rules = {
       value: {}
     };
 
@@ -40,7 +48,7 @@ Fliplet.FormBuilder.field('radio', {
       this.updateValue();
     },
     focusHandler: function(index) {
-      var newIndex = index;
+      let newIndex = index;
 
       if (index > this.options.length - 1) {
         newIndex = 0;
@@ -53,10 +61,10 @@ Fliplet.FormBuilder.field('radio', {
     }
   },
   created: function() {
-    var $vm = this;
+    const $vm = this;
 
-    var selectedOption = _.find($vm.options, function(option) {
-      return (_.has(option, 'label') && _.has(option, 'id')) ? option.id === $vm.value : option.label === $vm.value;
+    const selectedOption = $vm.options.find(function(option) {
+      return (Fliplet.FormBuilderUtils.has(option, 'label') && Fliplet.FormBuilderUtils.has(option, 'id')) ? option.id === $vm.value : option.label === $vm.value;
     });
 
     this.value = selectedOption ? this.value : '';

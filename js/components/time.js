@@ -1,6 +1,5 @@
 /**
  * Time field component – renders a time picker input for selecting hours and minutes.
- * Supports 12/24 hour formats and time validation constraints.
  */
 Fliplet.FormBuilder.field('time', {
   name: 'Time picker',
@@ -34,7 +33,7 @@ Fliplet.FormBuilder.field('time', {
     };
   },
   validations: function() {
-    var rules = {
+    const rules = {
       value: {}
     };
 
@@ -56,7 +55,7 @@ Fliplet.FormBuilder.field('time', {
         return;
       }
 
-      var $vm = this;
+      const $vm = this;
 
       this.timePicker = Fliplet.UI.TimePicker(this.$refs.timePicker, {
         required: this.required || this.autofill === 'always',

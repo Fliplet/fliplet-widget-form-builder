@@ -3,5 +3,12 @@
   "globals": {
     "Vue": "readonly",
     "Sortable": "readonly"
+  },
+  "rules": {
+    "no-var": "error",
+    "prefer-const": "error",
+    "no-const-assign": "error",
+    "no-redeclare": "error",
+    "block-scoped-var": "error"
   }
 }

@@ -5,7 +5,7 @@ const MAX_IMAGE_HEIGHT = 3000;
 
 /**
  * Image field component – renders an image capture and upload input in forms.
- * Supports camera capture, file upload, and image compression options.
+ * Supports camera capture, file upload.
  */
 Fliplet.FormBuilder.field('image', {
   i18n: window.VueI18Next,
@@ -70,7 +70,7 @@ Fliplet.FormBuilder.field('image', {
     forcedClick: false
   },
   validations: function() {
-    var rules = {
+    const rules = {
       value: {}
     };
 
@@ -95,7 +95,7 @@ Fliplet.FormBuilder.field('image', {
   },
   methods: {
     removeImage: function(index) {
-      var $vm = this;
+      const $vm = this;
 
       // this is used to trigger onChange event even if user deletes and than uploads same image
       $vm.$refs.imageInput.value = null;
@@ -139,8 +139,8 @@ Fliplet.FormBuilder.field('image', {
       }
     },
     requestPicture: function(fileInput) {
-      var $vm = this;
-      var boundingRect = fileInput.getBoundingClientRect();
+      const $vm = this;
+      let boundingRect = fileInput.getBoundingClientRect();
 
       while (boundingRect.width === 0 || boundingRect.height === 0) {
         if (!fileInput.parentNode) {
@@ -154,7 +154,7 @@ Fliplet.FormBuilder.field('image', {
       return new Promise(function(resolve) {
         $vm.boundingRect = fileInput.getBoundingClientRect();
 
-        var buttonLabels = [
+        let buttonLabels = [
           T('widgets.form.image.actionLabels.takePhoto'),
           T('widgets.form.image.actionLabels.choosePhoto'),
           T('widgets.form.image.actionLabels.cancel')
@@ -192,8 +192,8 @@ Fliplet.FormBuilder.field('image', {
       });
     },
     getPicture: function() {
-      var $vm = this;
-      var popoverOptions = {
+      const $vm = this;
+      const popoverOptions = {
         arrowDir: Camera.PopoverArrowDirection.ARROW_ANY
       };
 
@@ -292,14 +292,14 @@ Fliplet.FormBuilder.field('image', {
     },    
     onFileClick: function(event) {
       // Native
-      var $vm = this;
+      const $vm = this;
 
       // Web
       if (Fliplet.Env.is('web') || !navigator.camera) {
         return;
       }
 
-      var getPicture;
+      let getPicture;
 
       if (this.forcedClick) {
         this.forcedClick = false;
@@ -408,17 +408,17 @@ Fliplet.FormBuilder.field('image', {
       });
     },
     onFileChange: function(e) {
-      var files = this.$refs.imageInput.files;
+      const files = this.$refs.imageInput.files;
 
-      for (var i = 0; i < files.length; i++) {
+      for (let i = 0; i < files.length; i++) {
         this.processImage(files.item(i), true);
       }
 
       e.target.value = '';
     },
     onImageClick: function(index) {
-      var imagesData = {
-        images: _.map(this.value, function(img) {
+      const imagesData = {
+        images: this.value.map(function(img) {
           if (img instanceof Blob) {
             return { url: URL.createObjectURL(img) };
           }
@@ -437,7 +437,7 @@ Fliplet.FormBuilder.field('image', {
         return;
       }
 
-      var $vm = this;
+      const $vm = this;
 
       $vm.value.forEach(function(image, index) {
         addThumbnailToCanvas(image, index, $vm);

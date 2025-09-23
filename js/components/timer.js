@@ -1,6 +1,6 @@
 /**
- * Timer field component – renders a countdown timer display in forms.
- * Supports duration tracking and automatic form actions upon timer completion.
+ * This component renders a stopwatch or countdown timer input.
+ * It can start automatically, track elapsed or remaining time, and store the value persistently.
  */
 Fliplet.FormBuilder.field('timer', {
   name: 'Timer',
@@ -49,7 +49,7 @@ Fliplet.FormBuilder.field('timer', {
     };
   },
   validations: function() {
-    var rules = {
+    const rules = {
       value: {}
     };
 
@@ -74,14 +74,14 @@ Fliplet.FormBuilder.field('timer', {
   },
   methods: {
     formatSeconds: function(seconds) {
-      var hours = Math.floor(seconds / 3600);
-      var minutes = Math.floor((seconds % 3600) / 60);
-      var remainingSeconds = Math.floor(seconds % 60);
+      const hours = Math.floor(seconds / 3600);
+      const minutes = Math.floor((seconds % 3600) / 60);
+      const remainingSeconds = Math.floor(seconds % 60);
 
       // Add leading zeros if necessary
-      var hoursStr = hours.toString().padStart(2, '0');
-      var minutesStr = minutes.toString().padStart(2, '0');
-      var secondsStr = remainingSeconds.toString().padStart(2, '0');
+      const hoursStr = hours.toString().padStart(2, '0');
+      const minutesStr = minutes.toString().padStart(2, '0');
+      const secondsStr = remainingSeconds.toString().padStart(2, '0');
 
       return hoursStr + ' : ' + minutesStr + ' : ' + secondsStr;
     },
@@ -123,17 +123,17 @@ Fliplet.FormBuilder.field('timer', {
       return this.status === 'running';
     },
     setInterval: function() {
-      var $vm = this;
+      const $vm = this;
 
       if (this.type === 'stopwatch') {
         this.timerInterval = setInterval(function() {
-          var totalSeconds = $vm.updateValue();
+          const totalSeconds = $vm.updateValue();
 
           $vm.stringValue = $vm.formatSeconds(totalSeconds);
         }, 500);
       } else if (this.type === 'timer') {
         this.timerInterval = setInterval(function() {
-          var totalSeconds = $vm.initialTimerValue - $vm.updateValue();
+          const totalSeconds = $vm.initialTimerValue - $vm.updateValue();
 
           if (totalSeconds <= 0) {
             Fliplet.UI.Toast({
