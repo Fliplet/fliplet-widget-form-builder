@@ -1,7 +1,3 @@
-/**
- * Time range field component – renders dual time pickers for selecting time ranges.
- * Allows selection of start and end times with validation for proper time sequences.
- */
 Fliplet.FormBuilder.field('timeRange', {
   name: 'Time range',
   category: 'Date & time',
