@@ -37,7 +37,7 @@ Fliplet.FormBuilder.field('select', {
     Fliplet.FormBuilder.on('reset', this.onReset);
   },
   mounted: function() {
-    var $vm = this;
+    const $vm = this;
 
     if ($vm.source === 'dataSources') {
       Fliplet.DataSources.get().then(function(dataSources) {
@@ -50,7 +50,7 @@ Fliplet.FormBuilder.field('select', {
     }
   },
   validations: function() {
-    var rules = {
+    const rules = {
       value: {}
     };
 
@@ -61,6 +61,8 @@ Fliplet.FormBuilder.field('select', {
     return rules;
   },
   methods: {
+    isNumber: Fliplet.FormBuilderUtils.isNumber,
+    isString: Fliplet.FormBuilderUtils.isString,
     onReset: function(data) {
       if (!data || data.id !== this.$parent.id) {
         return;

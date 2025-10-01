@@ -81,7 +81,7 @@ Fliplet.FormBuilder.field('timeRange', {
     this.$v.$reset();
   },
   validations: function() {
-    var rules = {
+    const rules = {
       value: {}
     };
 
@@ -132,7 +132,7 @@ Fliplet.FormBuilder.field('timeRange', {
       this.timeRange.clear();
     },
     initTimeRange: function() {
-      var $vm = this;
+      const $vm = this;
 
       if (this.timeRange && !this.$refs.timeRange) {
         return;

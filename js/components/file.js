@@ -51,16 +51,16 @@ Fliplet.FormBuilder.field('file', {
   },
   computed: {
     selectedFileName: function() {
-      return _.map(this.value, 'name').join(', ');
+      return this.value.map(function(file) { return file.name; }).join(', ');
     },
     isValueUrlLink: function() {
-      return _.some(this.value, function(value) {
+      return this.value.some(function(value) {
         return typeof value === 'string' && Fliplet.Media.isRemoteUrl(value);
       });
     }
   },
   validations: function() {
-    var rules = {
+    const rules = {
       value: {}
     };
 
@@ -87,9 +87,9 @@ Fliplet.FormBuilder.field('file', {
   },
   methods: {
     loadFileData: function() {
-      var $vm = this;
-      var isFileDataLoaded = false;
-      var fileIDs = _.map(this.value, function(fileURL) {
+      const $vm = this;
+      let isFileDataLoaded = false;
+      const fileIDs = this.value.map(function(fileURL) {
         if (typeof fileURL === 'string' && /v1\/media\/files\/([0-9]+)/.test(fileURL)) {
           return +fileURL.match(/v1\/media\/files\/([0-9]+)/)[1];
         }
@@ -107,13 +107,13 @@ Fliplet.FormBuilder.field('file', {
         files: fileIDs,
         fields: ['name', 'url', 'metadata', 'createdAt']
       }).then(function(files) {
-        var newFiles = _.map(files, function(file) {
+        const newFiles = files.map(function(file) {
           file.size = file.metadata.size;
 
           return file;
         });
 
-        $vm.value = _.sortBy(newFiles, ['name']);
+        $vm.value = Fliplet.FormBuilderUtils.sortBy(newFiles, function(file) { return file.name; });
       }).catch(function() {});
     },
     showLocalDateFormat: function(date) {
@@ -135,16 +135,16 @@ Fliplet.FormBuilder.field('file', {
      * @return {String} Formatted size i.e 1.2MB
      */
     humanFileSize: function(bytes) {
-      var unitCapacity = 1000;
-      var decimals = 1;
+      const unitCapacity = 1000;
+      const decimals = 1;
 
       if (Math.abs(bytes) < unitCapacity) {
         return bytes + ' B';
       }
 
-      var units = ['kB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
-      var unitIndex = -1;
-      var round  = 10 * decimals;
+      const units = ['kB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
+      let unitIndex = -1;
+      const round  = 10 * decimals;
 
       do {
         bytes /= unitCapacity;
@@ -154,7 +154,7 @@ Fliplet.FormBuilder.field('file', {
       return TN(bytes.toFixed(decimals)) + ' ' + units[unitIndex];
     },
     onReset: function() {
-      var $vm = this;
+      const $vm = this;
 
       $vm.value = [];
       $vm.selectedFileName = '';
@@ -171,7 +171,7 @@ Fliplet.FormBuilder.field('file', {
       }
     },
     processImage: function(file, isAddElem) {
-      var $vm = this;
+      const $vm = this;
 
       loadImage.parseMetaData(file, function() {
         loadImage(
@@ -190,7 +190,7 @@ Fliplet.FormBuilder.field('file', {
       });
     },
     removeFile: function(index) {
-      var $vm = this;
+      const $vm = this;
 
       this.validateValue();
 
@@ -208,13 +208,13 @@ Fliplet.FormBuilder.field('file', {
       $vm.$emit('_input', $vm.name, $vm.value);
     },
     updateValue: function(e) {
-      var $vm = this;
-      var files = $vm.$refs.fileInput.files;
+      const $vm = this;
+      const files = $vm.$refs.fileInput.files;
 
       this.validateValue();
 
-      for (var i = 0; i < files.length; i++) {
-        var file = files.item(i);
+      for (let i = 0; i < files.length; i++) {
+        const file = files.item(i);
 
         if ($vm.isFileImage(file)) {
           this.processImage(file, true);

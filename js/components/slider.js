@@ -55,7 +55,7 @@ Fliplet.FormBuilder.field('slider', {
         readonly: this.readonly
       });
 
-      var $vm = this;
+      const $vm = this;
 
       if (this.defaultValueSource !== 'default' && this.defaultValueSource !== 'profile') {
         this.setValueFromDefaultSettings({

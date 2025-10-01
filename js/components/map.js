@@ -289,7 +289,7 @@ Fliplet.FormBuilder.field('map', {
     }
   },
   validations: function() {
-    var rules = {
+    const rules = {
       value: {}
     };
 

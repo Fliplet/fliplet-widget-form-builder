@@ -28,7 +28,7 @@ Fliplet.FormBuilder.field('geolocation', {
     };
   },
   validations: function() {
-    var rules = {
+    const rules = {
       value: {}
     };
 
@@ -76,13 +76,13 @@ Fliplet.FormBuilder.field('geolocation', {
       });
     },
     getLocation: function() {
-      var $vm = this;
+      const $vm = this;
 
       $vm.showFeedback = true;
       $vm.isLoading = true;
       $vm.errorOccurred = false;
 
-      var location = this.getDeviceLocation();
+      const location = this.getDeviceLocation();
 
       location.then(function(result) {
         $vm.setValue(result);
@@ -101,8 +101,8 @@ Fliplet.FormBuilder.field('geolocation', {
     updateLocation: function() {
       this.timeOut = undefined;
 
-      var $vm = this;
-      var location = this.getDeviceLocation();
+      const $vm = this;
+      const location = this.getDeviceLocation();
 
       $vm.showFeedback = true;
       $vm.isLoading = true;
@@ -144,7 +144,7 @@ Fliplet.FormBuilder.field('geolocation', {
       }
     },
     openToastMessage: function(error) {
-      var supportsSettings = Fliplet.Navigator.supportsAppSettings();
+      const supportsSettings = Fliplet.Navigator.supportsAppSettings();
 
       this.errorOccurred = true;
 
@@ -180,7 +180,7 @@ Fliplet.FormBuilder.field('geolocation', {
 
         return Promise.reject('');
       } else if (this.preciseLocationRequired && this.value && this.value[0] && this.value[1] > 100) {
-        var error = {
+        const error = {
           code: 'inaccurateCoords'
         };
 

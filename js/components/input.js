@@ -18,7 +18,7 @@ Fliplet.FormBuilder.field('input', {
     }
   },
   validations: function() {
-    var rules = {
+    const rules = {
       value: {}
     };
 

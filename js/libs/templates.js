@@ -5,7 +5,8 @@
  * Provides utility functions for working with Handlebars templates.
  * All exported functions and major logic blocks are documented with JSDoc.
  */
-var systemTemplates = [{
+
+const systemTemplates = [{
   id: 1,
   settings: {
     displayName: 'Blank',
