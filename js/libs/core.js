@@ -13,12 +13,12 @@
 
 /* eslint-disable eqeqeq */
 Fliplet.FormBuilder = (function() {
-  var components = {};
-  var eventHub = new Vue();
+  const components = {};
+  const eventHub = new Vue();
 
   Vue.use(window.vuelidate.default);
 
-  var templates = Fliplet.Widget.Templates;
+  const templates = Fliplet.Widget.Templates;
 
   function name(component) {
     return 'fl' + component.charAt(0).toUpperCase() + component.slice(1);
@@ -38,14 +38,15 @@ Fliplet.FormBuilder = (function() {
       return components;
     },
     categories: function() {
-      var categories = [];
+      const categories = [];
 
-      _.forIn(components, function(component, componentName) {
-        var categoryName = component.category || 'Generic';
-        var category = _.find(categories, {
-          name: categoryName
+      Object.keys(components).forEach(function(componentName) {
+        const component = components[componentName];
+        const categoryName = component.category || 'Generic';
+        let category = categories.find(function(cat) {
+          return cat.name === categoryName;
         });
-        var isExisting = !!category;
+        const isExisting = !!category;
 
         if (!isExisting) {
           category = {
@@ -68,7 +69,7 @@ Fliplet.FormBuilder = (function() {
         throw new Error('The component name is required');
       }
 
-      var template = templates['templates.components.' + componentName];
+      const template = templates['templates.components.' + componentName];
 
       if (!template) {
         throw new Error('A template for the ' + componentName + ' component has not been found');
@@ -97,8 +98,8 @@ Fliplet.FormBuilder = (function() {
        * @return {void} - this method does not return anything but updates the value directly on the target field.
        */
       component.methods.setValueFromDefaultSettings = function(data) {
-        var result;
-        var $vm = this;
+        let result;
+        const $vm = this;
 
         switch (data.source) {
           case 'profile':
@@ -131,20 +132,22 @@ Fliplet.FormBuilder = (function() {
             }
 
             if (this._componentName === 'flMatrix') {
-              var matrixValue = {};
+              let matrixValue = {};
 
-              _.mapKeys(Fliplet.Navigate.query, function(value, key) {
+              Object.keys(Fliplet.Navigate.query).forEach(function(key) {
+                const value = Fliplet.Navigate.query[key];
+
                 if (key === data.key) {
-                  _.forEach(this.rowOptions, function(row) {
-                    var val = row.id ? row.id : row.label;
+                  this.rowOptions.forEach(function(row) {
+                    const val = row.id ? row.id : row.label;
 
-                    if (!_.has(matrixValue, val)) {
+                    if (!Fliplet.FormBuilderUtils.has(matrixValue, val)) {
                       matrixValue[val] = value;
                     }
                   });
-                } else if (_.includes(key, data.key)) {
-                  var regex = /\[(.*)\]/g;
-                  var match = key.split(regex).filter(r => r !== '');
+                } else if (key.includes(data.key)) {
+                  const regex = /\[(.*)\]/g;
+                  const match = key.split(regex).filter(r => r !== '');
 
                   if (match.length > 1) {
                     matrixValue[match[1]] = value;
@@ -184,7 +187,7 @@ Fliplet.FormBuilder = (function() {
             value = Array.isArray(value) ? value : [value];
           }
 
-          var isValueChanged = value !== $vm.value;
+          const isValueChanged = value !== $vm.value;
 
           $vm.value = value;
 
@@ -205,7 +208,7 @@ Fliplet.FormBuilder = (function() {
 
       // Define method to highlight Error on blur form field
       component.methods.highlightError = function() {
-        var $vm = this;
+        const $vm = this;
 
         if ($vm.$v && $vm.$v.value) {
           if ($vm.$v.passwordConfirmation) {
@@ -218,7 +221,8 @@ Fliplet.FormBuilder = (function() {
         }
       };
 
-      component.methods.onInput = _.debounce(function($event) {
+
+      component.methods.onInput = Fliplet.FormBuilderUtils.debounce(function($event) {
         this.$emit('_input', this.name, $event.target.value, false, true);
       }, 200);
 
@@ -272,7 +276,7 @@ Fliplet.FormBuilder = (function() {
       };
 
       component.computed._fieldDynamicWidth = function() {
-        var $vm = this;
+        const $vm = this;
 
         if ($vm.fieldWidth) {
           switch ($vm.width) {
@@ -295,9 +299,9 @@ Fliplet.FormBuilder = (function() {
           return this.value;
         }
 
-        var vm = this;
+        const vm = this;
 
-        var option = _.find(this.options, function(opt) {
+        const option = this.options.find(function(opt) {
           return opt.id == vm.value;
         });
 
@@ -312,14 +316,14 @@ Fliplet.FormBuilder = (function() {
         };
       }
 
-      var fieldContext = $('html').hasClass('context-build') ? 'field' : 'interface';
+      const fieldContext = $('html').hasClass('context-build') ? 'field' : 'interface';
 
       componentName = name(componentName);
 
       components[componentName] = component;
 
       // All fields have these properties
-      component.props = _.assign({
+      component.props = Object.assign({
         name: {
           type: String,
           required: true
@@ -401,20 +405,24 @@ Fliplet.FormBuilder = (function() {
       let currentMultiStepForm = [];
       let currentFormData;
 
-      var template = templates['templates.configurations.' + componentName];
+      const template = templates['templates.configurations.' + componentName];
 
       Handlebars.registerPartial('defaultValuePartial', templates['templates.configurations.defaultValue']());
 
       componentName = name(componentName);
 
       // Extend from base component
-      component = _.assign({
+      const baseComponent = components[componentName];
+      const pickedProps = {
+        props: baseComponent.props,
+        computed: baseComponent.computed
+      };
+
+      component = Object.assign({
         computed: {},
         methods: {},
         props: {}
-      }, _.pick(components[componentName], [
-        'props', 'computed'
-      ]), component);
+      }, pickedProps, component);
 
       // On submit event
       component.methods._onSubmit = function() {
@@ -426,8 +434,8 @@ Fliplet.FormBuilder = (function() {
           return;
         }
 
-        var $vm = this;
-        var data = {};
+        const $vm = this;
+        const data = {};
 
         Object.keys($vm.$props).forEach(function(prop) {
           if (prop.indexOf('_') !== 0) {
@@ -484,20 +492,20 @@ Fliplet.FormBuilder = (function() {
       }
 
       component.methods.initButtonProvider = async function() {
-        var widgetId = parseInt(Fliplet.Widget.getDefaultId(), 10);
-        var formParents = await Fliplet.Widget.findParents({ instanceId: widgetId });
+        const widgetId = parseInt(Fliplet.Widget.getDefaultId(), 10);
+        const formParents = await Fliplet.Widget.findParents({ instanceId: widgetId });
 
         const formSlideParent = formParents.find(parent =>
           parent.package === 'com.fliplet.slide' || parent.name === 'Slide'
         );
 
-        var isFormInSlide = !!(formSlideParent && formSlideParent.slideId);
+        const isFormInSlide = !!(formSlideParent && formSlideParent.slideId);
 
-        var $vm = this;
-        var page = Fliplet.Widget.getPage();
-        var omitPages = page ? [page.id] : [];
+        const $vm = this;
+        const page = Fliplet.Widget.getPage();
+        const omitPages = page ? [page.id] : [];
 
-        var action = $.extend(true, {
+        const action = $.extend(true, {
           omitPages: omitPages,
           functionStr: '',
           isFormInSlide: isFormInSlide,
@@ -523,7 +531,7 @@ Fliplet.FormBuilder = (function() {
         });
 
         window.buttonProvider.then(function onLinkAction(result) {
-          var data = {};
+          const data = {};
 
           Object.keys($vm.$props).forEach(function(prop) {
             if (prop.indexOf('_') !== 0) {
@@ -612,9 +620,9 @@ Fliplet.FormBuilder = (function() {
           return 'Please provide a Field Name';
         }
 
-        var existing = _.findIndex(this._fields, {
-          name: this.name
-        });
+        const existing = this._fields.findIndex(function(field) {
+          return field.name === this.name;
+        }.bind(this));
 
         if (existing > -1 && existing !== this._idx) {
           return this.name + ' is taken. Please use another Field Name.';
@@ -633,8 +641,8 @@ Fliplet.FormBuilder = (function() {
         }
 
         if (this.buttonLabel) {
-          var regex = /<([a-z]+)([^<]+)*(?:>(.*)<\/\1>|\s+\/>)/;
-          var isValid = regex.test(this.buttonLabel);
+          const regex = /<([a-z]+)([^<]+)*(?:>(.*)<\/\1>|\s+\/>)/;
+          const isValid = regex.test(this.buttonLabel);
 
           if (/^[^<]*$/.test(this.buttonLabel)) {
             return '';
@@ -649,9 +657,9 @@ Fliplet.FormBuilder = (function() {
           return 'Please provide a Field Label';
         }
 
-        var existing = _.findIndex(this._fields, {
-          name: this.name
-        });
+        const existing = this._fields.findIndex(function(field) {
+          return field.name === this.name;
+        }.bind(this));
 
         if (existing > -1 && existing !== this._idx) {
           return this.name + ' is taken. Please use another Field Label.';
@@ -663,29 +671,28 @@ Fliplet.FormBuilder = (function() {
       component.computed._hasErrors = function() {
         this._getErrors();
 
-        return !_.isEmpty(this.errors);
+        return !Fliplet.FormBuilderUtils.isEmpty(this.errors);
       };
 
       component.methods._hasDuplicateOptions  = function(options) {
-        var finalOptions = _.map(options, function(option) {
+        const finalOptions = options.map(function(option) {
           return {
             id: option.id ? option.id : option.label,
             label: option.label ? option.label : option.id
           };
         });
 
-        var duplicates = _.filter(
-          _.uniq(
-            _.map(finalOptions, function(item) {
-              var val = item.id;
+        const duplicates = [...new Set(
+          finalOptions.map(function(item) {
+            const val = item.id;
 
-              if (_.filter(finalOptions, ['id', val]).length > 1) {
-                return val;
-              }
+            if (finalOptions.filter(function(option) { return option.id === val; }).length > 1) {
+              return val;
+            }
 
-              return false;
-            })),
-          function(value) { return value; });
+            return false;
+          })
+        )].filter(function(value) { return value; });
 
         return !!duplicates.length;
       };
@@ -696,11 +703,11 @@ Fliplet.FormBuilder = (function() {
         switch (this._componentName) {
           case 'flCheckbox':
             if (this.options.length === 0) {
-              _.assignIn(this.errors, {
+              Object.assign(this.errors, {
                 checkboxOptions: 'Please enter options for the checkbox field'
               });
             } else if (this._hasDuplicateOptions(this.options)) {
-              _.assignIn(this.errors, {
+              Object.assign(this.errors, {
                 checkboxDuplicateOptions: 'Please enter unique options for the checkbox field'
               });
             }
@@ -709,11 +716,11 @@ Fliplet.FormBuilder = (function() {
 
           case 'flRadio':
             if (this.options.length === 0) {
-              _.assignIn(this.errors, {
+              Object.assign(this.errors, {
                 radioOptions: 'Please enter options for the radio field'
               });
             } else if (this._hasDuplicateOptions(this.options)) {
-              _.assignIn(this.errors, {
+              Object.assign(this.errors, {
                 radioDuplicateOptions: 'Please enter unique options for the radio field'
               });
             }
@@ -722,11 +729,11 @@ Fliplet.FormBuilder = (function() {
 
           case 'flSelect':
             if (this.options.length === 0) {
-              _.assignIn(this.errors, {
+              Object.assign(this.errors, {
                 selectOptions: 'Please enter options for the dropdown field'
               });
             } else if (this._hasDuplicateOptions(this.options)) {
-              _.assignIn(this.errors, {
+              Object.assign(this.errors, {
                 selectDuplicateOptions: 'Please enter unique options for the dropdown field'
               });
             }
@@ -736,7 +743,7 @@ Fliplet.FormBuilder = (function() {
           case 'flDate':
           case 'flTime':
             if (this.autofill === 'custom' && !this.value) {
-              _.assignIn(this.errors, {
+              Object.assign(this.errors, {
                 requiredField: 'This field is required'
               });
             }
@@ -745,7 +752,7 @@ Fliplet.FormBuilder = (function() {
 
           case 'flTimer':
             if (this.type === 'timer' && this.hours === 0 && this.minutes === 0 && this.seconds === 0) {
-              _.assignIn(this.errors, {
+              Object.assign(this.errors, {
                 requiredField: 'This field is required'
               });
             }
@@ -753,18 +760,18 @@ Fliplet.FormBuilder = (function() {
             break;
 
           case 'flSlider':
-            var max = !this.max ? 100 : Number(this.max);
-            var min = !this.min ? 0 : Number(this.min);
-            var step = !this.step ? 1 : Number(this.step);
+            const max = !this.max ? 100 : Number(this.max);
+            const min = !this.min ? 0 : Number(this.min);
+            const step = !this.step ? 1 : Number(this.step);
 
             if (min >= max) {
-              _.assignIn(this.errors, {
+              Object.assign(this.errors, {
                 sliderMinMax: 'The maximum value must be higher than the minimum value'
               });
             }
 
             if (step > (max - min)) {
-              _.assignIn(this.errors, {
+              Object.assign(this.errors, {
                 sliderStep: 'Number of steps should be less than or equal to the difference between maximum value and minimum value'
               });
             }
@@ -773,31 +780,31 @@ Fliplet.FormBuilder = (function() {
 
           case 'flMatrix':
             if (this.columnOptions.length === 0) {
-              _.assignIn(this.errors, {
+              Object.assign(this.errors, {
                 matrixColumnOptions: 'Please enter column options for the matrix field'
               });
             } else if (this._hasDuplicateOptions(this.columnOptions)) {
-              _.assignIn(this.errors, {
+              Object.assign(this.errors, {
                 matrixDuplicateColumnOptions: 'Please enter unique column options for the matrix field'
               });
             }
 
             if (this.rowOptions.length === 0) {
-              _.assignIn(this.errors, {
+              Object.assign(this.errors, {
                 matrixRowOptions: 'Please enter row options for the matrix field'
               });
             } else if (this._hasDuplicateOptions(this.rowOptions)) {
-              _.assignIn(this.errors, {
+              Object.assign(this.errors, {
                 matrixDuplicateRowOptions: 'Please enter unique row options for the matrix field'
               });
             } else {
-              var $vm = this;
+              const $vm = this;
 
-              _.some(this.rowOptions, function(row) {
-                var val = row.id ? row.id : row.label;
+              this.rowOptions.some(function(row) {
+                const val = row.id ? row.id : row.label;
 
                 if (val.indexOf('[') > -1 || val.indexOf(']') > -1) {
-                  _.assignIn($vm.errors, {
+                  Object.assign($vm.errors, {
                     matrixRowInvalidOptions: '[ ] characters are not allowed in row options'
                   });
 
@@ -810,7 +817,7 @@ Fliplet.FormBuilder = (function() {
 
           case 'flTimeStamp':
             if (!this.updatedAt && !this.createdAt) {
-              _.assignIn(this.errors, {
+              Object.assign(this.errors, {
                 timeStampOption: 'Select at least one timestamp saving option to continue'
               });
             }
@@ -846,8 +853,8 @@ Fliplet.FormBuilder = (function() {
 
           if (componentName === 'flAddress') {
             this._initAddressTypeahead();
-            this.localSelectedFieldOptions = _.cloneDeep(this.selectedFieldOptions);
-            this.localFieldOptions = _.cloneDeep(this.fieldOptions);
+            this.localSelectedFieldOptions = Fliplet.FormBuilderUtils.cloneDeep(this.selectedFieldOptions);
+            this.localFieldOptions = Fliplet.FormBuilderUtils.cloneDeep(this.fieldOptions);
           }
 
           if (componentName === 'flParagraph') {
@@ -900,7 +907,7 @@ Fliplet.FormBuilder = (function() {
         component.methods.enableAutomatch = component.methods._enableAutomatch;
       }
 
-      component.methods._matchFields = _.debounce(function() {
+      component.methods._matchFields = Fliplet.FormBuilderUtils.debounce(function() {
         if (!this._showNameField) {
           this.name = this._componentName === 'flCustomButton' ? this.buttonLabel : this.label;
         }
@@ -908,20 +915,17 @@ Fliplet.FormBuilder = (function() {
         if (currentMultiStepForm.length) {
           this.hasFieldDuplicatesInMultiStepForm = this._checkDuplicateFieldsInMultiStepForm();
         }
-
-
-        return;
-      }, 200);
+      });
 
       if (!component.methods.matchFields) {
         component.methods.matchFields = component.methods._matchFields;
       }
 
       component.methods._initTooltip = function() {
-        var $vm = this;
+        const $vm = this;
 
         $vm.$nextTick(function() {
-          var tooltip = $vm.$refs.tooltip;
+          const tooltip = $vm.$refs.tooltip;
 
           if (tooltip) {
             $(tooltip).tooltip();
@@ -934,9 +938,9 @@ Fliplet.FormBuilder = (function() {
       }
 
       component.methods._openFilePicker = function() {
-        var $vm = this;
+        const $vm = this;
 
-        var config = {
+        const config = {
           selectedFiles: {},
           selectMultiple: false,
           type: 'folder'
@@ -953,7 +957,7 @@ Fliplet.FormBuilder = (function() {
                 });
                 Fliplet.Widget.toggleSaveButton(!!data.length);
 
-                var msg = data.length ? data.length + ' folder selected' : 'no selected folders';
+                const msg = data.length ? data.length + ' folder selected' : 'no selected folders';
 
                 Fliplet.Widget.info(msg);
                 break;
@@ -988,7 +992,7 @@ Fliplet.FormBuilder = (function() {
       };
 
       component.methods._initAddressTypeahead = function() {
-        var $vm = this;
+        const $vm = this;
         const countries = Fliplet.FormBuilderData.countries;
 
         const addressTypeahead = Fliplet.UI.Typeahead('#restricted-countries', {
@@ -1007,9 +1011,9 @@ Fliplet.FormBuilder = (function() {
       };
 
       component.methods._initDataProvider = function() {
-        var $vm = this;
+        const $vm = this;
 
-        var dataSourceData = {
+        const dataSourceData = {
           dataSourceTitle: 'Your list data',
           dataSourceId: $vm.dataSourceId,
           appId: Fliplet.Env.get('appId'),
@@ -1069,7 +1073,7 @@ Fliplet.FormBuilder = (function() {
       }
 
       component.methods._openFileManager = function() {
-        var $vm = this;
+        const $vm = this;
 
         Fliplet.Studio.emit('overlay', {
           name: 'widget',
@@ -1150,9 +1154,9 @@ Fliplet.FormBuilder = (function() {
       component.methods._getCurrentMultiStepForm = async function(allFormsInSlide, currentForm) {
         let currentMultiStepForm = [];
         let isCurrentForm = false;
-        let currentFormDsId = currentForm.dataSourceId;
+        const currentFormDsId = currentForm.dataSourceId;
 
-        for (let form of allFormsInSlide) {
+        for (const form of allFormsInSlide) {
           const formDsId = form.dataSourceId;
 
 
@@ -1246,21 +1250,21 @@ Fliplet.FormBuilder = (function() {
         }
       };
 
-      var hasOptions = component.props.options && Array.isArray(component.props.options.type());
-      var hasSelectAll = component.props.addSelectAll && typeof component.props.addSelectAll.default === 'boolean';
-      var isSlider = component.props._componentName.default === 'flSlider';
-      var isMatrix = component.props._componentName.default === 'flMatrix';
-      var isTimer = component.props._componentName.default === 'flTimer';
-      var isTypeahead = component.props._componentName.default === 'flTypeahead';
-      var isReorderList = component.props._componentName.default === 'flReorderList';
-      var hasCustomOptions = isTypeahead || isReorderList;
+      const hasOptions = component.props.options && Array.isArray(component.props.options.type());
+      const hasSelectAll = component.props.addSelectAll && typeof component.props.addSelectAll.default === 'boolean';
+      const isSlider = component.props._componentName.default === 'flSlider';
+      const isMatrix = component.props._componentName.default === 'flMatrix';
+      const isTimer = component.props._componentName.default === 'flTimer';
+      const isTypeahead = component.props._componentName.default === 'flTypeahead';
+      const isReorderList = component.props._componentName.default === 'flReorderList';
+      const hasCustomOptions = isTypeahead || isReorderList;
 
       /**
       * Generate text configurations for radio/checkbox options, separated by new lines
       * @param {Array} options - A list of options to be mapped
       * @returns {String} Text options for the configuration interface
       */
-      var generateOptionsAsText = function(options) {
+      const generateOptionsAsText = function(options) {
         if (!options) {
           return;
         }
@@ -1295,22 +1299,22 @@ Fliplet.FormBuilder = (function() {
             throw new Error('Attribute must be provided');
           }
 
-          this[attribute] = _.compact(_.map(str.split(/\r?\n/), function(option) {
+          this[attribute] = str.split(/\r?\n/).map(function(option) {
             if (option !== '') {
               return option.trim();
             }
-          }).map(function(rawOption) {
+          }).filter(Boolean).map(function(rawOption) {
             if (rawOption) {
               rawOption = rawOption.trim();
 
-              var regex = /<.*>$/g;
-              var match = rawOption.match(regex);
-              var option = {};
+              const regex = /<.*>$/g;
+              const match = rawOption.match(regex);
+              const option = {};
 
               if (match) {
                 option.label = rawOption.replace(regex, '').trim();
 
-                var value = match[0].substring(1, match[0].length - 1).trim();
+                const value = match[0].substring(1, match[0].length - 1).trim();
 
                 option.id = value || option.label;
               } else {
@@ -1320,7 +1324,7 @@ Fliplet.FormBuilder = (function() {
 
               return option;
             }
-          }));
+          });
         };
       }
 

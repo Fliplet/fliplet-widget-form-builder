@@ -34,7 +34,7 @@ Fliplet.FormBuilder.field('date', {
     };
   },
   validations: function() {
-    var rules = {
+    const rules = {
       value: {}
     };
 
@@ -109,7 +109,7 @@ Fliplet.FormBuilder.field('date', {
         return;
       }
 
-      var $vm = this;
+      const $vm = this;
 
       this.datePicker = Fliplet.UI.DatePicker(this.$refs.datePicker, {
         required: this.required || this.autofill === 'always',
