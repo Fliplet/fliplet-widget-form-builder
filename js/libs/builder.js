@@ -237,6 +237,13 @@ Fliplet().then(function() {
       };
     },
     computed: {
+      localFieldOptions: function() {
+        return this.fields.map(function(field) {
+          if (field._type !== 'flButtons' && field._type !== 'flAddress') {
+            return { label: field.label, disabled: false };
+          }
+        }).filter(Boolean);
+      },
       hasRequiredFields: function() {
         return this.fields.some(function(el) {
           return !!el.required;
@@ -274,6 +281,9 @@ Fliplet().then(function() {
         }
 
         return message;
+      },
+      fieldLabelChangeWarningMessage(){
+        return `<b>${T('widgets.form.warningLabel')}: </b> ${T('widgets.form.fieldLabelChangeWarning')}`;
       },
       /**
        * Generates a warning message for media fields that don't have a media folder configured.
@@ -770,7 +780,7 @@ Fliplet().then(function() {
             if (_.isEqual(columns.sort(), ds.columns.sort())) {
               return; // no need to update
             }
-          }
+          } 
 
           return Fliplet.DataSources.update(dataSourceId, {
             hooks: ds.hooks
@@ -1166,6 +1176,11 @@ Fliplet().then(function() {
     watch: {
       'dataSources': function() {
         changeSelectText();
+      },
+      'settings.singleSubmissionSelected': function(value) {
+        if (value) {
+          this.settings.offline = false;
+        }
       },
       'settings.dataSourceId': function(value) {
         this.showDataSourceSettings = value && value !== 'new';

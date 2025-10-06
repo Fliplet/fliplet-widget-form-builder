@@ -190,8 +190,13 @@ Fliplet.FormBuilder = (function() {
 
           if (isValueChanged) {
             $vm.updateValue();
+            $vm.setDefaultValues({ key: data.key, value });
           }
         });
+      };
+
+      component.methods.setDefaultValues = function(data) {
+        this.$emit('set-default-values', data)
       };
 
       component.methods.getDataSourceColumnValues = function() {
