@@ -1715,18 +1715,6 @@ Fliplet().then(async function() {
         },
         loadEntryForUpdate: function(fn) {
           const $vm = this;
-          // if (singleSubmissionSelected) {
-          //   const entry = Fliplet.DataSources.connect(data.dataSourceId, { offline: false }).then(function(ds) {
-          //       return ds.find({
-          //         where: {
-          //           [singleSubmissionField.label]: settings.singleSubmissionField
-          //         }
-          //       });
-          //     });
-          //     if(entry){
-                
-          //     }
-          // }
 
           if (entryId || fn) {
             $vm.isLoading = true;

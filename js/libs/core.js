@@ -193,13 +193,9 @@ Fliplet.FormBuilder = (function() {
 
           if (isValueChanged) {
             $vm.updateValue();
-            $vm.setDefaultValues({ key: data.key, value });
+            this.$emit('set-default-values', data);
           }
         });
-      };
-
-      component.methods.setDefaultValues = function(data) {
-        this.$emit('set-default-values', data)
       };
 
       component.methods.getDataSourceColumnValues = function() {
@@ -1125,7 +1121,7 @@ Fliplet.FormBuilder = (function() {
 
             widget.isFormInSlider = !!(formSliderParent && formSliderParent.slideId);
 
-            widget.sliderContainerId = formSliderParent.length && formSliderParent.sliderId;
+            widget.sliderContainerId = formSliderParent && formSliderParent.length && formSliderParent.sliderId;
             widget.slideId = widget.sldieId;
 
             return widget;
