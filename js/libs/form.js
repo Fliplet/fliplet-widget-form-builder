@@ -693,17 +693,13 @@ Fliplet().then(async function() {
     const changeListeners = {};
 
     /**
-     * ============================================
-     * SINGLE SUBMISSION - UTILITY FUNCTIONS
-     * ============================================
+     * @function showSubmissionExistMessage
+     * @description Shows a toast message when a duplicate submission is detected
+     * @param {string} columnName - The name of the identifier field
+     * @param {*} value - The duplicate value found
+     * @param {Function} [onDismiss] - Optional callback when toast is dismissed
      */
 
-    /**
-     * Shows toast message when duplicate submission is detected
-     * @param {string} columnName - The identifier column name
-     * @param {any} value - The value that already exists
-     * @param {Function} onDismiss - Callback to execute when user clicks OK
-     */
     function showSubmissionExistMessage(columnName, value, onDismiss) {
       Fliplet.UI.Toast({
         type: 'regular',
@@ -715,6 +711,7 @@ Fliplet().then(async function() {
           label: 'OK',
           action: function() {
             this.dismiss();
+
             if (typeof onDismiss === 'function') {
               onDismiss();
             }
@@ -726,23 +723,47 @@ Fliplet().then(async function() {
     }
 
     /**
-     * Executes the configured post-submission action
-     * @param {Object} $vm - Vue instance
+     * @function showOfflineMessage
+     * @description Shows a toast message when the device is offline and form submission is blocked
      */
+
+    function showOfflineMessage() {
+      Fliplet.UI.Toast({
+        type: 'regular',
+        position: 'center',
+        backdrop: true,
+        tapToDismiss: false,
+        duration: false,
+        actions: [{
+          label: 'OK',
+          action: function() {
+            this.dismiss();
+          }
+        }],
+        title: 'Unable to submit form',
+        message: 'You must have an active network connection to submit this form.'
+      });
+    }
+
+    /**
+     * @function executePostSubmissionAction
+     * @description Executes the configured post-submission action (redirect or show success message)
+     * @param {Object} $vm - The Vue instance of the form
+     */
+
     function executePostSubmissionAction($vm) {
-      // Navigate to configured page
       if (data.linkAction && data.redirect === true) {
         Fliplet.Navigate.to(data.linkAction);
+
         return;
       }
-      
-      // Go to next slide (multi-step forms)
+
       if (data.redirect === 'nextSlide' && data.isFormInSlide) {
         $vm.start();
+
         return;
       }
-      
-      // Show confirmation message
+
       $vm.isSent = true;
       $vm.$forceUpdate();
     }
@@ -754,50 +775,36 @@ Fliplet().then(async function() {
      * @returns {Promise<boolean>} - True if duplicate exists, false otherwise
      */
     async function checkForDuplicateSubmission(fieldName, fieldValue) {
-      // Early returns for invalid scenarios
       if (!data.singleSubmissionSelected || !data.singleSubmissionField) {
         return false;
       }
-      
+
       if (!fieldName || fieldValue === null || fieldValue === undefined || fieldValue === '') {
         return false;
       }
-      
+
       try {
-        // Connect to data source (online only)
-        const connection = await Fliplet.DataSources.connect(data.dataSourceId, { 
-          offline: false 
+        const connection = await Fliplet.DataSources.connect(data.dataSourceId, {
+          offline: false
         });
-        
-        // Build query to find matching records
+
         const query = {
           where: {
             [fieldName]: fieldValue
           }
         };
-        
-        // Exclude current entry if in edit mode
+
         if (entryId && entryId !== 'session') {
           query.where.id = { $ne: entryId };
         }
-        
-        // Execute query
+
         const records = await connection.find(query);
-        
-        // Return true if any records found
+
         return records.length > 0;
-        
       } catch (error) {
-        // Re-throw error to be handled by caller
         throw error;
       }
     }
-
-    /**
-     * ============================================
-     * END SINGLE SUBMISSION - UTILITY FUNCTIONS
-     * ============================================
-     */
 
     const $form = new Vue({
       i18n: Fliplet.Locale.plugins.vue(),
@@ -864,7 +871,6 @@ Fliplet().then(async function() {
             if (currentMultiStepForm.length > 1) {
               const targetSlideId = currentMultiStepForm[0].$instance.slideId;
               const targetSlide = document.querySelector(`.swiper-slide[data-id="${targetSlideId}"]`);
-
 
               if (targetSlide) {
                 const swiperContainer = targetSlide.closest('.swiper-container');
@@ -1118,47 +1124,77 @@ Fliplet().then(async function() {
             this.saveProgressed();
           }
         },
+
         /**
-         * Called when default values are set for form fields
-         * Used to check for duplicate submissions on form load
+         * Handles default value setting and triggers single submission validation on load.
+         * This method is called when default values are set for form fields.
+         *
+         * @function onSetDefaultValues
+         * @memberof VueFormInstance
+         * @param {Object} defaultValue - The default value object
+         * @param {string} defaultValue.key - The field key/name
+         * @param {*} defaultValue.value - The default value to set
+         * @returns {void}
+         *
+         * @description
+         * If single submission is enabled and the default value key matches the
+         * single submission field, this method triggers a duplicate check on page load.
+         * This prevents users from accessing forms where they've already submitted
+         * with the pre-filled identifier.
+         *
+         * @see checkSingleSubmissionOnLoad
          */
+
         onSetDefaultValues: function(defaultValue) {
-          const $vm = this;
-          
-          // Check if single submission is enabled
           if (!data.singleSubmissionSelected || !data.singleSubmissionField) {
             return;
           }
-          
-          // Only check when the identifier field value is set
-          if (defaultValue.key !== data.singleSubmissionField) {
+
+          if (defaultValue.key !== data.singleSubmissionField.label) {
             return;
           }
-          
-          // Perform the duplicate check
+
           this.checkSingleSubmissionOnLoad(defaultValue.key, defaultValue.value);
         },
+
         /**
-         * Check for existing submission on form load
-         * @param {string} fieldName - The identifier field name
-         * @param {any} fieldValue - The field value to check
+         * Validates single submission constraint when the form loads with pre-filled values.
+         * Checks if a submission already exists with the given field value.
+         *
+         * @async
+         * @function checkSingleSubmissionOnLoad
+         * @memberof VueFormInstance
+         * @param {string} fieldName - The name of the single submission identifier field
+         * @param {*} fieldValue - The value to check for existing submissions
+         * @returns {Promise<void>}
+         *
+         * @description
+         * This method:
+         * - Checks for duplicate submissions using the provided field value
+         * - Shows a toast message if a duplicate is found
+         * - Executes post-submission action (redirect/show success) if duplicate exists
+         * - Tracks analytics event for blocked submission
+         * - Handles offline scenarios by showing appropriate error messages
+         * - Blocks the form screen when offline if validation cannot be performed
+         *
+         * @fires Fliplet.Analytics#trackEvent - Tracks 'single_submission_blocked_on_load' event
+         *
+         * @example
+         * // Called internally when a field with default value is loaded
+         * this.checkSingleSubmissionOnLoad('Email', 'user@example.com');
          */
+
         checkSingleSubmissionOnLoad: async function(fieldName, fieldValue) {
           const $vm = this;
-          
-          // Skip if no value
+
           if (!fieldValue) {
             return;
           }
-          
+
           try {
-            // Check if duplicate exists
             const isDuplicate = await checkForDuplicateSubmission(fieldName, fieldValue);
-            
+
             if (isDuplicate) {
-              console.log('Duplicate submission detected on load');
-              
-              // Show toast message with post-submission action
               showSubmissionExistMessage(
                 fieldName,
                 fieldValue,
@@ -1166,22 +1202,18 @@ Fliplet().then(async function() {
                   executePostSubmissionAction($vm);
                 }
               );
-              
-              // Track analytics
+
               Fliplet.Analytics.trackEvent('form', 'single_submission_blocked_on_load', {
                 formId: data.id,
                 fieldName: fieldName
               });
             }
-            
           } catch (error) {
-            console.error('Error checking for duplicate submission:', error);
-            
-            // Handle offline scenario
             if (!Fliplet.Navigator.isOnline()) {
               $vm.isOffline = true;
               $vm.blockScreen = true;
               $vm.isOfflineMessage = 'This form requires internet access to verify submission status.';
+              showOfflineMessage();
             }
           }
         },
@@ -1210,7 +1242,6 @@ Fliplet().then(async function() {
 
           changeListeners[fieldName].push(fn);
 
-          // also run it once for initialization
           if (runOnBind !== false) {
             fn.call(this, field.value);
           }
@@ -1749,92 +1780,80 @@ Fliplet().then(async function() {
             formPromise.then(function(form) {
               return Fliplet.Hooks.run('beforeFormSubmit', formData, form);
             }).then(async function() {
-              
-              // ========================================
-              // SINGLE SUBMISSION VALIDATION
-              // ========================================
+              /**
+               * Single Submission Validation Block
+               *
+               * @description
+               * This block validates the single submission constraint before allowing form submission.
+               * It ensures that forms configured with single submission can only be submitted once
+               * per unique identifier (e.g., email address, employee ID, etc.).
+               *
+               * Process:
+               * 1. Checks if single submission feature is enabled
+               * 2. Verifies device is online (required for validation)
+               * 3. Extracts the identifier field value from form data
+               * 4. Calls checkForDuplicateSubmission to query existing records
+               * 5. If duplicate found:
+               *    - Stops form submission
+               *    - Shows toast message to user
+               *    - Executes post-submission action (redirect/success screen)
+               *    - Tracks analytics event
+               *    - Rejects the promise to prevent form submission
+               * 6. If offline:
+               *    - Shows offline error message
+               *    - Rejects submission
+               *
+               * @throws {string} Throws 'Duplicate submission detected' if duplicate exists
+               * @throws {Error} Throws error if offline or validation fails
+               *
+               * @fires Fliplet.Analytics#trackEvent - Tracks 'single_submission_blocked_on_submit' event
+               */
+
               if (data.singleSubmissionSelected && data.singleSubmissionField) {
-                
-                // 1. Check if device is online
                 if (!Fliplet.Navigator.isOnline()) {
-                  console.error('Device is offline, cannot submit');
                   $vm.isSending = false;
-                  
-                  Fliplet.UI.Toast({
-                    type: 'error',
-                    position: 'center',
-                    backdrop: true,
-                    tapToDismiss: false,
-                    duration: false,
-                    actions: [{
-                      label: 'OK',
-                      action: function() {
-                        this.dismiss();
-                      }
-                    }],
-                    title: 'Unable to submit form',
-                    message: 'You must have an active network connection to submit this form.'
-                  });
-                  
-                  // Stop submission
+                  showOfflineMessage();
+
                   return Promise.reject('Device is offline');
                 }
-                
-                // 2. Get the identifier field value
-                const fieldValue = formData[data.singleSubmissionField];
-                
-                // 3. Check for duplicate
+
+                const fieldValue = formData[data.singleSubmissionField.label];
+
                 try {
                   const isDuplicate = await checkForDuplicateSubmission(
-                    data.singleSubmissionField,
+                    data.singleSubmissionField.label,
                     fieldValue
                   );
-                  
+
                   if (isDuplicate) {
-                    console.log('Duplicate submission detected on submit');
                     $vm.isSending = false;
-                    
-                    // Show toast message
+
                     showSubmissionExistMessage(
-                      data.singleSubmissionField,
+                      data.singleSubmissionField.label,
                       fieldValue,
                       function() {
                         executePostSubmissionAction($vm);
                       }
                     );
-                    
-                    // Track analytics
+
                     Fliplet.Analytics.trackEvent('form', 'single_submission_blocked_on_submit', {
                       formId: data.id,
                       fieldName: data.singleSubmissionField
                     });
-                    
-                    // Stop submission
+
                     return Promise.reject('Duplicate submission detected');
                   }
-                  
                 } catch (error) {
-                  console.error('Error during duplicate check:', error);
                   $vm.isSending = false;
-                  
-                  // Handle offline error
+
                   if (!Fliplet.Navigator.isOnline()) {
-                    Fliplet.UI.Toast({
-                      type: 'error',
-                      position: 'center',
-                      title: 'Unable to submit form',
-                      message: 'You must have an active network connection to submit this form.'
-                    });
+                    showOfflineMessage();
                   }
-                  
+
                   return Promise.reject(error);
                 }
               }
-              // ========================================
-              // END SINGLE SUBMISSION VALIDATION
-              // ========================================
-              
-              // Continue with existing submission flow
+
               if (data.isFormInSlide) {
                 await  submitMultiStepForm(formData);
               }
@@ -1874,16 +1893,26 @@ Fliplet().then(async function() {
             }).then(function(result) {
               return formPromise.then(function(form) {
                 return Fliplet.Hooks.run('afterFormSubmit', { formData: formData, result: result }, form).then(function() {
-                  
-                  // Track single submission feature usage
+                  /**
+                   * Single Submission Success Analytics
+                   *
+                   * @description
+                   * Tracks successful single submission form submission to analytics.
+                   * This is called after form data is successfully saved to the data source.
+                   *
+                   * Tracked data includes:
+                   * - Form ID
+                   * - Identifier field used for single submission validation
+                   *
+                   * @fires Fliplet.Analytics#trackEvent - Tracks 'single_form_submission' event
+                   */
                   if (data.singleSubmissionSelected) {
                     Fliplet.Analytics.trackEvent('form', 'single_form_submission', {
                       formId: data.id,
                       identifierField: data.singleSubmissionField
                     });
                   }
-                  
-                  // Existing code continues...
+
                   if (entryId !== 'session') {
                     return;
                   }
@@ -1978,18 +2007,6 @@ Fliplet().then(async function() {
         },
         loadEntryForUpdate: function(fn) {
           const $vm = this;
-          // if (singleSubmissionSelected) {
-          //   const entry = Fliplet.DataSources.connect(data.dataSourceId, { offline: false }).then(function(ds) {
-          //       return ds.find({
-          //         where: {
-          //           [singleSubmissionField.label]: settings.singleSubmissionField
-          //         }
-          //       });
-          //     });
-          //     if(entry){
-                
-          //     }
-          // }
 
           if (entryId || fn) {
             $vm.isLoading = true;
@@ -2294,13 +2311,12 @@ Fliplet().then(async function() {
 
           Fliplet.Navigator.onOffline(function() {
             $vm.isOffline = true;
-            $vm.isOfflineMessage = data.dataStore && data.dataStore.indexOf('editDataSource') > -1
-              ? T('widgets.form.errors.offlineDataError')
-              : T('widgets.form.errors.offlineFormError');
 
             if ($vm.isEditMode && $vm.isLoading && $vm.isOffline) {
               $vm.blockScreen = true;
             }
+
+            showOfflineMessage();
           });
         }
 

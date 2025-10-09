@@ -86,14 +86,12 @@
                 <input type="checkbox" id="singleSubmissionSelected" v-model="settings.singleSubmissionSelected">
                 <label class="single-submission-check-label" for="singleSubmissionSelected">
                   <span class="check"><i class="fa fa-check"></i></span>
-                  <p>Users can only submit this form once</p>
+                  <p>Only allow single submission</p>
                 </label>
-                <p class="single-submission-text">Select the form field that contains the user's email address. This
-                  will
-                  be used to identify duplicate submissions</p>
+                <p class="single-submission-text">Choose the data source column used to detect existing submissions</p>
               </div>
               <div class="control-label" v-if="settings.singleSubmissionSelected">
-                <label class="field-selection-single-submission">Email field used to match user submissions</label>
+                <label class="field-selection-single-submission">Identifying column</label>
                 <select class="form-control" v-model="settings.singleSubmissionField" style="margin-bottom: 18px;">
                   <option value="null">--Select one</option>
                   <option v-for="field in localFieldOptions" :value="field">
