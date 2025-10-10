@@ -278,7 +278,7 @@ Fliplet().then(function() {
 
         return message;
       },
-      fieldLabelChangeWarningMessage(){
+      fieldLabelChangeWarningMessage() {
         return `<b>${T('widgets.form.warningLabel')}: </b> ${T('widgets.form.fieldLabelChangeWarning')}`;
       },
       /**
@@ -718,21 +718,24 @@ Fliplet().then(function() {
       },
       getDataSourceColumns: function() {
         const $vm = this;
-        
+
         if (!this.settings.dataSourceId) {
           this.dataSourceColumns = [];
+
           return Promise.resolve([]);
         }
-        
+
         return Fliplet.DataSources.getById(this.settings.dataSourceId, {
           cache: false,
           attributes: 'columns'
         }).then(function(dataSource) {
           $vm.dataSourceColumns = dataSource && dataSource.columns ? dataSource.columns : [];
+
           return $vm.dataSourceColumns;
         }).catch(function(error) {
           console.error('Error fetching data source columns:', error);
           $vm.dataSourceColumns = [];
+
           return [];
         });
       },
@@ -793,7 +796,7 @@ Fliplet().then(function() {
             if (Fliplet.FormBuilderUtils.isEqual(columns.sort(), ds.columns.sort())) {
               return; // no need to update
             }
-          } 
+          }
 
           return Fliplet.DataSources.update(dataSourceId, {
             hooks: ds.hooks
@@ -1202,7 +1205,7 @@ Fliplet().then(function() {
       'settings.singleSubmissionSelected': function(value) {
         if (value) {
           this.settings.offline = false;
-          
+
           // Fetch data source columns when single submission is enabled
           if (this.settings.dataSourceId) {
             this.getDataSourceColumns();
