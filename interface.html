@@ -80,7 +80,7 @@
             </div>
             <div v-if="showDataSourceSettings">
               <div class="single-submission-label">
-                <label>Single submission per user</label>
+                <label>Single submission</label>
               </div>
               <div class="checkbox checkbox-icon">
                 <input type="checkbox" id="singleSubmissionSelected" v-model="settings.singleSubmissionSelected">
@@ -88,14 +88,14 @@
                   <span class="check"><i class="fa fa-check"></i></span>
                   <p>Only allow single submission</p>
                 </label>
-                <p class="single-submission-text">Choose the data source column used to detect existing submissions</p>
+                <p v-if="settings.singleSubmissionSelected" class="single-submission-text">Choose the data source column used to detect existing submissions</p>
               </div>
               <div class="control-label" v-if="settings.singleSubmissionSelected">
                 <label class="field-selection-single-submission">Identifying column</label>
                 <select class="form-control" v-model="settings.singleSubmissionField" style="margin-bottom: 18px;">
-                  <option value="null">--Select one</option>
-                  <option v-for="field in localFieldOptions" :value="field">
-                    \{{ field.label }}
+                  <option value="">\{{ dataSourceColumns.length > 0 ? 'Select a column' : 'No columns found' }}</option>
+                  <option v-for="column in dataSourceColumns" :value="column">
+                    \{{ column }}
                   </option>
                 </select>
               </div>
@@ -240,8 +240,8 @@
           <section class="form-preview" v-bind:class="{ 'col-sm-6': isAddingFields, 'col-sm-12': !isAddingFields }">
             <div class="alert alert-info">Break up long forms into simple, user-friendly steps to boost form completion rates. <a href="https://help.fliplet.com/multi-step-form/" target="_blank" rel="noopener noreferrer">Learn more</a></div>
             <div v-if="dataSourceWarningMessage" class="alert alert-warning" role="alert" aria-live="polite" v-html="dataSourceWarningMessage"></div>
-            <div v-if="settings.singleSubmissionSelected" class="alert alert-warning" role="alert" aria-live="polite" v-html="mediaWarningMessage"></div>
-            <div v-if="fieldLabelChangeWarningMessage" class="alert alert-warning" role="alert" aria-live="polite" v-html="fieldLabelChangeWarningMessage"></div>
+            <div v-if="mediaWarningMessage" class="alert alert-warning" role="alert" aria-live="polite" v-html="mediaWarningMessage"></div>
+            <div v-if="settings.singleSubmissionSelected" class="alert alert-warning" role="alert" aria-live="polite" v-html="fieldLabelChangeWarningMessage"></div>
 
             <a href="#" v-if="!isAddingFields" v-on:click.prevent="isAddingFields = true" class="btn btn-primary btn-xs add-field pull-right">Add fields <i class="fa fa-plus"></i></a>
             <h2><small>Your form</small> <span class="required-info-label" v-bind:class="{'isRequired': hasRequiredFields}">* Required fields</span></h2>
