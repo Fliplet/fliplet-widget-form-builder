@@ -4,6 +4,7 @@
       "loading": "Loading...",
       "savingData": "Saving data...",
       "retrievingData": "Retrieving data...",
+      "fieldLabelChangeWarning": "When you change a Field's label, then it may affect the field selected for checking single submission.",
       "mediaWarning": "No storage folder is selected for {{fieldNames}} field(s).",
       "warningLabel": "Warning",
       "noDatasourceLinked": "No data source is linked.",

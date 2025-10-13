@@ -39,6 +39,18 @@
       "title": "Allow the form to be used offline",
       "default": true
     },
+    "singleSubmissionSelected": {
+      "type": "boolean",
+      "title": "Enable single submission per user",
+      "description": "Prevent users from submitting the form more than once based on an identifier column",
+      "default": false
+    },
+    "singleSubmissionField": {
+      "type": "string",
+      "title": "Identifier column name",
+      "description": "The data source column used to detect existing submissions",
+      "default": ""
+    },
     "fields": {
       "title": "The fields of this form",
       "description": "This is an array of fields that make up the form. The order of the fields in this array will be the order in which they appear on the form. The last field in this array should always be the 'flButtons' field.",

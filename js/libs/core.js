@@ -193,6 +193,8 @@ Fliplet.FormBuilder = (function() {
 
           if (isValueChanged) {
             $vm.updateValue();
+            data.value = value;
+            $vm.$emit('set-default-values', data);
           }
         });
       };
@@ -1120,7 +1122,7 @@ Fliplet.FormBuilder = (function() {
 
             widget.isFormInSlider = !!(formSliderParent && formSliderParent.slideId);
 
-            widget.sliderContainerId = formSliderParent.length && formSliderParent.sliderId;
+            widget.sliderContainerId = formSliderParent && formSliderParent.length && formSliderParent.sliderId;
             widget.slideId = widget.sldieId;
 
             return widget;
