@@ -698,8 +698,8 @@ Fliplet().then(async function() {
      * @param {string} columnName - The name of the identifier field
      * @param {*} value - The duplicate value found
      * @param {Function} [onDismiss] - Optional callback when toast is dismissed
-     */
-
+     * @returns {void}
+    */
     function showSubmissionExistMessage(columnName, value, onDismiss) {
       Fliplet.UI.Toast({
         type: 'regular',
@@ -725,6 +725,7 @@ Fliplet().then(async function() {
     /**
      * @function showOfflineMessage
      * @description Shows a toast message when the device is offline and form submission is blocked
+     * @returns {void}
     */
     function showOfflineMessage() {
       Fliplet.UI.Toast({
@@ -748,6 +749,7 @@ Fliplet().then(async function() {
      * @function executePostSubmissionAction
      * @description Executes the configured post-submission action (redirect or show success message)
      * @param {Object} $vm - The Vue instance of the form
+     * @returns {void}
     */
     function executePostSubmissionAction($vm) {
       if (data.linkAction && data.redirect === true) {
@@ -771,6 +773,8 @@ Fliplet().then(async function() {
      * @param {string} fieldName - The identifier field name
      * @param {any} fieldValue - The value to check
      * @returns {Promise<boolean>} - True if duplicate exists, false otherwise
+     * @throws {Error} - Throws error if offline or validation fails
+     * @throws {string} - Throws 'Duplicate submission detected' if duplicate exists
     */
     async function checkForDuplicateSubmission(fieldName, fieldValue) {
       if (!data.singleSubmissionSelected || !data.singleSubmissionField) {
@@ -1724,7 +1728,6 @@ Fliplet().then(async function() {
             formPromise.then(function(form) {
               return Fliplet.Hooks.run('beforeFormSubmit', formData, form);
             }).then(async function() {
-
               if (data.singleSubmissionSelected && data.singleSubmissionField) {
                 if (!Fliplet.Navigator.isOnline()) {
                   $vm.isSending = false;
@@ -1804,7 +1807,6 @@ Fliplet().then(async function() {
             }).then(function(result) {
               return formPromise.then(function(form) {
                 return Fliplet.Hooks.run('afterFormSubmit', { formData: formData, result: result }, form).then(function() {
-
                   if (data.singleSubmissionSelected) {
                     Fliplet.Analytics.trackEvent({
                       category: 'form',
@@ -2218,7 +2220,6 @@ Fliplet().then(async function() {
                 : T('widgets.form.errors.offlineFormError');
             }
 
-
             if ($vm.isEditMode && $vm.isLoading && $vm.isOffline) {
               $vm.blockScreen = true;
             }
@@ -2226,7 +2227,6 @@ Fliplet().then(async function() {
             if (data.singleSubmissionSelected) {
               showOfflineMessage();
             }
-
           });
         }
 
