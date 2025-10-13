@@ -485,6 +485,19 @@ Fliplet().then(function() {
 
         $vm.settings.name = $vm.settings.displayName;
 
+        if (this.settings.singleSubmissionSelected) {
+          console.log('form_configure_to_screen: ', '[ isSingleSubmissionSelected: ', this.settings.singleSubmissionSelected, ', singleSubmissionField: ',  this.settings.singleSubmissionField, ', Widget ID: ', data.id, ']');
+          Fliplet.Analytics.trackEvent({
+            category: 'form',
+            action: 'form_configure_to_screen',
+            label: this.settings.singleSubmissionField,
+            value: {
+              formId: data.id,
+              identifierField: this.settings.singleSubmissionField
+            }
+          });
+        }
+
         // Cleanup
         this.settings.fields = Fliplet.FormBuilderUtils.compact(this.fields);
 

@@ -1150,7 +1150,7 @@ Fliplet().then(async function() {
             return;
           }
 
-          if (defaultValue.key !== data.singleSubmissionField.label) {
+          if (defaultValue.key !== data.singleSubmissionField) {
             return;
           }
 
@@ -1202,11 +1202,6 @@ Fliplet().then(async function() {
                   executePostSubmissionAction($vm);
                 }
               );
-
-              Fliplet.Analytics.trackEvent('form', 'single_submission_blocked_on_load', {
-                formId: data.id,
-                fieldName: fieldName
-              });
             }
           } catch (error) {
             if (!Fliplet.Navigator.isOnline()) {
@@ -1817,11 +1812,11 @@ Fliplet().then(async function() {
                   return Promise.reject('Device is offline');
                 }
 
-                const fieldValue = formData[data.singleSubmissionField.label];
+                const fieldValue = formData[data.singleSubmissionField];
 
                 try {
                   const isDuplicate = await checkForDuplicateSubmission(
-                    data.singleSubmissionField.label,
+                    data.singleSubmissionField,
                     fieldValue
                   );
 
@@ -1829,17 +1824,12 @@ Fliplet().then(async function() {
                     $vm.isSending = false;
 
                     showSubmissionExistMessage(
-                      data.singleSubmissionField.label,
+                      data.singleSubmissionField,
                       fieldValue,
                       function() {
                         executePostSubmissionAction($vm);
                       }
                     );
-
-                    Fliplet.Analytics.trackEvent('form', 'single_submission_blocked_on_submit', {
-                      formId: data.id,
-                      fieldName: data.singleSubmissionField
-                    });
 
                     return Promise.reject('Duplicate submission detected');
                   }
@@ -1893,23 +1883,16 @@ Fliplet().then(async function() {
             }).then(function(result) {
               return formPromise.then(function(form) {
                 return Fliplet.Hooks.run('afterFormSubmit', { formData: formData, result: result }, form).then(function() {
-                  /**
-                   * Single Submission Success Analytics
-                   *
-                   * @description
-                   * Tracks successful single submission form submission to analytics.
-                   * This is called after form data is successfully saved to the data source.
-                   *
-                   * Tracked data includes:
-                   * - Form ID
-                   * - Identifier field used for single submission validation
-                   *
-                   * @fires Fliplet.Analytics#trackEvent - Tracks 'single_form_submission' event
-                   */
                   if (data.singleSubmissionSelected) {
-                    Fliplet.Analytics.trackEvent('form', 'single_form_submission', {
-                      formId: data.id,
-                      identifierField: data.singleSubmissionField
+                    console.log('single_form_submission: ', '[ isSingleSubmissionSelected: ', data.singleSubmissionSelected, ', singleSubmissionField: ',  data.singleSubmissionField, ', Widget ID: ', data.id, ']');
+                    Fliplet.Analytics.trackEvent({
+                      category: 'form',
+                      action: 'single_form_submission',
+                      label: data.singleSubmissionField,
+                      value: {
+                        formId: data.id,
+                        identifierField: data.singleSubmissionField
+                      }
                     });
                   }
 

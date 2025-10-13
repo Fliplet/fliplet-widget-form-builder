@@ -193,7 +193,8 @@ Fliplet.FormBuilder = (function() {
 
           if (isValueChanged) {
             $vm.updateValue();
-            this.$emit('set-default-values', data);
+            data.value = value;
+            $vm.$emit('set-default-values', data);
           }
         });
       };
