@@ -205,7 +205,7 @@ Fliplet.FormBuilder.field('image', {
       }
 
       return new Promise(function(resolve, reject) {
-        var isCamera = $vm.cameraSource === Camera.PictureSourceType.CAMERA;
+        const isCamera = $vm.cameraSource === Camera.PictureSourceType.CAMERA;
 
         navigator.camera.getPicture(resolve, reject, {
           quality: $vm.jpegQuality,
@@ -224,6 +224,7 @@ Fliplet.FormBuilder.field('image', {
     },
     processImage: async function(file, addThumbnail = true) {
       const $vm = this;
+
       try {
         // Validate current value before adding new images
         this.validateValue();
@@ -237,18 +238,18 @@ Fliplet.FormBuilder.field('image', {
           maxHeight: $vm.customHeight || MAX_IMAGE_HEIGHT,
           orientation: 0       // set to 0 by default; can read EXIF if needed
         };
-    
+
         // Load the image into a canvas
         const img = await new Promise((resolve) => loadImage(file, resolve, options));
-    
+
         if (!img || img.type === 'error') {
           $vm.hasCorruptedImage = true;
-          console.error('Failed to load image', file.name);
+
           return;
         }
-    
+
         $vm.hasCorruptedImage = false;
-    
+
         // Convert the canvas to a WebP Blob
         const blob = await new Promise((resolve) => {
           img.toBlob(
@@ -257,39 +258,40 @@ Fliplet.FormBuilder.field('image', {
             $vm.jpegQuality || 0.8    // Compression quality (0–1)
           );
         });
-    
+
         if (!blob) {
           $vm.hasCorruptedImage = true;
-          console.error('Blob creation failed for', file.name);
+
           return;
         }
-    
+
         // Assign proper filename and extension
         const blobExtension = (blob.type && blob.type.split('/')[1]) || 'webp';
+
         blob.name = file.name
           ? file.name.replace(/\.[^/.]+$/, '') + '.' + blobExtension
           : 'image-' + Date.now() + '.' + blobExtension;
-    
+
         // Add the blob to the component's value
         $vm.value.push(blob);
-    
+
         // Generate thumbnail if needed
         if (addThumbnail) {
           const reader = new FileReader();
-          reader.onload = function (e) {
+
+          reader.onload = function(e) {
             addThumbnailToCanvas(e.target.result, $vm.value.length - 1, $vm);
           };
+
           reader.readAsDataURL(blob); // Convert blob to base64 for thumbnail preview
         }
-    
+
         // Emit the updated value for parent component
         $vm.$emit('_input', $vm.name, $vm.value);
-    
       } catch (err) {
         $vm.hasCorruptedImage = true;
-        console.error('Error processing image', file.name, err);
       }
-    },    
+    },
     onFileClick: function(event) {
       // Native
       const $vm = this;
@@ -303,6 +305,7 @@ Fliplet.FormBuilder.field('image', {
 
       if (this.forcedClick) {
         this.forcedClick = false;
+
         try {
           getPicture = $vm.getPicture();
         } catch (error) {
@@ -386,7 +389,7 @@ Fliplet.FormBuilder.field('image', {
         }
 
         // Fallback for legacy base64 results
-        var imgBase64Url = (typeof result === 'string' && result.indexOf('base64') > -1)
+        const imgBase64Url = (typeof result === 'string' && result.indexOf('base64') > -1)
           ? result
           : 'data:image/jpeg;base64,' + result;
 
