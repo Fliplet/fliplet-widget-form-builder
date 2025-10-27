@@ -808,6 +808,57 @@ Fliplet().then(async function() {
       }
     }
 
+    /**
+     * Validates single submission constraint before form submission
+     * @param {Object} formData - The form data being submitted
+     * @param {Object} $vm - The Vue instance
+     * @returns {Promise<void>} - Resolves if validation passes, rejects otherwise
+     * @throws {string} - Throws 'Device is offline', 'Duplicate submission detected', or error message
+    */
+    async function validateSingleSubmission(formData, $vm) {
+      if (!data.singleSubmissionSelected || !data.singleSubmissionField) {
+        return;
+      }
+
+      if (!Fliplet.Navigator.isOnline()) {
+        $vm.isSending = false;
+        showOfflineMessage();
+
+        return Promise.reject('Device is offline');
+      }
+
+      const fieldValue = formData[data.singleSubmissionField];
+
+      try {
+        const isDuplicate = await checkForDuplicateSubmission(
+          data.singleSubmissionField,
+          fieldValue
+        );
+
+        if (isDuplicate) {
+          $vm.isSending = false;
+
+          showSubmissionExistMessage(
+            data.singleSubmissionField,
+            fieldValue,
+            function() {
+              executePostSubmissionAction($vm);
+            }
+          );
+
+          return Promise.reject('Duplicate submission detected');
+        }
+      } catch (error) {
+        $vm.isSending = false;
+
+        if (!Fliplet.Navigator.isOnline()) {
+          showOfflineMessage();
+        }
+
+        return Promise.reject(error);
+      }
+    }
+
     const $form = new Vue({
       i18n: Fliplet.Locale.plugins.vue(),
       el: getRootElement(),
@@ -1728,48 +1779,10 @@ Fliplet().then(async function() {
             formPromise.then(function(form) {
               return Fliplet.Hooks.run('beforeFormSubmit', formData, form);
             }).then(async function() {
-              if (data.singleSubmissionSelected && data.singleSubmissionField) {
-                if (!Fliplet.Navigator.isOnline()) {
-                  $vm.isSending = false;
-                  showOfflineMessage();
-
-                  return Promise.reject('Device is offline');
-                }
-
-                const fieldValue = formData[data.singleSubmissionField];
-
-                try {
-                  const isDuplicate = await checkForDuplicateSubmission(
-                    data.singleSubmissionField,
-                    fieldValue
-                  );
-
-                  if (isDuplicate) {
-                    $vm.isSending = false;
-
-                    showSubmissionExistMessage(
-                      data.singleSubmissionField,
-                      fieldValue,
-                      function() {
-                        executePostSubmissionAction($vm);
-                      }
-                    );
-
-                    return Promise.reject('Duplicate submission detected');
-                  }
-                } catch (error) {
-                  $vm.isSending = false;
-
-                  if (!Fliplet.Navigator.isOnline()) {
-                    showOfflineMessage();
-                  }
-
-                  return Promise.reject(error);
-                }
-              }
+              await validateSingleSubmission(formData, $vm);
 
               if (data.isFormInSlide) {
-                await  submitMultiStepForm(formData);
+                await submitMultiStepForm(formData);
               }
 
               if (data.dataSourceId) {
