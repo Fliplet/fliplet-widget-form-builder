@@ -26,14 +26,22 @@ Fliplet.FormBuilder.field('customButton', {
     }
   },
   methods: {
-    runCustomFunction: function() {
+    runCustomFunction: async function() {
       const $vm = this;
+      let dynamicContext;
+
+      try {
+        dynamicContext = await Fliplet.Widget.getDynamicContext($($vm.$el));
+      } catch (err) {
+        dynamicContext = {};
+      }
 
       Fliplet.FormBuilder.get().then(function(form) {
         const foundField = $vm.$parent.fields.find(function(field) { return field.name === $vm.name; });
         const button = Object.assign({}, foundField, { $el: $vm.$el });
 
         if ($vm.buttonAction) {
+          $vm.buttonAction.dynamicContext = dynamicContext;
           $vm.buttonAction.context = {
             form,
             button,
