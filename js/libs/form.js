@@ -692,6 +692,173 @@ Fliplet().then(async function() {
 
     const changeListeners = {};
 
+    /**
+     * @function showSubmissionExistMessage
+     * @description Shows a toast message when a duplicate submission is detected
+     * @param {string} columnName - The name of the identifier field
+     * @param {*} value - The duplicate value found
+     * @param {Function} [onDismiss] - Optional callback when toast is dismissed
+     * @returns {void}
+    */
+    function showSubmissionExistMessage(columnName, value, onDismiss) {
+      Fliplet.UI.Toast({
+        type: 'regular',
+        position: 'center',
+        backdrop: true,
+        tapToDismiss: false,
+        duration: false,
+        actions: [{
+          label: 'OK',
+          action: function() {
+            this.dismiss();
+
+            if (typeof onDismiss === 'function') {
+              onDismiss();
+            }
+          }
+        }],
+        title: 'This form can only be submitted once',
+        message: 'An entry with ' + columnName + ': ' + value + ' already exists.'
+      });
+    }
+
+    /**
+     * @function showOfflineMessage
+     * @description Shows a toast message when the device is offline and form submission is blocked
+     * @returns {void}
+    */
+    function showOfflineMessage() {
+      Fliplet.UI.Toast({
+        type: 'regular',
+        position: 'center',
+        backdrop: true,
+        tapToDismiss: false,
+        duration: false,
+        actions: [{
+          label: 'OK',
+          action: function() {
+            this.dismiss();
+          }
+        }],
+        title: 'Unable to submit form',
+        message: 'You must have an active network connection to submit this form.'
+      });
+    }
+
+    /**
+     * @function executePostSubmissionAction
+     * @description Executes the configured post-submission action (redirect or show success message)
+     * @param {Object} $vm - The Vue instance of the form
+     * @returns {void}
+    */
+    function executePostSubmissionAction($vm) {
+      if (data.linkAction && data.redirect === true) {
+        Fliplet.Navigate.to(data.linkAction);
+
+        return;
+      }
+
+      if (data.redirect === 'nextSlide' && data.isFormInSlide) {
+        $vm.start();
+
+        return;
+      }
+
+      $vm.isSent = true;
+      $vm.$forceUpdate();
+    }
+
+    /**
+     * Checks if a record with the identifier already exists in the data source
+     * @param {string} fieldName - The identifier field name
+     * @param {any} fieldValue - The value to check
+     * @returns {Promise<boolean>} - True if duplicate exists, false otherwise
+     * @throws {Error} - Throws error if offline or validation fails
+     * @throws {string} - Throws 'Duplicate submission detected' if duplicate exists
+    */
+    async function checkForDuplicateSubmission(fieldName, fieldValue) {
+      if (!data.singleSubmissionSelected || !data.singleSubmissionField) {
+        return false;
+      }
+
+      if (!fieldName || fieldValue === null || fieldValue === undefined || fieldValue === '') {
+        return false;
+      }
+
+      try {
+        const connection = await Fliplet.DataSources.connect(data.dataSourceId, {
+          offline: false
+        });
+
+        const query = {
+          where: {
+            [fieldName]: fieldValue
+          }
+        };
+
+        if (entryId && entryId !== 'session') {
+          query.where.id = { $ne: entryId };
+        }
+
+        const records = await connection.find(query);
+
+        return records.length > 0;
+      } catch (error) {
+        throw error;
+      }
+    }
+
+    /**
+     * Validates single submission constraint before form submission
+     * @param {Object} formData - The form data being submitted
+     * @param {Object} $vm - The Vue instance
+     * @returns {Promise<void>} - Resolves if validation passes, rejects otherwise
+     * @throws {string} - Throws 'Device is offline', 'Duplicate submission detected', or error message
+    */
+    async function validateSingleSubmission(formData, $vm) {
+      if (!data.singleSubmissionSelected || !data.singleSubmissionField) {
+        return;
+      }
+
+      if (!Fliplet.Navigator.isOnline()) {
+        $vm.isSending = false;
+        showOfflineMessage();
+
+        return Promise.reject('Device is offline');
+      }
+
+      const fieldValue = formData[data.singleSubmissionField];
+
+      try {
+        const isDuplicate = await checkForDuplicateSubmission(
+          data.singleSubmissionField,
+          fieldValue
+        );
+
+        if (isDuplicate) {
+          $vm.isSending = false;
+
+          showSubmissionExistMessage(
+            data.singleSubmissionField,
+            fieldValue,
+            function() {
+              executePostSubmissionAction($vm);
+            }
+          );
+
+          return Promise.reject('Duplicate submission detected');
+        }
+      } catch (error) {
+        $vm.isSending = false;
+
+        if (!Fliplet.Navigator.isOnline()) {
+          showOfflineMessage();
+        }
+
+        return Promise.reject(error);
+      }
+    }
+
     const $form = new Vue({
       i18n: Fliplet.Locale.plugins.vue(),
       el: getRootElement(),
@@ -757,7 +924,6 @@ Fliplet().then(async function() {
             if (currentMultiStepForm.length > 1) {
               const targetSlideId = currentMultiStepForm[0].$instance.slideId;
               const targetSlide = document.querySelector(`.swiper-slide[data-id="${targetSlideId}"]`);
-
 
               if (targetSlide) {
                 const swiperContainer = targetSlide.closest('.swiper-container');
@@ -1011,6 +1177,45 @@ Fliplet().then(async function() {
             this.saveProgressed();
           }
         },
+        onSetDefaultValues: function(defaultValue) {
+          if (!data.singleSubmissionSelected || !data.singleSubmissionField) {
+            return;
+          }
+
+          if (defaultValue.key !== data.singleSubmissionField) {
+            return;
+          }
+
+          this.checkSingleSubmissionOnLoad(defaultValue.key, defaultValue.value);
+        },
+        checkSingleSubmissionOnLoad: async function(fieldName, fieldValue) {
+          const $vm = this;
+
+          if (!fieldValue) {
+            return;
+          }
+
+          try {
+            const isDuplicate = await checkForDuplicateSubmission(fieldName, fieldValue);
+
+            if (isDuplicate) {
+              showSubmissionExistMessage(
+                fieldName,
+                fieldValue,
+                function() {
+                  executePostSubmissionAction($vm);
+                }
+              );
+            }
+          } catch (error) {
+            if (!Fliplet.Navigator.isOnline()) {
+              $vm.isOffline = true;
+              $vm.blockScreen = true;
+              $vm.isOfflineMessage = 'This form requires internet access to verify submission status.';
+              showOfflineMessage();
+            }
+          }
+        },
         onChange: function(fieldName, fn, runOnBind) {
           let field;
 
@@ -1036,7 +1241,6 @@ Fliplet().then(async function() {
 
           changeListeners[fieldName].push(fn);
 
-          // also run it once for initialization
           if (runOnBind !== false) {
             fn.call(this, field.value);
           }
@@ -1575,8 +1779,10 @@ Fliplet().then(async function() {
             formPromise.then(function(form) {
               return Fliplet.Hooks.run('beforeFormSubmit', formData, form);
             }).then(async function() {
+              await validateSingleSubmission(formData, $vm);
+
               if (data.isFormInSlide) {
-                await  submitMultiStepForm(formData);
+                await submitMultiStepForm(formData);
               }
 
               if (data.dataSourceId) {
@@ -1614,6 +1820,14 @@ Fliplet().then(async function() {
             }).then(function(result) {
               return formPromise.then(function(form) {
                 return Fliplet.Hooks.run('afterFormSubmit', { formData: formData, result: result }, form).then(function() {
+                  if (data.singleSubmissionSelected) {
+                    Fliplet.Analytics.trackEvent({
+                      category: 'form',
+                      action: 'single_form_submission',
+                      label: data.singleSubmissionField
+                    });
+                  }
+
                   if (entryId !== 'session') {
                     return;
                   }
@@ -2012,12 +2226,19 @@ Fliplet().then(async function() {
 
           Fliplet.Navigator.onOffline(function() {
             $vm.isOffline = true;
-            $vm.isOfflineMessage = data.dataStore && data.dataStore.indexOf('editDataSource') > -1
-              ? T('widgets.form.errors.offlineDataError')
-              : T('widgets.form.errors.offlineFormError');
+
+            if (!data.singleSubmissionSelected) {
+              $vm.isOfflineMessage = data.dataStore && data.dataStore.indexOf('editDataSource') > -1
+                ? T('widgets.form.errors.offlineDataError')
+                : T('widgets.form.errors.offlineFormError');
+            }
 
             if ($vm.isEditMode && $vm.isLoading && $vm.isOffline) {
               $vm.blockScreen = true;
+            }
+
+            if (data.singleSubmissionSelected) {
+              showOfflineMessage();
             }
           });
         }
