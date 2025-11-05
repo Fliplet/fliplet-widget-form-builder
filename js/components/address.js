@@ -94,7 +94,8 @@ Fliplet.FormBuilder.field('address', {
   },
   data: function() {
     return {
-      lastChosenAutocompleteValue: ''
+      lastChosenAutocompleteValue: '',
+      debouncedAutocomplete: null
     };
   },
   created: function() {
@@ -109,9 +110,14 @@ Fliplet.FormBuilder.field('address', {
   },
   destroyed: function() {
     Fliplet.Hooks.off('beforeFormSubmit', this.onBeforeSubmit);
+
+    if (this.debouncedAutocomplete) {
+      clearTimeout(this.debouncedAutocomplete);
+    }
   },
   mounted: function() {
-    this.initAutocomplete('', this.countryRestrictions);
+    this.addressField = Fliplet.UI.AddressField(this.$refs.addressField);
+    this.fetchAddressSuggestions('', this.countryRestrictions);
     this.onChange();
     document.addEventListener('click', this.handleClickOutside);
 
@@ -293,17 +299,29 @@ Fliplet.FormBuilder.field('address', {
         option.disabled = assignedValues.includes(option.label);
       });
     },
-    initAutocomplete: async function(input, countryRestrictions) {
-      this.addressField = Fliplet.UI.AddressField(this.$refs.addressField);
+    fetchAddressSuggestions: async function(input, countryRestrictions) {
+      try {
+        const suggestions = await this.addressField.getAutocompleteSuggestions(input, countryRestrictions);
 
-      const suggestions = await this.addressField.getAutocompleteSuggestions(input, countryRestrictions);
-
-      if (typeof this.value === 'object') {
-        this.addressSuggestions = [];
-        this.suggestionSelected = true;
-      } else {
-        this.addressSuggestions = suggestions;
+        if (typeof this.value === 'object') {
+          this.addressSuggestions = [];
+          this.suggestionSelected = true;
+        } else {
+          this.addressSuggestions = suggestions;
+        }
+      } catch (error) {
+        console.error('Error loading address suggestions:', error);
       }
+    },
+    debouncedInputHandler: function() {
+      if (this.debouncedAutocomplete) {
+        clearTimeout(this.debouncedAutocomplete);
+      }
+
+      this.debouncedAutocomplete = setTimeout(() => {
+        this.fetchAddressSuggestions(this.value, this.countryRestrictions);
+        this.onChange();
+      }, 1000);
     },
     onChange: function() {
       this.addressField.change((value) => {
@@ -373,11 +391,13 @@ Fliplet.FormBuilder.field('address', {
         this.suggestionSelected = true;
         val = val.label;
       } else if (val.trim() !== this.lastChosenAutocompleteValue) {
-        this.initAutocomplete(val, this.countryRestrictions);
-        this.onChange();
+        this.debouncedInputHandler();
       }
 
-      this.addressField.set(val);
+      if (this.addressField) {
+        this.addressField.set(val);
+      }
+
       this.$emit('_input', this.name, val);
     },
     addressSuggestions: function(newSuggestions) {
