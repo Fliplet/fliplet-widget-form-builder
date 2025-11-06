@@ -41,31 +41,14 @@ function drawImageOnCanvas(img, canvas) {
 }
 
 /* eslint-disable-next-line */
-function dataURLToBlob(dataUrl) {
-  const arr = dataUrl.split(',');
-  const mime = arr[0].match(/:(.*?);/)[1];
-  const bstr = atob(arr[1]);
-  let n = bstr.length;
-  const u8arr = new Uint8Array(n);
-
-  while (n--) {
-    u8arr[n] = bstr.charCodeAt(n);
-  }
-
-  return new Blob([u8arr], { type: mime });
-}
-
-/* eslint-disable-next-line */
 function addThumbnailToCanvas(imageURI, indexCanvas, self, isFileCanvas) {
   const $vm = self;
 
-  if (imageURI instanceof Blob) {
-    imageURI = URL.createObjectURL(imageURI);
-  } else if (!imageURI.match(/^http/) && imageURI.indexOf('data:') !== 0 && imageURI.indexOf('blob:') !== 0) {
+  if (!imageURI.match(/^http/)) {
     imageURI = (imageURI.indexOf('base64') > -1)
       ? imageURI.split(';filename:')[0]
       : 'data:image/jpeg;base64,' + imageURI;
-  } else if (imageURI.match(/^http/)) {
+  } else {
     imageURI = Fliplet.Media.authenticate(imageURI);
   }
 
@@ -1498,7 +1481,7 @@ Fliplet().then(async function() {
                   }
                 }
 
-                if (type === 'flFile' || type === 'flImage') {
+                if (type === 'flFile') {
                   const result = value.map(function(val) {
                     if (!val) {
                       return '';
