@@ -32,4 +32,3 @@ Fliplet.FormBuilder.templates = function() {
     system: systemTemplates
   };
 };
-

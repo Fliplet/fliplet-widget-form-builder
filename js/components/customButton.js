@@ -1,7 +1,3 @@
-/**
- * Custom button field component – renders configurable action buttons in forms.
- * Supports custom styling, actions, and conditional display logic.
- */
 Fliplet.FormBuilder.field('customButton', {
   name: 'Button',
   category: 'Buttons',
