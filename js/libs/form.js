@@ -797,6 +797,8 @@ Fliplet().then(async function() {
 
           $vm.$nextTick(function() {
             this.attachCustomButtonListener();
+
+            Fliplet.Hooks.run('afterFormStartOver', null, $vm);
           });
         },
         reset: function() {
