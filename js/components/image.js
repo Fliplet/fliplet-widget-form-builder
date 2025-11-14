@@ -85,6 +85,8 @@ Fliplet.FormBuilder.field('image', {
     Fliplet.Hooks.on('beforeFormSubmit', this.onBeforeSubmit);
   },
   mounted: function() {
+    // Normalize the value to ensure it's always an array
+    this.validateValue();
     this.drawImagesAfterInit();
   },
   updated: function() {
@@ -123,7 +125,15 @@ Fliplet.FormBuilder.field('image', {
         return;
       }
 
-      if (!this.value.length) {
+      // Normalize the value to ensure it's an array
+      this.validateValue();
+
+      // Filter out empty strings, null, undefined, and other falsy values
+      const validImages = this.value.filter(function(img) {
+        return img !== null && img !== undefined && img !== '';
+      });
+
+      if (!validImages.length) {
         $(this.$refs.imageInput).parents('.form-group').addClass('has-error');
 
         return Promise.reject(T('widgets.form.image.required'));
