@@ -177,14 +177,22 @@ Fliplet.FormBuilder.field('typeahead', {
     /**
      * Handles locking/unlocking the typeahead based on maxItems limit
      * Prevents further selection when the limit is reached
+     * Readonly fields should always be locked regardless of maxItems
      * @returns {void}
      */
     handleMaxItemsLock: function() {
-      if (!this.typeahead || !this.maxItems) {
+      if (!this.typeahead) {
         return;
       }
 
-      if (this.reachedMaxItems) {
+      // Readonly fields should always be locked
+      if (this.readonly) {
+        this.typeahead.lock();
+        return;
+      }
+
+      // Lock if maxItems limit is reached
+      if (this.maxItems && this.reachedMaxItems) {
         this.typeahead.lock();
       } else {
         this.typeahead.unlock();
@@ -226,6 +234,24 @@ Fliplet.FormBuilder.field('typeahead', {
       }
 
       this.typeahead.set(this.value);
+    },
+    /**
+     * Watches for changes in the readonly prop
+     * Updates the typeahead instance's readonly state using lock/unlock methods
+     * @param {boolean} val - The new readonly value
+     * @returns {void}
+     */
+    readonly: function(val) {
+      if (!this.typeahead) {
+        return;
+      }
+
+      if (val) {
+        this.typeahead.lock();
+      } else {
+        // When unlocking, check if maxItems locking should still apply
+        this.handleMaxItemsLock();
+      }
     }
   }
 });
