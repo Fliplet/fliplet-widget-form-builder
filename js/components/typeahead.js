@@ -188,6 +188,7 @@ Fliplet.FormBuilder.field('typeahead', {
       // Readonly fields should always be locked
       if (this.readonly) {
         this.typeahead.lock();
+
         return;
       }
 
