@@ -4,6 +4,10 @@
     "Vue": "readonly",
     "Sortable": "readonly"
   },
+  "parserOptions": {
+    "ecmaVersion": "latest",
+    "requireConfigFile": false
+  },
   "rules": {
     "no-var": "error",
     "prefer-const": "error",
