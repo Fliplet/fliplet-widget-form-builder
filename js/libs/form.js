@@ -1154,15 +1154,6 @@ Fliplet().then(async function() {
 
           $vm.triggerBlurEventOnInputs();
 
-          let trackEventOp = Fliplet.Analytics.trackEvent({
-            category: 'form',
-            action: 'submit'
-          });
-
-          if (!(trackEventOp instanceof Promise)) {
-            trackEventOp = Promise.resolve();
-          }
-
           // form validation
           $vm.isFormValid = true;
 
@@ -1404,9 +1395,15 @@ Fliplet().then(async function() {
               return;
             }
 
+            const formFieldNames = [];
+            const formFieldTypes = [];
+
             $vm.fields.forEach(function(field) {
               let value = field.value;
               const type = field._type;
+
+              formFieldNames.push(field.name);
+              formFieldTypes.push(type);
 
               if (field._submit === false || !field.enabled) {
                 return;
@@ -1579,6 +1576,18 @@ Fliplet().then(async function() {
                 }
               }
             });
+
+            let trackEventOp = Fliplet.App.Analytics.event({
+              category: 'form',
+              action: 'submit',
+              formFieldNames,
+              formFieldTypes,
+              multiStep: data.isFormInSlide
+            });
+
+            if (!(trackEventOp instanceof Promise)) {
+              trackEventOp = Promise.resolve();
+            }
 
             formPromise.then(function(form) {
               return Fliplet.Hooks.run('beforeFormSubmit', formData, form);
