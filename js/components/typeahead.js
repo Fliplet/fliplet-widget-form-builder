@@ -258,3 +258,4 @@ Fliplet.FormBuilder.field('typeahead', {
     }
   }
 });
+
