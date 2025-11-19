@@ -24,17 +24,58 @@ module.exports = [
       ecmaVersion: 2020,
       sourceType: 'script',
       globals: {
+        // Browser globals
+        window: 'readonly',
+        document: 'readonly',
+        navigator: 'readonly',
+        location: 'readonly',
+        console: 'readonly',
+        setTimeout: 'readonly',
+        setInterval: 'readonly',
+        clearTimeout: 'readonly',
+        clearInterval: 'readonly',
+        localStorage: 'readonly',
+        sessionStorage: 'readonly',
+        atob: 'readonly',
+        btoa: 'readonly',
+        Blob: 'readonly',
+        File: 'readonly',
+        FileReader: 'readonly',
+        URL: 'readonly',
+        URLSearchParams: 'readonly',
+        Image: 'readonly',
+        structuredClone: 'readonly',
+        
+        // Third-party libraries (loaded via widget.json)
         Fliplet: 'readonly',
         Vue: 'readonly',
         Handlebars: 'readonly',
+        moment: 'readonly',
+        tinymce: 'readonly',
+        Sortable: 'readonly',
+        Modernizr: 'readonly',
+        
+        // Translation helper
         T: 'readonly',
-        $: 'readonly'
+        
+        // jQuery
+        $: 'readonly',
+        jQuery: 'readonly',
+        
+        // Fliplet-specific canvas helpers
+        TD: 'readonly',
+        TN: 'readonly'
       }
     },
     rules: {
       // Match existing project style
       eqeqeq: 'off',
-      'no-unused-vars': ['warn', { args: 'none', ignoreRestSiblings: true }]
+      'no-prototype-builtins': 'off',
+      'no-case-declarations': 'off',
+      'no-useless-escape': 'off',
+      'no-extra-boolean-cast': 'off',
+      'no-self-assign': 'off',
+      'no-unused-vars': ['warn', { argsIgnorePattern: '^_', varsIgnorePattern: '^_' }]
     }
   }
 ];
