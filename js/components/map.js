@@ -52,7 +52,8 @@ Fliplet.FormBuilder.field('map', {
   },
   data: function() {
     return {
-      lastChosenAutocompleteValue: ''
+      lastChosenAutocompleteValue: '',
+      debouncedAutocomplete: null
     };
   },
   created: function() {
@@ -60,6 +61,10 @@ Fliplet.FormBuilder.field('map', {
   },
   destroyed: function() {
     Fliplet.FormBuilder.off('reset', this.onReset);
+
+    if (this.debouncedAutocomplete) {
+      clearTimeout(this.debouncedAutocomplete);
+    }
   },
   mounted: async function() {
     this.initAutocomplete('', []);
@@ -225,6 +230,15 @@ Fliplet.FormBuilder.field('map', {
         return;
       }
 
+      if (this.debouncedAutocomplete) {
+        clearTimeout(this.debouncedAutocomplete);
+      }
+
+      this.debouncedAutocomplete = setTimeout(() => {
+        this.performAutocompleteSearch(value);
+      }, 1000);
+    },
+    performAutocompleteSearch: async function(value) {
       this.mapAddressField.getAutocompleteSuggestions(value, [])
         .then(async(suggestions) => {
           if (suggestions.length && suggestions[0].label !== 'Select location on map') {
