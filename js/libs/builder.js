@@ -557,28 +557,21 @@ Fliplet().then(function() {
             const payload = JSON.parse(JSON.stringify($vm.emailTemplateAdd));
 
             operation = Fliplet.DataSources.getById($vm.settings.dataSourceId).then(function(dataSource) {
-              // First check if any email hook exists
-              const emailHook = dataSource.hooks.find(function(hook) {
-                return hook.type === 'email' && hook.widgetInstanceId === widgetId && hook.runOn.includes('insert');
+              const updatedHooks = dataSource.hooks.filter(function(hook) {
+                return !(hook.type === 'email' && hook.widgetInstanceId === widgetId && hook.runOn.includes('insert'));
               });
 
-              if (emailHook) {
-                // Update existing email hook
-                emailHook.payload = payload;
-                emailHook.triggers = [widgetUuid];
-              } else {
-                // Add new hook only if no email hook exists
-                dataSource.hooks.push({
-                  type: 'email',
-                  runOn: ['insert'],
-                  widgetInstanceId: widgetId,
-                  payload: payload,
-                  triggers: [widgetUuid]
-                });
-              }
+              // Add the new email hook
+              updatedHooks.push({
+                type: 'email',
+                runOn: ['insert'],
+                widgetInstanceId: widgetId,
+                payload: payload,
+                triggers: [widgetUuid]
+              });
 
               return Fliplet.DataSources.update($vm.settings.dataSourceId, {
-                hooks: dataSource.hooks
+                hooks: updatedHooks
               });
             });
           } else {
@@ -625,28 +618,21 @@ Fliplet().then(function() {
             const payload = JSON.parse(JSON.stringify($vm.emailTemplateEdit));
 
             operation = Fliplet.DataSources.getById($vm.settings.dataSourceId).then(function(dataSource) {
-              // First check if any email hook exists
-              const emailHook = dataSource.hooks.find(function(hook) {
-                return hook.type === 'email' && hook.widgetInstanceId === widgetId && hook.runOn.includes('update');
+              const updatedHooks = dataSource.hooks.filter(function(hook) {
+                return !(hook.type === 'email' && hook.widgetInstanceId === widgetId && hook.runOn.includes('update'));
               });
 
-              if (emailHook) {
-                // Update existing email hook
-                emailHook.payload = payload;
-                emailHook.triggers = [widgetUuid];
-              } else {
-                // Add new hook only if no email hook exists
-                dataSource.hooks.push({
-                  type: 'email',
-                  runOn: ['update'],
-                  widgetInstanceId: widgetId,
-                  payload: payload,
-                  triggers: [widgetUuid]
-                });
-              }
+              // Add the new email hook
+              updatedHooks.push({
+                type: 'email',
+                runOn: ['update'],
+                widgetInstanceId: widgetId,
+                payload: payload,
+                triggers: [widgetUuid]
+              });
 
               return Fliplet.DataSources.update($vm.settings.dataSourceId, {
-                hooks: dataSource.hooks
+                hooks: updatedHooks
               });
             });
           } else {
@@ -1281,15 +1267,13 @@ Fliplet().then(function() {
               dataSource.hooks = dataSource.hooks || [];
 
               if (dataSource.hooks.length) {
-                const index = dataSource.hooks.findIndex(function(o) {
-                  return o.widgetInstanceId == widgetId && o.runOn.indexOf('insert') > -1;
+                const updatedHooks = dataSource.hooks.filter(function(hook) {
+                  return !(hook.type === 'email' && hook.widgetInstanceId === widgetId && hook.runOn.includes('insert'));
                 });
 
-                if (index > -1) {
-                  dataSource.hooks.splice(index, 1);
-
+                if (updatedHooks.length) {
                   Fliplet.DataSources.update($vm.settings.dataSourceId, {
-                    hooks: dataSource.hooks
+                    hooks: updatedHooks
                   });
                 }
               }
@@ -1309,15 +1293,13 @@ Fliplet().then(function() {
               dataSource.hooks = dataSource.hooks || [];
 
               if (dataSource.hooks.length) {
-                const index = dataSource.hooks.findIndex(function(o) {
-                  return o.widgetInstanceId == widgetId && o.runOn.indexOf('update') > -1;
+                const updatedHooks = dataSource.hooks.filter(function(hook) {
+                  return !(hook.type === 'email' && hook.widgetInstanceId === widgetId && hook.runOn.includes('update'));
                 });
 
-                if (index > -1) {
-                  dataSource.hooks.splice(index, 1);
-
+                if (updatedHooks.length) {
                   Fliplet.DataSources.update($vm.settings.dataSourceId, {
-                    hooks: dataSource.hooks
+                    hooks: updatedHooks
                   });
                 }
               }
