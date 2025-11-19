@@ -79,27 +79,29 @@
               </div>
             </div>
             <div v-if="showDataSourceSettings">
-              <div class="single-submission-label">
-                <label>Single submission</label>
+              <div class="form-group">
+                <div class="single-submission-label">
+                  <label>Single submission</label>
+                </div>
+                <div class="checkbox checkbox-icon">
+                  <input type="checkbox" id="singleSubmissionSelected" v-model="settings.singleSubmissionSelected">
+                  <label class="single-submission-check-label" for="singleSubmissionSelected">
+                    <span class="check"><i class="fa fa-check"></i></span>
+                    <p>Only allow single submission</p>
+                  </label>
+                  <p v-if="settings.singleSubmissionSelected" class="single-submission-text">Choose the data source column used to detect existing submissions</p>
+                </div>
+                <div class="select-proxy-display" v-if="settings.singleSubmissionSelected">
+                  <label class="field-selection-single-submission">Identifying column</label>
+                  <select class="hidden-select form-control" v-model="settings.singleSubmissionField" style="margin-bottom: 18px;">
+                    <option value="">\{{ dataSourceColumns.length > 0 ? '-- Select a column' : 'No columns found' }}</option>
+                    <option v-for="column in dataSourceColumns" :value="column">
+                      \{{ column }}
+                    </option>
+                  </select>
+                  <span class="icon fa fa-chevron-down"></span>
+                </div>
               </div>
-              <div class="checkbox checkbox-icon">
-                <input type="checkbox" id="singleSubmissionSelected" v-model="settings.singleSubmissionSelected">
-                <label class="single-submission-check-label" for="singleSubmissionSelected">
-                  <span class="check"><i class="fa fa-check"></i></span>
-                  <p>Only allow single submission</p>
-                </label>
-                <p v-if="settings.singleSubmissionSelected" class="single-submission-text">Choose the data source column used to detect existing submissions</p>
-              </div>
-              <div class="control-label" v-if="settings.singleSubmissionSelected">
-                <label class="field-selection-single-submission">Identifying column</label>
-                <select class="form-control" v-model="settings.singleSubmissionField" style="margin-bottom: 18px;">
-                  <option value="">\{{ dataSourceColumns.length > 0 ? 'Select a column' : 'No columns found' }}</option>
-                  <option v-for="column in dataSourceColumns" :value="column">
-                    \{{ column }}
-                  </option>
-                </select>
-              </div>
-
 
               <div class="control-label">
                 <label>When the form is submitted...</label>
