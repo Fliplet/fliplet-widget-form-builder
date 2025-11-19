@@ -170,7 +170,9 @@ function generateFormDefaults(data) {
       id: Fliplet.User.get('id'),
       fullName: Fliplet.User.get('fullName')
     },
-    isFormInSlider: isFormInSlider
+    isFormInSlider: isFormInSlider,
+    singleSubmissionSelected: false,
+    singleSubmissionField: ''
   }, data);
 }
 
@@ -202,6 +204,7 @@ Fliplet().then(function() {
         dataSources: [],
         section: 'form', // form or settings
         settings: formSettings,
+        dataSourceColumns: [],
         chooseTemplate: (!formSettings.templateId),
         redirect: formSettings.redirect,
         toggleTemplatedEmailAdd: formSettings.onSubmit.indexOf('templatedEmailAdd') > -1,
@@ -274,6 +277,9 @@ Fliplet().then(function() {
         }
 
         return message;
+      },
+      fieldLabelChangeWarningMessage() {
+        return `<b>${T('widgets.form.warningLabel')}: </b> ${T('widgets.form.fieldLabelChangeWarning')}`;
       },
       /**
        * Generates a warning message for media fields that don't have a media folder configured.
@@ -478,6 +484,14 @@ Fliplet().then(function() {
         }
 
         $vm.settings.name = $vm.settings.displayName;
+
+        if (this.settings.singleSubmissionSelected) {
+          Fliplet.Analytics.trackEvent({
+            category: 'form',
+            action: 'form_configure_to_screen',
+            label: this.settings.singleSubmissionField
+          });
+        }
 
         // Cleanup
         this.settings.fields = Fliplet.FormBuilderUtils.compact(this.fields);
@@ -697,11 +711,26 @@ Fliplet().then(function() {
         }
       },
       getDataSourceColumns: function() {
+        const $vm = this;
+
+        if (!this.settings.dataSourceId) {
+          this.dataSourceColumns = [];
+
+          return Promise.resolve([]);
+        }
+
         return Fliplet.DataSources.getById(this.settings.dataSourceId, {
           cache: false,
           attributes: 'columns'
         }).then(function(dataSource) {
-          return dataSource && dataSource.columns ? dataSource.columns : [];
+          $vm.dataSourceColumns = dataSource && dataSource.columns ? dataSource.columns : [];
+
+          return $vm.dataSourceColumns;
+        }).catch(function(error) {
+          console.error('Error fetching data source columns:', error);
+          $vm.dataSourceColumns = [];
+
+          return [];
         });
       },
       updateDataSourceHooks: function() {
@@ -1074,7 +1103,7 @@ Fliplet().then(function() {
             );
 
             widget.isFormInSlider = !!(formSliderParent && formSliderParent.slideId);
-            widget.sliderContainerId = formSliderParent.length && formSliderParent.sliderId;
+            widget.sliderContainerId = formSliderParent && formSliderParent.length && formSliderParent.sliderId;
 
             return widget;
           } catch (error) {
@@ -1166,6 +1195,20 @@ Fliplet().then(function() {
     watch: {
       'dataSources': function() {
         changeSelectText();
+      },
+      'settings.singleSubmissionSelected': function(value) {
+        if (value) {
+          this.settings.offline = false;
+
+          // Fetch data source columns when single submission is enabled
+          if (this.settings.dataSourceId) {
+            this.getDataSourceColumns();
+          }
+        } else {
+          this.settings.offline = true;
+          // Clear the selected field when disabled
+          this.settings.singleSubmissionField = '';
+        }
       },
       'settings.dataSourceId': function(value) {
         this.showDataSourceSettings = value && value !== 'new';
@@ -1341,6 +1384,11 @@ Fliplet().then(function() {
 
       if (!$vm.showDataSourceSettings) {
         $vm.settings.dataStore = [];
+      }
+
+      // Load data source columns if single submission is already enabled
+      if ($vm.settings.singleSubmissionSelected && $vm.settings.dataSourceId) {
+        $vm.getDataSourceColumns();
       }
 
       if (this.chooseTemplate) {
