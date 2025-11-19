@@ -180,6 +180,7 @@ Fliplet.FormBuilder.field('typeahead', {
     },
     /**
      * Ensures the DOM <select> placeholder matches this instance's prop
+     * @returns {void}
      */
     ensurePlaceholder: function() {
       if (!this.$refs.typeahead) {
@@ -252,6 +253,7 @@ Fliplet.FormBuilder.field('typeahead', {
     },
     /**
      * React to placeholder changes or reactivity side-effects (e.g. hiding fields) by force applying correct placeholder.
+     * @returns {void}
      */
     placeholder: function() {
       this.$nextTick(this.ensurePlaceholder);
