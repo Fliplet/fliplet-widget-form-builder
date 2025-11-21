@@ -1506,7 +1506,13 @@ Fliplet().then(async function() {
                       return '';
                     }
 
-                    return val instanceof File || !val.url ? val : val.url;
+                    // More robust File/Blob detection to support all file types including MP4 videos
+                    // Check for File, Blob instances, or File-like objects (duck typing)
+                    const isFileObject = val instanceof File
+                      || val instanceof Blob
+                      || (val && typeof val.size === 'number' && typeof val.type === 'string' && val.name);
+
+                    return isFileObject || !val.url ? val : val.url;
                   });
 
                   value = result;
