@@ -1870,14 +1870,66 @@ Fliplet().then(async function() {
 
           const currentSlide = formElement.closest('.swiper-slide');
           let isTouchMoveTriggered = false;
+          const SWIPE_DIRECTION_THRESHOLD = 10;
+          let touchStartX = null;
+          let touchStartY = null;
 
-          function handleTouchStart(swiper) {
-            isTouchMoveTriggered = false;
-            swiper.allowSlideNext = true;
+          function recordTouchStart(event, swiper) {
+            if (event && event.touches && event.touches.length) {
+              touchStartX = event.touches[0].clientX;
+              touchStartY = event.touches[0].clientY;
+            } else if (swiper && swiper.touches) {
+              touchStartX = swiper.touches.startX || swiper.touches.currentX || null;
+              touchStartY = swiper.touches.startY || swiper.touches.currentY || null;
+            } else {
+              touchStartX = null;
+              touchStartY = null;
+            }
           }
 
-          async function handleTouchMove(swiper, swiperContainer, data, allFormsInSlide, $vm) {
-            if (isTouchMoveTriggered) {
+          function isHorizontalSwipe(event, swiper) {
+            if (touchStartX === null || touchStartY === null) {
+              return false;
+            }
+
+            let deltaX;
+            let deltaY;
+
+            if (event && event.touches && event.touches.length) {
+              const touch = event.touches[0];
+
+              deltaX = Math.abs(touch.clientX - touchStartX);
+              deltaY = Math.abs(touch.clientY - touchStartY);
+            } else if (swiper && swiper.touches) {
+              const currentX = swiper.touches.currentX;
+              const currentY = swiper.touches.currentY;
+
+              if (typeof currentX !== 'number' || typeof currentY !== 'number') {
+                return false;
+              }
+
+              deltaX = Math.abs(currentX - touchStartX);
+              deltaY = Math.abs(currentY - touchStartY);
+            } else {
+              return false;
+            }
+
+            if (deltaX < SWIPE_DIRECTION_THRESHOLD && deltaY < SWIPE_DIRECTION_THRESHOLD) {
+              // Ignore small drags
+              return false;
+            }
+
+            return deltaX > deltaY;
+          }
+
+          function handleTouchStart(swiper, event) {
+            isTouchMoveTriggered = false;
+            swiper.allowSlideNext = true;
+            recordTouchStart(event, swiper);
+          }
+
+          async function handleTouchMove(swiper, swiperContainer, data, allFormsInSlide, $vm, event) {
+            if (isTouchMoveTriggered || !isHorizontalSwipe(event, swiper)) {
               return;
             }
 
@@ -1986,19 +2038,19 @@ Fliplet().then(async function() {
               button.addEventListener('click', button._prevClickHandler);
             });
             // DOM events
-            swiperContainer.addEventListener('touchstart', () => {
+            swiperContainer.addEventListener('touchstart', (event) => {
               const swiper = swiperContainer && swiperContainer.swiper;
 
               if (swiper) {
-                handleTouchStart(swiper);
+                handleTouchStart(swiper, event);
               }
             });
 
-            swiperContainer.addEventListener('touchmove', () => {
+            swiperContainer.addEventListener('touchmove', (event) => {
               const swiper = swiperContainer && swiperContainer.swiper;
 
               if (swiper) {
-                handleTouchMove(swiper, swiperContainer, data, allFormsInSlide, $vm);
+                handleTouchMove(swiper, swiperContainer, data, allFormsInSlide, $vm, event);
               }
             });
 
@@ -2010,8 +2062,12 @@ Fliplet().then(async function() {
                 return;
               }
 
-              swiper.on('touchStart', () => handleTouchStart(swiper));
-              swiper.on('touchMove', () => handleTouchMove(swiper, swiperContainer, data, allFormsInSlide, $vm));
+              swiper.on('touchStart', function(event) {
+                handleTouchStart(swiper, event);
+              });
+              swiper.on('touchMove', function(event) {
+                handleTouchMove(swiper, swiperContainer, data, allFormsInSlide, $vm, event);
+              });
             }, 0);
           }
         }
