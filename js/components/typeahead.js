@@ -165,6 +165,92 @@ Fliplet.FormBuilder.field('typeahead', {
         order: this.optionsType === 'dataSource' ? 'asc' : null
       });
 
+      // Ensure elements receive classes so Field border settings apply.
+      //  - Add .form-group and .fl-typeahead to the selectize control wrapper
+      //  - Add .form-control to the inner text input inside .selectize-input
+      function annotateSelectizeDom() {
+        const host = $vm.$refs.typeahead;
+
+        if (!host || !host.querySelector) {
+          return false;
+        }
+
+        const control = document.querySelector('.selectize-control');
+        const input = document.querySelector('.selectize-input');
+
+
+        if (!control) {
+          return false;
+        }
+
+        control.classList.add('form-group', 'fl-typeahead');
+
+        if (input) {
+          input.classList.add('form-control');
+        }
+
+        return true;
+      }
+
+      annotateSelectizeDom();
+
+      // Ensure that when the dropdown is active, the Selectize wrapper doesn't keep the "focus" class
+      // so visual state reflects the actual interaction state.
+      // function setupFocusDropdownSync() {
+      //   const host = $vm.$refs.typeahead;
+
+      //   if (!host || !host.querySelector) {
+      //     return;
+      //   }
+
+      //   const wrapper = document.querySelector('.selectize-input');
+
+      //   if (!wrapper) {
+      //     return;
+      //   }
+
+      //   function enforceDropdownFocusRule() {
+      //     if (wrapper.classList.contains('dropdown-active') && wrapper.classList.contains('focus')) {
+      //       wrapper.classList.remove('focus');
+      //     }
+      //   }
+
+      //   // Initial enforcement in case classes are already present
+      //   enforceDropdownFocusRule();
+
+      //   try {
+      //     const classObserver = new MutationObserver(function() {
+      //       enforceDropdownFocusRule();
+      //     });
+
+      //     classObserver.observe(wrapper, { attributes: true, attributeFilter: ['class'] });
+      //   } catch (e) {
+      //     // no-op
+      //   }
+      // }
+
+      // setupFocusDropdownSync();
+
+      // const wrapper = document && document.querySelector('.selectize-input');
+
+      // if (!wrapper) return;
+
+      // // 2) Let Appearance rules target it
+      // wrapper.classList.add('form-control');         // so .form-control:focus applies
+      // wrapper.setAttribute('tabindex', '0');         // so it can receive :focus
+
+      // // 3) Focus/blur the wrapper based on Selectize state
+      // function syncFocus() {
+      //   if (wrapper.classList.contains('input-active')) {
+      //     wrapper.focus();   // triggers .form-control:focus (Appearance active border)
+      //   } else {
+      //     wrapper.blur();
+      //   }
+      // }
+
+      // // Initial sync + keep in sync when classes change
+      // syncFocus();
+      // new MutationObserver(syncFocus).observe(wrapper, { attributes: true, attributeFilter: ['class'] });
       this.typeahead.change(function(value) {
         $vm.value = value;
         $vm.updateValue();
