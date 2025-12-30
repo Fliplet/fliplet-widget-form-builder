@@ -34,6 +34,16 @@ Fliplet.FormBuilder.field('slider', {
       }
 
       this.$emit('_input', this.name, val);
+    },
+    min: function(val) {
+      if (this.slider) {
+        this.slider.setMin(val);
+      }
+    },
+    max: function(val) {
+      if (this.slider) {
+        this.slider.setMax(val);
+      }
     }
   },
   mounted: function() {
@@ -59,7 +69,7 @@ Fliplet.FormBuilder.field('slider', {
         readonly: this.readonly
       });
 
-      var $vm = this;
+      const $vm = this;
 
       if (this.defaultValueSource !== 'default' && this.defaultValueSource !== 'profile') {
         this.setValueFromDefaultSettings({
