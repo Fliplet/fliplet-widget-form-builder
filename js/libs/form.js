@@ -708,7 +708,7 @@ Fliplet().then(async function() {
     }
 
     const changeListeners = {};
-    let isErrorToastShown = false;
+    let hasBlockingError = false;
 
     /**
      * @function showSubmissionExistMessage
@@ -719,18 +719,20 @@ Fliplet().then(async function() {
      * @returns {void}
     */
     function showSubmissionExistMessage(columnName, value, onDismiss) {
-      isErrorToastShown = true;
+      hasBlockingError = true;
 
-      // Immediately disable all swipers on the page
       const swipers = document.querySelectorAll('.swiper-container');
 
-      swipers.forEach(function(swiperEl) {
-        if (swiperEl.swiper) {
-          swiperEl.swiper.allowSlideNext = false;
-          swiperEl.swiper.allowSlidePrev = false;
-          swiperEl.swiper.allowTouchMove = false;
-        }
-      });
+      if (swipers && swipers.length > 0) {
+        swipers.forEach(function(swiperEl) {
+          if (swiperEl.swiper) {
+            // Disable all navigation when error toast is shown
+            swiperEl.swiper.allowSlideNext = false;
+            swiperEl.swiper.allowSlidePrev = false;
+            swiperEl.swiper.allowTouchMove = false;
+          }
+        });
+      }
 
       Fliplet.UI.Toast({
         type: 'regular',
@@ -742,18 +744,6 @@ Fliplet().then(async function() {
           label: 'OK',
           action: function() {
             this.dismiss();
-            isErrorToastShown = false;
-
-            // Re-enable all swipers on the page
-            const swipers = document.querySelectorAll('.swiper-container');
-
-            swipers.forEach(function(swiperEl) {
-              if (swiperEl.swiper) {
-                swiperEl.swiper.allowSlideNext = true;
-                swiperEl.swiper.allowSlidePrev = true;
-                swiperEl.swiper.allowTouchMove = true;
-              }
-            });
 
             if (typeof onDismiss === 'function') {
               onDismiss();
@@ -771,18 +761,20 @@ Fliplet().then(async function() {
      * @returns {void}
     */
     function showOfflineMessage() {
-      isErrorToastShown = true;
+      hasBlockingError = true;
 
-      // Immediately disable all swipers on the page
       const swipers = document.querySelectorAll('.swiper-container');
 
-      swipers.forEach(function(swiperEl) {
-        if (swiperEl.swiper) {
-          swiperEl.swiper.allowSlideNext = false;
-          swiperEl.swiper.allowSlidePrev = false;
-          swiperEl.swiper.allowTouchMove = false;
-        }
-      });
+      if (swipers && swipers.length > 0) {
+        swipers.forEach(function(swiperEl) {
+          if (swiperEl.swiper) {
+            // Disable all navigation when error toast is shown
+            swiperEl.swiper.allowSlideNext = false;
+            swiperEl.swiper.allowSlidePrev = false;
+            swiperEl.swiper.allowTouchMove = false;
+          }
+        });
+      }
 
       Fliplet.UI.Toast({
         type: 'regular',
@@ -794,18 +786,6 @@ Fliplet().then(async function() {
           label: 'OK',
           action: function() {
             this.dismiss();
-            isErrorToastShown = false;
-
-            // Re-enable all swipers on the page
-            const swipers = document.querySelectorAll('.swiper-container');
-
-            swipers.forEach(function(swiperEl) {
-              if (swiperEl.swiper) {
-                swiperEl.swiper.allowSlideNext = true;
-                swiperEl.swiper.allowSlidePrev = true;
-                swiperEl.swiper.allowTouchMove = true;
-              }
-            });
           }
         }],
         title: 'Unable to submit form',
@@ -2138,9 +2118,14 @@ Fliplet().then(async function() {
 
           function handleTouchStart(swiper) {
             isTouchMoveTriggered = false;
-            swiper.allowSlideNext = !isErrorToastShown;
-            swiper.allowSlidePrev = !isErrorToastShown;
-            swiper.allowTouchMove = !isErrorToastShown;
+
+            if (hasBlockingError) {
+              swiper.allowSlideNext = false;
+              swiper.allowSlidePrev = false;
+              swiper.allowTouchMove = false;
+            } else {
+              swiper.allowSlideNext = true;
+            }
           }
 
           async function handleTouchMove(swiper, swiperContainer, data, allFormsInSlide, $vm) {
@@ -2163,12 +2148,17 @@ Fliplet().then(async function() {
             $vm.synchronizeMatchingFields(currentMultiStepForm, data, 'touchmove');
 
             setTimeout(() => {
-              const formsInActiveSlide = currentMultiStepForm.filter(form => form.$instance.slideId === activeSlideId);
-              const canSwipe = !formsInActiveSlide.some(form => form.$instance.isFormValid === false) && !isErrorToastShown;
+              if (hasBlockingError) {
+                swiper.allowSlideNext = false;
+                swiper.allowSlidePrev = false;
+                swiper.allowTouchMove = false;
+              } else {
+                // Normal form validation behavior
+                const formsInActiveSlide = currentMultiStepForm.filter(form => form.$instance.slideId === activeSlideId);
+                const canSwipe = !formsInActiveSlide.some(form => form.$instance.isFormValid === false);
 
-              swiper.allowSlideNext = canSwipe;
-              swiper.allowSlidePrev = !isErrorToastShown;
-              swiper.allowTouchMove = !isErrorToastShown;
+                swiper.allowSlideNext = canSwipe;
+              }
             }, 0);
           }
 
