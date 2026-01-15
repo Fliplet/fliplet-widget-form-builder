@@ -151,6 +151,37 @@ Fliplet.FormBuilder.field('wysiwyg', {
             editor.setContent($vm.value, { format: 'raw' });
           }
 
+          // Ensure elements receive classes so Field border settings apply
+          try {
+            const containerEl = editor.editorContainer
+              || (editor.iframeElement && editor.iframeElement.parentElement && editor.iframeElement.parentElement.parentElement)
+              || null;
+
+            if (containerEl) {
+              // Allow base Form input border rules to apply
+              containerEl.classList.add('form-control');
+              // Mark the editor container for styling regardless of Vue re-renders
+              containerEl.classList.add('fl-rich-text');
+
+              // Make wrapper focusable so :focus rules from Appearance can apply
+              if (!containerEl.hasAttribute('tabindex')) {
+                containerEl.setAttribute('tabindex', '0');
+              }
+
+              // Mark the field wrapper so Field border rules can target it
+              const formGroup = containerEl.closest && containerEl.closest('.form-group');
+
+              if (formGroup) {
+                formGroup.classList.add('fl-rich-text');
+              }
+
+              // Save on instance for focus/blur handlers below
+              editor._fl_containerEl = containerEl;
+            }
+          } catch (e) {
+            // no-op
+          }
+
           if ($vm.isInterface) {
             // iFrames don't work with the form builder's Sortable feature
             // Instead, the iFrame is swapped with a <div></div> of the same dimensions
@@ -167,12 +198,30 @@ Fliplet.FormBuilder.field('wysiwyg', {
           const $el = $(editor.iframeElement);
 
           $el.parent().parent().addClass('focus-outline');
+
+          // Focus the wrapper so .form-control:focus rules from Appearance apply
+          if (editor._fl_containerEl && editor._fl_containerEl.focus) {
+            editor._fl_containerEl.classList.add('focus');
+
+            // Ensure form-group retains the marker class even if Vue re-rendered
+            const formGroup = editor._fl_containerEl.closest && editor._fl_containerEl.closest('.form-group');
+
+            if (formGroup && !formGroup.classList.contains('fl-rich-text')) {
+              formGroup.classList.add('fl-rich-text');
+            }
+          }
         });
 
         editor.on('blur', function() {
           const $el = $(editor.iframeElement);
 
           $el.parent().parent().removeClass('focus-outline');
+
+          // Remove focus from wrapper to clear :focus styles
+          if (editor._fl_containerEl && editor._fl_containerEl.blur) {
+            editor._fl_containerEl.classList.remove('focus');
+          }
+
           $vm.onBlur();
         });
 

@@ -165,6 +165,35 @@ Fliplet.FormBuilder.field('typeahead', {
         order: this.optionsType === 'dataSource' ? 'asc' : null
       });
 
+      // Ensure elements receive classes so Field border settings apply.
+      //  - Add .form-group and .fl-typeahead to the selectize control wrapper
+      //  - Add .form-control to the inner text input inside .selectize-input
+      function annotateSelectizeDom() {
+        const host = $vm.$refs.typeahead;
+
+        if (!host || !host.querySelector) {
+          return false;
+        }
+
+        const control = document.querySelector('.selectize-control');
+        const input = document.querySelector('.selectize-input');
+
+
+        if (!control) {
+          return false;
+        }
+
+        control.classList.add('form-group', 'fl-typeahead');
+
+        if (input) {
+          input.classList.add('form-control');
+        }
+
+        return true;
+      }
+
+      annotateSelectizeDom();
+
       this.typeahead.change(function(value) {
         $vm.value = value;
         $vm.updateValue();
