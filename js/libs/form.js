@@ -708,6 +708,7 @@ Fliplet().then(async function() {
     }
 
     const changeListeners = {};
+    let hasBlockingError = false;
 
     /**
      * @function showSubmissionExistMessage
@@ -718,6 +719,21 @@ Fliplet().then(async function() {
      * @returns {void}
     */
     function showSubmissionExistMessage(columnName, value, onDismiss) {
+      hasBlockingError = true;
+
+      const swipers = document.querySelectorAll('.swiper-container');
+
+      if (swipers && swipers.length > 0) {
+        swipers.forEach(function(swiperEl) {
+          if (swiperEl.swiper) {
+            // Disable all navigation when error toast is shown
+            swiperEl.swiper.allowSlideNext = false;
+            swiperEl.swiper.allowSlidePrev = false;
+            swiperEl.swiper.allowTouchMove = false;
+          }
+        });
+      }
+
       Fliplet.UI.Toast({
         type: 'regular',
         position: 'center',
@@ -745,6 +761,21 @@ Fliplet().then(async function() {
      * @returns {void}
     */
     function showOfflineMessage() {
+      hasBlockingError = true;
+
+      const swipers = document.querySelectorAll('.swiper-container');
+
+      if (swipers && swipers.length > 0) {
+        swipers.forEach(function(swiperEl) {
+          if (swiperEl.swiper) {
+            // Disable all navigation when error toast is shown
+            swiperEl.swiper.allowSlideNext = false;
+            swiperEl.swiper.allowSlidePrev = false;
+            swiperEl.swiper.allowTouchMove = false;
+          }
+        });
+      }
+
       Fliplet.UI.Toast({
         type: 'regular',
         position: 'center',
@@ -2087,7 +2118,14 @@ Fliplet().then(async function() {
 
           function handleTouchStart(swiper) {
             isTouchMoveTriggered = false;
-            swiper.allowSlideNext = true;
+
+            if (hasBlockingError) {
+              swiper.allowSlideNext = false;
+              swiper.allowSlidePrev = false;
+              swiper.allowTouchMove = false;
+            } else {
+              swiper.allowSlideNext = true;
+            }
           }
 
           async function handleTouchMove(swiper, swiperContainer, data, allFormsInSlide, $vm) {
@@ -2110,10 +2148,17 @@ Fliplet().then(async function() {
             $vm.synchronizeMatchingFields(currentMultiStepForm, data, 'touchmove');
 
             setTimeout(() => {
-              const formsInActiveSlide = currentMultiStepForm.filter(form => form.$instance.slideId === activeSlideId);
-              const canSwipe = !formsInActiveSlide.some(form => form.$instance.isFormValid === false);
+              if (hasBlockingError) {
+                swiper.allowSlideNext = false;
+                swiper.allowSlidePrev = false;
+                swiper.allowTouchMove = false;
+              } else {
+                // Normal form validation behavior
+                const formsInActiveSlide = currentMultiStepForm.filter(form => form.$instance.slideId === activeSlideId);
+                const canSwipe = !formsInActiveSlide.some(form => form.$instance.isFormValid === false);
 
-              swiper.allowSlideNext = canSwipe;
+                swiper.allowSlideNext = canSwipe;
+              }
             }, 0);
           }
 
