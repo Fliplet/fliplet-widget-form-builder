@@ -1655,17 +1655,17 @@ Fliplet().then(async function() {
                 return submittedValue instanceof File || submittedValue instanceof Blob;
               });
 
-              // Only validate if we submitted files to a data source
-              if (submittedFileFields.length > 0 && data.dataSourceId) {
+              const isOfflineSubmission = data.offline && !Fliplet.Navigator.isOnline();
+
+              if (submittedFileFields.length > 0 && data.dataSourceId && !isOfflineSubmission) {
                 const failedUploads = [];
 
                 // Check if the result is a valid API response (should have 'id' and 'data' properties)
-                // If the upload failed and was queued offline, result won't have these properties
                 const isValidApiResponse = result
                   && typeof result.id !== 'undefined'
                   && typeof result.data === 'object';
 
-                // If no valid result or result was queued (no proper API response), that's a failure
+                // If no valid API response, the upload failed
                 if (!isValidApiResponse) {
                   submittedFileFields.forEach(function(field) {
                     failedUploads.push(field.label || field.name);
