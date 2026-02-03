@@ -52,6 +52,8 @@ Fliplet separates code that runs **inside Fliplet Studio** (“builder”) from 
 | `interface.assets` | Fliplet Studio only | `interface.html`, `js/libs/builder.js`, `css/builder.css`, etc. |
 | `build.assets`      | Mobile / Web runtime | `build.html`, `js/libs/form.js`, `css/form.css`, etc. |
 
+Additional notes about the JavaScript files can be found in [docs/js-documentation.md](docs/js-documentation.md).
+
 ---
 
 ## Adding a new field type
