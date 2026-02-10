@@ -1631,6 +1631,78 @@ Fliplet().then(async function() {
 
               return;
             }).then(function(result) {
+              // Validate that file uploads were successful
+              // If form contains file fields, verify they were properly uploaded
+              const fileFields = $vm.fields.filter(function(field) {
+                return ['flFile', 'flImage'].indexOf(field._type) > -1;
+              });
+
+              // Check if formData contains File objects that were submitted
+              const submittedFileFields = fileFields.filter(function(field) {
+                const submittedValue = formData[field.name];
+
+                if (!submittedValue) {
+                  return false;
+                }
+
+                // Check if the submitted data contains File/Blob objects
+                if (Array.isArray(submittedValue)) {
+                  return submittedValue.some(function(val) {
+                    return val instanceof File || val instanceof Blob;
+                  });
+                }
+
+                return submittedValue instanceof File || submittedValue instanceof Blob;
+              });
+
+              const isOfflineSubmission = data.offline && !Fliplet.Navigator.isOnline();
+
+              if (submittedFileFields.length > 0 && data.dataSourceId && !isOfflineSubmission) {
+                const failedUploads = [];
+
+                // Check if the result is a valid API response (should have 'id' and 'data' properties)
+                const isValidApiResponse = result
+                  && typeof result.id !== 'undefined'
+                  && typeof result.data === 'object';
+
+                // If no valid API response, the upload failed
+                if (!isValidApiResponse) {
+                  submittedFileFields.forEach(function(field) {
+                    failedUploads.push(field.label || field.name);
+                  });
+                } else {
+                  submittedFileFields.forEach(function(field) {
+                    const resultValue = result.data[field.name];
+
+                    // Helper to check if a value is a valid media URL
+                    function isValidMediaUrl(val) {
+                      return typeof val === 'string'
+                        && val.length > 0
+                        && (val.indexOf('v1/media/files') > -1 || val.indexOf('cdn.') > -1);
+                    }
+
+                    // Check if the result contains valid file URLs
+                    let hasValidUrls = false;
+
+                    if (Array.isArray(resultValue)) {
+                      hasValidUrls = resultValue.some(isValidMediaUrl);
+                    } else if (typeof resultValue === 'string') {
+                      hasValidUrls = isValidMediaUrl(resultValue);
+                    }
+
+                    if (!hasValidUrls) {
+                      failedUploads.push(field.label || field.name);
+                    }
+                  });
+                }
+
+                if (failedUploads.length > 0) {
+                  const errorMessage = 'File upload failed for: ' + failedUploads.join(', ') + '. Please try again.';
+
+                  return Promise.reject(new Error(errorMessage));
+                }
+              }
+
               return formPromise.then(function(form) {
                 return Fliplet.Hooks.run('afterFormSubmit', { formData: formData, result: result }, form).then(function() {
                   if (entryId !== 'session') {
