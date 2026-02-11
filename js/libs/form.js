@@ -745,8 +745,14 @@ Fliplet().then(async function() {
           action: function() {
             this.dismiss();
 
+            const shouldRefresh = !data.linkAction || data.redirect !== true;
+
             if (typeof onDismiss === 'function') {
               onDismiss();
+            }
+
+            if (shouldRefresh && typeof window !== 'undefined' && window.location) {
+              window.location.reload();
             }
           }
         }],
