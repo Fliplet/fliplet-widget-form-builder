@@ -1118,10 +1118,10 @@ Fliplet.FormBuilder = (function() {
               parent.package === 'com.fliplet.slider-container' || parent.name === 'Slider container'
             );
 
-            widget.isFormInSlider = !!(formSliderParent && formSliderParent.slideId);
+            widget.isFormInSlider = !!(formSliderParent && formSliderParent.sliderId);
 
-            widget.sliderContainerId = formSliderParent.length && formSliderParent.sliderId;
-            widget.slideId = widget.sldieId;
+            widget.sliderContainerId = formSliderParent && formSliderParent.sliderId;
+            widget.slideId = widget.slideId;
 
             return widget;
           } catch (error) {
