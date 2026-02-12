@@ -436,6 +436,11 @@ Fliplet.FormBuilder.field('image', {
             return { url: URL.createObjectURL(img) };
           }
 
+          // Handle image values stored as objects (e.g. { url: '...', name: '...' })
+          if (img && typeof img === 'object') {
+            return { url: img.url || '' };
+          }
+
           return { url: img };
         }),
         options: {

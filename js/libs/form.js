@@ -59,6 +59,15 @@ function dataURLToBlob(dataUrl) {
 function addThumbnailToCanvas(imageURI, indexCanvas, self, isFileCanvas) {
   const $vm = self;
 
+  // Handle image values stored as objects (e.g. { url: '...', name: '...' })
+  if (imageURI && typeof imageURI === 'object' && !(imageURI instanceof Blob)) {
+    imageURI = imageURI.url || '';
+  }
+
+  if (!imageURI) {
+    return;
+  }
+
   if (imageURI instanceof Blob) {
     imageURI = URL.createObjectURL(imageURI);
   } else if (!imageURI.match(/^http/) && imageURI.indexOf('data:') !== 0 && imageURI.indexOf('blob:') !== 0) {
