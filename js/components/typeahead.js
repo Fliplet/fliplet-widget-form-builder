@@ -260,10 +260,10 @@ Fliplet.FormBuilder.field('typeahead', {
      */
     options: function(val) {
       if (this.typeahead) {
-        this.typeahead.options(val, this.value);
+        this.typeahead.options(val, this.value || []);
       }
 
-      this.typeahead.set(this.value);
+      this.typeahead.set(this.value || []);
     },
     /**
      * Watches for changes in the readonly prop
