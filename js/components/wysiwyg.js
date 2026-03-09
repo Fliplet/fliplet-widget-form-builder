@@ -547,9 +547,11 @@ Fliplet.FormBuilder.field('wysiwyg', {
           setTimeout(updateIframeStyles, 0);
         });
 
-        editor.on('keyup', function() {
-          // If content is still empty, re-allow placeholder to show
-
+        /**
+         * Remove the fl-typing class if the editor content is empty,
+         * allowing the placeholder to reappear.
+         */
+        const clearTypingIfEmpty = () => {
           try {
             const body = editor.getBody && editor.getBody();
 
@@ -569,6 +571,10 @@ Fliplet.FormBuilder.field('wysiwyg', {
           } catch (err) {
             // no-op
           }
+        };
+
+        editor.on('keyup', function() {
+          clearTypingIfEmpty();
         });
 
         editor.on('focus', function() {
@@ -603,26 +609,7 @@ Fliplet.FormBuilder.field('wysiwyg', {
           updateIframeStyles();
 
           // On blur, ensure placeholder can appear again if content is empty
-
-          try {
-            const body = editor.getBody && editor.getBody();
-
-            if (body) {
-              const rawHtml = editor.getContent({ format: 'raw' }) || '';
-              const textOnly = (editor.getContent({ format: 'text' }) || '').replace(/\u00a0/g, ' ').trim();
-              const htmlWithoutEmptyParas = rawHtml
-                .replace(/<p>(?:\s|&nbsp;|<br\s*\/?>)*<\/p>/gi, '')
-                .replace(/<br\s*\/?>/gi, '')
-                .replace(/&nbsp;/gi, '')
-                .trim();
-
-              if (textOnly.length === 0 && htmlWithoutEmptyParas.length === 0) {
-                body.classList.remove('fl-typing');
-              }
-            }
-          } catch (err) {
-            // no-op
-          }
+          clearTypingIfEmpty();
         });
 
         editor.on('change', function() {
