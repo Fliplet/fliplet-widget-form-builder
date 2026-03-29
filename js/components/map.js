@@ -2,6 +2,8 @@
  * Map field component – renders an interactive map for location selection in forms.
  * Supports marker placement, address lookup, and coordinate capture.
  */
+const AUTOCOMPLETE_DEBOUNCE_DELAY = 1000;
+
 Fliplet.FormBuilder.field('map', {
   name: 'Map',
   category: 'Location & Map',
@@ -52,7 +54,8 @@ Fliplet.FormBuilder.field('map', {
   },
   data: function() {
     return {
-      lastChosenAutocompleteValue: ''
+      lastChosenAutocompleteValue: '',
+      debouncedAutocomplete: null
     };
   },
   created: function() {
@@ -60,6 +63,10 @@ Fliplet.FormBuilder.field('map', {
   },
   destroyed: function() {
     Fliplet.FormBuilder.off('reset', this.onReset);
+
+    if (this.debouncedAutocomplete) {
+      clearTimeout(this.debouncedAutocomplete);
+    }
   },
   mounted: async function() {
     this.initAutocomplete('', []);
@@ -225,6 +232,15 @@ Fliplet.FormBuilder.field('map', {
         return;
       }
 
+      if (this.debouncedAutocomplete) {
+        clearTimeout(this.debouncedAutocomplete);
+      }
+
+      this.debouncedAutocomplete = setTimeout(() => {
+        this.performAutocompleteSearch(value);
+      }, AUTOCOMPLETE_DEBOUNCE_DELAY);
+    },
+    performAutocompleteSearch: async function(value) {
       this.mapAddressField.getAutocompleteSuggestions(value, [])
         .then(async(suggestions) => {
           if (suggestions.length && suggestions[0].label !== 'Select location on map') {
@@ -286,6 +302,9 @@ Fliplet.FormBuilder.field('map', {
             this.suggestionSelected = false;
             this.$emit('_input', this.name, this.value, false, true);
           }
+        })
+        .catch(function() {
+          // Fail silently - autocomplete suggestions are non-critical
         });
     },
     onReset: function() {
