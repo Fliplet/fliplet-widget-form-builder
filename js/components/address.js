@@ -2,6 +2,8 @@
  * Address field component – renders a smart address autocomplete field in forms.
  * Supports Google Places API integration and manual address input options.
  */
+const AUTOCOMPLETE_DEBOUNCE_DELAY = 1000;
+
 Fliplet.FormBuilder.field('address', {
   name: 'Address',
   category: 'Location & Map',
@@ -310,7 +312,7 @@ Fliplet.FormBuilder.field('address', {
           this.addressSuggestions = suggestions;
         }
       } catch (error) {
-        console.error('Error loading address suggestions:', error);
+        // Fail silently - address suggestions are non-critical
       }
     },
     debouncedInputHandler: function() {
@@ -321,7 +323,7 @@ Fliplet.FormBuilder.field('address', {
       this.debouncedAutocomplete = setTimeout(() => {
         this.fetchAddressSuggestions(this.value, this.countryRestrictions);
         this.onChange();
-      }, 1000);
+      }, AUTOCOMPLETE_DEBOUNCE_DELAY);
     },
     onChange: function() {
       this.addressField.change((value) => {

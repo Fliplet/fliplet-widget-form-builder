@@ -2,6 +2,8 @@
  * Map field component – renders an interactive map for location selection in forms.
  * Supports marker placement, address lookup, and coordinate capture.
  */
+const AUTOCOMPLETE_DEBOUNCE_DELAY = 1000;
+
 Fliplet.FormBuilder.field('map', {
   name: 'Map',
   category: 'Location & Map',
@@ -236,7 +238,7 @@ Fliplet.FormBuilder.field('map', {
 
       this.debouncedAutocomplete = setTimeout(() => {
         this.performAutocompleteSearch(value);
-      }, 1000);
+      }, AUTOCOMPLETE_DEBOUNCE_DELAY);
     },
     performAutocompleteSearch: async function(value) {
       this.mapAddressField.getAutocompleteSuggestions(value, [])
@@ -300,6 +302,9 @@ Fliplet.FormBuilder.field('map', {
             this.suggestionSelected = false;
             this.$emit('_input', this.name, this.value, false, true);
           }
+        })
+        .catch(function() {
+          // Fail silently - autocomplete suggestions are non-critical
         });
     },
     onReset: function() {
