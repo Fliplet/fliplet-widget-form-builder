@@ -120,7 +120,7 @@ Fliplet.FormBuilder.field('dateRange', {
     this.$emit('_input', this.name, this.value, false, true);
   },
   validations: function() {
-    var rules = {
+    const rules = {
       value: {}
     };
 
@@ -161,7 +161,7 @@ Fliplet.FormBuilder.field('dateRange', {
       this.$emit('_input', this.name, val, false, true);
     },
     selectedRange: function(range) {
-      var newDate = range ? this.getDate(range.value) : this.getDate();
+      const newDate = range ? this.getDate(range.value) : this.getDate();
 
       newDate.selectedRange = this.selectedRange;
 
@@ -183,7 +183,7 @@ Fliplet.FormBuilder.field('dateRange', {
       this.dateRange.clear();
     },
     initDaterange: function() {
-      var $vm = this;
+      const $vm = this;
 
       if (this.dateRange && !this.$refs.dateRange) {
         return;

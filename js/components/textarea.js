@@ -18,7 +18,7 @@ Fliplet.FormBuilder.field('textarea', {
     }
   },
   validations: function() {
-    var rules = {
+    const rules = {
       value: {}
     };
 

@@ -6,6 +6,10 @@
   <label>Set a maximum height for uploaded images</label>
   <input class="form-control" type="number" v-model.trim="customHeight" />
 </div>
+ <div v-if="!customHeight || !customWidth">
+  <p class="alert alert-warning">
+    <b>Warning:</b> If you don't set a maximum width or height, the image will be resized to 3000x3000 to fit the canvas.</p>
+</div>
 <div class="form-group">
   <label class="selectLabel">Select the folder where the images are stored.</label>
   <div class="btn btn-primary" id="select_folder" v-model="mediaFolderId" v-on:click="openFilePicker">

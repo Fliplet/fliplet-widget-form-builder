@@ -23,7 +23,7 @@ Fliplet.FormBuilder.field('wysiwyg', {
     }
   },
   validations: function() {
-    var rules = {
+    const rules = {
       value: {}
     };
 
@@ -41,14 +41,14 @@ Fliplet.FormBuilder.field('wysiwyg', {
   watch: {
     value: function(val) {
       // This happens when the value is updated programmatically via the FormBuilder field().val() method
-      val = _.isNumber(val) ? _.toString(val) : val;
+      const formattedVal = Fliplet.FormBuilderUtils.isNumber(val) ? val.toString() : val;
 
-      if (this.editor && val !== this.editor.getContent()) {
-        return this.editor.setContent(val || '', { format: 'raw' });
+      if (this.editor && formattedVal !== this.editor.getContent()) {
+        return this.editor.setContent(formattedVal || '', { format: 'raw' });
       }
 
-      if (val !== this.value) {
-        this.value = val;
+      if (formattedVal !== this.value) {
+        this.value = formattedVal;
       }
     }
   },
@@ -63,7 +63,7 @@ Fliplet.FormBuilder.field('wysiwyg', {
       }
     },
     addBulletedListShortcutsWindows: function() {
-      var $vm = this;
+      const $vm = this;
 
       // For Windows
       this.editor.addShortcut('ctrl+shift+8', 'UnorderedList', function() {
@@ -78,12 +78,12 @@ Fliplet.FormBuilder.field('wysiwyg', {
     }
   },
   mounted: function() {
-    var $vm = this;
-    var lineHeight = 55;
+    const $vm = this;
+    const lineHeight = 55;
 
-    this.tinymceId = _.kebabCase(this.name) + '-' + $(this.$refs.textarea).parents('[data-form-builder-id]').data('formBuilderId');
+    this.tinymceId = Fliplet.FormBuilderUtils.kebabCase(this.name) + '-' + $(this.$refs.textarea).parents('[data-form-builder-id]').data('formBuilderId');
 
-    var config = {
+    const config = {
       target: this.$refs.textarea,
       mobile: {
         toolbar_mode: 'floating',
@@ -136,7 +136,7 @@ Fliplet.FormBuilder.field('wysiwyg', {
         editor.on('init', function() {
           $vm.addBulletedListShortcutsWindows();
 
-          var mobileEditorSocket = $('.tinymce-mobile-editor-socket');
+          const mobileEditorSocket = $('.tinymce-mobile-editor-socket');
 
           if (mobileEditorSocket) {
             mobileEditorSocket.height('auto');
@@ -151,10 +151,41 @@ Fliplet.FormBuilder.field('wysiwyg', {
             editor.setContent($vm.value, { format: 'raw' });
           }
 
+          // Ensure elements receive classes so Field border settings apply
+          try {
+            const containerEl = editor.editorContainer
+              || (editor.iframeElement && editor.iframeElement.parentElement && editor.iframeElement.parentElement.parentElement)
+              || null;
+
+            if (containerEl) {
+              // Allow base Form input border rules to apply
+              containerEl.classList.add('form-control');
+              // Mark the editor container for styling regardless of Vue re-renders
+              containerEl.classList.add('fl-rich-text');
+
+              // Make wrapper focusable so :focus rules from Appearance can apply
+              if (!containerEl.hasAttribute('tabindex')) {
+                containerEl.setAttribute('tabindex', '0');
+              }
+
+              // Mark the field wrapper so Field border rules can target it
+              const formGroup = containerEl.closest && containerEl.closest('.form-group');
+
+              if (formGroup) {
+                formGroup.classList.add('fl-rich-text');
+              }
+
+              // Save on instance for focus/blur handlers below
+              editor._fl_containerEl = containerEl;
+            }
+          } catch (e) {
+            // no-op
+          }
+
           if ($vm.isInterface) {
             // iFrames don't work with the form builder's Sortable feature
             // Instead, the iFrame is swapped with a <div></div> of the same dimensions
-            var $el = $($vm.$refs.ghost);
+            const $el = $($vm.$refs.ghost);
 
             $el.width(editor.iframeElement.style.width).height(editor.iframeElement.style.height);
             $(editor.iframeElement).replaceWith($el);
@@ -164,15 +195,33 @@ Fliplet.FormBuilder.field('wysiwyg', {
         editor.on('keydown', $vm.addBulletedListShortcutsMac);
 
         editor.on('focus', function() {
-          var $el = $(editor.iframeElement);
+          const $el = $(editor.iframeElement);
 
           $el.parent().parent().addClass('focus-outline');
+
+          // Focus the wrapper so .form-control:focus rules from Appearance apply
+          if (editor._fl_containerEl && editor._fl_containerEl.focus) {
+            editor._fl_containerEl.classList.add('focus');
+
+            // Ensure form-group retains the marker class even if Vue re-rendered
+            const formGroup = editor._fl_containerEl.closest && editor._fl_containerEl.closest('.form-group');
+
+            if (formGroup && !formGroup.classList.contains('fl-rich-text')) {
+              formGroup.classList.add('fl-rich-text');
+            }
+          }
         });
 
         editor.on('blur', function() {
-          var $el = $(editor.iframeElement);
+          const $el = $(editor.iframeElement);
 
           $el.parent().parent().removeClass('focus-outline');
+
+          // Remove focus from wrapper to clear :focus styles
+          if (editor._fl_containerEl && editor._fl_containerEl.blur) {
+            editor._fl_containerEl.classList.remove('focus');
+          }
+
           $vm.onBlur();
         });
 
@@ -202,17 +251,17 @@ Fliplet.FormBuilder.field('wysiwyg', {
         field: this,
         config: config
       }).then(function() {
-        var pluginPaths = ['plugins', 'mobile.plugins'];
+        const pluginPaths = ['plugins', 'mobile.plugins'];
 
-        _.forEach(pluginPaths, function(path) {
-          var plugins = _.get(config, path);
+        pluginPaths.forEach(function(path) {
+          let plugins = Fliplet.FormBuilderUtils.get(config, path);
 
           if (typeof plugins === 'string') {
             // Use array of plugins (as TinyMCE's preferred format) if string is provided
             plugins = plugins.split(' ');
           }
 
-          _.set(config, path, plugins);
+          Fliplet.FormBuilderUtils.set(config, path, plugins);
         });
 
         tinymce.init(config);

@@ -279,7 +279,7 @@ Fliplet.FormBuilder.field('address', {
       });
     },
     updateFieldOptions: function() {
-      var fields = this.$parent.fields;
+      const fields = this.$parent.fields;
 
       this.fieldOptions = fields.map(function(field) {
         if (field._type !== 'flButtons' && field._type !== 'flAddress') {
@@ -374,7 +374,7 @@ Fliplet.FormBuilder.field('address', {
     }
   },
   validations: function() {
-    var rules = {
+    const rules = {
       value: {}
     };
 

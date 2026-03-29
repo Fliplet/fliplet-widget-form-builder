@@ -33,7 +33,7 @@ Fliplet.FormBuilder.field('time', {
     };
   },
   validations: function() {
-    var rules = {
+    const rules = {
       value: {}
     };
 
@@ -55,7 +55,7 @@ Fliplet.FormBuilder.field('time', {
         return;
       }
 
-      var $vm = this;
+      const $vm = this;
 
       this.timePicker = Fliplet.UI.TimePicker(this.$refs.timePicker, {
         required: this.required || this.autofill === 'always',

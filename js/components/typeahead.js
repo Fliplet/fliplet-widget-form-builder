@@ -91,7 +91,7 @@ Fliplet.FormBuilder.field('typeahead', {
    * @returns {Object} Validation rules object
    */
   validations: function() {
-    var rules = {
+    const rules = {
       value: {}
     };
 
@@ -150,7 +150,7 @@ Fliplet.FormBuilder.field('typeahead', {
      * @returns {void}
      */
     initTypeahead: function() {
-      var $vm = this;
+      const $vm = this;
 
       if (this.typeahead && !this.$refs.typeahead) {
         return;
@@ -165,6 +165,35 @@ Fliplet.FormBuilder.field('typeahead', {
         order: this.optionsType === 'dataSource' ? 'asc' : null
       });
 
+      // Ensure elements receive classes so Field border settings apply.
+      //  - Add .form-group and .fl-typeahead to the selectize control wrapper
+      //  - Add .form-control to the inner text input inside .selectize-input
+      function annotateSelectizeDom() {
+        const host = $vm.$refs.typeahead;
+
+        if (!host || !host.querySelector) {
+          return false;
+        }
+
+        const control = document.querySelector('.selectize-control');
+        const input = document.querySelector('.selectize-input');
+
+
+        if (!control) {
+          return false;
+        }
+
+        control.classList.add('form-group', 'fl-typeahead');
+
+        if (input) {
+          input.classList.add('form-control');
+        }
+
+        return true;
+      }
+
+      annotateSelectizeDom();
+
       this.typeahead.change(function(value) {
         $vm.value = value;
         $vm.updateValue();
@@ -177,14 +206,23 @@ Fliplet.FormBuilder.field('typeahead', {
     /**
      * Handles locking/unlocking the typeahead based on maxItems limit
      * Prevents further selection when the limit is reached
+     * Readonly fields should always be locked regardless of maxItems
      * @returns {void}
      */
     handleMaxItemsLock: function() {
-      if (!this.typeahead || !this.maxItems) {
+      if (!this.typeahead) {
         return;
       }
 
-      if (this.reachedMaxItems) {
+      // Readonly fields should always be locked
+      if (this.readonly) {
+        this.typeahead.lock();
+
+        return;
+      }
+
+      // Lock if maxItems limit is reached
+      if (this.maxItems && this.reachedMaxItems) {
         this.typeahead.lock();
       } else {
         this.typeahead.unlock();
@@ -222,10 +260,28 @@ Fliplet.FormBuilder.field('typeahead', {
      */
     options: function(val) {
       if (this.typeahead) {
-        this.typeahead.options(val);
+        this.typeahead.options(val, this.value);
       }
 
       this.typeahead.set(this.value);
+    },
+    /**
+     * Watches for changes in the readonly prop
+     * Updates the typeahead instance's readonly state using lock/unlock methods
+     * @param {boolean} val - The new readonly value
+     * @returns {void}
+     */
+    readonly: function(val) {
+      if (!this.typeahead) {
+        return;
+      }
+
+      if (val) {
+        this.typeahead.lock();
+      } else {
+        // When unlocking, check if maxItems locking should still apply
+        this.handleMaxItemsLock();
+      }
     }
   }
 });

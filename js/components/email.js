@@ -14,7 +14,7 @@ Fliplet.FormBuilder.field('email', {
     }
   },
   validations: function() {
-    var rules = {
+    const rules = {
       value: {
         email: window.validators.email
       }

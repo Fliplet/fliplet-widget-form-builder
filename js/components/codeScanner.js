@@ -23,7 +23,7 @@ Fliplet.FormBuilder.field('codeScanner', {
     };
   },
   validations: function() {
-    var rules = {
+    const rules = {
       value: {}
     };
 
@@ -41,7 +41,7 @@ Fliplet.FormBuilder.field('codeScanner', {
   },
   methods: {
     openScanner: function() {
-      var $vm = this;
+      const $vm = this;
 
       if (this.readonly) {
         return;
@@ -60,8 +60,8 @@ Fliplet.FormBuilder.field('codeScanner', {
       this.errorMessage = null;
     },
     scannerInput: function(event) {
-      var el = event.target;
-      var maxRows = 5;
+      const el = event.target;
+      const maxRows = 5;
 
       el.rows = 1;
 
