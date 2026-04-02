@@ -128,7 +128,7 @@
       "fliplet-barcode",
       "font-awesome",
       "moment",
-      "tinymce",
+      { "name": "tinymce:5.7.0", "interact": false }
       "fliplet-session"
     ],
     "assets": [
