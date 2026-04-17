@@ -547,10 +547,6 @@ Fliplet.FormBuilder.field('wysiwyg', {
           setTimeout(updateIframeStyles, 0);
         });
 
-        /**
-         * Remove the fl-typing class if the editor content is empty,
-         * allowing the placeholder to reappear.
-         */
         const clearTypingIfEmpty = () => {
           try {
             const body = editor.getBody && editor.getBody();
