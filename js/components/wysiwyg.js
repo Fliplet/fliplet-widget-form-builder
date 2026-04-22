@@ -83,6 +83,41 @@ Fliplet.FormBuilder.field('wysiwyg', {
 
     this.tinymceId = Fliplet.FormBuilderUtils.kebabCase(this.name) + '-' + $(this.$refs.textarea).parents('[data-form-builder-id]').data('formBuilderId');
 
+    const warnedScopes = new Set();
+    const logWarn = (scope, err) => {
+      if (warnedScopes.has(scope)) return;
+
+      warnedScopes.add(scope);
+
+      // eslint-disable-next-line no-console
+      if (window.console && console.warn) console.warn('[fl-rt-style]', scope, err);
+    };
+
+    let probeEl = null;
+    const getProbe = () => {
+      if (probeEl && probeEl.isConnected) return probeEl;
+
+      probeEl = document.createElement('input');
+      probeEl.className = 'form-control';
+      probeEl.placeholder = 'x';
+      probeEl.setAttribute('aria-hidden', 'true');
+      probeEl.tabIndex = -1;
+      probeEl.style.cssText = 'position:absolute;visibility:hidden;height:0;padding:0;margin:0;pointer-events:none';
+
+      const host = (this.$el && this.$el.closest && this.$el.closest('.form-group')) || document.body;
+
+      host.appendChild(probeEl);
+
+      return probeEl;
+    };
+    const destroyProbe = () => {
+      if (probeEl && probeEl.parentNode) {
+        probeEl.parentNode.removeChild(probeEl);
+      }
+
+      probeEl = null;
+    };
+
     /**
      * Collect text input and placeholder styles from the host page so the editor
      * inside the TinyMCE iframe matches the app Appearance settings.
@@ -91,16 +126,7 @@ Fliplet.FormBuilder.field('wysiwyg', {
      */
     const collectEditorStyles = () => {
       try {
-        const probe = document.createElement('input');
-
-        probe.className = 'form-control';
-        probe.placeholder = 'x';
-        probe.style.cssText = 'position:absolute;visibility:hidden;height:0;padding:0;margin:0';
-
-        const formGroup = this.$el && this.$el.closest ? this.$el.closest('.form-group') : null;
-
-        (formGroup || document.body).appendChild(probe);
-
+        const probe = getProbe();
         const cs = getComputedStyle(probe);
         const csp = getComputedStyle(probe, '::placeholder') || {};
 
@@ -139,10 +165,10 @@ Fliplet.FormBuilder.field('wysiwyg', {
           textDecoration: pick(csp, 'textDecorationLine', (csp.textDecoration || text.textDecoration))
         };
 
-        probe.remove();
-
         return { text, placeholder };
       } catch (e) {
+        logWarn('collectEditorStyles', e);
+
         // Conservative, readable defaults
         return {
           text: {
@@ -171,49 +197,52 @@ Fliplet.FormBuilder.field('wysiwyg', {
       }
     };
 
-    // Build CSS to ensure TinyMCE body and placeholder inherit host input and placeholder styles
-    const { text: textStyles, placeholder: placeholderStyles } = collectEditorStyles();
+    /**
+     * Build the CSS string injected into the TinyMCE iframe from collected styles.
+     *
+     * @param {{ text: Object, placeholder: Object }} styles Style maps from collectEditorStyles()
+     * @param {boolean} includePlaceholder Whether to include placeholder CSS blocks
+     * @returns {string} The complete content_style CSS
+     */
+    const buildContentStyleCss = (styles, includePlaceholder) => {
+      const bodyCss = [
+        '.mce-content-body{',
+        'color:', styles.text.color, ' !important;',
+        'font-family:', styles.text.fontFamily, ' !important;',
+        'font-size:', styles.text.fontSize, ' !important;',
+        'font-weight:', styles.text.fontWeight, ' !important;',
+        'font-style:', styles.text.fontStyle, ' !important;',
+        'line-height:', styles.text.lineHeight, ' !important;',
+        'letter-spacing:', styles.text.letterSpacing, ' !important;',
+        'text-transform:', styles.text.textTransform, ' !important;',
+        'text-decoration:', styles.text.textDecoration, ' !important;',
+        '}'
+      ].join('');
+
+      if (!includePlaceholder) return bodyCss;
+
+      const placeholderCss = [
+        '.mce-content-body[data-mce-placeholder]:not(.mce-visualblocks)::before{',
+        'color:', styles.placeholder.color, ' !important;',
+        'font-family:', styles.placeholder.fontFamily, ' !important;',
+        'font-size:', styles.placeholder.fontSize, ' !important;',
+        'font-weight:', styles.placeholder.fontWeight, ' !important;',
+        'font-style:', styles.placeholder.fontStyle, ' !important;',
+        'line-height:', styles.placeholder.lineHeight, ' !important;',
+        'letter-spacing:', styles.placeholder.letterSpacing, ' !important;',
+        'text-transform:', styles.placeholder.textTransform, ' !important;',
+        'text-decoration:', styles.placeholder.textDecoration, ' !important;',
+        'opacity:1 !important;',
+        '}'
+      ].join('');
+
+      const typingHideCss = '.mce-content-body.fl-typing[data-mce-placeholder]::before{content:none !important;opacity:0 !important;}';
+
+      return bodyCss + placeholderCss + typingHideCss;
+    };
+
     const hasPlaceholder = typeof this.placeholder === 'string' && this.placeholder.trim().length > 0;
-
-    const bodyCss = [
-      '.mce-content-body{',
-      'color:', textStyles.color, ' !important;',
-      'font-family:', textStyles.fontFamily, ' !important;',
-      'font-size:', textStyles.fontSize, ' !important;',
-      'font-weight:', textStyles.fontWeight, ' !important;',
-      'font-style:', textStyles.fontStyle, ' !important;',
-      'line-height:', textStyles.lineHeight, ' !important;',
-      'letter-spacing:', textStyles.letterSpacing, ' !important;',
-      'text-transform:', textStyles.textTransform, ' !important;',
-      'text-decoration:', textStyles.textDecoration, ' !important;',
-      '}'
-    ].join('');
-
-    const placeholderCss = [
-      '.mce-content-body[data-mce-placeholder]:not(.mce-visualblocks)::before{',
-      'color:', placeholderStyles.color, ' !important;',
-      'font-family:', placeholderStyles.fontFamily, ' !important;',
-      'font-size:', placeholderStyles.fontSize, ' !important;',
-      'font-weight:', placeholderStyles.fontWeight, ' !important;',
-      'font-style:', placeholderStyles.fontStyle, ' !important;',
-      'line-height:', placeholderStyles.lineHeight, ' !important;',
-      'letter-spacing:', placeholderStyles.letterSpacing, ' !important;',
-      'text-transform:', placeholderStyles.textTransform, ' !important;',
-      'text-decoration:', placeholderStyles.textDecoration, ' !important;',
-      'opacity:1 !important;',
-      '}'
-    ].join('');
-
-    const typingHideCss = [
-      '.mce-content-body.fl-typing[data-mce-placeholder]::before{',
-      'content:none !important;',
-      'opacity:0 !important;',
-      '}'
-    ].join('');
-
-    const contentStyleCss = hasPlaceholder
-      ? (bodyCss + placeholderCss + typingHideCss)
-      : bodyCss;
+    const contentStyleCss = buildContentStyleCss(collectEditorStyles(), hasPlaceholder);
 
     const config = {
       target: this.$refs.textarea,
@@ -261,6 +290,9 @@ Fliplet.FormBuilder.field('wysiwyg', {
       setup: function(editor) {
         $vm.editor = editor;
 
+        let containerEl = null;
+        let styleWatch = null;
+
         /**
          * Inject or update a <style> tag inside the TinyMCE iframe to keep styles
          * in sync with the current Appearance settings without requiring reload.
@@ -273,47 +305,8 @@ Fliplet.FormBuilder.field('wysiwyg', {
 
             if (!d || !d.head) return;
 
-            const styles = collectEditorStyles();
-
-            const bodyCssLive = [
-              '.mce-content-body{',
-              'color:', styles.text.color, ' !important;',
-              'font-family:', styles.text.fontFamily, ' !important;',
-              'font-size:', styles.text.fontSize, ' !important;',
-              'font-weight:', styles.text.fontWeight, ' !important;',
-              'font-style:', styles.text.fontStyle, ' !important;',
-              'line-height:', styles.text.lineHeight, ' !important;',
-              'letter-spacing:', styles.text.letterSpacing, ' !important;',
-              'text-transform:', styles.text.textTransform, ' !important;',
-              'text-decoration:', styles.text.textDecoration, ' !important;',
-              '}'
-            ].join('');
-
-            const placeholderCssLive = [
-              '.mce-content-body[data-mce-placeholder]:not(.mce-visualblocks)::before{',
-              'color:', styles.placeholder.color, ' !important;',
-              'font-family:', styles.placeholder.fontFamily, ' !important;',
-              'font-size:', styles.placeholder.fontSize, ' !important;',
-              'font-weight:', styles.placeholder.fontWeight, ' !important;',
-              'font-style:', styles.placeholder.fontStyle, ' !important;',
-              'line-height:', styles.placeholder.lineHeight, ' !important;',
-              'letter-spacing:', styles.placeholder.letterSpacing, ' !important;',
-              'text-transform:', styles.placeholder.textTransform, ' !important;',
-              'text-decoration:', styles.placeholder.textDecoration, ' !important;',
-              'opacity:1 !important;',
-              '}'
-            ].join('');
-
-            const typingHideCssLive = [
-              '.mce-content-body.fl-typing[data-mce-placeholder]::before{',
-              'content:none !important;',
-              'opacity:0 !important;',
-              '}'
-            ].join('');
-
-            const css = ($vm.placeholder && String($vm.placeholder).trim().length > 0)
-              ? (bodyCssLive + placeholderCssLive + typingHideCssLive)
-              : bodyCssLive;
+            const hasPh = !!($vm.placeholder && String($vm.placeholder).trim().length > 0);
+            const css = buildContentStyleCss(collectEditorStyles(), hasPh);
             const id = 'fl-rt-style';
             let s = d.getElementById(id);
 
@@ -325,7 +318,7 @@ Fliplet.FormBuilder.field('wysiwyg', {
 
             s.textContent = css;
           } catch (e) {
-            // no-op
+            logWarn('updateIframeStyles', e);
           }
         };
 
@@ -372,55 +365,52 @@ Fliplet.FormBuilder.field('wysiwyg', {
           // Initial signature
           lastStyleSignature = computeStyleSignature();
 
+          let debounceId = null;
+          const scheduleDebounced = () => {
+            if (debounceId) clearTimeout(debounceId);
+            debounceId = setTimeout(maybeUpdateIframeStyles, 100);
+          };
+
           // Observe <head> for added/removed stylesheets
-          const headObserver = new MutationObserver(() => {
-            // Debounce to coalesce bursts
-            setTimeout(maybeUpdateIframeStyles, 0);
-          });
+          const headObserver = new MutationObserver(scheduleDebounced);
 
           try {
             headObserver.observe(document.head, { childList: true, subtree: true });
           } catch (e) {
-            // no-op
+            logWarn('headObserver.observe', e);
           }
 
-          // Observe the root for class/style changes that could affect Appearance
-          const rootObserver = new MutationObserver(() => {
-            setTimeout(maybeUpdateIframeStyles, 0);
-          });
+          // Observe the form root (not the whole document) for Appearance-affecting attribute changes
+          const rootTarget = ($vm.$el && $vm.$el.closest && $vm.$el.closest('form'))
+            || $vm.$el
+            || document.body;
+          const rootObserver = new MutationObserver(scheduleDebounced);
 
           try {
-            rootObserver.observe(document.documentElement, {
+            rootObserver.observe(rootTarget, {
               attributes: true,
-              attributeFilter: ['class', 'style'],
-              subtree: true,
-              childList: false
+              attributeFilter: ['class', 'style']
             });
           } catch (e) {
-            // no-op
+            logWarn('rootObserver.observe', e);
           }
 
-          // Short polling window to capture late async CSS loads
-          let attemptsLeft = 24; // ~6s @ 250ms
-          const intervalId = setInterval(() => {
-            maybeUpdateIframeStyles();
-            attemptsLeft -= 1;
-
-            if (attemptsLeft <= 0) {
-              clearInterval(intervalId);
-            }
-          }, 250);
-
           // Keep references for cleanup
-          editor._fl_styleWatch = {
+          styleWatch = {
             headObserver,
             rootObserver,
-            intervalId
+            timers: new Set(),
+            rafs: new Set()
           };
+
+          // Short backoff schedule to capture late async CSS loads (3 attempts)
+          [100, 500, 1500].forEach((delay) => {
+            trackTimeout(maybeUpdateIframeStyles, delay);
+          });
         };
 
         const stopLiveStyleWatch = () => {
-          const refs = editor._fl_styleWatch || {};
+          const refs = styleWatch || {};
 
           try {
             if (refs.headObserver && refs.headObserver.disconnect) refs.headObserver.disconnect();
@@ -434,13 +424,33 @@ Fliplet.FormBuilder.field('wysiwyg', {
             // no-op
           }
 
-          try {
-            if (refs.intervalId) clearInterval(refs.intervalId);
-          } catch (e) {
-            // no-op
+          if (refs.timers) {
+            refs.timers.forEach((id) => clearTimeout(id));
           }
 
-          editor._fl_styleWatch = null;
+          if (refs.rafs && window.cancelAnimationFrame) {
+            refs.rafs.forEach((id) => window.cancelAnimationFrame(id));
+          }
+
+          styleWatch = null;
+          destroyProbe();
+        };
+
+        /**
+         * Track a setTimeout so stopLiveStyleWatch can cancel it on teardown.
+         *
+         * @param {Function} fn Callback to run after the delay
+         * @param {number} delay Delay in milliseconds
+         * @returns {void}
+         */
+        const trackTimeout = (fn, delay) => {
+          const refs = styleWatch;
+          const id = setTimeout(() => {
+            if (refs && refs.timers) refs.timers.delete(id);
+            fn();
+          }, delay);
+
+          if (refs && refs.timers) refs.timers.add(id);
         };
 
         /**
@@ -452,12 +462,19 @@ Fliplet.FormBuilder.field('wysiwyg', {
         const scheduleStyleRefreshBurst = () => {
           updateIframeStyles();
 
+          const refs = styleWatch;
+
           if (window.requestAnimationFrame) {
-            requestAnimationFrame(updateIframeStyles);
+            const rafId = window.requestAnimationFrame(() => {
+              if (refs && refs.rafs) refs.rafs.delete(rafId);
+              updateIframeStyles();
+            });
+
+            if (refs && refs.rafs) refs.rafs.add(rafId);
           }
 
-          setTimeout(updateIframeStyles, 50);
-          setTimeout(updateIframeStyles, 300);
+          trackTimeout(updateIframeStyles, 50);
+          trackTimeout(updateIframeStyles, 300);
         };
 
         editor.on('click', function() {
@@ -484,13 +501,13 @@ Fliplet.FormBuilder.field('wysiwyg', {
             editor.setContent($vm.value, { format: 'raw' });
           }
 
-          // Sync styles on init
-          scheduleStyleRefreshBurst();
+          // Sync styles on init (startLiveStyleWatch first so the burst timers can be tracked)
           startLiveStyleWatch();
+          scheduleStyleRefreshBurst();
 
           // Ensure elements receive classes so Field border settings apply
           try {
-            const containerEl = editor.editorContainer
+            containerEl = editor.editorContainer
               || (editor.iframeElement && editor.iframeElement.parentElement && editor.iframeElement.parentElement.parentElement)
               || null;
 
@@ -511,9 +528,6 @@ Fliplet.FormBuilder.field('wysiwyg', {
               if (formGroup) {
                 formGroup.classList.add('fl-rich-text');
               }
-
-              // Save on instance for focus/blur handlers below
-              editor._fl_containerEl = containerEl;
             }
           } catch (e) {
             // no-op
@@ -544,25 +558,15 @@ Fliplet.FormBuilder.field('wysiwyg', {
           }
 
           // Styles may change due to theme toggles; refresh shortly after keystrokes
-          setTimeout(updateIframeStyles, 0);
+          trackTimeout(updateIframeStyles, 0);
         });
 
         const clearTypingIfEmpty = () => {
           try {
             const body = editor.getBody && editor.getBody();
 
-            if (body) {
-              const rawHtml = editor.getContent({ format: 'raw' }) || '';
-              const textOnly = (editor.getContent({ format: 'text' }) || '').replace(/\u00a0/g, ' ').trim();
-              const htmlWithoutEmptyParas = rawHtml
-                .replace(/<p>(?:\s|&nbsp;|<br\s*\/?>)*<\/p>/gi, '')
-                .replace(/<br\s*\/?>/gi, '')
-                .replace(/&nbsp;/gi, '')
-                .trim();
-
-              if (textOnly.length === 0 && htmlWithoutEmptyParas.length === 0) {
-                body.classList.remove('fl-typing');
-              }
+            if (body && editor.dom && editor.dom.isEmpty(body)) {
+              body.classList.remove('fl-typing');
             }
           } catch (err) {
             // no-op
@@ -579,16 +583,19 @@ Fliplet.FormBuilder.field('wysiwyg', {
           $el.parent().parent().addClass('focus-outline');
 
           // Focus the wrapper so .form-control:focus rules from Appearance apply
-          if (editor._fl_containerEl && editor._fl_containerEl.focus) {
-            editor._fl_containerEl.classList.add('focus');
+          if (containerEl && containerEl.focus) {
+            containerEl.classList.add('focus');
 
             // Ensure form-group retains the marker class even if Vue re-rendered
-            const formGroup = editor._fl_containerEl.closest && editor._fl_containerEl.closest('.form-group');
+            const formGroup = containerEl.closest && containerEl.closest('.form-group');
 
             if (formGroup && !formGroup.classList.contains('fl-rich-text')) {
               formGroup.classList.add('fl-rich-text');
             }
           }
+
+          // Refresh styles on focus (e.g., after returning from preview)
+          updateIframeStyles();
         });
 
         editor.on('blur', function() {
@@ -597,8 +604,8 @@ Fliplet.FormBuilder.field('wysiwyg', {
           $el.parent().parent().removeClass('focus-outline');
 
           // Remove focus from wrapper to clear :focus styles
-          if (editor._fl_containerEl && editor._fl_containerEl.blur) {
-            editor._fl_containerEl.classList.remove('focus');
+          if (containerEl && containerEl.blur) {
+            containerEl.classList.remove('focus');
           }
 
           $vm.onBlur();
@@ -626,11 +633,6 @@ Fliplet.FormBuilder.field('wysiwyg', {
           $vm.value = editor.getContent();
 
           $vm.updateValue();
-          updateIframeStyles();
-        });
-
-        // Refresh styles when editor gains focus (e.g., after returning from preview)
-        editor.on('focus', function() {
           updateIframeStyles();
         });
 
