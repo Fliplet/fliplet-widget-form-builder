@@ -175,7 +175,7 @@ async function getCurrentMultiStepForm(allFormsInSlide, currentForm) {
       if (field._type === 'flButtons' && field.showSubmit !== false && currenFormDsId === formDsId) { hasFlButton = true; break; }
     }
 
-    if (!hasFlButton && currenFormDsId.id === formDsId.id) {
+    if (!hasFlButton && currenFormDsId === formDsId) {
       currentMultiStepForm.push(form);
     } else if (isCurrentForm && hasFlButton) {
       if (currentMultiStepForm.length && currentMultiStepForm[currentMultiStepForm.length - 1].dataSourceId !== currenFormDsId) {
