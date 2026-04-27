@@ -165,6 +165,8 @@ async function getCurrentMultiStepForm(allFormsInSlide, currentForm) {
 
     if (currentForm.id === form.id) isCurrentForm = true;
 
+    if (!currenFormDsId || !formDsId) continue;
+
     if (currenFormDsId !== formDsId) continue;
 
     let hasFlButton = false;
