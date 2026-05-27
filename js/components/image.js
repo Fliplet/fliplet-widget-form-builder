@@ -311,23 +311,20 @@ Fliplet.FormBuilder.field('image', {
         return;
       }
 
-      let getPicture;
-
+      // Re-entry from imageInput.click() in the PHOTOLIBRARY branch below — the
+      // native HTML file picker is about to open and onFileChange will deliver
+      // the result. Calling getPicture() here opens a second, orphan Cordova
+      // picker (no .then handler), which stacks on Android and leaks into the
+      // next tap on iOS (PS-1978).
       if (this.forcedClick) {
         this.forcedClick = false;
-
-        try {
-          getPicture = $vm.getPicture();
-        } catch (error) {
-          console.error('Failed to get picture', error);
-        }
 
         return;
       }
 
       event.preventDefault();
 
-      getPicture = this.requestPicture(this.$refs.imageInput).then(function onRequestedPicture() {
+      const getPicture = this.requestPicture(this.$refs.imageInput).then(function onRequestedPicture() {
         if ($vm.cameraSource === Camera.PictureSourceType.PHOTOLIBRARY) {
           $vm.forcedClick = true;
 
