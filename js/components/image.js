@@ -311,35 +311,34 @@ Fliplet.FormBuilder.field('image', {
         return;
       }
 
-      // Re-entry from imageInput.click() in the PHOTOLIBRARY branch below — the
-      // native HTML file picker is about to open and onFileChange will deliver
-      // the result. Calling getPicture() here opens a second, orphan Cordova
-      // picker (no .then handler), which stacks on Android and leaks into the
-      // next tap on iOS (PS-1978).
-      if (this.forcedClick) {
-        this.forcedClick = false;
-
-        return;
-      }
-
       event.preventDefault();
 
-      const getPicture = this.requestPicture(this.$refs.imageInput).then(function onRequestedPicture() {
-        if ($vm.cameraSource === Camera.PictureSourceType.PHOTOLIBRARY) {
-          $vm.forcedClick = true;
+      let getPicture;
 
-          // Use native element click so the OS file picker opens reliably
-          if ($vm.$refs.imageInput && typeof $vm.$refs.imageInput.click === 'function') {
-            $vm.$refs.imageInput.click();
-          } else {
+      // Re-entry from the jQuery trigger('click') in the PHOTOLIBRARY branch
+      // below. jQuery's trigger fires the JS click event without opening the
+      // browser's native file picker, so this branch is responsible for opening
+      // the Cordova picker and its result must flow through onSelectedPicture
+      // below — do NOT early-return here (PS-1978).
+      if (this.forcedClick) {
+        this.forcedClick = false;
+        getPicture = $vm.getPicture();
+      } else {
+        getPicture = this.requestPicture(this.$refs.imageInput).then(function onRequestedPicture() {
+          if ($vm.cameraSource === Camera.PictureSourceType.PHOTOLIBRARY) {
+            $vm.forcedClick = true;
+
+            // jQuery trigger — re-enters onFileClick without opening the
+            // browser's native file picker (which is unreliable from this
+            // async context in Android WebView).
             $($vm.$refs.imageInput).trigger('click');
+
+            return Promise.reject('Switch to HTML file input to select files');
           }
 
-          return Promise.reject('Switch to HTML file input to select files');
-        }
-
-        return $vm.getPicture();
-      });
+          return $vm.getPicture();
+        });
+      }
 
       this.validateValue();
 
