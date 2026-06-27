@@ -161,6 +161,7 @@ Fliplet.FormBuilder.field('typeahead', {
         value: this.value,
         options: this.options,
         freeInput: this.freeInput,
+        // Explicitly pass placeholder then immediately force-set it to avoid cross-instance leakage
         placeholder: this.placeholder,
         order: this.optionsType === 'dataSource' ? 'asc' : null
       });
@@ -194,6 +195,9 @@ Fliplet.FormBuilder.field('typeahead', {
 
       annotateSelectizeDom();
 
+      // Force placeholder on underlying DOM element (library may clone previous instance when some are hidden)
+      this.ensurePlaceholder();
+
       this.typeahead.change(function(value) {
         $vm.value = value;
         $vm.updateValue();
@@ -202,6 +206,26 @@ Fliplet.FormBuilder.field('typeahead', {
 
       // Check if initial value already reaches maxItems limit
       this.handleMaxItemsLock();
+    },
+    /**
+     * Ensures the DOM <select> placeholder matches this instance's prop
+     * @returns {void}
+     */
+    ensurePlaceholder: function() {
+      if (!this.$refs.typeahead) {
+        return;
+      }
+
+      const $el = this.$refs.typeahead.querySelector('select');
+
+      if ($el) {
+        $el.setAttribute('placeholder', this.placeholder || '');
+      }
+
+      // Some versions expose internal input element
+      if (this.typeahead && this.typeahead.input) {
+        this.typeahead.input.setAttribute('placeholder', this.placeholder || '');
+      }
     },
     /**
      * Handles locking/unlocking the typeahead based on maxItems limit
@@ -282,6 +306,13 @@ Fliplet.FormBuilder.field('typeahead', {
         // When unlocking, check if maxItems locking should still apply
         this.handleMaxItemsLock();
       }
+    },
+    /**
+     * React to placeholder changes or reactivity side-effects (e.g. hiding fields) by force applying correct placeholder.
+     * @returns {void}
+     */
+    placeholder: function() {
+      this.$nextTick(this.ensurePlaceholder);
     }
   }
 });
