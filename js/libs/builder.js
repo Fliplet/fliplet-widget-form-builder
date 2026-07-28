@@ -1114,14 +1114,15 @@ Fliplet().then(function() {
             isCurrentForm = true;
           }
 
-          if (currentFormDsId !== formDsId) {
+          // a form with no data source is not part of a data-source-backed multi-step form
+          if (!currentFormDsId || currentFormDsId !== formDsId) {
             return false;
           }
 
           let hasFlButton = false;
 
           form.fields.slice().reverse().some(function(field) {
-            if (field._type === 'flButtons' && field.showSubmit !== false && currentFormDsId === formDsId) {
+            if (field._type === 'flButtons' && field.showSubmit !== false) {
               hasFlButton = true;
 
               return true; // break the loop
@@ -1130,7 +1131,7 @@ Fliplet().then(function() {
             return false;
           });
 
-          if (!hasFlButton && currentFormDsId.id === formDsId.id) {
+          if (!hasFlButton) {
             currentMultiStepForm.push(form);
           } else if (isCurrentForm && hasFlButton) {
             if (currentMultiStepForm.length && currentMultiStepForm[currentMultiStepForm.length - 1].dataSourceId !== currentFormDsId) {
