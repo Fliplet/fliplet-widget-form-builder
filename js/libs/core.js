@@ -1159,17 +1159,18 @@ Fliplet.FormBuilder = (function() {
 
           if (currentForm.id === form.id) isCurrentForm = true;
 
-          if (currentFormDsId !== formDsId) continue;
+          // a form with no data source is not part of a data-source-backed multi-step form
+          if (!currentFormDsId || currentFormDsId !== formDsId) continue;
 
           let hasFlButton = false;
 
           for (let i = form.fields.length - 1; i >= 0; i--) {
             const field = form.fields[i];
 
-            if (field._type === 'flButtons' && field.showSubmit && currentFormDsId === formDsId) { hasFlButton = true; break; }
+            if (field._type === 'flButtons' && field.showSubmit) { hasFlButton = true; break; }
           }
 
-          if (!hasFlButton && currentFormDsId.id === formDsId.id) {
+          if (!hasFlButton) {
             currentMultiStepForm.push(form);
           } else if (isCurrentForm && hasFlButton) {
             if (currentMultiStepForm.length && currentMultiStepForm[currentMultiStepForm.length - 1].dataSourceId !== currentFormDsId) {

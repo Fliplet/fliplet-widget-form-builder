@@ -165,17 +165,18 @@ async function getCurrentMultiStepForm(allFormsInSlide, currentForm) {
 
     if (currentForm.id === form.id) isCurrentForm = true;
 
-    if (currenFormDsId !== formDsId) continue;
+    // a form with no data source is not part of a data-source-backed multi-step form
+    if (!currenFormDsId || currenFormDsId !== formDsId) continue;
 
     let hasFlButton = false;
 
     for (let i = form.fields.length - 1; i >= 0; i--) {
       const field = form.fields[i];
 
-      if (field._type === 'flButtons' && field.showSubmit !== false && currenFormDsId === formDsId) { hasFlButton = true; break; }
+      if (field._type === 'flButtons' && field.showSubmit !== false) { hasFlButton = true; break; }
     }
 
-    if (!hasFlButton && currenFormDsId.id === formDsId.id) {
+    if (!hasFlButton) {
       currentMultiStepForm.push(form);
     } else if (isCurrentForm && hasFlButton) {
       if (currentMultiStepForm.length && currentMultiStepForm[currentMultiStepForm.length - 1].dataSourceId !== currenFormDsId) {
