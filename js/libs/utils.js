@@ -559,6 +559,66 @@ function isTotalSizeExceeded(files) {
 }
 
 /**
+ * Approximate the number of bytes a single form value contributes to the
+ * multipart request.
+ *
+ * Files and blobs report their size. Base64 data URIs — what the signature
+ * field and the image field's legacy path submit — are ASCII, so one character
+ * is one byte on the wire. Everything else is a short text field and rounds to
+ * nothing next to a 500 MB video.
+ *
+ * @param {*} value - a value from the assembled formData
+ *
+ * @return {Number} approximate size in bytes
+ */
+function payloadValueSize(value) {
+  if (!value) {
+    return 0;
+  }
+
+  if (Array.isArray(value)) {
+    return value.reduce(function(sum, item) {
+      return sum + payloadValueSize(item);
+    }, 0);
+  }
+
+  if (typeof value.size === 'number') {
+    return value.size;
+  }
+
+  if (typeof value === 'string') {
+    return value.length;
+  }
+
+  return 0;
+}
+
+/**
+ * Checks whether an assembled form payload is too large to send in one request.
+ *
+ * The per-field checks in the file and image components cannot catch this on
+ * their own: a form with a file field and an image field can put two separately
+ * valid selections into the same request, and the API's checkRequestBodySize
+ * measures the whole multipart envelope. This runs once over the final payload,
+ * after beforeFormSubmit, so signatures and every file field are included.
+ *
+ * @param {Object} formData - the payload about to be sent to the data source
+ *
+ * @return {Boolean} true when the payload exceeds MAX_TOTAL_SIZE
+ */
+function isPayloadSizeExceeded(formData) {
+  if (!formData || typeof formData !== 'object') {
+    return false;
+  }
+
+  const total = Object.keys(formData).reduce(function(sum, key) {
+    return sum + payloadValueSize(formData[key]);
+  }, 0);
+
+  return total > MAX_TOTAL_SIZE;
+}
+
+/**
  * Human-readable form of MAX_FILE_SIZE, for use in error messages.
  *
  * @return {String} e.g. "500 MB"
@@ -581,6 +641,7 @@ Fliplet.FormBuilderUtils = {
   MAX_TOTAL_SIZE,
   isFileSizeExceeded,
   isTotalSizeExceeded,
+  isPayloadSizeExceeded,
   maxFileSizeLabel,
   maxTotalSizeLabel,
   cloneDeep,
@@ -613,6 +674,7 @@ if (typeof window !== 'undefined') {
     MAX_TOTAL_SIZE,
     isFileSizeExceeded,
     isTotalSizeExceeded,
+    isPayloadSizeExceeded,
     maxFileSizeLabel,
     maxTotalSizeLabel,
     cloneDeep,
