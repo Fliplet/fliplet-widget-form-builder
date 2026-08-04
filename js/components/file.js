@@ -47,11 +47,15 @@ Fliplet.FormBuilder.field('file', {
     },
     description: {
       type: String
-    },
-    isFileSizeExceeded: {
-      type: Boolean,
-      default: false
     }
+  },
+  // Transient UI state, deliberately NOT a prop: props are owned by the saved
+  // field configuration, so the parent re-render triggered by the `_input` emit
+  // in updateValue() would reset the flag before the message could render.
+  data: function() {
+    return {
+      isFileSizeExceeded: false
+    };
   },
   computed: {
     maxFileSizeLabel: function() {

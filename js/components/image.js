@@ -52,10 +52,6 @@ Fliplet.FormBuilder.field('image', {
       type: Boolean,
       default: false
     },
-    isFileSizeExceeded: {
-      type: Boolean,
-      default: false
-    },
     canHide: {
       type: Boolean,
       default: false
@@ -68,10 +64,18 @@ Fliplet.FormBuilder.field('image', {
       default: false
     }
   },
-  data: {
-    boundingRect: undefined,
-    cameraSource: undefined,
-    forcedClick: false
+  // `data` must be a function: Vue.component() shares a plain object across every
+  // instance of the field, so two image fields on one form would overwrite each
+  // other's state. isFileSizeExceeded is transient UI state and deliberately not a
+  // prop - props are owned by the saved field configuration, so the parent
+  // re-render triggered by onFileChange() would reset it before it could render.
+  data: function() {
+    return {
+      boundingRect: undefined,
+      cameraSource: undefined,
+      forcedClick: false,
+      isFileSizeExceeded: false
+    };
   },
   computed: {
     maxFileSizeLabel: function() {
