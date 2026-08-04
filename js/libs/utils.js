@@ -503,7 +503,40 @@ function extend(target, ...sources) {
   return target;
 }
 
+/**
+ * Maximum size of a single file that can be attached to a form field, in bytes.
+ *
+ * MUST stay in sync with MAX_FILE_SIZE in fliplet-api routes/v1/data-sources.js
+ * (itself sourced from V3's MAX_BINARY_FILE_SIZE). A client limit lower than the
+ * server's rejects files the server would happily accept; a higher one puts the
+ * user back where PS-2112 started — waiting out a long upload only to be refused.
+ */
+const MAX_FILE_SIZE = 500 * 1024 * 1024;
+
+/**
+ * Checks whether a selected file exceeds the maximum upload size.
+ *
+ * @param {File} file - the file selected by the user
+ *
+ * @return {Boolean} true when the file is larger than MAX_FILE_SIZE
+ */
+function isFileSizeExceeded(file) {
+  return !!file && typeof file.size === 'number' && file.size > MAX_FILE_SIZE;
+}
+
+/**
+ * Human-readable form of MAX_FILE_SIZE, for use in error messages.
+ *
+ * @return {String} e.g. "500 MB"
+ */
+function maxFileSizeLabel() {
+  return Math.floor(MAX_FILE_SIZE / 1024 / 1024) + ' MB';
+}
+
 Fliplet.FormBuilderUtils = {
+  MAX_FILE_SIZE,
+  isFileSizeExceeded,
+  maxFileSizeLabel,
   cloneDeep,
   debounce,
   kebabCase,
@@ -530,6 +563,9 @@ Fliplet.FormBuilderUtils = {
 // Make utilities available globally for browser usage
 if (typeof window !== 'undefined') {
   window.FlipletUtils = {
+    MAX_FILE_SIZE,
+    isFileSizeExceeded,
+    maxFileSizeLabel,
     cloneDeep,
     debounce,
     kebabCase,

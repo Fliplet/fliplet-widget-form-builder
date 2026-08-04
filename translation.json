@@ -155,7 +155,8 @@
         "unableToLoadEntry": "Unable to load entry",
         "offlineDataError": "The data can only be updated when connected to the internet.",
         "offlineFormError": "This form can only be submitted when connected to the internet.",
-        "locationError": "Address processing failed. Check your connection and try again."
+        "locationError": "Address processing failed. Check your connection and try again.",
+        "fileSizeExceeded": "One or more files are too large and were not attached. Each file must be {{maxFileSize}} or smaller."
       }
     }
   }

@@ -47,9 +47,16 @@ Fliplet.FormBuilder.field('file', {
     },
     description: {
       type: String
+    },
+    isFileSizeExceeded: {
+      type: Boolean,
+      default: false
     }
   },
   computed: {
+    maxFileSizeLabel: function() {
+      return window.FlipletUtils.maxFileSizeLabel();
+    },
     selectedFileName: function() {
       return this.value.map(function(file) { return file.name; }).join(', ');
     },
@@ -213,8 +220,19 @@ Fliplet.FormBuilder.field('file', {
 
       this.validateValue();
 
+      $vm.isFileSizeExceeded = false;
+
       for (let i = 0; i < files.length; i++) {
         const file = files.item(i);
+
+        // Reject oversized files here rather than letting the upload run for
+        // minutes and fail server-side (PS-2112). The threshold mirrors the API's
+        // MAX_FILE_SIZE so nothing is refused locally that the server would accept.
+        if (window.FlipletUtils.isFileSizeExceeded(file)) {
+          $vm.isFileSizeExceeded = true;
+
+          continue;
+        }
 
         if ($vm.isFileImage(file)) {
           this.processImage(file, true);

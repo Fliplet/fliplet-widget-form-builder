@@ -52,6 +52,10 @@ Fliplet.FormBuilder.field('image', {
       type: Boolean,
       default: false
     },
+    isFileSizeExceeded: {
+      type: Boolean,
+      default: false
+    },
     canHide: {
       type: Boolean,
       default: false
@@ -68,6 +72,11 @@ Fliplet.FormBuilder.field('image', {
     boundingRect: undefined,
     cameraSource: undefined,
     forcedClick: false
+  },
+  computed: {
+    maxFileSizeLabel: function() {
+      return window.FlipletUtils.maxFileSizeLabel();
+    }
   },
   validations: function() {
     const rules = {
@@ -419,8 +428,20 @@ Fliplet.FormBuilder.field('image', {
     onFileChange: function(e) {
       const files = this.$refs.imageInput.files;
 
+      this.isFileSizeExceeded = false;
+
       for (let i = 0; i < files.length; i++) {
-        this.processImage(files.item(i), true);
+        const file = files.item(i);
+
+        // Reject oversized files before processImage reads them into memory and
+        // before any upload is attempted (PS-2112). Mirrors the API's MAX_FILE_SIZE.
+        if (window.FlipletUtils.isFileSizeExceeded(file)) {
+          this.isFileSizeExceeded = true;
+
+          continue;
+        }
+
+        this.processImage(file, true);
       }
 
       e.target.value = '';
