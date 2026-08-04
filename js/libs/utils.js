@@ -525,6 +525,40 @@ function isFileSizeExceeded(file) {
 }
 
 /**
+ * Maximum size of a whole upload, in bytes.
+ *
+ * MUST stay in sync with MAX_REQUEST_BODY_SIZE in fliplet-api
+ * routes/v1/data-sources.js. The API's checkRequestBodySize guard measures the
+ * entire multipart envelope, not any single part, so passing the per-file check
+ * on every file is not enough: three 200 MB files are each valid and the
+ * submission is still refused. Checking the total here means the user is told
+ * before the upload starts rather than after it has run for minutes — which is
+ * the whole point of PS-2112.
+ */
+const MAX_TOTAL_SIZE = MAX_FILE_SIZE + (10 * 1024 * 1024);
+
+/**
+ * Checks whether the combined size of the given files exceeds the maximum a
+ * single request can carry.
+ *
+ * @param {Array} files - files selected by the user. Entries without a numeric
+ *                        size (base64 strings, already-uploaded URLs) count as 0.
+ *
+ * @return {Boolean} true when the files together are larger than MAX_TOTAL_SIZE
+ */
+function isTotalSizeExceeded(files) {
+  if (!Array.isArray(files) || !files.length) {
+    return false;
+  }
+
+  const total = files.reduce(function(sum, file) {
+    return sum + (file && typeof file.size === 'number' ? file.size : 0);
+  }, 0);
+
+  return total > MAX_TOTAL_SIZE;
+}
+
+/**
  * Human-readable form of MAX_FILE_SIZE, for use in error messages.
  *
  * @return {String} e.g. "500 MB"
@@ -533,10 +567,22 @@ function maxFileSizeLabel() {
   return Math.floor(MAX_FILE_SIZE / 1024 / 1024) + ' MB';
 }
 
+/**
+ * Human-readable form of MAX_TOTAL_SIZE, for use in error messages.
+ *
+ * @return {String} e.g. "510 MB"
+ */
+function maxTotalSizeLabel() {
+  return Math.floor(MAX_TOTAL_SIZE / 1024 / 1024) + ' MB';
+}
+
 Fliplet.FormBuilderUtils = {
   MAX_FILE_SIZE,
+  MAX_TOTAL_SIZE,
   isFileSizeExceeded,
+  isTotalSizeExceeded,
   maxFileSizeLabel,
+  maxTotalSizeLabel,
   cloneDeep,
   debounce,
   kebabCase,
@@ -564,8 +610,11 @@ Fliplet.FormBuilderUtils = {
 if (typeof window !== 'undefined') {
   window.FlipletUtils = {
     MAX_FILE_SIZE,
+    MAX_TOTAL_SIZE,
     isFileSizeExceeded,
+    isTotalSizeExceeded,
     maxFileSizeLabel,
+    maxTotalSizeLabel,
     cloneDeep,
     debounce,
     kebabCase,

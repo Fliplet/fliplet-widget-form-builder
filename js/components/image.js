@@ -74,12 +74,20 @@ Fliplet.FormBuilder.field('image', {
       boundingRect: undefined,
       cameraSource: undefined,
       forcedClick: false,
-      isFileSizeExceeded: false
+      isFileSizeExceeded: false,
+      isTotalSizeExceeded: false,
+      oversizedFileNames: []
     };
   },
   computed: {
     maxFileSizeLabel: function() {
-      return window.FlipletUtils.maxFileSizeLabel();
+      return Fliplet.FormBuilderUtils.maxFileSizeLabel();
+    },
+    maxTotalSizeLabel: function() {
+      return Fliplet.FormBuilderUtils.maxTotalSizeLabel();
+    },
+    oversizedFileList: function() {
+      return this.oversizedFileNames.join(', ');
     }
   },
   validations: function() {
@@ -396,6 +404,22 @@ Fliplet.FormBuilder.field('image', {
 
               blob.name = name || 'image-' + Date.now() + '.jpg';
 
+              // Same gate as onFileChange (PS-2112). A camera capture is unlikely
+              // to breach it, but a gallery pick resolved through this path can,
+              // and an ungated route is how limits quietly stop applying.
+              if (Fliplet.FormBuilderUtils.isFileSizeExceeded(blob)) {
+                $vm.isFileSizeExceeded = true;
+                $vm.oversizedFileNames.push(blob.name);
+
+                return;
+              }
+
+              if (Fliplet.FormBuilderUtils.isTotalSizeExceeded($vm.value.concat([blob]))) {
+                $vm.isTotalSizeExceeded = true;
+
+                return;
+              }
+
               // Use existing pipeline
               $vm.processImage(blob, true);
             })
@@ -432,21 +456,41 @@ Fliplet.FormBuilder.field('image', {
     onFileChange: function(e) {
       const files = this.$refs.imageInput.files;
 
+      const $vm = this;
+
       this.isFileSizeExceeded = false;
+      this.isTotalSizeExceeded = false;
+      this.oversizedFileNames = [];
+
+      const accepted = [];
 
       for (let i = 0; i < files.length; i++) {
         const file = files.item(i);
 
         // Reject oversized files before processImage reads them into memory and
         // before any upload is attempted (PS-2112). Mirrors the API's MAX_FILE_SIZE.
-        if (window.FlipletUtils.isFileSizeExceeded(file)) {
+        if (Fliplet.FormBuilderUtils.isFileSizeExceeded(file)) {
           this.isFileSizeExceeded = true;
+          this.oversizedFileNames.push(file.name);
 
           continue;
         }
 
-        this.processImage(file, true);
+        accepted.push(file);
       }
+
+      // Individually-valid files can still overflow the request: the API's
+      // checkRequestBodySize measures the whole multipart envelope (PS-2112).
+      if (Fliplet.FormBuilderUtils.isTotalSizeExceeded(this.value.concat(accepted))) {
+        this.isTotalSizeExceeded = true;
+        e.target.value = '';
+
+        return;
+      }
+
+      accepted.forEach(function(file) {
+        $vm.processImage(file, true);
+      });
 
       e.target.value = '';
     },

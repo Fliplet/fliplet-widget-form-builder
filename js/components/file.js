@@ -54,12 +54,20 @@ Fliplet.FormBuilder.field('file', {
   // in updateValue() would reset the flag before the message could render.
   data: function() {
     return {
-      isFileSizeExceeded: false
+      isFileSizeExceeded: false,
+      isTotalSizeExceeded: false,
+      oversizedFileNames: []
     };
   },
   computed: {
     maxFileSizeLabel: function() {
-      return window.FlipletUtils.maxFileSizeLabel();
+      return Fliplet.FormBuilderUtils.maxFileSizeLabel();
+    },
+    maxTotalSizeLabel: function() {
+      return Fliplet.FormBuilderUtils.maxTotalSizeLabel();
+    },
+    oversizedFileList: function() {
+      return this.oversizedFileNames.join(', ');
     },
     selectedFileName: function() {
       return this.value.map(function(file) { return file.name; }).join(', ');
@@ -208,6 +216,12 @@ Fliplet.FormBuilder.field('file', {
       // this is used to trigger onChange event even if user deletes and than uploads same file
       this.$refs.fileInput.value = null;
 
+      // Clearing the field clears the size warnings with it — leaving them up
+      // after the offending file is gone is the same confusion PS-2112 is about
+      $vm.isFileSizeExceeded = false;
+      $vm.isTotalSizeExceeded = false;
+      $vm.oversizedFileNames = [];
+
       $vm.value.splice(index, 1);
 
       $vm.value.forEach(function(file) {
@@ -225,6 +239,10 @@ Fliplet.FormBuilder.field('file', {
       this.validateValue();
 
       $vm.isFileSizeExceeded = false;
+      $vm.isTotalSizeExceeded = false;
+      $vm.oversizedFileNames = [];
+
+      const accepted = [];
 
       for (let i = 0; i < files.length; i++) {
         const file = files.item(i);
@@ -232,18 +250,34 @@ Fliplet.FormBuilder.field('file', {
         // Reject oversized files here rather than letting the upload run for
         // minutes and fail server-side (PS-2112). The threshold mirrors the API's
         // MAX_FILE_SIZE so nothing is refused locally that the server would accept.
-        if (window.FlipletUtils.isFileSizeExceeded(file)) {
+        if (Fliplet.FormBuilderUtils.isFileSizeExceeded(file)) {
           $vm.isFileSizeExceeded = true;
+          $vm.oversizedFileNames.push(file.name);
 
           continue;
         }
 
+        accepted.push(file);
+      }
+
+      // Each file can be under MAX_FILE_SIZE and the submission still be refused:
+      // the API's checkRequestBodySize measures the whole multipart envelope.
+      // Check the total against what is already attached plus what was just
+      // selected, so the user finds out now rather than after the upload.
+      if (Fliplet.FormBuilderUtils.isTotalSizeExceeded($vm.value.concat(accepted))) {
+        $vm.isTotalSizeExceeded = true;
+        e.target.value = '';
+
+        return;
+      }
+
+      accepted.forEach(function(file) {
         if ($vm.isFileImage(file)) {
-          this.processImage(file, true);
+          $vm.processImage(file, true);
         } else {
           $vm.value.push(file);
         }
-      }
+      });
 
       $vm.$emit('_input', $vm.name, $vm.value);
       e.target.value = '';
