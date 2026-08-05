@@ -303,6 +303,30 @@ Fliplet.FormBuilder.field('image', {
           ? file.name.replace(/\.[^/.]+$/, '') + '.' + blobExtension
           : 'image-' + Date.now() + '.' + blobExtension;
 
+        // Size gate lives here, not at the call sites, because this blob is what
+        // actually goes on the wire (PS-2112). The selected file is resized to
+        // maxWidth/maxHeight and re-encoded to WebP above, so gating on the raw
+        // File refused a 600 MB photo that uploads as a ~1 MB WebP the server
+        // accepts without complaint — while the size that IS uploaded went
+        // unchecked. Every entry point (onFileChange, the Cordova URI path,
+        // onSelectedPicture) funnels through here, so one check covers them all.
+        if (Fliplet.FormBuilderUtils.isFileSizeExceeded(blob)) {
+          $vm.isFileSizeExceeded = true;
+          $vm.oversizedFileNames.push(blob.name);
+
+          return;
+        }
+
+        // Individually-valid images can still overflow the request: the API's
+        // checkRequestBodySize measures the whole multipart envelope. $vm.value
+        // holds previously-processed blobs plus already-uploaded URLs, and only
+        // the blobs are counted (see fileByteSize in js/libs/utils.js).
+        if (Fliplet.FormBuilderUtils.isTotalSizeExceeded($vm.value.concat([blob]))) {
+          $vm.isTotalSizeExceeded = true;
+
+          return;
+        }
+
         // Add the blob to the component's value
         $vm.value.push(blob);
 
@@ -404,21 +428,13 @@ Fliplet.FormBuilder.field('image', {
 
               blob.name = name || 'image-' + Date.now() + '.jpg';
 
-              // Same gate as onFileChange (PS-2112). A camera capture is unlikely
-              // to breach it, but a gallery pick resolved through this path can,
-              // and an ungated route is how limits quietly stop applying.
-              if (Fliplet.FormBuilderUtils.isFileSizeExceeded(blob)) {
-                $vm.isFileSizeExceeded = true;
-                $vm.oversizedFileNames.push(blob.name);
-
-                return;
-              }
-
-              if (Fliplet.FormBuilderUtils.isTotalSizeExceeded($vm.value.concat([blob]))) {
-                $vm.isTotalSizeExceeded = true;
-
-                return;
-              }
+              // Clear any previous warning, then let processImage gate this on the
+              // compressed blob (PS-2112) — a gallery pick can be far larger than
+              // what it uploads as, so checking the raw capture here would refuse
+              // images the server would accept.
+              $vm.isFileSizeExceeded = false;
+              $vm.isTotalSizeExceeded = false;
+              $vm.oversizedFileNames = [];
 
               // Use existing pipeline
               $vm.processImage(blob, true);
@@ -462,35 +478,14 @@ Fliplet.FormBuilder.field('image', {
       this.isTotalSizeExceeded = false;
       this.oversizedFileNames = [];
 
-      const accepted = [];
-
+      // Deliberately no size check on the raw selection (PS-2112). processImage
+      // resizes to maxWidth/maxHeight and re-encodes to WebP, so the selected
+      // file's size says nothing about what gets uploaded — a 600 MB photo can
+      // land as a ~1 MB WebP. The gate lives in processImage, on the blob that
+      // is actually sent.
       for (let i = 0; i < files.length; i++) {
-        const file = files.item(i);
-
-        // Reject oversized files before processImage reads them into memory and
-        // before any upload is attempted (PS-2112). Mirrors the API's MAX_FILE_SIZE.
-        if (Fliplet.FormBuilderUtils.isFileSizeExceeded(file)) {
-          this.isFileSizeExceeded = true;
-          this.oversizedFileNames.push(file.name);
-
-          continue;
-        }
-
-        accepted.push(file);
+        $vm.processImage(files.item(i), true);
       }
-
-      // Individually-valid files can still overflow the request: the API's
-      // checkRequestBodySize measures the whole multipart envelope (PS-2112).
-      if (Fliplet.FormBuilderUtils.isTotalSizeExceeded(this.value.concat(accepted))) {
-        this.isTotalSizeExceeded = true;
-        e.target.value = '';
-
-        return;
-      }
-
-      accepted.forEach(function(file) {
-        $vm.processImage(file, true);
-      });
 
       e.target.value = '';
     },

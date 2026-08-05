@@ -527,22 +527,47 @@ function isFileSizeExceeded(file) {
 /**
  * Maximum size of a whole upload, in bytes.
  *
- * MUST stay in sync with MAX_REQUEST_BODY_SIZE in fliplet-api
- * routes/v1/data-sources.js. The API's checkRequestBodySize guard measures the
- * entire multipart envelope, not any single part, so passing the per-file check
- * on every file is not enough: three 200 MB files are each valid and the
- * submission is still refused. Checking the total here means the user is told
- * before the upload starts rather than after it has run for minutes — which is
- * the whole point of PS-2112.
+ * Deliberately STRICTER than the API's MAX_REQUEST_BODY_SIZE
+ * (routes/v1/data-sources.js), not equal to it. The API compares its limit
+ * against content-length, which carries multipart boundaries, per-part headers,
+ * every sibling text field, and 4/3 expansion for base64-submitted fields. This
+ * limit is compared against a raw sum of file bytes. Setting the two to the same
+ * number would make the client the LOOSER gate: a payload just under the client
+ * threshold arrives just over the server's, which is exactly the "find out after
+ * uploading" symptom PS-2112 exists to remove.
+ *
+ * Sitting at MAX_FILE_SIZE leaves the API's +10 MB headroom as the margin that
+ * absorbs the envelope overhead, so anything this check passes is guaranteed to
+ * fit. The per-file check alone is not enough — three 200 MB files are each
+ * valid and the submission is still refused.
  */
-const MAX_TOTAL_SIZE = MAX_FILE_SIZE + (10 * 1024 * 1024);
+const MAX_TOTAL_SIZE = MAX_FILE_SIZE;
+
+/**
+ * Bytes a value contributes to the multipart body.
+ *
+ * Only File/Blob instances are sent as bytes. Already-uploaded attachments are
+ * media-file objects that loadFileData() decorates with `size` from
+ * `metadata.size` (js/components/file.js) — they are re-sent as URLs/IDs and
+ * contribute essentially nothing to content-length, so counting their `size`
+ * would refuse uploads the server would happily accept. File extends Blob, so
+ * one check covers both.
+ *
+ * @param {*} file - a value from a field's `value` array
+ *
+ * @return {Number} bytes this value puts on the wire
+ */
+function fileByteSize(file) {
+  return file instanceof Blob && typeof file.size === 'number' ? file.size : 0;
+}
 
 /**
  * Checks whether the combined size of the given files exceeds the maximum a
  * single request can carry.
  *
- * @param {Array} files - files selected by the user. Entries without a numeric
- *                        size (base64 strings, already-uploaded URLs) count as 0.
+ * @param {Array} files - files selected by the user. Entries that are not
+ *                        File/Blob (base64 strings, already-uploaded media
+ *                        objects) count as 0 — see fileByteSize.
  *
  * @return {Boolean} true when the files together are larger than MAX_TOTAL_SIZE
  */
@@ -552,7 +577,7 @@ function isTotalSizeExceeded(files) {
   }
 
   const total = files.reduce(function(sum, file) {
-    return sum + (file && typeof file.size === 'number' ? file.size : 0);
+    return sum + fileByteSize(file);
   }, 0);
 
   return total > MAX_TOTAL_SIZE;
@@ -566,6 +591,13 @@ function isTotalSizeExceeded(files) {
  * field and the image field's legacy path submit — are ASCII, so one character
  * is one byte on the wire. Everything else is a short text field and rounds to
  * nothing next to a 500 MB video.
+ *
+ * Anything with a numeric `size` that is NOT a Blob is deliberately counted as
+ * zero. In edit mode js/libs/form.js assigns `formData[field.name] = field.value`
+ * verbatim, and for a file field that value is the array of already-uploaded
+ * media objects loadFileData() stamped with `size` from `metadata.size`. Those
+ * are re-sent as references, not bytes — counting them would refuse an entry
+ * whose request carries no file bytes at all.
  *
  * @param {*} value - a value from the assembled formData
  *
@@ -582,8 +614,8 @@ function payloadValueSize(value) {
     }, 0);
   }
 
-  if (typeof value.size === 'number') {
-    return value.size;
+  if (value instanceof Blob) {
+    return typeof value.size === 'number' ? value.size : 0;
   }
 
   if (typeof value === 'string') {

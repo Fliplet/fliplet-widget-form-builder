@@ -250,6 +250,12 @@ Fliplet.FormBuilder.field('file', {
         // Reject oversized files here rather than letting the upload run for
         // minutes and fail server-side (PS-2112). The threshold mirrors the API's
         // MAX_FILE_SIZE so nothing is refused locally that the server would accept.
+        //
+        // Checking the raw File is correct on this field, unlike the image field.
+        // This component's processImage() (line 192) runs loadImage purely for its
+        // orientation/canvas side effects and then pushes the ORIGINAL `file` — it
+        // does not compress or re-encode. image.js's same-named method does, which
+        // is why its gate had to move onto the resulting blob instead.
         if (Fliplet.FormBuilderUtils.isFileSizeExceeded(file)) {
           $vm.isFileSizeExceeded = true;
           $vm.oversizedFileNames.push(file.name);
