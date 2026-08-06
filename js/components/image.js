@@ -3,6 +3,56 @@
 const MAX_IMAGE_WIDTH = 3000;
 const MAX_IMAGE_HEIGHT = 3000;
 
+// Marks that an image decode is in flight, so a decode that takes the renderer
+// down with it can be reported on the next load.
+//
+// A WebView OOM during canvas decode is not catchable: the process dies, so no
+// catch block, rejection handler or window.onerror runs. Nothing in-page can
+// observe it. What survives is storage — so the fact that a decode started is
+// written before the decode, and removed as soon as one finishes by any route,
+// success or failure. A flag still present at mount means the last one never
+// returned.
+//
+// sessionStorage rather than localStorage: this should not outlive the session
+// and report a crash from days ago. Wrapped because storage can throw (private
+// mode, quota), and a failure here must never break image upload — the
+// breadcrumb is diagnostic, not load-bearing.
+const DECODE_BREADCRUMB_KEY = 'flFormBuilderImageDecodeInFlight';
+
+function markDecodeStarted(file) {
+  try {
+    window.sessionStorage.setItem(DECODE_BREADCRUMB_KEY, (file && file.name) || 'image');
+  } catch (err) {
+    // Storage unavailable — proceed without the breadcrumb.
+  }
+}
+
+function markDecodeFinished() {
+  try {
+    window.sessionStorage.removeItem(DECODE_BREADCRUMB_KEY);
+  } catch (err) {
+    // As above.
+  }
+}
+
+/**
+ * Reads and clears the breadcrumb.
+ * @returns {String|null} the file name a previous decode died on, if any
+ */
+function takeUnfinishedDecode() {
+  try {
+    const name = window.sessionStorage.getItem(DECODE_BREADCRUMB_KEY);
+
+    if (name) {
+      window.sessionStorage.removeItem(DECODE_BREADCRUMB_KEY);
+    }
+
+    return name;
+  } catch (err) {
+    return null;
+  }
+}
+
 /**
  * Image field component – renders an image capture and upload input in forms.
  * Supports camera capture, file upload.
@@ -48,10 +98,6 @@ Fliplet.FormBuilder.field('image', {
       type: Array,
       default: []
     },
-    hasCorruptedImage: {
-      type: Boolean,
-      default: false
-    },
     canHide: {
       type: Boolean,
       default: false
@@ -76,7 +122,12 @@ Fliplet.FormBuilder.field('image', {
       forcedClick: false,
       isFileSizeExceeded: false,
       isTotalSizeExceeded: false,
-      oversizedFileNames: []
+      oversizedFileNames: [],
+      // Was a prop, which made it inert: the component set it, emitted _input,
+      // and the parent re-render reset it from saved config before Vue could
+      // paint — the same defect a0c6c65 fixed for isFileSizeExceeded. Nothing
+      // outside this component binds it, so the template is unchanged.
+      hasCorruptedImage: false
     };
   },
   computed: {
@@ -106,6 +157,19 @@ Fliplet.FormBuilder.field('image', {
     Fliplet.Hooks.on('beforeFormSubmit', this.onBeforeSubmit);
   },
   mounted: function() {
+    // A decode was in flight when the page last stopped running, so it never
+    // returned — almost certainly the renderer being killed part-way through
+    // one. The user's photo is not attached and, without this, nothing would
+    // ever say so: they would come back to a form that had simply forgotten
+    // their selection.
+    const unfinished = takeUnfinishedDecode();
+
+    if (unfinished) {
+      this.hasCorruptedImage = true;
+      /* eslint-disable-next-line no-console */
+      console.warn('Image decode did not complete for "' + unfinished + '" — the renderer likely ran out of memory');
+    }
+
     // Normalize the value to ensure it's always an array
     this.validateValue();
     this.drawImagesAfterInit();
@@ -260,27 +324,21 @@ Fliplet.FormBuilder.field('image', {
         // Validate current value before adding new images
         this.validateValue();
 
-        // Decode guard, on the RAW file, before loadImage touches it.
+        // Breadcrumb for a decode that kills the renderer.
         //
-        // The size gate further down runs on the compressed blob, which is what
-        // actually gets uploaded — but by the time it runs, loadImage has
-        // already decoded the source into a canvas. Without this, the failure
-        // mode for a huge source is a WebView OOM with no message, which is a
-        // worse outcome for the same user than the inline error they used to
-        // get before the gate moved.
+        // The size gate runs on the compressed blob (that is what gets
+        // uploaded), so the raw source is decoded to canvas before anything
+        // checks it. Canvas backing store is width x height x 4, so a modest
+        // file with huge dimensions can exhaust the WebView — and no size check
+        // on the file would predict it. That failure is not catchable in
+        // process: the renderer dies, so no catch block, promise rejection or
+        // error handler runs.
         //
-        // Reuses the MAX_FILE_SIZE ceiling, so the existing message stays
-        // accurate and no new string or precompiled template is needed. It is a
-        // heuristic, not a bound: canvas memory is width x height x 4, so a
-        // modest file with huge dimensions still gets through. Refusing a
-        // >500 MB source that would have compressed small is the narrow cost of
-        // not crashing on the ones that would not.
-        if (Fliplet.FormBuilderUtils.isFileSizeExceeded(file)) {
-          $vm.isFileSizeExceeded = true;
-          $vm.oversizedFileNames.push(file.name);
-
-          return;
-        }
+        // What is possible is noticing afterwards. This records that a decode
+        // was in flight; it is cleared the moment one finishes, by any route.
+        // If the flag is still set at mount, the previous decode never returned
+        // and the user is told, instead of silently getting their photo back.
+        markDecodeStarted(file);
 
         // Parse EXIF metadata (orientation, etc.)
         await new Promise((resolve) => loadImage.parseMetaData(file, resolve));
@@ -366,7 +424,16 @@ Fliplet.FormBuilder.field('image', {
         // Emit the updated value for parent component
         $vm.$emit('_input', $vm.name, $vm.value);
       } catch (err) {
+        // Catchable decode failures land here: a corrupt file, a canvas the
+        // browser refused to allocate, a toBlob that threw. An OOM that kills
+        // the renderer does not — that is what the breadcrumb is for.
         $vm.hasCorruptedImage = true;
+      } finally {
+        // Every exit above happens after the decode returned, so the decode did
+        // not kill us. Clearing here rather than at each return keeps the
+        // breadcrumb honest: it is removed on success, on early return and on
+        // throw, and survives only when this code never ran at all.
+        markDecodeFinished();
       }
     },
     onFileClick: function(event) {
