@@ -260,6 +260,28 @@ Fliplet.FormBuilder.field('image', {
         // Validate current value before adding new images
         this.validateValue();
 
+        // Decode guard, on the RAW file, before loadImage touches it.
+        //
+        // The size gate further down runs on the compressed blob, which is what
+        // actually gets uploaded — but by the time it runs, loadImage has
+        // already decoded the source into a canvas. Without this, the failure
+        // mode for a huge source is a WebView OOM with no message, which is a
+        // worse outcome for the same user than the inline error they used to
+        // get before the gate moved.
+        //
+        // Reuses the MAX_FILE_SIZE ceiling, so the existing message stays
+        // accurate and no new string or precompiled template is needed. It is a
+        // heuristic, not a bound: canvas memory is width x height x 4, so a
+        // modest file with huge dimensions still gets through. Refusing a
+        // >500 MB source that would have compressed small is the narrow cost of
+        // not crashing on the ones that would not.
+        if (Fliplet.FormBuilderUtils.isFileSizeExceeded(file)) {
+          $vm.isFileSizeExceeded = true;
+          $vm.oversizedFileNames.push(file.name);
+
+          return;
+        }
+
         // Parse EXIF metadata (orientation, etc.)
         await new Promise((resolve) => loadImage.parseMetaData(file, resolve));
 
@@ -478,11 +500,12 @@ Fliplet.FormBuilder.field('image', {
       this.isTotalSizeExceeded = false;
       this.oversizedFileNames = [];
 
-      // Deliberately no size check on the raw selection (PS-2112). processImage
-      // resizes to maxWidth/maxHeight and re-encodes to WebP, so the selected
-      // file's size says nothing about what gets uploaded — a 600 MB photo can
-      // land as a ~1 MB WebP. The gate lives in processImage, on the blob that
-      // is actually sent.
+      // No size check here: both gates live in processImage, which every entry
+      // point funnels through. It checks the raw file before decoding it (so a
+      // huge source cannot OOM the WebView) and the compressed blob afterwards
+      // (because that is what is actually uploaded — a 600 MB photo can land as
+      // a ~1 MB WebP, and gating only the selection refused images the server
+      // would have accepted).
       for (let i = 0; i < files.length; i++) {
         $vm.processImage(files.item(i), true);
       }
