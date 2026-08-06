@@ -544,30 +544,16 @@ function isFileSizeExceeded(file) {
 const MAX_TOTAL_SIZE = MAX_FILE_SIZE;
 
 /**
- * Bytes a value contributes to the multipart body.
- *
- * Only File/Blob instances are sent as bytes. Already-uploaded attachments are
- * media-file objects that loadFileData() decorates with `size` from
- * `metadata.size` (js/components/file.js) — they are re-sent as URLs/IDs and
- * contribute essentially nothing to content-length, so counting their `size`
- * would refuse uploads the server would happily accept. File extends Blob, so
- * one check covers both.
- *
- * @param {*} file - a value from a field's `value` array
- *
- * @return {Number} bytes this value puts on the wire
- */
-function fileByteSize(file) {
-  return file instanceof Blob && typeof file.size === 'number' ? file.size : 0;
-}
-
-/**
  * Checks whether the combined size of the given files exceeds the maximum a
  * single request can carry.
  *
- * @param {Array} files - files selected by the user. Entries that are not
- *                        File/Blob (base64 strings, already-uploaded media
- *                        objects) count as 0 — see fileByteSize.
+ * Sizes each entry with payloadValueSize, the same function the submit-time
+ * check uses. The two counted base64 differently before — this check saw a data
+ * URI as 0 bytes and the submit check saw its full length — so a form with a
+ * signature plus large files passed here and was then refused at submit with a
+ * different message, which is exactly what a field-level check exists to avoid.
+ *
+ * @param {Array} files - files selected by the user
  *
  * @return {Boolean} true when the files together are larger than MAX_TOTAL_SIZE
  */
@@ -577,7 +563,7 @@ function isTotalSizeExceeded(files) {
   }
 
   const total = files.reduce(function(sum, file) {
-    return sum + fileByteSize(file);
+    return sum + payloadValueSize(file);
   }, 0);
 
   return total > MAX_TOTAL_SIZE;
@@ -587,10 +573,12 @@ function isTotalSizeExceeded(files) {
  * Approximate the number of bytes a single form value contributes to the
  * multipart request.
  *
- * Files and blobs report their size. Base64 data URIs — what the signature
- * field and the image field's legacy path submit — are ASCII, so one character
- * is one byte on the wire. Everything else is a short text field and rounds to
- * nothing next to a 500 MB video.
+ * Files and blobs report their size. Strings are counted as one byte per
+ * character, which is exact for the case that matters — base64 data URIs, what
+ * the signature field and the image field's legacy path submit — and an
+ * undercount for non-ASCII text, since `length` is UTF-16 code units rather
+ * than the UTF-8 bytes that go on the wire. Text fields round to nothing next
+ * to a 500 MB video, so the difference cannot move this check.
  *
  * Anything with a numeric `size` that is NOT a Blob is deliberately counted as
  * zero. In edit mode js/libs/form.js assigns `formData[field.name] = field.value`
