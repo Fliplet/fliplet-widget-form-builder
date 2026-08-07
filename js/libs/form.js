@@ -1836,6 +1836,18 @@ Fliplet().then(async function() {
             formPromise.then(function(form) {
               return Fliplet.Hooks.run('beforeFormSubmit', formData, form);
             }).then(async function() {
+              // Whole-payload size gate (PS-2112). The per-field checks in the
+              // file and image components cannot see each other, so a form with
+              // one of each can assemble two separately valid selections into a
+              // single request that the API's checkRequestBodySize refuses on
+              // the envelope. Runs after beforeFormSubmit so signature base64
+              // and every file field are already in formData.
+              if (Fliplet.FormBuilderUtils.isPayloadSizeExceeded(formData)) {
+                return Promise.reject(new Error(T('widgets.form.errors.totalSizeExceeded', {
+                  maxTotalSize: Fliplet.FormBuilderUtils.maxTotalSizeLabel()
+                })));
+              }
+
               await validateSingleSubmission(formData, $vm);
 
               if (data.isFormInSlide) {
