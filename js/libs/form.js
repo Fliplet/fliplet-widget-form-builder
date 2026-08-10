@@ -263,11 +263,21 @@ Fliplet().then(async function() {
     // changes behaviour only for the ids that were previously thrown away. Those
     // now reach loadEntryForUpdate() and surface as "This entry has not been
     // found" — recoverable, and honest. Temp ids are resolved below.
+    //
+    // The exception to "keep what parseInt cannot read": these are what a link
+    // action stringifies when its data binding resolved to nothing, and
+    // ?dataSourceEntryId=undefined is a common shape in Fliplet-built apps.
+    // They mean "no id", not "an id I could not parse", so they keep the old
+    // fall-through to a create form rather than surfacing a "not found" error.
+    const NON_IDS = ['undefined', 'null', 'NaN', ''];
+
     if (entryId) {
       const parsedEntryId = parseInt(entryId, 10);
 
       if (!isNaN(parsedEntryId)) {
         entryId = parsedEntryId;
+      } else if (NON_IDS.indexOf(String(entryId).trim()) > -1) {
+        entryId = undefined;
       }
     }
 
@@ -300,9 +310,13 @@ Fliplet().then(async function() {
             entryId = realId;
           }
         })
-        .catch(function() {
+        .catch(function(err) {
           // Leave entryId alone — loadEntryForUpdate reports it as not found,
           // which is the honest outcome and still better than a blank form.
+          // Warned rather than swallowed: "not found" and "could not resolve"
+          // look identical to the user, and this is the only way to tell them
+          // apart from a device console.
+          console.warn('Could not resolve temp entry ID ' + entryId, err);
         });
     }
 
@@ -1921,7 +1935,19 @@ Fliplet().then(async function() {
                 }
               });
 
-              if (entryId && entry && data.dataSourceId) {
+              // An unresolved temp id means the optimistic insert has not synced,
+              // so there is no server row to update. dataSource.update has no
+              // temp-id handling and no queueing — it would issue a live PUT to
+              // /data/temp_<ts>_<rand>, which fails on the offline device this
+              // only happens on, and the edit would be lost. Falling through to
+              // the queued insert below keeps the data.
+              //
+              // The cost is a duplicate row once both writes sync. That is the
+              // behaviour that shipped before the entry-id parse changed, so it
+              // is not a regression — but it is worth removing: PS-2112 follow-up
+              // covers teaching update to enqueue and resolve the temp id at
+              // drain time, which is the fix that avoids the duplicate.
+              if (entryId && !isTempEntryId(entryId) && entry && data.dataSourceId) {
                 return connection.update(entryId, formData, {
                   offline: false,
                   ack: data.linkAction && data.redirect,
@@ -2068,7 +2094,15 @@ Fliplet().then(async function() {
               let record = results[0];
 
               if (!record) {
+                // Returns rather than falling through: the omitBy() below reads
+                // record.data and throws a TypeError on undefined, which the
+                // .catch() then overwrites this message with. The user would see
+                // the parse of that TypeError instead of "not found".
                 $vm.error = 'This entry has not been found';
+                $vm.isLoading = false;
+                $vm.$forceUpdate();
+
+                return;
               }
 
               if (typeof record === 'object' && typeof record.data === 'undefined') {
