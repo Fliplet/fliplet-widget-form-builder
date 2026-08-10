@@ -250,8 +250,60 @@ Fliplet().then(async function() {
       formReady = resolve;
     });
 
+    // PS-2112 QA defect 2: this used to be `parseInt(entryId, 10) || undefined`,
+    // so an id parseInt could not read became undefined — and because
+    // loadEntryForUpdate() is gated on `if (entryId || fn)`, the form then loaded
+    // nothing and silently rendered as an empty CREATE form. No error, no "not
+    // found", just a blank form where the user expected their entry. On native
+    // that is what an offline entry hits: an optimistic write is keyed by a
+    // temp_<ts>_<rand> id (fliplet-datasources/1.0/datasources.js), and any
+    // screen rendered before the queue drained links to it by that id.
+    //
+    // Anything parseInt CAN read is still coerced exactly as before, so this
+    // changes behaviour only for the ids that were previously thrown away. Those
+    // now reach loadEntryForUpdate() and surface as "This entry has not been
+    // found" — recoverable, and honest. Temp ids are resolved below.
     if (entryId) {
-      entryId = parseInt(entryId, 10) || undefined;
+      const parsedEntryId = parseInt(entryId, 10);
+
+      if (!isNaN(parsedEntryId)) {
+        entryId = parsedEntryId;
+      }
+    }
+
+    function isTempEntryId(id) {
+      return typeof id === 'string' && id.indexOf('temp_') === 0;
+    }
+
+    /**
+     * Swaps a temp_ id for the entry it synced to.
+     *
+     * Feature-detected: an app running an older fliplet-datasources asset has no
+     * _resolveTempId, and must behave exactly as it did before rather than throw.
+     *
+     * @return {Promise} resolves once entryId is whatever we can best make of it
+     */
+    function resolveTempEntryId() {
+      if (!isTempEntryId(entryId)
+        || !Fliplet.DataSources
+        || typeof Fliplet.DataSources._resolveTempId !== 'function') {
+        return Promise.resolve();
+      }
+
+      // Promise.resolve wraps the call rather than trusting it: a version that
+      // returned a non-promise would otherwise throw synchronously out of
+      // loadEntryForUpdate, past every caller's catch — the same class of silent
+      // failure this fix exists to remove.
+      return Promise.resolve(Fliplet.DataSources._resolveTempId(data.dataSourceId, entryId))
+        .then(function(realId) {
+          if (realId) {
+            entryId = realId;
+          }
+        })
+        .catch(function() {
+          // Leave entryId alone — loadEntryForUpdate reports it as not found,
+          // which is the honest outcome and still better than a blank form.
+        });
     }
 
     function getProgress(progressKey) {
@@ -1995,17 +2047,24 @@ Fliplet().then(async function() {
           if (entryId || fn) {
             $vm.isLoading = true;
 
-            let loadEntry = typeof fn === 'function'
-              ? fn(entryId)
-              : Fliplet.DataSources.connect(data.dataSourceId, { offline: false }).then(function(ds) {
-                return ds.findById(entryId);
-              });
+            return resolveTempEntryId().then(function() {
+              // An entry that is still queued exists only in the offline store,
+              // so the usual { offline: false } would guarantee a miss. Every
+              // other id keeps the server-only connection it has always used.
+              const connectOptions = isTempEntryId(entryId) ? {} : { offline: false };
 
-            if (loadEntry instanceof Promise === false) {
-              loadEntry = Promise.resolve(loadEntry);
-            }
+              let loadEntry = typeof fn === 'function'
+                ? fn(entryId)
+                : Fliplet.DataSources.connect(data.dataSourceId, connectOptions).then(function(ds) {
+                  return ds.findById(entryId);
+                });
 
-            return Promise.all([loadEntry].concat(Object.values(dataSourceColumnPromises))).then(function(results) {
+              if (loadEntry instanceof Promise === false) {
+                loadEntry = Promise.resolve(loadEntry);
+              }
+
+              return Promise.all([loadEntry].concat(Object.values(dataSourceColumnPromises)));
+            }).then(function(results) {
               let record = results[0];
 
               if (!record) {
