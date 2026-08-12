@@ -250,8 +250,74 @@ Fliplet().then(async function() {
       formReady = resolve;
     });
 
+    // PS-2112 QA defect 2: this used to be `parseInt(entryId, 10) || undefined`,
+    // so an id parseInt could not read became undefined — and because
+    // loadEntryForUpdate() is gated on `if (entryId || fn)`, the form then loaded
+    // nothing and silently rendered as an empty CREATE form. No error, no "not
+    // found", just a blank form where the user expected their entry. On native
+    // that is what an offline entry hits: an optimistic write is keyed by a
+    // temp_<ts>_<rand> id (fliplet-datasources/1.0/datasources.js), and any
+    // screen rendered before the queue drained links to it by that id.
+    //
+    // Anything parseInt CAN read is still coerced exactly as before, so this
+    // changes behaviour only for the ids that were previously thrown away. Those
+    // now reach loadEntryForUpdate() and surface as "This entry has not been
+    // found" — recoverable, and honest. Temp ids are resolved below.
+    //
+    // The exception to "keep what parseInt cannot read": these are what a link
+    // action stringifies when its data binding resolved to nothing, and
+    // ?dataSourceEntryId=undefined is a common shape in Fliplet-built apps.
+    // They mean "no id", not "an id I could not parse", so they keep the old
+    // fall-through to a create form rather than surfacing a "not found" error.
+    const NON_IDS = ['undefined', 'null', 'NaN', ''];
+
     if (entryId) {
-      entryId = parseInt(entryId, 10) || undefined;
+      const parsedEntryId = parseInt(entryId, 10);
+
+      if (!isNaN(parsedEntryId)) {
+        entryId = parsedEntryId;
+      } else if (NON_IDS.indexOf(String(entryId).trim()) > -1) {
+        entryId = undefined;
+      }
+    }
+
+    function isTempEntryId(id) {
+      return typeof id === 'string' && id.indexOf('temp_') === 0;
+    }
+
+    /**
+     * Swaps a temp_ id for the entry it synced to.
+     *
+     * Feature-detected: an app running an older fliplet-datasources asset has no
+     * _resolveTempId, and must behave exactly as it did before rather than throw.
+     *
+     * @return {Promise} resolves once entryId is whatever we can best make of it
+     */
+    function resolveTempEntryId() {
+      if (!isTempEntryId(entryId)
+        || !Fliplet.DataSources
+        || typeof Fliplet.DataSources._resolveTempId !== 'function') {
+        return Promise.resolve();
+      }
+
+      // Promise.resolve wraps the call rather than trusting it: a version that
+      // returned a non-promise would otherwise throw synchronously out of
+      // loadEntryForUpdate, past every caller's catch — the same class of silent
+      // failure this fix exists to remove.
+      return Promise.resolve(Fliplet.DataSources._resolveTempId(data.dataSourceId, entryId))
+        .then(function(realId) {
+          if (realId) {
+            entryId = realId;
+          }
+        })
+        .catch(function(err) {
+          // Leave entryId alone — loadEntryForUpdate reports it as not found,
+          // which is the honest outcome and still better than a blank form.
+          // Warned rather than swallowed: "not found" and "could not resolve"
+          // look identical to the user, and this is the only way to tell them
+          // apart from a device console.
+          console.warn('Could not resolve temp entry ID ' + entryId, err);
+        });
     }
 
     function getProgress(progressKey) {
@@ -1869,7 +1935,19 @@ Fliplet().then(async function() {
                 }
               });
 
-              if (entryId && entry && data.dataSourceId) {
+              // An unresolved temp id means the optimistic insert has not synced,
+              // so there is no server row to update. dataSource.update has no
+              // temp-id handling and no queueing — it would issue a live PUT to
+              // /data/temp_<ts>_<rand>, which fails on the offline device this
+              // only happens on, and the edit would be lost. Falling through to
+              // the queued insert below keeps the data.
+              //
+              // The cost is a duplicate row once both writes sync. That is the
+              // behaviour that shipped before the entry-id parse changed, so it
+              // is not a regression — but it is worth removing: PS-2112 follow-up
+              // covers teaching update to enqueue and resolve the temp id at
+              // drain time, which is the fix that avoids the duplicate.
+              if (entryId && !isTempEntryId(entryId) && entry && data.dataSourceId) {
                 return connection.update(entryId, formData, {
                   offline: false,
                   ack: data.linkAction && data.redirect,
@@ -1995,21 +2073,36 @@ Fliplet().then(async function() {
           if (entryId || fn) {
             $vm.isLoading = true;
 
-            let loadEntry = typeof fn === 'function'
-              ? fn(entryId)
-              : Fliplet.DataSources.connect(data.dataSourceId, { offline: false }).then(function(ds) {
-                return ds.findById(entryId);
-              });
+            return resolveTempEntryId().then(function() {
+              // An entry that is still queued exists only in the offline store,
+              // so the usual { offline: false } would guarantee a miss. Every
+              // other id keeps the server-only connection it has always used.
+              const connectOptions = isTempEntryId(entryId) ? {} : { offline: false };
 
-            if (loadEntry instanceof Promise === false) {
-              loadEntry = Promise.resolve(loadEntry);
-            }
+              let loadEntry = typeof fn === 'function'
+                ? fn(entryId)
+                : Fliplet.DataSources.connect(data.dataSourceId, connectOptions).then(function(ds) {
+                  return ds.findById(entryId);
+                });
 
-            return Promise.all([loadEntry].concat(Object.values(dataSourceColumnPromises))).then(function(results) {
+              if (loadEntry instanceof Promise === false) {
+                loadEntry = Promise.resolve(loadEntry);
+              }
+
+              return Promise.all([loadEntry].concat(Object.values(dataSourceColumnPromises)));
+            }).then(function(results) {
               let record = results[0];
 
               if (!record) {
+                // Returns rather than falling through: the omitBy() below reads
+                // record.data and throws a TypeError on undefined, which the
+                // .catch() then overwrites this message with. The user would see
+                // the parse of that TypeError instead of "not found".
                 $vm.error = 'This entry has not been found';
+                $vm.isLoading = false;
+                $vm.$forceUpdate();
+
+                return;
               }
 
               if (typeof record === 'object' && typeof record.data === 'undefined') {
