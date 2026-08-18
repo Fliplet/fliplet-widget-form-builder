@@ -503,7 +503,167 @@ function extend(target, ...sources) {
   return target;
 }
 
+/**
+ * Maximum size of a single file that can be attached to a form field, in bytes.
+ *
+ * MUST stay in sync with MAX_FILE_SIZE in fliplet-api routes/v1/data-sources.js
+ * (itself sourced from V3's MAX_BINARY_FILE_SIZE). A client limit lower than the
+ * server's rejects files the server would happily accept; a higher one puts the
+ * user back where PS-2112 started — waiting out a long upload only to be refused.
+ */
+const MAX_FILE_SIZE = 500 * 1024 * 1024;
+
+/**
+ * Checks whether a selected file exceeds the maximum upload size.
+ *
+ * @param {File} file - the file selected by the user
+ *
+ * @return {Boolean} true when the file is larger than MAX_FILE_SIZE
+ */
+function isFileSizeExceeded(file) {
+  return !!file && typeof file.size === 'number' && file.size > MAX_FILE_SIZE;
+}
+
+/**
+ * Maximum size of a whole upload, in bytes.
+ *
+ * Deliberately STRICTER than the API's MAX_REQUEST_BODY_SIZE
+ * (routes/v1/data-sources.js), not equal to it. The API compares its limit
+ * against content-length, which carries multipart boundaries, per-part headers,
+ * every sibling text field, and 4/3 expansion for base64-submitted fields. This
+ * limit is compared against a raw sum of file bytes. Setting the two to the same
+ * number would make the client the LOOSER gate: a payload just under the client
+ * threshold arrives just over the server's, which is exactly the "find out after
+ * uploading" symptom PS-2112 exists to remove.
+ *
+ * Sitting at MAX_FILE_SIZE leaves the API's +10 MB headroom as the margin that
+ * absorbs the envelope overhead, so anything this check passes is guaranteed to
+ * fit. The per-file check alone is not enough — three 200 MB files are each
+ * valid and the submission is still refused.
+ */
+const MAX_TOTAL_SIZE = MAX_FILE_SIZE;
+
+/**
+ * Checks whether the combined size of the given files exceeds the maximum a
+ * single request can carry.
+ *
+ * Sizes each entry with payloadValueSize, the same function the submit-time
+ * check uses. The two counted base64 differently before — this check saw a data
+ * URI as 0 bytes and the submit check saw its full length — so a form with a
+ * signature plus large files passed here and was then refused at submit with a
+ * different message, which is exactly what a field-level check exists to avoid.
+ *
+ * @param {Array} files - files selected by the user
+ *
+ * @return {Boolean} true when the files together are larger than MAX_TOTAL_SIZE
+ */
+function isTotalSizeExceeded(files) {
+  if (!Array.isArray(files) || !files.length) {
+    return false;
+  }
+
+  const total = files.reduce(function(sum, file) {
+    return sum + payloadValueSize(file);
+  }, 0);
+
+  return total > MAX_TOTAL_SIZE;
+}
+
+/**
+ * Approximate the number of bytes a single form value contributes to the
+ * multipart request.
+ *
+ * Files and blobs report their size. Strings are counted as one byte per
+ * character, which is exact for the case that matters — base64 data URIs, what
+ * the signature field and the image field's legacy path submit — and an
+ * undercount for non-ASCII text, since `length` is UTF-16 code units rather
+ * than the UTF-8 bytes that go on the wire. Text fields round to nothing next
+ * to a 500 MB video, so the difference cannot move this check.
+ *
+ * Anything with a numeric `size` that is NOT a Blob is deliberately counted as
+ * zero. In edit mode js/libs/form.js assigns `formData[field.name] = field.value`
+ * verbatim, and for a file field that value is the array of already-uploaded
+ * media objects loadFileData() stamped with `size` from `metadata.size`. Those
+ * are re-sent as references, not bytes — counting them would refuse an entry
+ * whose request carries no file bytes at all.
+ *
+ * @param {*} value - a value from the assembled formData
+ *
+ * @return {Number} approximate size in bytes
+ */
+function payloadValueSize(value) {
+  if (!value) {
+    return 0;
+  }
+
+  if (Array.isArray(value)) {
+    return value.reduce(function(sum, item) {
+      return sum + payloadValueSize(item);
+    }, 0);
+  }
+
+  if (value instanceof Blob) {
+    return typeof value.size === 'number' ? value.size : 0;
+  }
+
+  if (typeof value === 'string') {
+    return value.length;
+  }
+
+  return 0;
+}
+
+/**
+ * Checks whether an assembled form payload is too large to send in one request.
+ *
+ * The per-field checks in the file and image components cannot catch this on
+ * their own: a form with a file field and an image field can put two separately
+ * valid selections into the same request, and the API's checkRequestBodySize
+ * measures the whole multipart envelope. This runs once over the final payload,
+ * after beforeFormSubmit, so signatures and every file field are included.
+ *
+ * @param {Object} formData - the payload about to be sent to the data source
+ *
+ * @return {Boolean} true when the payload exceeds MAX_TOTAL_SIZE
+ */
+function isPayloadSizeExceeded(formData) {
+  if (!formData || typeof formData !== 'object') {
+    return false;
+  }
+
+  const total = Object.keys(formData).reduce(function(sum, key) {
+    return sum + payloadValueSize(formData[key]);
+  }, 0);
+
+  return total > MAX_TOTAL_SIZE;
+}
+
+/**
+ * Human-readable form of MAX_FILE_SIZE, for use in error messages.
+ *
+ * @return {String} e.g. "500 MB"
+ */
+function maxFileSizeLabel() {
+  return Math.floor(MAX_FILE_SIZE / 1024 / 1024) + ' MB';
+}
+
+/**
+ * Human-readable form of MAX_TOTAL_SIZE, for use in error messages.
+ *
+ * @return {String} e.g. "510 MB"
+ */
+function maxTotalSizeLabel() {
+  return Math.floor(MAX_TOTAL_SIZE / 1024 / 1024) + ' MB';
+}
+
 Fliplet.FormBuilderUtils = {
+  MAX_FILE_SIZE,
+  MAX_TOTAL_SIZE,
+  isFileSizeExceeded,
+  isTotalSizeExceeded,
+  isPayloadSizeExceeded,
+  maxFileSizeLabel,
+  maxTotalSizeLabel,
   cloneDeep,
   debounce,
   kebabCase,
@@ -530,6 +690,13 @@ Fliplet.FormBuilderUtils = {
 // Make utilities available globally for browser usage
 if (typeof window !== 'undefined') {
   window.FlipletUtils = {
+    MAX_FILE_SIZE,
+    MAX_TOTAL_SIZE,
+    isFileSizeExceeded,
+    isTotalSizeExceeded,
+    isPayloadSizeExceeded,
+    maxFileSizeLabel,
+    maxTotalSizeLabel,
     cloneDeep,
     debounce,
     kebabCase,
