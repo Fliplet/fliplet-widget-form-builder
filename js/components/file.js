@@ -178,6 +178,13 @@ Fliplet.FormBuilder.field('file', {
       $vm.value = [];
       $vm.selectedFileName = '';
 
+      // Clearing the form clears the size error with it. Without this, Clear
+      // empties the file list but leaves "these files weren't attached" on
+      // screen, describing a selection that no longer exists.
+      $vm.isFileSizeExceeded = false;
+      $vm.isTotalSizeExceeded = false;
+      $vm.oversizedFileNames = [];
+
       $vm.$emit('_input', $vm.name, $vm.value);
     },
     validateValue: function() {

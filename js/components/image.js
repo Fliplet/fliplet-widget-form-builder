@@ -197,6 +197,12 @@ Fliplet.FormBuilder.field('image', {
     },
     onReset: function() {
       this.value = [];
+
+      // As in file.js: the size error must not outlive the value it describes.
+      this.isFileSizeExceeded = false;
+      this.isTotalSizeExceeded = false;
+      this.oversizedFileNames = [];
+
       this.$emit('_input', this.name, this.value);
     },
     onBeforeSubmit: function() {
