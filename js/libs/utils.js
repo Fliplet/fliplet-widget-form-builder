@@ -506,12 +506,25 @@ function extend(target, ...sources) {
 /**
  * Maximum size of a single file that can be attached to a form field, in bytes.
  *
- * MUST stay in sync with MAX_FILE_SIZE in fliplet-api routes/v1/data-sources.js
- * (itself sourced from V3's MAX_BINARY_FILE_SIZE). A client limit lower than the
- * server's rejects files the server would happily accept; a higher one puts the
- * user back where PS-2112 started — waiting out a long upload only to be refused.
+ * Deliberately BELOW the API's MAX_FILE_SIZE (routes/v1/data-sources.js, 500 *
+ * 1024 * 1024 = 524,288,000 B, sourced from V3's MAX_BINARY_FILE_SIZE). The two
+ * are not the same number and must not be "resynced" without reading this.
+ *
+ * The client counts megabytes the way humanFileSize() prints them and the way
+ * iOS and Finder report them — 1000-based. Enforcing the server's 1024-based
+ * figure while displaying 1000-based sizes is what PS-2112 round-3 was reported
+ * as an "off-by-one auto-trim": the limit was quoted as "500 MB" while 524.3 MB
+ * was actually allowed, so a batch the widget itself rendered as "514.2 MB" was
+ * accepted and looked like the check had failed to fire.
+ *
+ * Holding the client at a round 500,000,000 B closes that gap exactly: the
+ * number in the message, the number beside each file, and the number enforced
+ * are all the same. The cost is a 24.3 MB band (500.0-524.3 MB) the server
+ * would have accepted and the client now refuses. That is the safe direction —
+ * a client limit ABOVE the server's is what puts the user back where PS-2112
+ * started, waiting out a long upload only to be refused at the end.
  */
-const MAX_FILE_SIZE = 500 * 1024 * 1024;
+const MAX_FILE_SIZE = 500 * 1000 * 1000;
 
 /**
  * Checks whether a selected file exceeds the maximum upload size.
@@ -536,10 +549,12 @@ function isFileSizeExceeded(file) {
  * threshold arrives just over the server's, which is exactly the "find out after
  * uploading" symptom PS-2112 exists to remove.
  *
- * Sitting at MAX_FILE_SIZE leaves the API's +10 MB headroom as the margin that
- * absorbs the envelope overhead, so anything this check passes is guaranteed to
- * fit. The per-file check alone is not enough — three 200 MB files are each
- * valid and the submission is still refused.
+ * Sitting at MAX_FILE_SIZE keeps a wide margin under the API's envelope limit
+ * (MAX_REQUEST_BODY_SIZE = 534,773,760 B): 34.7 MB of headroom, which absorbs
+ * multipart boundaries, per-part headers and sibling text fields, so anything
+ * this check passes is guaranteed to fit. The per-file check alone is not
+ * enough — three 200 MB files are each valid and the submission is still
+ * refused.
  */
 const MAX_TOTAL_SIZE = MAX_FILE_SIZE;
 
@@ -639,21 +654,43 @@ function isPayloadSizeExceeded(formData) {
 }
 
 /**
+ * Divisor used to turn a byte count into the "MB" a message quotes at the user.
+ *
+ * 1000, not 1024, because these labels are read side by side with the per-file
+ * sizes humanFileSize() prints in the file field, and that function is
+ * 1000-based. Dividing the threshold by 1024 while displaying file sizes by 1000
+ * is what PS-2112 round-3 reported as an "off-by-one auto-trim": the limit was
+ * quoted as "500 MB" while 524,288,000 bytes were actually allowed, so a batch
+ * the widget itself rendered as "514.2 MB" was accepted and looked like the
+ * check had failed to fire. It had not — the two numbers were simply in
+ * different units. MAX_FILE_SIZE now uses the same base, so the quoted figure
+ * and the enforced figure are the same number rather than 24.3 MB apart.
+ *
+ * iOS and Finder also report file sizes this way, so the number a user reads in
+ * the message is the number their device shows them.
+ */
+const BYTES_PER_LABEL_MB = 1000 * 1000;
+
+/**
  * Human-readable form of MAX_FILE_SIZE, for use in error messages.
  *
- * @return {String} e.g. "500 MB"
+ * Floors, so the quoted figure is never larger than what is enforced: a file
+ * the message implies is acceptable always is. With MAX_FILE_SIZE a whole
+ * number of 1000-based MB there is currently no remainder to discard.
+ *
+ * @return {String} e.g. "524 MB"
  */
 function maxFileSizeLabel() {
-  return Math.floor(MAX_FILE_SIZE / 1024 / 1024) + ' MB';
+  return Math.floor(MAX_FILE_SIZE / BYTES_PER_LABEL_MB) + ' MB';
 }
 
 /**
  * Human-readable form of MAX_TOTAL_SIZE, for use in error messages.
  *
- * @return {String} e.g. "510 MB"
+ * @return {String} e.g. "524 MB"
  */
 function maxTotalSizeLabel() {
-  return Math.floor(MAX_TOTAL_SIZE / 1024 / 1024) + ' MB';
+  return Math.floor(MAX_TOTAL_SIZE / BYTES_PER_LABEL_MB) + ' MB';
 }
 
 Fliplet.FormBuilderUtils = {

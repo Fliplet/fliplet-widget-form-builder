@@ -197,6 +197,18 @@ Fliplet.FormBuilder.field('image', {
     },
     onReset: function() {
       this.value = [];
+
+      // As in file.js: the error must not outlive the value it describes.
+      // hasCorruptedImage belongs here too — it is only ever cleared by a
+      // later successful decode, and the mounted() breadcrumb can set it
+      // before the user has touched the field, so without this Clear leaves
+      // "This image is invalid" on an empty field. isImageSizeExceeded is a
+      // prop, owned by the saved field configuration, so it is not ours to reset.
+      this.isFileSizeExceeded = false;
+      this.isTotalSizeExceeded = false;
+      this.oversizedFileNames = [];
+      this.hasCorruptedImage = false;
+
       this.$emit('_input', this.name, this.value);
     },
     onBeforeSubmit: function() {
