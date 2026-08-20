@@ -155,7 +155,10 @@
         "unableToLoadEntry": "Unable to load entry",
         "offlineDataError": "The data can only be updated when connected to the internet.",
         "offlineFormError": "This form can only be submitted when connected to the internet.",
-        "locationError": "Address processing failed. Check your connection and try again."
+        "locationError": "Address processing failed. Check your connection and try again.",
+        "fileSizeExceeded": "These files are too large and were not attached: {{fileNames}}. Each file must be {{maxFileSize}} or smaller.",
+        "totalSizeExceeded": "Your files are too large to upload together. The total must be {{maxTotalSize}} or smaller — please remove some files or submit them separately.",
+        "totalSizeWouldExceed": "These files weren't attached — they would take the total over {{maxTotalSize}}. Attach fewer or smaller files, or submit them separately."
       }
     }
   }

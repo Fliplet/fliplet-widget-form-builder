@@ -49,7 +49,26 @@ Fliplet.FormBuilder.field('file', {
       type: String
     }
   },
+  // Transient UI state, deliberately NOT a prop: props are owned by the saved
+  // field configuration, so the parent re-render triggered by the `_input` emit
+  // in updateValue() would reset the flag before the message could render.
+  data: function() {
+    return {
+      isFileSizeExceeded: false,
+      isTotalSizeExceeded: false,
+      oversizedFileNames: []
+    };
+  },
   computed: {
+    maxFileSizeLabel: function() {
+      return Fliplet.FormBuilderUtils.maxFileSizeLabel();
+    },
+    maxTotalSizeLabel: function() {
+      return Fliplet.FormBuilderUtils.maxTotalSizeLabel();
+    },
+    oversizedFileList: function() {
+      return this.oversizedFileNames.join(', ');
+    },
     selectedFileName: function() {
       return this.value.map(function(file) { return file.name; }).join(', ');
     },
@@ -159,6 +178,13 @@ Fliplet.FormBuilder.field('file', {
       $vm.value = [];
       $vm.selectedFileName = '';
 
+      // Clearing the form clears the size error with it. Without this, Clear
+      // empties the file list but leaves "these files weren't attached" on
+      // screen, describing a selection that no longer exists.
+      $vm.isFileSizeExceeded = false;
+      $vm.isTotalSizeExceeded = false;
+      $vm.oversizedFileNames = [];
+
       $vm.$emit('_input', $vm.name, $vm.value);
     },
     validateValue: function() {
@@ -197,6 +223,12 @@ Fliplet.FormBuilder.field('file', {
       // this is used to trigger onChange event even if user deletes and than uploads same file
       this.$refs.fileInput.value = null;
 
+      // Clearing the field clears the size warnings with it — leaving them up
+      // after the offending file is gone is the same confusion PS-2112 is about
+      $vm.isFileSizeExceeded = false;
+      $vm.isTotalSizeExceeded = false;
+      $vm.oversizedFileNames = [];
+
       $vm.value.splice(index, 1);
 
       $vm.value.forEach(function(file) {
@@ -213,15 +245,52 @@ Fliplet.FormBuilder.field('file', {
 
       this.validateValue();
 
+      $vm.isFileSizeExceeded = false;
+      $vm.isTotalSizeExceeded = false;
+      $vm.oversizedFileNames = [];
+
+      const accepted = [];
+
       for (let i = 0; i < files.length; i++) {
         const file = files.item(i);
 
+        // Reject oversized files here rather than letting the upload run for
+        // minutes and fail server-side (PS-2112). The threshold mirrors the API's
+        // MAX_FILE_SIZE so nothing is refused locally that the server would accept.
+        //
+        // Checking the raw File is correct on this field, unlike the image field.
+        // This component's processImage() (line 192) runs loadImage purely for its
+        // orientation/canvas side effects and then pushes the ORIGINAL `file` — it
+        // does not compress or re-encode. image.js's same-named method does, which
+        // is why its gate had to move onto the resulting blob instead.
+        if (Fliplet.FormBuilderUtils.isFileSizeExceeded(file)) {
+          $vm.isFileSizeExceeded = true;
+          $vm.oversizedFileNames.push(file.name);
+
+          continue;
+        }
+
+        accepted.push(file);
+      }
+
+      // Each file can be under MAX_FILE_SIZE and the submission still be refused:
+      // the API's checkRequestBodySize measures the whole multipart envelope.
+      // Check the total against what is already attached plus what was just
+      // selected, so the user finds out now rather than after the upload.
+      if (Fliplet.FormBuilderUtils.isTotalSizeExceeded($vm.value.concat(accepted))) {
+        $vm.isTotalSizeExceeded = true;
+        e.target.value = '';
+
+        return;
+      }
+
+      accepted.forEach(function(file) {
         if ($vm.isFileImage(file)) {
-          this.processImage(file, true);
+          $vm.processImage(file, true);
         } else {
           $vm.value.push(file);
         }
-      }
+      });
 
       $vm.$emit('_input', $vm.name, $vm.value);
       e.target.value = '';

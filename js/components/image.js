@@ -3,6 +3,56 @@
 const MAX_IMAGE_WIDTH = 3000;
 const MAX_IMAGE_HEIGHT = 3000;
 
+// Marks that an image decode is in flight, so a decode that takes the renderer
+// down with it can be reported on the next load.
+//
+// A WebView OOM during canvas decode is not catchable: the process dies, so no
+// catch block, rejection handler or window.onerror runs. Nothing in-page can
+// observe it. What survives is storage — so the fact that a decode started is
+// written before the decode, and removed as soon as one finishes by any route,
+// success or failure. A flag still present at mount means the last one never
+// returned.
+//
+// sessionStorage rather than localStorage: this should not outlive the session
+// and report a crash from days ago. Wrapped because storage can throw (private
+// mode, quota), and a failure here must never break image upload — the
+// breadcrumb is diagnostic, not load-bearing.
+const DECODE_BREADCRUMB_KEY = 'flFormBuilderImageDecodeInFlight';
+
+function markDecodeStarted(file) {
+  try {
+    window.sessionStorage.setItem(DECODE_BREADCRUMB_KEY, (file && file.name) || 'image');
+  } catch (err) {
+    // Storage unavailable — proceed without the breadcrumb.
+  }
+}
+
+function markDecodeFinished() {
+  try {
+    window.sessionStorage.removeItem(DECODE_BREADCRUMB_KEY);
+  } catch (err) {
+    // As above.
+  }
+}
+
+/**
+ * Reads and clears the breadcrumb.
+ * @returns {String|null} the file name a previous decode died on, if any
+ */
+function takeUnfinishedDecode() {
+  try {
+    const name = window.sessionStorage.getItem(DECODE_BREADCRUMB_KEY);
+
+    if (name) {
+      window.sessionStorage.removeItem(DECODE_BREADCRUMB_KEY);
+    }
+
+    return name;
+  } catch (err) {
+    return null;
+  }
+}
+
 /**
  * Image field component – renders an image capture and upload input in forms.
  * Supports camera capture, file upload.
@@ -48,10 +98,6 @@ Fliplet.FormBuilder.field('image', {
       type: Array,
       default: []
     },
-    hasCorruptedImage: {
-      type: Boolean,
-      default: false
-    },
     canHide: {
       type: Boolean,
       default: false
@@ -64,10 +110,36 @@ Fliplet.FormBuilder.field('image', {
       default: false
     }
   },
-  data: {
-    boundingRect: undefined,
-    cameraSource: undefined,
-    forcedClick: false
+  // `data` must be a function: Vue.component() shares a plain object across every
+  // instance of the field, so two image fields on one form would overwrite each
+  // other's state. isFileSizeExceeded is transient UI state and deliberately not a
+  // prop - props are owned by the saved field configuration, so the parent
+  // re-render triggered by onFileChange() would reset it before it could render.
+  data: function() {
+    return {
+      boundingRect: undefined,
+      cameraSource: undefined,
+      forcedClick: false,
+      isFileSizeExceeded: false,
+      isTotalSizeExceeded: false,
+      oversizedFileNames: [],
+      // Was a prop, which made it inert: the component set it, emitted _input,
+      // and the parent re-render reset it from saved config before Vue could
+      // paint — the same defect a0c6c65 fixed for isFileSizeExceeded. Nothing
+      // outside this component binds it, so the template is unchanged.
+      hasCorruptedImage: false
+    };
+  },
+  computed: {
+    maxFileSizeLabel: function() {
+      return Fliplet.FormBuilderUtils.maxFileSizeLabel();
+    },
+    maxTotalSizeLabel: function() {
+      return Fliplet.FormBuilderUtils.maxTotalSizeLabel();
+    },
+    oversizedFileList: function() {
+      return this.oversizedFileNames.join(', ');
+    }
   },
   validations: function() {
     const rules = {
@@ -85,6 +157,19 @@ Fliplet.FormBuilder.field('image', {
     Fliplet.Hooks.on('beforeFormSubmit', this.onBeforeSubmit);
   },
   mounted: function() {
+    // A decode was in flight when the page last stopped running, so it never
+    // returned — almost certainly the renderer being killed part-way through
+    // one. The user's photo is not attached and, without this, nothing would
+    // ever say so: they would come back to a form that had simply forgotten
+    // their selection.
+    const unfinished = takeUnfinishedDecode();
+
+    if (unfinished) {
+      this.hasCorruptedImage = true;
+      /* eslint-disable-next-line no-console */
+      console.warn('Image decode did not complete for "' + unfinished + '" — the renderer likely ran out of memory');
+    }
+
     // Normalize the value to ensure it's always an array
     this.validateValue();
     this.drawImagesAfterInit();
@@ -112,6 +197,18 @@ Fliplet.FormBuilder.field('image', {
     },
     onReset: function() {
       this.value = [];
+
+      // As in file.js: the error must not outlive the value it describes.
+      // hasCorruptedImage belongs here too — it is only ever cleared by a
+      // later successful decode, and the mounted() breadcrumb can set it
+      // before the user has touched the field, so without this Clear leaves
+      // "This image is invalid" on an empty field. isImageSizeExceeded is a
+      // prop, owned by the saved field configuration, so it is not ours to reset.
+      this.isFileSizeExceeded = false;
+      this.isTotalSizeExceeded = false;
+      this.oversizedFileNames = [];
+      this.hasCorruptedImage = false;
+
       this.$emit('_input', this.name, this.value);
     },
     onBeforeSubmit: function() {
@@ -239,6 +336,22 @@ Fliplet.FormBuilder.field('image', {
         // Validate current value before adding new images
         this.validateValue();
 
+        // Breadcrumb for a decode that kills the renderer.
+        //
+        // The size gate runs on the compressed blob (that is what gets
+        // uploaded), so the raw source is decoded to canvas before anything
+        // checks it. Canvas backing store is width x height x 4, so a modest
+        // file with huge dimensions can exhaust the WebView — and no size check
+        // on the file would predict it. That failure is not catchable in
+        // process: the renderer dies, so no catch block, promise rejection or
+        // error handler runs.
+        //
+        // What is possible is noticing afterwards. This records that a decode
+        // was in flight; it is cleared the moment one finishes, by any route.
+        // If the flag is still set at mount, the previous decode never returned
+        // and the user is told, instead of silently getting their photo back.
+        markDecodeStarted(file);
+
         // Parse EXIF metadata (orientation, etc.)
         await new Promise((resolve) => loadImage.parseMetaData(file, resolve));
 
@@ -282,6 +395,30 @@ Fliplet.FormBuilder.field('image', {
           ? file.name.replace(/\.[^/.]+$/, '') + '.' + blobExtension
           : 'image-' + Date.now() + '.' + blobExtension;
 
+        // Size gate lives here, not at the call sites, because this blob is what
+        // actually goes on the wire (PS-2112). The selected file is resized to
+        // maxWidth/maxHeight and re-encoded to WebP above, so gating on the raw
+        // File refused a 600 MB photo that uploads as a ~1 MB WebP the server
+        // accepts without complaint — while the size that IS uploaded went
+        // unchecked. Every entry point (onFileChange, the Cordova URI path,
+        // onSelectedPicture) funnels through here, so one check covers them all.
+        if (Fliplet.FormBuilderUtils.isFileSizeExceeded(blob)) {
+          $vm.isFileSizeExceeded = true;
+          $vm.oversizedFileNames.push(blob.name);
+
+          return;
+        }
+
+        // Individually-valid images can still overflow the request: the API's
+        // checkRequestBodySize measures the whole multipart envelope. $vm.value
+        // holds previously-processed blobs plus already-uploaded URLs, and only
+        // the blobs are counted (see fileByteSize in js/libs/utils.js).
+        if (Fliplet.FormBuilderUtils.isTotalSizeExceeded($vm.value.concat([blob]))) {
+          $vm.isTotalSizeExceeded = true;
+
+          return;
+        }
+
         // Add the blob to the component's value
         $vm.value.push(blob);
 
@@ -299,7 +436,16 @@ Fliplet.FormBuilder.field('image', {
         // Emit the updated value for parent component
         $vm.$emit('_input', $vm.name, $vm.value);
       } catch (err) {
+        // Catchable decode failures land here: a corrupt file, a canvas the
+        // browser refused to allocate, a toBlob that threw. An OOM that kills
+        // the renderer does not — that is what the breadcrumb is for.
         $vm.hasCorruptedImage = true;
+      } finally {
+        // Every exit above happens after the decode returned, so the decode did
+        // not kill us. Clearing here rather than at each return keeps the
+        // breadcrumb honest: it is removed on success, on early return and on
+        // throw, and survives only when this code never ran at all.
+        markDecodeFinished();
       }
     },
     onFileClick: function(event) {
@@ -383,6 +529,14 @@ Fliplet.FormBuilder.field('image', {
 
               blob.name = name || 'image-' + Date.now() + '.jpg';
 
+              // Clear any previous warning, then let processImage gate this on the
+              // compressed blob (PS-2112) — a gallery pick can be far larger than
+              // what it uploads as, so checking the raw capture here would refuse
+              // images the server would accept.
+              $vm.isFileSizeExceeded = false;
+              $vm.isTotalSizeExceeded = false;
+              $vm.oversizedFileNames = [];
+
               // Use existing pipeline
               $vm.processImage(blob, true);
             })
@@ -419,8 +573,20 @@ Fliplet.FormBuilder.field('image', {
     onFileChange: function(e) {
       const files = this.$refs.imageInput.files;
 
+      const $vm = this;
+
+      this.isFileSizeExceeded = false;
+      this.isTotalSizeExceeded = false;
+      this.oversizedFileNames = [];
+
+      // No size check here: both gates live in processImage, which every entry
+      // point funnels through. It checks the raw file before decoding it (so a
+      // huge source cannot OOM the WebView) and the compressed blob afterwards
+      // (because that is what is actually uploaded — a 600 MB photo can land as
+      // a ~1 MB WebP, and gating only the selection refused images the server
+      // would have accepted).
       for (let i = 0; i < files.length; i++) {
-        this.processImage(files.item(i), true);
+        $vm.processImage(files.item(i), true);
       }
 
       e.target.value = '';
