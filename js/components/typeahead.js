@@ -229,6 +229,43 @@ Fliplet.FormBuilder.field('typeahead', {
       }
     },
     /**
+     * Removes duplicated entries from a value array, keeping the first occurrence
+     * Entries are compared the way Selectize keys its items (hash_key), so the
+     * result holds exactly what the typeahead can hold: 1 and '1' are one item
+     * The array is returned untouched when it holds no duplicates, so an
+     * already-clean value keeps its identity and does not re-trigger watchers
+     * @param {Array} val - The value array to normalize
+     * @returns {Array} The value array without duplicates, original order kept
+     */
+    dedupeValue: function(val) {
+      if (!Array.isArray(val)) {
+        return val;
+      }
+
+      const keys = [];
+      const deduped = val.filter(function(item) {
+        // Same keying as Selectize's hash_key(): null and undefined share a
+        // key, booleans become '1' / '0', anything else its string form
+        let key = null;
+
+        if (typeof item === 'boolean') {
+          key = item ? '1' : '0';
+        } else if (item !== null && typeof item !== 'undefined') {
+          key = String(item);
+        }
+
+        if (keys.indexOf(key) !== -1) {
+          return false;
+        }
+
+        keys.push(key);
+
+        return true;
+      });
+
+      return deduped.length === val.length ? val : deduped;
+    },
+    /**
      * Hook called before form submission
      * Ensures the current typeahead value is captured for submission
      * @returns {void}
@@ -240,17 +277,26 @@ Fliplet.FormBuilder.field('typeahead', {
   watch: {
     /**
      * Watches for changes in the value prop
-     * Updates the typeahead component and handles max items locking
+     * Removes duplicated entries so the typeahead and the emitted value hold
+     * the same array, updates the typeahead and handles max items locking
      * @param {Array} val - The new value array
      * @returns {void}
      */
     value: function(val) {
+      // PS-1759: Selectize only ever holds one item per value (addItem drops a
+      // repeat), so a duplicated value never matches its items and every set()
+      // fires another change event. De-duplicate here, before the value is used,
+      // so the emit below publishes what the typeahead can actually hold —
+      // emitting the raw array instead makes the form write the duplicate back
+      // and the two writers never agree, which hangs edit mode.
+      const value = this.dedupeValue(val);
+
       if (this.typeahead) {
-        this.typeahead.set(val);
+        this.typeahead.set(value);
       }
 
       this.handleMaxItemsLock();
-      this.$emit('_input', this.name, val);
+      this.$emit('_input', this.name, value);
     },
     /**
      * Watches for changes in the options prop
