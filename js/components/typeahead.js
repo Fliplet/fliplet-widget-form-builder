@@ -229,6 +229,54 @@ Fliplet.FormBuilder.field('typeahead', {
       }
     },
     /**
+     * PS-1759: Removes duplicated entries from a value array, keeping the first
+     * occurrence. Entries are compared the way Selectize keys its items
+     * (hash_key), so the result holds exactly what the typeahead can hold:
+     * 1 and '1' are one item.
+     * Returns the SAME array reference when there is nothing to drop. That is
+     * not an optimisation — it is what stops the value watcher re-triggering
+     * itself forever. See the return statement below before changing this.
+     * Order is preserved because the user's saved order must survive a save,
+     * not because the loop depends on it.
+     * @param {Array} val - The value array to normalize
+     * @returns {Array} The value array without duplicates, original order kept
+     */
+    dedupeValue: function(val) {
+      if (!Array.isArray(val)) {
+        return val;
+      }
+
+      const keys = [];
+      const deduped = val.filter(function(item) {
+        // Same keying as Selectize's hash_key(): null and undefined share a
+        // key, booleans become '1' / '0', anything else its string form.
+        // Source: selectize 0.15.2, served by fliplet-api from
+        // public/assets/selectize/0.15.2/selectize.js:613-618. Nothing pins
+        // that version here, so re-check this mirror if the asset is upgraded.
+        let key = null;
+
+        if (typeof item === 'boolean') {
+          key = item ? '1' : '0';
+        } else if (item !== null && typeof item !== 'undefined') {
+          key = item + '';
+        }
+
+        if (keys.indexOf(key) !== -1) {
+          return false;
+        }
+
+        keys.push(key);
+
+        return true;
+      });
+
+      // PS-1759: returning a NEW array when nothing was dropped re-triggers
+      // this component's value watcher forever and freezes every typeahead
+      // field on its first selection — do not replace this with
+      // Fliplet.FormBuilderUtils.uniq() or any always-copying de-dupe.
+      return deduped.length === val.length ? val : deduped;
+    },
+    /**
      * Hook called before form submission
      * Ensures the current typeahead value is captured for submission
      * @returns {void}
@@ -240,17 +288,26 @@ Fliplet.FormBuilder.field('typeahead', {
   watch: {
     /**
      * Watches for changes in the value prop
-     * Updates the typeahead component and handles max items locking
+     * Removes duplicated entries so the typeahead and the emitted value hold
+     * the same array, updates the typeahead and handles max items locking
      * @param {Array} val - The new value array
      * @returns {void}
      */
     value: function(val) {
+      // PS-1759: Selectize only ever holds one item per value (addItem drops a
+      // repeat), so a duplicated value never matches its items and every set()
+      // fires another change event. De-duplicate here, before the value is used,
+      // so the emit below publishes what the typeahead can actually hold —
+      // emitting the raw array instead makes the form write the duplicate back
+      // and the two writers never agree, which hangs edit mode.
+      const dedupedValue = this.dedupeValue(val);
+
       if (this.typeahead) {
-        this.typeahead.set(val);
+        this.typeahead.set(dedupedValue);
       }
 
       this.handleMaxItemsLock();
-      this.$emit('_input', this.name, val);
+      this.$emit('_input', this.name, dedupedValue);
     },
     /**
      * Watches for changes in the options prop
@@ -259,11 +316,17 @@ Fliplet.FormBuilder.field('typeahead', {
      * @returns {void}
      */
     options: function(val) {
+      // PS-1759: normalize here too — during edit-mode prefill both watchers
+      // run in the same flush while the prop still holds the duplicate, and
+      // handing the raw value to Selectize makes it clear and re-add the items,
+      // firing a spurious change event and flickering the chips.
+      const dedupedValue = this.dedupeValue(this.value);
+
       if (this.typeahead) {
-        this.typeahead.options(val, this.value);
+        this.typeahead.options(val, dedupedValue);
       }
 
-      this.typeahead.set(this.value);
+      this.typeahead.set(dedupedValue);
     },
     /**
      * Watches for changes in the readonly prop
