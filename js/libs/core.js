@@ -1120,7 +1120,7 @@ Fliplet.FormBuilder = (function() {
 
             widget.isFormInSlider = !!(formSliderParent && formSliderParent.slideId);
 
-            widget.sliderContainerId = formSliderParent.length && formSliderParent.sliderId;
+            widget.sliderContainerId = formSliderParent ? formSliderParent.sliderId : undefined;
             widget.slideId = widget.sldieId;
 
             return widget;
