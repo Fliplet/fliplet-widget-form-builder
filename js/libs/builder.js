@@ -37,8 +37,8 @@ Fliplet.Widget.findParents({ instanceId: widgetId }).then(function(parents) {
     parent.package === 'com.fliplet.slider-container' || parent.name === 'Slider container'
   );
 
-  data.slideId = formSlideParent.length && formSlideParent.slideId;
-  data.sliderContainerId = formSliderParent.length && formSliderParent.sliderId;
+  data.slideId = formSlideParent ? formSlideParent.slideId : undefined;
+  data.sliderContainerId = formSliderParent ? formSliderParent.sliderId : undefined;
   isFormInSlider = !!(formSlideParent && formSlideParent.slideId);
 });
 
@@ -1074,7 +1074,7 @@ Fliplet().then(function() {
             );
 
             widget.isFormInSlider = !!(formSliderParent && formSliderParent.slideId);
-            widget.sliderContainerId = formSliderParent.length && formSliderParent.sliderId;
+            widget.sliderContainerId = formSliderParent ? formSliderParent.sliderId : undefined;
 
             return widget;
           } catch (error) {
