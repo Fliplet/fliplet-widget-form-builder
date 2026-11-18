@@ -1475,8 +1475,9 @@ Fliplet().then(async function() {
           async function onFormSubmission() {
             if (data.isFormInSlide && $vm.isFormValid) {
               const multiStepForm = await getCurrentMultiStepForm(allFormsInSlide, data);
+              const lastForm = multiStepForm[multiStepForm.length - 1];
 
-              if (data.id !== multiStepForm[multiStepForm.length - 1].$instance.id) return;
+              if (lastForm && data.id !== lastForm.$instance.id) return;
 
               for (const form of multiStepForm) {
                 if (form.$instance && form.$instance._data.id === data.id) {
