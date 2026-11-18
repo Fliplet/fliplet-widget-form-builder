@@ -239,11 +239,11 @@ Fliplet().then(async function() {
     };
 
     // Copied apps keep the widget uuid, so the app ID keeps saved progress separate per app
+    // Progress under the old uuid-only key is not carried over, as it cannot be matched to one app copy
     const appId = Fliplet.Env.get('appId');
-    const legacyProgressKey = 'form-builder-progress-' + (data.uuid || data.id);
     const progressKey = appId
       ? 'form-builder-progress-' + appId + '-' + (data.uuid || data.id)
-      : legacyProgressKey;
+      : 'form-builder-progress-' + (data.uuid || data.id);
 
     let entryId = !Fliplet.Env.get('interact') && data.dataSourceId && (data.entryId || Fliplet.Navigate.query.dataSourceEntryId);
     const formMode = Fliplet.Navigate.query.mode;
@@ -261,17 +261,7 @@ Fliplet().then(async function() {
 
     function getProgress(progressKey) {
       const storage = isFormInSlide ? sessionStorage : localStorage;
-      let progress = storage.getItem(progressKey);
-
-      // Move progress saved before the key included the app ID, then remove the old key
-      if (!progress && progressKey !== legacyProgressKey) {
-        progress = storage.getItem(legacyProgressKey);
-
-        if (progress) {
-          storage.setItem(progressKey, progress);
-          storage.removeItem(legacyProgressKey);
-        }
-      }
+      const progress = storage.getItem(progressKey);
 
       if (!progress) {
         return;
