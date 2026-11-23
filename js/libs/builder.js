@@ -373,6 +373,11 @@ Fliplet().then(function() {
             Object.assign(data, { 'selectedFieldOptions': component.props.selectedFieldOptions.default() });
           }
 
+          if (componentName === 'flWysiwyg') {
+            // New rich text fields don't allow embedded content unless enabled in the field settings
+            Object.assign(data, { 'allowEmbeds': false });
+          }
+
           return this.fields.splice(event.newIndex, 0, data);
         }
       },

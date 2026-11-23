@@ -20,6 +20,10 @@ Fliplet.FormBuilder.field('wysiwyg', {
     },
     tinymceId: {
       type: Number
+    },
+    allowEmbeds: {
+      type: Boolean,
+      default: true
     }
   },
   validations: function() {
@@ -44,7 +48,7 @@ Fliplet.FormBuilder.field('wysiwyg', {
       const formattedVal = Fliplet.FormBuilderUtils.isNumber(val) ? val.toString() : val;
 
       if (this.editor && formattedVal !== this.editor.getContent()) {
-        return this.editor.setContent(formattedVal || '', { format: 'raw' });
+        return this.setEditorContent(formattedVal || '');
       }
 
       if (formattedVal !== this.value) {
@@ -53,6 +57,21 @@ Fliplet.FormBuilder.field('wysiwyg', {
     }
   },
   methods: {
+    hasEmbeds: function(val) {
+      return typeof val === 'string' && /<\s*(iframe|object|embed|frame)/i.test(val);
+    },
+    setEditorContent: function(val) {
+      // Raw content skips TinyMCE's schema, so embeds are loaded as HTML to have them removed
+      if (this.allowEmbeds === false && this.hasEmbeds(val)) {
+        this.editor.setContent(val);
+        this.value = this.editor.getContent();
+        this.updateValue();
+
+        return;
+      }
+
+      this.editor.setContent(val, { format: 'raw' });
+    },
     onReset: function() {
       if (this.editor) {
         try {
@@ -83,28 +102,31 @@ Fliplet.FormBuilder.field('wysiwyg', {
 
     this.tinymceId = Fliplet.FormBuilderUtils.kebabCase(this.name) + '-' + $(this.$refs.textarea).parents('[data-form-builder-id]').data('formBuilderId');
 
+    const allowEmbeds = this.allowEmbeds !== false;
+    // The source code editor lets users add any HTML, so it's only available when embeds are allowed
+    const plugins = [
+      'advlist', 'autolink', 'lists', 'link', 'directionality',
+      'autoresize', 'fullscreen', 'code', 'wordcount', 'table'
+    ].filter(function(plugin) {
+      return allowEmbeds || plugin !== 'code';
+    });
+
     const config = {
       target: this.$refs.textarea,
       mobile: {
         toolbar_mode: 'floating',
-        plugins: [
-          'advlist', 'autolink', 'lists', 'link', 'directionality',
-          'autoresize', 'fullscreen', 'code', 'wordcount', 'table'
-        ]
+        plugins: plugins.slice()
       },
       readonly: this.readonly,
       placeholder: this.placeholder,
-      plugins: [
-        'advlist', 'autolink', 'lists', 'link', 'directionality',
-        'autoresize', 'fullscreen', 'code', 'wordcount', 'table'
-      ],
+      plugins: plugins.slice(),
       toolbar: this.readonly
         ? false
         : [
           'undo redo',
           'bold italic underline',
           'alignleft aligncenter alignright alignjustify | bullist numlist | outdent indent',
-          'ltr rtl | link | removeformat code fullscreen',
+          'ltr rtl | link | removeformat ' + (allowEmbeds ? 'code ' : '') + 'fullscreen',
           'table tabledelete | tableprops tablerowprops tablecellprops',
           'tableinsertrowbefore tableinsertrowafter tabledeleterow | tableinsertcolbefore tableinsertcolafter tabledeletecol'
         ].join(' | '),
@@ -148,7 +170,7 @@ Fliplet.FormBuilder.field('wysiwyg', {
 
           // initialise value if it was set prior to initialisation
           if ($vm.value) {
-            editor.setContent($vm.value, { format: 'raw' });
+            $vm.setEditorContent($vm.value);
           }
 
           // Ensure elements receive classes so Field border settings apply
@@ -244,6 +266,11 @@ Fliplet.FormBuilder.field('wysiwyg', {
         });
       }
     };
+
+    if (!allowEmbeds) {
+      // Remove embedded content from pasted, inserted and serialized HTML
+      config.invalid_elements = 'iframe,object,embed,frame,frameset';
+    }
 
     // Allow custom code to register hooks before this runs
     Fliplet().then(function() {
