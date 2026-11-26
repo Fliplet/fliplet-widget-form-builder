@@ -238,7 +238,12 @@ Fliplet().then(async function() {
       return document.querySelector(selector);
     };
 
-    const progressKey = 'form-builder-progress-' + (data.uuid || data.id);
+    // Copied apps keep the widget uuid, so the app ID keeps saved progress separate per app
+    // Progress under the old uuid-only key is not carried over, as it cannot be matched to one app copy
+    const appId = Fliplet.Env.get('appId');
+    const progressKey = appId
+      ? 'form-builder-progress-' + appId + '-' + (data.uuid || data.id)
+      : 'form-builder-progress-' + (data.uuid || data.id);
 
     let entryId = !Fliplet.Env.get('interact') && data.dataSourceId && (data.entryId || Fliplet.Navigate.query.dataSourceEntryId);
     const formMode = Fliplet.Navigate.query.mode;
